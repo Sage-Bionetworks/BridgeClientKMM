@@ -3,8 +3,8 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 val sqlDelightVersion: String by project
 val kotlinVersion: String by project
 val coroutinesVersion = "1.3.9-native-mt-2"
-val serializationVersion = "1.0.0-RC2"
-val ktorVersion = "1.4.1"
+val serializationVersion = "1.0.1"
+val ktorVersion = "1.4.2"
 
 plugins {
     kotlin("multiplatform")
@@ -55,7 +55,7 @@ kotlin {
                 }
                 implementation("com.squareup.sqldelight:runtime:$sqlDelightVersion")
                 //Comment out sqldelight coroutines extensions and uncomment dependency in Android sourceset to get code completion in Android Studio to work -nathaniel 11/9/20
-                implementation("com.squareup.sqldelight:coroutines-extensions:$sqlDelightVersion")
+                //implementation("com.squareup.sqldelight:coroutines-extensions:$sqlDelightVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
                 implementation("io.ktor:ktor-client-core:$ktorVersion")
                 implementation("io.ktor:ktor-client-serialization:$ktorVersion")
@@ -78,7 +78,7 @@ kotlin {
                 implementation("com.squareup.sqldelight:android-driver:$sqlDelightVersion")
                 implementation("io.ktor:ktor-client-android:$ktorVersion")
                 //Uncomment here and comment out sqldelight coroutines extensions in commen sourceset to get code completion in Android Studio to work -nathaniel 11/9/20
-                //implementation("com.squareup.sqldelight:coroutines-extensions:$sqlDelightVersion")
+                implementation("com.squareup.sqldelight:coroutines-extensions:$sqlDelightVersion")
             }
         }
         val androidTest by getting {

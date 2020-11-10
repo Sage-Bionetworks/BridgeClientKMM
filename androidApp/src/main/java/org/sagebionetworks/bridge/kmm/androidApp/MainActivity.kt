@@ -7,14 +7,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.asLiveData
 import org.sagebionetworks.bridge.kmm.androidApp.ui.login.LoginActivity
-import org.sagebionetworks.bridge.kmm.shared.Greeting
 import org.sagebionetworks.bridge.kmm.shared.cache.AccountDAO
 import org.sagebionetworks.bridge.kmm.shared.cache.DatabaseDriverFactory
 import org.sagebionetworks.bridge.kmm.shared.repo.AssessmentConfigRepo
-
-fun greet(): String {
-    return Greeting().greeting()
-}
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,7 +29,6 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         val tv: TextView = findViewById(R.id.text_view)
-        tv.text = greet()
 
         if (AccountDAO().hasSignedIn) {
             val repo = AssessmentConfigRepo(DatabaseDriverFactory(this))

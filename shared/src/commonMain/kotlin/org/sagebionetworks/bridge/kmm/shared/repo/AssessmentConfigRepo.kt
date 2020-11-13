@@ -10,7 +10,6 @@ import kotlinx.datetime.Clock
 import org.sagebionetworks.bridge.kmm.shared.apis.AssessmentsApi
 import org.sagebionetworks.bridge.kmm.shared.apis.DefaultHttpClient
 import org.sagebionetworks.bridge.kmm.shared.cache.*
-import kotlin.reflect.KClass
 
 class AssessmentConfigRepo(databaseDriverFactory: DatabaseDriverFactory) {
 
@@ -18,7 +17,7 @@ class AssessmentConfigRepo(databaseDriverFactory: DatabaseDriverFactory) {
         const val defaultUpdateFrequency = 10000// 60000 * 60
     }
 
-    private val database = Database(databaseDriverFactory)
+    private val database = ResourceDatabaseHelper(databaseDriverFactory)
 
     init {
         ensureNeverFrozen()

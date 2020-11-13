@@ -5,8 +5,8 @@ import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToOneOrNull
 import kotlinx.coroutines.flow.Flow
 
-internal class Database(databaseDriverFactory: DatabaseDriverFactory) {
-    private val database = BridgeResourceDatabase(
+internal class ResourceDatabaseHelper(databaseDriverFactory: DbDriverFactory) {
+    internal val database = BridgeResourceDatabase(
         databaseDriverFactory.createDriver(),
         Resource.Adapter(EnumColumnAdapter())
     )

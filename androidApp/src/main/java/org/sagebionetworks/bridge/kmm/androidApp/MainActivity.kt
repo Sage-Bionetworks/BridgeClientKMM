@@ -6,6 +6,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.asLiveData
+import kotlinx.coroutines.MainScope
 import org.sagebionetworks.bridge.kmm.androidApp.ui.login.LoginActivity
 import org.sagebionetworks.bridge.kmm.shared.cache.AccountDAO
 import org.sagebionetworks.bridge.kmm.shared.cache.DatabaseDriverFactory
@@ -31,7 +32,7 @@ class MainActivity : AppCompatActivity() {
         val tv: TextView = findViewById(R.id.text_view)
 
         if (AccountDAO().hasSignedIn) {
-            val repo = AssessmentConfigRepo(DatabaseDriverFactory(this))
+            val repo = AssessmentConfigRepo(DatabaseDriverFactory(this), MainScope())
             repo.getAssessmentById("eGhiQTT2a6SCCmjTod6CDb0t").asLiveData()
                 .observe(this, Observer { t ->
                     tv.text = t

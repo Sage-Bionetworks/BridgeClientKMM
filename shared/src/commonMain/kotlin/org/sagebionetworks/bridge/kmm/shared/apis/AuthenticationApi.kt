@@ -27,6 +27,7 @@ internal class AuthenticationApi(basePath: kotlin.String = "https://webservices.
             level = LogLevel.ALL
             logger = object : Logger {
                 override fun log(message: String) {
+                    // TODO: syoung 11/25/2020 Given that this is an authentication service, is there a risk that the message will include PII?
                     println(message)
                 }
             }

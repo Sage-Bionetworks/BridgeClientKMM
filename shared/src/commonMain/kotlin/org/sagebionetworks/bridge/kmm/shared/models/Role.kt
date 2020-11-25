@@ -15,6 +15,9 @@ import kotlinx.serialization.Serializable
 
 import kotlinx.serialization.SerialName
 
+// TODO: syoung 11/25/2020 I thought that the all caps with underscores was frowned upon? Shouldn't this be `Developer`, etc.?
+
+
 /**
 * The roles assigned to this user. Normal users do not have any roles assigned, but for developers,  researchers, etc. their roles will appear hear (see main API documentation about the roles  assigned by the Bridge server).  |Role|Description| |---|---| |developer|A user with the rights to use the app configuration APIs (all admin APIs except for those APIs which expose information about study participants).| |researcher|The research role is assigned to users who have permission to see the users in a study and the activity of participants. We will assign this role to developers during the initial development of the application so they can view the uploads of test accounts, etc.| |admin|A Sage Bionetworks Bridge administrator (internal to Bridge).| |worker|A Sage Bionetworks worker process (internal to Bridge).| 
 * Values: "developer","researcher","admin","worker"

@@ -16,7 +16,7 @@ internal class ConsentApi(basePath: kotlin.String = "https://webservices.sagebri
      * @param consentSignature A consent signature
      * @return UserSessionInfo
      */
-    suspend fun createConsentSignature(subpopulationGuid: kotlin.String,consentSignature: ConsentSignature) : UserSessionInfo {
+    suspend fun createConsentSignature(subpopulationGuid: kotlin.String, consentSignature: ConsentSignature) : UserSessionInfo {
         val path = "v3/subpopulations/$subpopulationGuid/consents/signature"
         return postData(consentSignature, path)
     }

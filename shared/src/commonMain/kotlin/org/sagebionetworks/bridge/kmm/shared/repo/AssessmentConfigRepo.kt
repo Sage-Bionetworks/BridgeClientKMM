@@ -39,6 +39,7 @@ class AssessmentConfigRepo(databaseDriverFactory: DatabaseDriverFactory) {
                 MainScope().launch {
 
                     val assessApi = assessmentsApi//loadAssessmentsApi(userSession.sessionToken)
+                    // TODO: syoung 11/25/2020 Is this method intentionally commented out rather than old code?
                     val assessment = assessApi.getAssessmentConfig(identifier)
                     val resource = Resource(
                         identifier,
@@ -51,6 +52,7 @@ class AssessmentConfigRepo(databaseDriverFactory: DatabaseDriverFactory) {
                 }
 
                 //Need to make sure webcall is not already in flight
+                // TODO: syoung 11/25/2020 Is this comment a TODO?
             }
         }.map { it?.json }
 

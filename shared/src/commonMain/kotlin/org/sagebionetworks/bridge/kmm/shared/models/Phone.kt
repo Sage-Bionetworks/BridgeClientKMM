@@ -36,7 +36,5 @@ data class Phone (
     /* Phone */
     @SerialName("type")
     val type: kotlin.String? = null
-) {
-
-}
+)
 

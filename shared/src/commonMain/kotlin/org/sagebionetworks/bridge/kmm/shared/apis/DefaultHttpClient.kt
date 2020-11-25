@@ -27,6 +27,7 @@ object DefaultHttpClient {
             }
         }
         install(SessionTokenFeature) {
+            // TODO: syoung 11/25/2020 Should this be a global key? I notice that it is also used below.
             sessionTokenHeaderName = "Bridge-Session"
             sessionTokenProvider = object: SessionTokenFeature.SessionTokenProvider {
 

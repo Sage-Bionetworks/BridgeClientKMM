@@ -47,7 +47,5 @@ internal data class SignIn (
     /* SignIn */
     @SerialName("type")
     val type: kotlin.String? = null
-) {
-
-}
+)
 

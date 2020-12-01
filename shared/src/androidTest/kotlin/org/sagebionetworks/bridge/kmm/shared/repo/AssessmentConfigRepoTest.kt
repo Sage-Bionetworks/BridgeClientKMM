@@ -32,7 +32,7 @@ class AssessmentConfigRepoTest {
             val r1 = db.getResource(assessmentConfigId).first()
             assertNotNull(r1)
             assertEquals(ResourceType.ASSESSMENT_CONFIG, r1.type)
-            assertTrue(r1.json.contains("identifier"))
+            assertTrue(r1.json?.contains("identifier")?: false)
             db.clearDatabase()
         }
     }

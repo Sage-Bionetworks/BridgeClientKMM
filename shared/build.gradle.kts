@@ -58,7 +58,8 @@ kotlin {
                 //implementation("com.squareup.sqldelight:coroutines-extensions:$sqlDelightVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
                 implementation("io.ktor:ktor-client-core:$ktorVersion")
-                implementation("io.ktor:ktor-client-serialization:$ktorVersion")
+                //Is api to give depending modules access to JsonElement
+                api("io.ktor:ktor-client-serialization:$ktorVersion")
                 implementation("io.ktor:ktor-client-logging:$ktorVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.1.0")
                 implementation("co.touchlab:stately-common:1.1.1")

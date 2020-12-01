@@ -10,6 +10,7 @@ import kotlinx.coroutines.MainScope
 import org.sagebionetworks.bridge.kmm.androidApp.ui.login.LoginActivity
 import org.sagebionetworks.bridge.kmm.shared.cache.AccountDAO
 import org.sagebionetworks.bridge.kmm.shared.cache.DatabaseDriverFactory
+import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
 import org.sagebionetworks.bridge.kmm.shared.repo.AssessmentConfigRepo
 
 class MainActivity : AppCompatActivity() {
@@ -35,7 +36,11 @@ class MainActivity : AppCompatActivity() {
             val repo = AssessmentConfigRepo(DatabaseDriverFactory(this), MainScope())
             repo.getAssessmentById("eGhiQTT2a6SCCmjTod6CDb0t").asLiveData()
                 .observe(this, Observer { t ->
-                    tv.text = t
+                    when (t) {
+                        is ResourceResult.Success -> {tv.text = t.data.config.toString()}
+                        is ResourceResult.InProgress -> {tv.text = "loading..."}
+                        is ResourceResult.Failed -> {tv.text = "failed to load"}
+                    }
                 })
         }
     }

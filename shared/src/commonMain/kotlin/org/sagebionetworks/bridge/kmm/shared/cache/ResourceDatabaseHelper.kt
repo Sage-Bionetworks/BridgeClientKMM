@@ -1,9 +1,11 @@
 package org.sagebionetworks.bridge.kmm.shared.cache
 
 import com.squareup.sqldelight.EnumColumnAdapter
-import com.squareup.sqldelight.runtime.coroutines.asFlow
-import com.squareup.sqldelight.runtime.coroutines.mapToOneOrNull
+//import com.squareup.sqldelight.runtime.coroutines.asFlow
+//import com.squareup.sqldelight.runtime.coroutines.mapToOneOrNull
 import kotlinx.coroutines.flow.Flow
+import org.sagebionetworks.bridge.kmm.shared.sqldelight.asFlow
+import org.sagebionetworks.bridge.kmm.shared.sqldelight.mapToOneOrNull
 
 internal class ResourceDatabaseHelper(databaseDriverFactory: DbDriverFactory) {
     internal val database = BridgeResourceDatabase(

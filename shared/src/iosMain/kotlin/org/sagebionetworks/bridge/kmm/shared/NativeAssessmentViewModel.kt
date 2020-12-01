@@ -32,5 +32,9 @@ class NativeAssessmentViewModel (
         }
     }
 
+    fun onCleared() {
+        scope.cancel()
+    }
+
 
 }

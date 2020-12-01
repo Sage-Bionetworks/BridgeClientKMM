@@ -21,6 +21,7 @@ class AuthenticationRepository {
         accountDAO.sessionToken = userSession.sessionToken
         accountDAO.reauthToken = userSession.reauthToken
 
+        // TODO: syoung 11/25/2020 Is this test code to get around consenting the user? Should it be here? And if so, please add a comment. Thanks!
         if (!userSession.consented) {
             ConsentRepo().createConsentSignature("sage-assessment-test")
         }

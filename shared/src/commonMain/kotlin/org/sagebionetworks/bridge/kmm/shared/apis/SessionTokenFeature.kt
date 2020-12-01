@@ -18,6 +18,7 @@ class SessionTokenFeature constructor(
     class Config {
         var sessionTokenHeaderName: String? = null
         var sessionTokenProvider: SessionTokenProvider? = null
+        // TODO: syoung 11/25/2020 Shouldn't these be `NullPointerException`?
         fun build() = SessionTokenFeature(
             sessionTokenHeaderName ?: throw IllegalArgumentException("HeaderName cannot be null"),
             sessionTokenProvider ?: throw IllegalArgumentException("SessionTokenProvider cannot be null")

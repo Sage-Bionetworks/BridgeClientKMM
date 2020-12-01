@@ -25,6 +25,7 @@ class RefreshTokenFeature(
         var updateTokenHandler: (suspend () -> Boolean)? = null
         var isCredentialsActual: ((HttpRequest) -> Boolean)? = null
 
+        // TODO: syoung 11/25/2020 Shouldn't these be `NullPointerException`?
         fun build() = RefreshTokenFeature(
             updateTokenHandler ?: throw IllegalArgumentException("updateTokenHandler should be passed"),
             isCredentialsActual ?: throw IllegalArgumentException("isCredentialsActual should be passed")
@@ -49,7 +50,7 @@ class RefreshTokenFeature(
                 refreshTokenHttpFeatureMutex.lock()
 
                 // If token of the request isn't actual, then token has already been updated and
-                // let's just to try repeat request
+                // let's just to try repeat request.
                 if (!feature.isCredentialsActual(context.request)) {
                     refreshTokenHttpFeatureMutex.unlock()
                     val requestBuilder = HttpRequestBuilder().takeFrom(context.request)
@@ -67,7 +68,7 @@ class RefreshTokenFeature(
                     val result: HttpResponse = context.client!!.request(requestBuilder)
                     proceedWith(result)
                 } else {
-                    // If the request refresh was unsuccessful
+                    // If the request refresh was unsuccessful.
                     refreshTokenHttpFeatureMutex.unlock()
                     proceedWith(subject)
                 }

@@ -1,6 +1,7 @@
 package org.sagebionetworks.bridge.kmm.shared.repo
 
 import co.touchlab.stately.ensureNeverFrozen
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -9,22 +10,25 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import org.sagebionetworks.bridge.kmm.shared.apis.AssessmentsApi
 import org.sagebionetworks.bridge.kmm.shared.apis.DefaultHttpClient
-import org.sagebionetworks.bridge.kmm.shared.cache.*
+import org.sagebionetworks.bridge.kmm.shared.cache.DbDriverFactory
+import org.sagebionetworks.bridge.kmm.shared.cache.Resource
+import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
+import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
 
-class AssessmentConfigRepo(databaseDriverFactory: DatabaseDriverFactory) {
+class AssessmentConfigRepo(databaseDriverFactory: DbDriverFactory, private val backgroundScope: CoroutineScope = MainScope()) {
 
     companion object {
         const val defaultUpdateFrequency = 10000// 60000 * 60
     }
 
-    private val database = ResourceDatabaseHelper(databaseDriverFactory)
+    internal val database = ResourceDatabaseHelper(databaseDriverFactory)
 
     init {
         ensureNeverFrozen()
     }
 
 
-    private val assessmentsApi = AssessmentsApi(
+    internal var assessmentsApi = AssessmentsApi(
         httpClient = DefaultHttpClient.httpClient
     )
 
@@ -36,10 +40,8 @@ class AssessmentConfigRepo(databaseDriverFactory: DatabaseDriverFactory) {
                     .toEpochMilliseconds()
             ) {
                 //Need to load assessment config from Bridge
-                MainScope().launch {
-
-                    val assessApi = assessmentsApi//loadAssessmentsApi(userSession.sessionToken)
-                    // TODO: syoung 11/25/2020 Is this method intentionally commented out rather than old code?
+                backgroundScope.launch() {
+                    val assessApi = assessmentsApi
                     val assessment = assessApi.getAssessmentConfig(identifier)
                     val resource = Resource(
                         identifier,
@@ -57,6 +59,5 @@ class AssessmentConfigRepo(databaseDriverFactory: DatabaseDriverFactory) {
         }.map { it?.json }
 
     }
-
 
 }

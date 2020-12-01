@@ -32,7 +32,7 @@ internal class AuthenticationApi(basePath: kotlin.String = "https://webservices.
                 }
             }
         }
-        expectSuccess = false
+        expectSuccess = false //Turns off automatic response code validation
     }
 
     /**

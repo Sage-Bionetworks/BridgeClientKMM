@@ -4,17 +4,21 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import org.sagebionetworks.bridge.kmm.shared.cache.DbDriverFactory
 import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
 import org.sagebionetworks.bridge.kmm.shared.repo.AssessmentConfigRepo
 import org.sagebionetworks.bridge.kmm.shared.repo.AuthenticationRepository
 
 class NativeAssessmentViewModel (
-    private val repo: AssessmentConfigRepo,
+    databaseDriverFactory: DbDriverFactory,
     private val viewUpdate: (String?) -> Unit
 ) {
 
+    private val scope = MainScope()
+    private val repo = AssessmentConfigRepo(databaseDriverFactory, scope)
+
     fun observeAssessmentConfig(identifier: String) {
-        MainScope().launch {
+        scope.launch {
             repo.getAssessmentById(identifier).collect { config ->
                 viewUpdate(config)
             }
@@ -22,10 +26,14 @@ class NativeAssessmentViewModel (
     }
 
     fun signIn(userName: String, password: String, callBack: (UserSessionInfo?) -> Unit) {
-        MainScope().launch {
+        scope.launch {
             val userSession = AuthenticationRepository().signIn(email = userName, password = password)
             callBack(userSession)
         }
+    }
+
+    fun onCleared() {
+        scope.cancel()
     }
 
 

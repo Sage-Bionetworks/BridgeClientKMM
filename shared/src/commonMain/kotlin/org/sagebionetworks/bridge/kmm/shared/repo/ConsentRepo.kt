@@ -12,9 +12,9 @@ class ConsentRepo {
         httpClient = DefaultHttpClient.httpClient
     )
 
-    suspend fun createConsentSignature(subpopulationGuid: String) : UserSessionInfo {
+    suspend fun createConsentSignature(subpopulationGuid: String, scope: SharingScope = SharingScope.ALL_QUALIFIED_RESEARCHERS) : UserSessionInfo {
 
-        val consentSignature = ConsentSignature("Name", scope = SharingScope.ALL_QUALIFIED_RESEARCHERS)
+        val consentSignature = ConsentSignature("Name", scope = scope)
 
         val userSession = consentApi.createConsentSignature(subpopulationGuid, consentSignature)
         return userSession

@@ -103,7 +103,5 @@ data class UserSessionInfo (
     /* UserSessionInfo */
     @SerialName("type")
     val type: kotlin.String? = null
-) {
-
-}
+)
 

@@ -41,7 +41,5 @@ data class AssessmentConfig (
     /* AssessmentConfig */
     @SerialName("type")
     val type: kotlin.String? = null
-) {
-
-}
+)
 

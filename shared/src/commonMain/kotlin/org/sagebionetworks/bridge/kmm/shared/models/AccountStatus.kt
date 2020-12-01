@@ -15,6 +15,9 @@ import kotlinx.serialization.Serializable
 
 import kotlinx.serialization.SerialName
 
+// TODO: syoung 11/25/2020 I thought that the all caps with underscores was frowned upon? Shouldn't this be `Enabled`, etc.?
+
+
 /**
 * Status of a participant's account, for accounts that must verify an email address.   |Status|Description| |---|---| |unverified|User has not consented to use the support email address.| |pending|System is waiting for the user to confirm the address.| |verified|User has consented and can sign in to the Bridge server.|  On creation, the initial status of a user account depends on the email verification policy of  the app. If verification is required, the account will be unverified until the participant  verifies the email address; otherwise it will be enabled. 
 * Values: "enabled","disabled","unverified"

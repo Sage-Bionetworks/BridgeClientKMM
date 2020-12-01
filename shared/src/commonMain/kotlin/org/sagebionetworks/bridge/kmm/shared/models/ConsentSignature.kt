@@ -40,6 +40,4 @@ internal data class ConsentSignature (
     /* ConsentSignature */
     @SerialName("type")
     val type: kotlin.String? = null
-) {
-
-}
+)

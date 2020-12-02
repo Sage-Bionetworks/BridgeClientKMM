@@ -16,7 +16,7 @@ class ResourceDatabaseTest {
         runBlocking {
             val db = ResourceDatabaseHelper(TestDatabaseDriverFactory())
             val testId = "TestId"
-            val resource = Resource(testId, ResourceType.ASSESSMENT_CONFIG, "{}", 0)
+            val resource = Resource(testId, ResourceType.ASSESSMENT_CONFIG, "{}", 0, ResourceStatus.SUCCESS)
             db.insertUpdateResource(resource)
             val r1 = db.getResource(testId).first()
             assertNotNull(r1)

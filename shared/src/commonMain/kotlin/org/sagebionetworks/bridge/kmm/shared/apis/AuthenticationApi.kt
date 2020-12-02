@@ -10,12 +10,11 @@ import io.ktor.client.features.logging.*
 import org.sagebionetworks.bridge.kmm.shared.models.SignIn
 import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
 
-internal class AuthenticationApi(basePath: kotlin.String = "https://webservices.sagebridge.org") : AbstractApi() {
-    override val _basePath = basePath
+internal class AuthenticationApi(basePath: kotlin.String = "https://webservices.sagebridge.org") : AbstractApi(basePath) {
 
     // Authentication uses its own HttpClient so as not to include the re-authentication feature found in DefaultHttpClient,
     // which would cause a dependency loop
-    override val _httpClient = HttpClient {
+    override val httpClient = HttpClient {
 
         install(JsonFeature) {
             serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
@@ -39,7 +38,7 @@ internal class AuthenticationApi(basePath: kotlin.String = "https://webservices.
      * Close the httpclient used by this api
      */
     fun close() {
-        _httpClient.close()
+        httpClient.close()
     }
 
     /**

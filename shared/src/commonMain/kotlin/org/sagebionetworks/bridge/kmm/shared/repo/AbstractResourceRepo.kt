@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import org.sagebionetworks.bridge.kmm.shared.cache.*
 
-abstract class AbstractResourceRepo<T: Any>(databaseDriverFactory: DbDriverFactory, private val resourceType: ResourceType, private val backgroundScope: CoroutineScope) {
+abstract class AbstractResourceRepo(databaseDriverFactory: DbDriverFactory, private val resourceType: ResourceType, private val backgroundScope: CoroutineScope) {
 
 
     companion object {

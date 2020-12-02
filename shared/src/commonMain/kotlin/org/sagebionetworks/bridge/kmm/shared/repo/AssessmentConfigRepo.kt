@@ -19,7 +19,7 @@ import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
 import org.sagebionetworks.bridge.kmm.shared.models.AssessmentConfig
 
 class AssessmentConfigRepo(databaseDriverFactory: DbDriverFactory, backgroundScope: CoroutineScope) :
-    AbstractResourceRepo<AssessmentConfig>(databaseDriverFactory, resourceType = ResourceType.ASSESSMENT_CONFIG, backgroundScope) {
+    AbstractResourceRepo(databaseDriverFactory, resourceType = ResourceType.ASSESSMENT_CONFIG, backgroundScope) {
 
     init {
         ensureNeverFrozen()
@@ -30,12 +30,12 @@ class AssessmentConfigRepo(databaseDriverFactory: DbDriverFactory, backgroundSco
         httpClient = DefaultHttpClient.httpClient
     )
 
-    private suspend fun loadRemoteAssessmentConfig(identifier: String) : String {
-        return Json.encodeToString(assessmentsApi.getAssessmentConfig(identifier))
-    }
-
     fun getAssessmentById(identifier: String): Flow<ResourceResult<AssessmentConfig>> {
         return getResourceById(identifier) { id -> loadRemoteAssessmentConfig(id) }
+    }
+
+    private suspend fun loadRemoteAssessmentConfig(identifier: String) : String {
+        return Json.encodeToString(assessmentsApi.getAssessmentConfig(identifier))
     }
 
 }

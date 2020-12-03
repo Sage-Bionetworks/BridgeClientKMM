@@ -1,26 +1,21 @@
 package org.sagebionetworks.bridge.kmm.shared.cache
 
-import kotlinx.serialization.PolymorphicSerializer
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.sagebionetworks.bridge.kmm.shared.models.AssessmentConfig
 import kotlin.reflect.KClass
 
 enum class ResourceType() {
-    ASSESSMENT_CONFIG() {
-        override fun getClass(): KClass<AssessmentConfig> {
-            return AssessmentConfig::class
-        }
-    };
+    ASSESSMENT_CONFIG,
+    APP_CONFIG
 
-    abstract fun getClass(): KClass<*>
 }
 
 enum class ResourceStatus {
-    SUCCESS(),
-    PENDING(),
-    RETRY(),
-    FAILED()
+    SUCCESS(), //Successfully loaded from Bridge
+    PENDING(), //Remote web call is in process
+    RETRY(),   //Remote web call failed due to a transient error and could be retried
+    FAILED()   //Remote web call failed
 }
 
 sealed class ResourceResult<out T : Any> {

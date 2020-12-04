@@ -4,7 +4,7 @@ import io.ktor.client.*
 import org.sagebionetworks.bridge.kmm.shared.models.ConsentSignature
 import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
 
-internal class ConsentApi(basePath: kotlin.String = "https://webservices.sagebridge.org", httpClient: HttpClient): AbstractApi(basePath) {
+internal class ConsentApi(basePath: kotlin.String = BASE_PATH, httpClient: HttpClient): AbstractApi(basePath) {
 
     override val httpClient = httpClient
 

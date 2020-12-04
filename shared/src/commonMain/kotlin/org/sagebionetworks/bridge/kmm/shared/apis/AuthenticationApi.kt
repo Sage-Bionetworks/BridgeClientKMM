@@ -10,7 +10,7 @@ import io.ktor.client.features.logging.*
 import org.sagebionetworks.bridge.kmm.shared.models.SignIn
 import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
 
-internal class AuthenticationApi(basePath: kotlin.String = "https://webservices.sagebridge.org") : AbstractApi(basePath) {
+internal class AuthenticationApi(basePath: kotlin.String = BASE_PATH) : AbstractApi(basePath) {
 
     // Authentication uses its own HttpClient so as not to include the re-authentication feature found in DefaultHttpClient,
     // which would cause a dependency loop

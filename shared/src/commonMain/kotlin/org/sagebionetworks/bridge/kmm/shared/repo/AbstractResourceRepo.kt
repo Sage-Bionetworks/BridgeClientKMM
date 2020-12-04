@@ -53,24 +53,24 @@ abstract class AbstractResourceRepo(databaseDriverFactory: DbDriverFactory, priv
                             ResourceStatus.SUCCESS
                         )
                         database.insertUpdateResource(resource)
-                    } catch (t: Throwable) {
+                    } catch (err: Throwable) {
                         var status = ResourceStatus.FAILED
                         var lastUpdate = curResource?.lastUpdate ?: Clock.System.now().toEpochMilliseconds()
                         var json = curResource?.json
-                        when (t) {
+                        when (err) {
 
                             is ResponseException -> {
-                                when(t.response.status) {
+                                when(err.response.status) {
                                     HttpStatusCode.NotModified -> {
                                         // 304 not modified
-                                        //Updated last modified time
+                                        // Update last modified time.
                                         status = ResourceStatus.SUCCESS
                                         lastUpdate = Clock.System.now().toEpochMilliseconds()
                                     }
 
                                     HttpStatusCode.Unauthorized -> {
                                         // 401 unauthorized
-                                        // User hasn't authenticated or re-auth has failed
+                                        // User hasn't authenticated or re-auth has failed.
                                         status = ResourceStatus.FAILED
                                         json = null
                                     }
@@ -109,11 +109,7 @@ abstract class AbstractResourceRepo(databaseDriverFactory: DbDriverFactory, priv
                         database.insertUpdateResource(resource)
 
                     }
-
                 }
-
-
-                //Need to make sure webcall is not already in flight
             }
             filterResource
         }.map {
@@ -129,7 +125,7 @@ abstract class AbstractResourceRepo(databaseDriverFactory: DbDriverFactory, priv
 
             val model = it.loadResource<T>()
             if (model != null) {
-                //If we have a model object, return it as a success
+                // If we have a model object, return it as a success.
                 return ResourceResult.Success(model, it.status)
             }
 
@@ -143,7 +139,7 @@ abstract class AbstractResourceRepo(databaseDriverFactory: DbDriverFactory, priv
 
             }
 
-        } ?: return ResourceResult.InProgress //If we don't have a resource, it hasn't been downloaded yet
+        } ?: return ResourceResult.InProgress // If we don't have a resource, it hasn't been downloaded yet.
 
     }
 }

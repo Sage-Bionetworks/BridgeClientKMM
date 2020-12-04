@@ -12,15 +12,15 @@ enum class ResourceType() {
 }
 
 enum class ResourceStatus {
-    SUCCESS(), //Successfully loaded from Bridge
-    PENDING(), //Remote web call is in process
-    RETRY(),   //Remote web call failed due to a transient error and could be retried
-    FAILED()   //Remote web call failed
+    SUCCESS, //Successfully loaded from Bridge
+    PENDING, //Remote web call is in process
+    RETRY,   //Remote web call failed due to a transient error and could be retried
+    FAILED   //Remote web call failed
 }
 
 sealed class ResourceResult<out T : Any> {
     data class Success<out T : Any>(val data: T, val status: ResourceStatus) : ResourceResult<T>()
-    //TODO: Failed reason
+    //TODO: Failed reason -nbrown 12/4/20
     data class Failed(val status: ResourceStatus) : ResourceResult<Nothing>()
     object InProgress : ResourceResult<Nothing>()
 }

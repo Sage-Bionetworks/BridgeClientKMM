@@ -20,7 +20,6 @@ abstract class AbstractResourceRepo(databaseDriverFactory: DbDriverFactory, priv
 
     internal val database = ResourceDatabaseHelper(databaseDriverFactory)
 
-    //protected fun getResourceList()
 
 
     internal inline fun <reified T: Any> getResourceById(identifier: String, noinline remoteLoad: suspend (identifier: String) -> String): Flow<ResourceResult<T>> {

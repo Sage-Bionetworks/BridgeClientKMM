@@ -25,7 +25,7 @@ import kotlinx.serialization.SerialName
  * @param type AssessmentConfig
  */
 @Serializable
-internal data class AssessmentConfig (
+data class AssessmentConfig (
     /* The JSON configuration for this assessment. */
     @SerialName("config")
     val config: kotlinx.serialization.json.JsonElement,

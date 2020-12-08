@@ -5,17 +5,20 @@ import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 
-abstract class AbstractApi {
+abstract class AbstractApi(protected val basePath: String) {
 
-    protected abstract val _basePath: String
-    protected abstract val _httpClient: HttpClient
+    protected abstract val httpClient: HttpClient
+
+    companion object {
+        public const val BASE_PATH = "https://webservices.sagebridge.org"
+    }
 
     protected suspend inline fun <T, reified S: Any> postData(model: T, path: String) : S {
         val builder = HttpRequestBuilder()
 
         builder.method = HttpMethod.Post
         builder.url {
-            takeFrom(_basePath)
+            takeFrom(basePath)
             encodedPath = encodedPath.let { startingPath ->
                 path(path)
                 return@let startingPath + encodedPath.substring(1)
@@ -32,7 +35,7 @@ abstract class AbstractApi {
         }
 
         try {
-            return _httpClient.post(builder)
+            return httpClient.post(builder)
         } catch (pipeline: ReceivePipelineException) {
             throw pipeline.cause
         }
@@ -43,7 +46,7 @@ abstract class AbstractApi {
 
         builder.method = HttpMethod.Get
         builder.url {
-            takeFrom(_basePath)
+            takeFrom(basePath)
             encodedPath = encodedPath.let { startingPath ->
                 path(path)
                 return@let startingPath + encodedPath.substring(1)
@@ -55,7 +58,7 @@ abstract class AbstractApi {
         }
 
         try {
-            return _httpClient.get(builder)
+            return httpClient.get(builder)
         } catch (pipeline: ReceivePipelineException) {
             throw pipeline.cause
         }

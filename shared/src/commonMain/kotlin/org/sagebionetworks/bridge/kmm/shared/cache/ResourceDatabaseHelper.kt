@@ -1,14 +1,16 @@
 package org.sagebionetworks.bridge.kmm.shared.cache
 
 import com.squareup.sqldelight.EnumColumnAdapter
-import com.squareup.sqldelight.runtime.coroutines.asFlow
-import com.squareup.sqldelight.runtime.coroutines.mapToOneOrNull
+//import com.squareup.sqldelight.runtime.coroutines.asFlow
+//import com.squareup.sqldelight.runtime.coroutines.mapToOneOrNull
 import kotlinx.coroutines.flow.Flow
+import org.sagebionetworks.bridge.kmm.shared.sqldelight.asFlow
+import org.sagebionetworks.bridge.kmm.shared.sqldelight.mapToOneOrNull
 
 internal class ResourceDatabaseHelper(databaseDriverFactory: DbDriverFactory) {
     internal val database = BridgeResourceDatabase(
         databaseDriverFactory.createDriver(),
-        Resource.Adapter(EnumColumnAdapter())
+        Resource.Adapter(EnumColumnAdapter(), EnumColumnAdapter())
     )
     private val dbQuery = database.bridgeResourceDatabaseQueries
 
@@ -24,12 +26,15 @@ internal class ResourceDatabaseHelper(databaseDriverFactory: DbDriverFactory) {
     }
 
     internal fun insertUpdateResource(resource: Resource) {
-        dbQuery.insertUpdateResource(
-            identifier = resource.identifier,
-            type = resource.type,
-            json = resource.json,
-            lastUpdate = resource.lastUpdate
-        )
+        database.transaction {
+            dbQuery.insertUpdateResource(
+                identifier = resource.identifier,
+                type = resource.type,
+                json = resource.json,
+                lastUpdate = resource.lastUpdate,
+                status = resource.status
+            )
+        }
     }
 
 }

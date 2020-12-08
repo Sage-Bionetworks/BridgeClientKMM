@@ -5,6 +5,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.sagebionetworks.bridge.kmm.shared.cache.DbDriverFactory
+import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
 import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
 import org.sagebionetworks.bridge.kmm.shared.repo.AssessmentConfigRepo
 import org.sagebionetworks.bridge.kmm.shared.repo.AuthenticationRepository
@@ -19,8 +20,12 @@ class NativeAssessmentViewModel (
 
     fun observeAssessmentConfig(identifier: String) {
         scope.launch {
-            repo.getAssessmentById(identifier).collect { config ->
-                viewUpdate(config)
+            repo.getAssessmentById(identifier).collect { resourceResult ->
+                when (resourceResult) {
+                    is ResourceResult.Success -> {viewUpdate(resourceResult.data.config.toString())}
+                    is ResourceResult.InProgress -> {viewUpdate("loading...")}
+                    is ResourceResult.Failed -> {viewUpdate("failed to load")}
+                }
             }
         }
     }

@@ -54,11 +54,12 @@ kotlin {
                     }
                 }
                 implementation("com.squareup.sqldelight:runtime:$sqlDelightVersion")
-                //Comment out sqldelight coroutines extensions and uncomment dependency in Android sourceset to get code completion in Android Studio to work -nathaniel 11/9/20
-                implementation("com.squareup.sqldelight:coroutines-extensions:$sqlDelightVersion")
+                //Copied CoroutinesExtensions from SqlDelight repo to workaround dependency issue. -nathaniel 11/30/20
+                //implementation("com.squareup.sqldelight:coroutines-extensions:$sqlDelightVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
                 implementation("io.ktor:ktor-client-core:$ktorVersion")
-                implementation("io.ktor:ktor-client-serialization:$ktorVersion")
+                //Is api to give depending modules access to JsonElement
+                api("io.ktor:ktor-client-serialization:$ktorVersion")
                 implementation("io.ktor:ktor-client-logging:$ktorVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.1.0")
                 implementation("co.touchlab:stately-common:1.1.1")

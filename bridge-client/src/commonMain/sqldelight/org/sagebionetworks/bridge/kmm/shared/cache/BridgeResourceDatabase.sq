@@ -1,0 +1,34 @@
+import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType;
+import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus;
+
+CREATE TABLE Resource (
+identifier TEXT NOT NULL,
+type TEXT as ResourceType NOT NULL,
+json TEXT,
+lastUpdate INTEGER as Long NOT NULL,
+status TEXT as ResourceStatus NOT NULL,
+PRIMARY KEY (identifier)
+);
+
+insertUpdateResource:
+INSERT OR REPLACE INTO Resource(identifier, type, json, lastUpdate, status)
+VALUES(?, ?, ?, ?, ?);
+
+removeAllResources:
+DELETE FROM Resource;
+
+selectAllResourcesByType:
+SELECT * FROM Resource
+WHERE type = ?;
+
+removeAllResourcesByType:
+DELETE FROM Resource
+WHERE type = ?;
+
+selectResourceById:
+SELECT * FROM Resource
+WHERE identifier = ?;
+
+removeResourceById:
+DELETE FROM Resource
+WHERE identifier = ?;

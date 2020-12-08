@@ -17,5 +17,5 @@ rootProject.name = "BridgeClientKMM"
 
 
 include(":androidApp")
-include(":shared")
+include(":bridge-client")
 

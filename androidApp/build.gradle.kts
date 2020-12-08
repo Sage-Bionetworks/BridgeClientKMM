@@ -4,8 +4,6 @@ plugins {
     id("kotlin-android-extensions")
     id("kotlin-android")
 }
-group = "org.sagebionetworks.bridge.kmm"
-version = "1.0-SNAPSHOT"
 
 repositories {
     gradlePluginPortal()
@@ -18,7 +16,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:${rootProject.extra["kotlin_version"]}")
     implementation("androidx.annotation:annotation:1.1.0")
     val lifecycle_version = "2.2.0"
-    implementation(project(":shared"))
+    implementation(project(":bridge-client"))
     implementation("com.google.android.material:material:1.2.1")
     implementation("androidx.appcompat:appcompat:1.2.0")
     implementation("androidx.constraintlayout:constraintlayout:2.0.1")
@@ -35,7 +33,7 @@ android {
         minSdkVersion(24)
         targetSdkVersion(29)
         versionCode = 1
-        versionName = "1.0"
+        versionName = "$version"
     }
     buildTypes {
         getByName("release") {

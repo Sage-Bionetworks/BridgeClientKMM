@@ -20,8 +20,6 @@ abstract class AbstractResourceRepo(databaseDriverFactory: DbDriverFactory, priv
 
     internal val database = ResourceDatabaseHelper(databaseDriverFactory)
 
-
-
     internal inline fun <reified T: Any> getResourceById(identifier: String, noinline remoteLoad: suspend (identifier: String) -> String): Flow<ResourceResult<T>> {
         return database.getResource(identifier).filter {curResource ->
             var filterResource = true
@@ -41,7 +39,6 @@ abstract class AbstractResourceRepo(databaseDriverFactory: DbDriverFactory, priv
                         ResourceStatus.PENDING
                     )
                     database.insertUpdateResource(resource)
-
 
                     try {
                         val resourceJson = remoteLoad(identifier)

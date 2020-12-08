@@ -16,12 +16,13 @@ buildscript {
         classpath("com.android.tools.build:gradle:4.1.1")
         classpath("com.squareup.sqldelight:gradle-plugin:$sqlDelightVersion")
         classpath("org.jetbrains.kotlin:kotlin-serialization:$kotlinVersion")
+        classpath("com.github.dcendents:android-maven-gradle-plugin:2.1")
     }
 }
-group = "org.sagebionetworks.bridge.kmm"
-version = "1.0-SNAPSHOT"
 
 allprojects {
+    group = "org.sagebionetworks.bridge.kmm"
+    version = "0.1.1"
     repositories {
         jcenter()
         google()

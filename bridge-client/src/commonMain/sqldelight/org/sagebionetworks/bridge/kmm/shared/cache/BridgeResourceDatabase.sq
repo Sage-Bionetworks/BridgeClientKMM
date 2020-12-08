@@ -17,6 +17,14 @@ VALUES(?, ?, ?, ?, ?);
 removeAllResources:
 DELETE FROM Resource;
 
+selectAllResourcesByType:
+SELECT * FROM Resource
+WHERE type = ?;
+
+removeAllResourcesByType:
+DELETE FROM Resource
+WHERE type = ?;
+
 selectResourceById:
 SELECT * FROM Resource
 WHERE identifier = ?;

@@ -5,8 +5,6 @@ import com.squareup.sqldelight.sqlite.driver.JdbcSqliteDriver
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
-import org.sagebionetworks.bridge.kmm.shared.apis.AuthenticationApi
-import org.sagebionetworks.bridge.kmm.shared.models.SignIn
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -29,31 +27,6 @@ class ResourceDatabaseTest {
             val r2 = db.getResource(testId).first()
             assertNull(r2)
         }
-    }
-
-    @Test
-    fun testAuth() {
-        runBlocking {
-            //val accountDAO = AccountDAO()
-            val authApi = AuthenticationApi()
-            val signIn = SignIn(
-                "sage-assessment-test",
-                "nathaniel.brown+test@sagebase.org",
-                password = "ngbTest1!",
-            )
-            val userSession = authApi.signIn(signIn)
-
-            val reAuthToken = userSession.reauthToken!!
-            val reAuth = SignIn(
-                "sage-assessment-test",
-                "Nathaniel.brown+test@sagebase.org",
-                reauthToken = reAuthToken
-            )
-            val session2 = authApi.reauthenticate(reAuth)
-
-            assertNotNull(session2)
-        }
-
     }
 }
 

@@ -23,52 +23,6 @@ abstract class AbstractResourceRepo(databaseDriverFactory: DbDriverFactory, priv
 
     internal val database = ResourceDatabaseHelper(databaseDriverFactory)
 
-    internal inline fun <reified T: Model> getAllResourceByType(type: ResourceType, noinline remoteLoad: suspend () -> List<T>): Flow<List<ResourceResult<T>>> {
-        return database.getResources(type).filter {curResourceList ->
-            var filterResource = true
-            if (curResourceList.isEmpty() || false
-                //TODO: Handle pending and update frequency
-                //(ResourceStatus.PENDING != curResource.status && curResource.lastUpdate + defaultUpdateFrequency < Clock.System.now().toEpochMilliseconds())
-            ) {
-                filterResource = false // don't return current item since we are going to update it
-
-                //Need to load resource from Bridge
-                backgroundScope.launch() {
-                    //TODO: Mark the resource as pending update
-
-                    try {
-                        val curTime = Clock.System.now().toEpochMilliseconds()
-                        val modelList = remoteLoad()
-                        val resourceList = modelList.map {
-                            Resource(
-                                it.getIdentifier(),
-                                resourceType,
-                                Json.encodeToString(it),
-                                curTime,
-                                ResourceStatus.SUCCESS)
-                        }
-                        database.removeAndUpdateResources(resourceType, resourceList)
-
-                    } catch (err: Throwable) {
-                        //TODO: Update status
-
-                    }
-
-                }
-
-
-                //Need to make sure webcall is not already in flight
-            }
-            filterResource
-        }.map {
-            it.map {
-                processResult(it)
-            }
-        }
-
-    }
-
-
     internal inline fun <reified T: Any> getResourceById(identifier: String, noinline remoteLoad: suspend (identifier: String) -> String): Flow<ResourceResult<T>> {
         return database.getResource(identifier).filter {curResource ->
             var filterResource = true

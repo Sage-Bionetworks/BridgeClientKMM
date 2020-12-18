@@ -20,8 +20,16 @@ internal class ResourceDatabaseHelper(databaseDriverFactory: DbDriverFactory) {
         }
     }
 
-    internal fun getResource(id: String): Flow<Resource?> {
+    internal fun getResourceAsFlow(id: String): Flow<Resource?> {
         return dbQuery.selectResourceById(id).asFlow().mapToOneOrNull()
+    }
+
+    internal fun getResource(id: String): Resource? {
+        return dbQuery.selectResourceById(id).executeAsOneOrNull()
+    }
+
+    internal fun removeResource(id: String) {
+        dbQuery.removeResourceById(id)
     }
 
     internal fun insertUpdateResource(resource: Resource) {
@@ -34,8 +42,12 @@ internal class ResourceDatabaseHelper(databaseDriverFactory: DbDriverFactory) {
         )
     }
 
-    internal fun getResources(type: ResourceType): Flow<List<Resource>> {
+    internal fun getResourcesAsFlow(type: ResourceType): Flow<List<Resource>> {
         return dbQuery.selectAllResourcesByType(type).asFlow().mapToList()
+    }
+
+    internal fun getResources(type: ResourceType): List<Resource> {
+        return dbQuery.selectAllResourcesByType(type).executeAsList()
     }
 
     internal fun removeAllResources(type: ResourceType) {

@@ -2,10 +2,12 @@ package org.sagebionetworks.bridge.kmm.shared.repo
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.sagebionetworks.bridge.kmm.shared.apis.AssessmentsApi
+import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
 import org.sagebionetworks.bridge.kmm.shared.getTestClient
 import org.sagebionetworks.bridge.kmm.shared.testDatabaseDriverFactory
@@ -25,11 +27,11 @@ class AssessmentConfigRepoTest {
             val repo = AssessmentConfigRepo(testDatabaseDriverFactory(), CoroutineScope(Dispatchers.Default))
             repo.assessmentsApi = AssessmentsApi(httpClient = getTestClient(assessmentJson))
 
-            val resultJson = repo.getAssessmentById(assessmentConfigId).filterNotNull().first() //drop(1).first()
+            val resultJson = repo.getAssessmentById(assessmentConfigId).filterNot { ResourceResult.InProgress == it }.first()
             assertNotNull(resultJson)
 
             val db = repo.database
-            val r1 = db.getResource(assessmentConfigId).first()
+            val r1 = db.getResourceAsFlow(assessmentConfigId).first()
             assertNotNull(r1)
             assertEquals(ResourceType.ASSESSMENT_CONFIG, r1.type)
             assertTrue(r1.json?.contains("identifier")?: false)

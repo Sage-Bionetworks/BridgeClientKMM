@@ -65,7 +65,7 @@ kotlin {
                 //Is api to give depending modules access to JsonElement
                 api("io.ktor:ktor-client-serialization:$ktorVersion")
                 implementation("io.ktor:ktor-client-logging:$ktorVersion")
-                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.1.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.1.1")
                 implementation("co.touchlab:stately-common:1.1.1")
                 implementation("com.russhwolf:multiplatform-settings:0.6.2")
                 implementation("com.russhwolf:multiplatform-settings-no-arg:0.6.2")

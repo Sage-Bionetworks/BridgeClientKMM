@@ -7,7 +7,9 @@ import kotlin.reflect.KClass
 
 enum class ResourceType() {
     ASSESSMENT_CONFIG,
-    APP_CONFIG
+    APP_CONFIG,
+    UPLOAD_SESSION,
+    FILE_UPLOAD
 
 }
 

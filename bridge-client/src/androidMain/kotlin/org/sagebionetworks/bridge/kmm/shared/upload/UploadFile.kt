@@ -5,7 +5,7 @@ import org.sagebionetworks.bridge.mpp.network.generated.models.UploadRequest
 
 @Serializable
 data class UploadFile (
-    val filename: String,
+    val filePath: String,
     val contentType: String,
     val fileLength: Long,
     val md5Hash: String,
@@ -13,16 +13,16 @@ data class UploadFile (
 ) {
 
     internal fun getUploadFileResourceId(): String {
-        return "uploadFile-$filename"
+        return "uploadFile-$filePath"
     }
 
     internal fun getUploadSessionResourceId(): String {
-        return "uploadSession--$filename"
+        return "uploadSession--$filePath"
     }
 
     internal fun getUploadRequest(): UploadRequest {
         return UploadRequest(
-            name = filename,
+            name = filePath.subSequence(filePath.lastIndexOf("/")+1, filePath.length).toString(),
             contentLength = fileLength,
             contentMd5 = md5Hash,
             contentType = contentType,

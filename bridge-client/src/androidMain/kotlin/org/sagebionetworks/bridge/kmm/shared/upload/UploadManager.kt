@@ -5,6 +5,10 @@ import io.ktor.client.*
 import kotlinx.datetime.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import okio.ExperimentalFileSystem
+import okio.FileSystem
+import okio.Path
+import okio.Path.Companion.toPath
 import org.sagebionetworks.bridge.kmm.shared.apis.S3UploadApi
 import org.sagebionetworks.bridge.kmm.shared.apis.UploadsApi
 import org.sagebionetworks.bridge.kmm.shared.cache.DbDriverFactory
@@ -14,7 +18,6 @@ import org.sagebionetworks.bridge.kmm.shared.cache.loadResource
 import org.sagebionetworks.bridge.kmm.shared.repo.AbstractResourceRepo
 import org.sagebionetworks.bridge.mpp.network.generated.models.UploadRequest
 import org.sagebionetworks.bridge.mpp.network.generated.models.UploadSession
-import java.io.File
 
 class UploadManager(
     httpClient: HttpClient,
@@ -93,12 +96,12 @@ class UploadManager(
         return Json.encodeToString(uploadsApi.requestUploadSession(uploadRequest))
     }
 
+    @OptIn(ExperimentalFileSystem::class)
     private suspend fun uploadToS3(uploadFile: UploadFile, uploadSession: UploadSession) {
         //Make call to S3 using url from UploadSession
         try {
             s3UploadApi.uploadFile(uploadSession.url, uploadFile)
-            val file = File(uploadFile.filename)
-            file.delete() //TODO: Handle delete failure -nbrown 12/16/20
+            FileSystem.SYSTEM.delete(uploadFile.filePath.toPath(Path.directorySeparator)) //TODO: Handle delete failure -nbrown 12/16/20
             //Remove UploadFile unless we want to keep a history of successful uploads?
             database.removeResource(uploadFile.getUploadFileResourceId())
             database.removeResource(uploadFile.getUploadSessionResourceId())

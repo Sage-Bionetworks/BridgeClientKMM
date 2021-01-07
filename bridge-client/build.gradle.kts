@@ -7,8 +7,8 @@ val serializationVersion = "1.0.1"
 val ktorVersion = "1.4.2"
 
 plugins {
-    kotlin("multiplatform")
     id("com.android.library")
+    kotlin("multiplatform")
     id("kotlin-android-extensions")
     id("com.squareup.sqldelight")
     kotlin("plugin.serialization")
@@ -35,7 +35,9 @@ sqldelight {
 }
 
 kotlin {
-    android ()
+    android {
+        publishLibraryVariants("release", "debug")
+    }
     // Block from https://github.com/cashapp/sqldelight/issues/2044#issuecomment-721299517.
     val iOSTarget: (String, KotlinNativeTarget.() -> Unit) -> KotlinNativeTarget =
         if (System.getenv("SDK_NAME")?.startsWith("iphoneos") == true)

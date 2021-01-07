@@ -42,12 +42,14 @@ class UploadManager(
         database.removeAllResources(ResourceType.UPLOAD_SESSION)
     }
 
-    suspend fun processUploads() {
+    suspend fun processUploads(): Boolean {
         for (resource in database.getResources(ResourceType.FILE_UPLOAD)) {
             resource.loadResource<UploadFile>()?.let {
                 processUploadFile(it)
             }
         }
+        //Check that all uploads succeeded and have been removed
+        return database.getResources(ResourceType.FILE_UPLOAD).isEmpty()
     }
 
     private suspend fun processUploadFile(uploadFile: UploadFile) {
@@ -101,7 +103,7 @@ class UploadManager(
         //Make call to S3 using url from UploadSession
         try {
             s3UploadApi.uploadFile(uploadSession.url, uploadFile)
-            FileSystem.SYSTEM.delete(uploadFile.filePath.toPath(Path.directorySeparator)) //TODO: Handle delete failure -nbrown 12/16/20
+            FileSystem.SYSTEM.delete(uploadFile.filePath.toPath(Path.DIRECTORY_SEPARATOR)) //TODO: Handle delete failure -nbrown 12/16/20
             //Remove UploadFile unless we want to keep a history of successful uploads?
             database.removeResource(uploadFile.getUploadFileResourceId())
             database.removeResource(uploadFile.getUploadSessionResourceId())

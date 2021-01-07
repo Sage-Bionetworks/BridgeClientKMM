@@ -45,7 +45,12 @@ class UploadRequester(
         database.insertUpdateResource(resource)
 
         //Make a WorkManager request to enqueueUniqueWork to processUploads
-        val workRequest: OneTimeWorkRequest = OneTimeWorkRequestBuilder<CoroutineUploadWorker>().build()
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+        val workRequest: OneTimeWorkRequest = OneTimeWorkRequestBuilder<CoroutineUploadWorker>()
+            .setConstraints(constraints)
+            .build()
         WorkManager.getInstance(context).beginUniqueWork(
             "ResultUpload",
             ExistingWorkPolicy.APPEND,
@@ -99,8 +104,8 @@ class UploadRequester(
 
     @OptIn(ExperimentalFileSystem::class)
     private fun getFile(filename: String): Path {
-        val pathString = context.filesDir.absolutePath + Path.directorySeparator + filename
-        return pathString.toPath(Path.directorySeparator)
+        val pathString = context.filesDir.absolutePath + Path.DIRECTORY_SEPARATOR + filename
+        return pathString.toPath(Path.DIRECTORY_SEPARATOR)
 
     }
 
@@ -119,9 +124,12 @@ class CoroutineUploadWorker(
                     applicationContext
                 )
             )
-            uploadManager.processUploads()
-            //TODO: Handle failure and retry scenarios -nbrown 12/21/20
-            Result.success()
+            if (uploadManager.processUploads()) {
+                Result.success()
+            } else {
+                //TODO: Handle failure and retry scenarios -nbrown 12/21/20
+                Result.retry()
+            }
         }
 
     }

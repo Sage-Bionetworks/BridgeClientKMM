@@ -1,6 +1,5 @@
 package org.sagebionetworks.bridge.kmm.shared.upload
 
-import android.util.Log
 import io.ktor.client.*
 import kotlinx.datetime.*
 import kotlinx.serialization.encodeToString
@@ -65,7 +64,6 @@ class UploadManager(
      * before returning it. This method is responsible for ensuring that upload session has not expired and is valid.
      */
     private suspend fun getUploadSession(uploadFile: UploadFile): UploadSession? {
-        Log.d("Upload", "getUploadSession called")
         val identifier = uploadFile.getUploadSessionResourceId()
         val resource = database.getResource(identifier)
         resource?.let {

@@ -58,6 +58,7 @@ class UploadRequester(
         ).enqueue()
     }
 
+    // This is a temporary helper method for testing upload with Bridge -nbrown 01/08/21
     @Throws(IOException::class)
     private fun writeTestZipFileTo(os: OutputStream?): ZipOutputStream {
         val zos = ZipOutputStream(os)
@@ -78,6 +79,8 @@ class UploadRequester(
         return zos
     }
 
+    // This is a temporary helper method for testing upload with Bridge -nbrown 01/08/21
+    // This utilizes the new multiplatform FileSystem api from Okio 
     @OptIn(ExperimentalFileSystem::class)
     fun generateTestUploadFile(filename: String): UploadFile? {
         val filePath = getFile(filename)

@@ -52,7 +52,7 @@ class UploadManager(
     }
 
     private suspend fun processUploadFile(uploadFile: UploadFile) {
-        //Does upload order matter to Bridge?
+        //Does upload order matter to Bridge? -nbrown 01/11/21
         val uploadSession = getUploadSession(uploadFile)
         uploadSession?.let {
             uploadToS3(uploadFile, uploadSession)

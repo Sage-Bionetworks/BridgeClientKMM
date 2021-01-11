@@ -80,7 +80,7 @@ class UploadRequester(
     }
 
     // This is a temporary helper method for testing upload with Bridge -nbrown 01/08/21
-    // This utilizes the new multiplatform FileSystem api from Okio 
+    // This utilizes the new multiplatform FileSystem api from Okio
     @OptIn(ExperimentalFileSystem::class)
     fun generateTestUploadFile(filename: String): UploadFile? {
         val filePath = getFile(filename)
@@ -109,7 +109,6 @@ class UploadRequester(
     private fun getFile(filename: String): Path {
         val pathString = context.filesDir.absolutePath + Path.DIRECTORY_SEPARATOR + filename
         return pathString.toPath(Path.DIRECTORY_SEPARATOR)
-
     }
 
 }

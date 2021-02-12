@@ -1,8 +1,8 @@
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
-    kotlin("multiplatform")
     id("com.android.library")
+    kotlin("multiplatform")
     id("kotlin-android-extensions")
     id("com.squareup.sqldelight")
     kotlin("plugin.serialization")
@@ -30,7 +30,9 @@ sqldelight {
 }
 
 kotlin {
-    android ()
+    android {
+        publishLibraryVariants("release", "debug")
+    }
     // Block from https://github.com/cashapp/sqldelight/issues/2044#issuecomment-721299517.
     val iOSTarget: (String, KotlinNativeTarget.() -> Unit) -> KotlinNativeTarget =
         if (System.getenv("SDK_NAME")?.startsWith("iphoneos") == true)

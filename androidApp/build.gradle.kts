@@ -11,27 +11,28 @@ repositories {
     jcenter()
     mavenCentral()
     maven(url = "https://kotlin.bintray.com/kotlinx/")
+    maven(url = "https://oss.sonatype.org/content/repositories/snapshots")
+    maven(url = "https://dl.bintray.com/sage-bionetworks/BridgeClientKMM" )
 }
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:${rootProject.extra["kotlin_version"]}")
-    implementation("androidx.annotation:annotation:1.1.0")
-    val lifecycle_version = "2.2.0"
-    implementation(project(":bridge-client"))
-    implementation("com.google.android.material:material:1.2.1")
-    implementation("androidx.appcompat:appcompat:1.2.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.0.1")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:${Versions.kotlin}")
+    implementation(Deps.AndroidX.annotation)
+    implementation(project(":bridgeClient"))
+    implementation(Deps.AndroidX.material)
+    implementation(Deps.AndroidX.appcompat)
+    implementation(Deps.AndroidX.constraintlayout)
 
     // ViewModel
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
+    implementation(Deps.AndroidX.lifecycle_viewmodel_ktx)
     // LiveData
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
+    implementation(Deps.AndroidX.lifecycle_livedata_ktx)
 }
 android {
-    compileSdkVersion(29)
+    compileSdkVersion(Versions.compile_sdk)
     defaultConfig {
         applicationId = "org.sagebionetworks.bridge.kmm.androidApp"
-        minSdkVersion(24)
-        targetSdkVersion(29)
+        minSdkVersion(Versions.min_sdk)
+        targetSdkVersion(Versions.target_sdk)
         versionCode = 1
         versionName = "$version"
     }

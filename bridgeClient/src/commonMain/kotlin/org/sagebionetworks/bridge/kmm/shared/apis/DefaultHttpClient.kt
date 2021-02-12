@@ -1,6 +1,7 @@
 package org.sagebionetworks.bridge.kmm.shared.apis
 
 import io.ktor.client.*
+import io.ktor.client.features.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
 import io.ktor.client.features.logging.*
@@ -11,6 +12,10 @@ import org.sagebionetworks.bridge.kmm.shared.models.SignIn
 object DefaultHttpClient {
 
     val httpClient = HttpClient {
+
+        defaultRequest {
+            
+        }
 
         install(JsonFeature) {
             serializer = KotlinxSerializer(kotlinx.serialization.json.Json {

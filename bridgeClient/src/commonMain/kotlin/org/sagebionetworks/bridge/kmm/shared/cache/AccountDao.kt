@@ -48,8 +48,6 @@ class AccountDAO() {
             }?: settings.remove(KEY_REAUTH_TOKEN)
         }
 
-    // TODO: syoung 11/25/2020 I thought that the all caps with underscores was frowned upon? Shouldn't this be `KeyEmail`, etc.? Also, the standard on Obj-c/Swift is "EmailKey" with the type of the object as the last bit. Is that different for Kotlin/Java?
-
     companion object {
         private const val KEY_EMAIL = "email"
         private const val KEY_SESSION_TOKEN = "sessionToken"

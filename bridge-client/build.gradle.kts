@@ -5,6 +5,7 @@ val kotlinVersion: String by project
 val coroutinesVersion = "1.3.9-native-mt-2"
 val serializationVersion = "1.0.1"
 val ktorVersion = "1.4.2"
+val workManagerVersion = "2.4.0"
 
 plugins {
     id("com.android.library")
@@ -25,6 +26,7 @@ repositories {
     jcenter()
     mavenCentral()
     maven(url = "https://kotlin.bintray.com/kotlinx/")
+    maven(url = "https://oss.sonatype.org/content/repositories/snapshots")
 }
 
 sqldelight {
@@ -67,10 +69,11 @@ kotlin {
                 //Is api to give depending modules access to JsonElement
                 api("io.ktor:ktor-client-serialization:$ktorVersion")
                 implementation("io.ktor:ktor-client-logging:$ktorVersion")
-                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.1.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.1.1")
                 implementation("co.touchlab:stately-common:1.1.1")
                 implementation("com.russhwolf:multiplatform-settings:0.6.2")
                 implementation("com.russhwolf:multiplatform-settings-no-arg:0.6.2")
+                implementation("com.squareup.okio:okio-multiplatform:2.10.0-SNAPSHOT")
             }
         }
         val commonTest by getting {
@@ -85,6 +88,9 @@ kotlin {
                 implementation("com.google.android.material:material:1.2.1")
                 implementation("com.squareup.sqldelight:android-driver:$sqlDelightVersion")
                 implementation("io.ktor:ktor-client-android:$ktorVersion")
+                implementation("androidx.work:work-runtime:$workManagerVersion")
+                implementation("androidx.work:work-runtime-ktx:$workManagerVersion")
+
                 //Uncomment here and comment out sqldelight coroutines extensions in commen sourceset to get code completion in Android Studio to work -nathaniel 11/9/20
                 //implementation("com.squareup.sqldelight:coroutines-extensions:$sqlDelightVersion")
             }

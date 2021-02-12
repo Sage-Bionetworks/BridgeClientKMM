@@ -11,6 +11,7 @@ abstract class AbstractApi(protected val basePath: String) {
 
     companion object {
         public const val BASE_PATH = "https://webservices.sagebridge.org"
+        public const val BRIDGE_SERVER_CHECK = "webservices.sagebridge"
     }
 
     protected suspend inline fun <T, reified S: Any> postData(model: T, path: String) : S {

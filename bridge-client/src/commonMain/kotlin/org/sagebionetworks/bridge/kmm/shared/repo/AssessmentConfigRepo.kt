@@ -31,7 +31,7 @@ class AssessmentConfigRepo(databaseDriverFactory: DbDriverFactory, backgroundSco
     )
 
     fun getAssessmentById(identifier: String): Flow<ResourceResult<AssessmentConfig>> {
-        return getResourceById(identifier) { id -> loadRemoteAssessmentConfig(id) }
+        return getResourceById(identifier, remoteLoad =  { loadRemoteAssessmentConfig(identifier) })
     }
 
     private suspend fun loadRemoteAssessmentConfig(identifier: String) : String {

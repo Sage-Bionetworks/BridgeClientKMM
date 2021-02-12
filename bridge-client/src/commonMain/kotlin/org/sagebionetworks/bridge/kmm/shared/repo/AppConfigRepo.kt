@@ -25,7 +25,7 @@ class AppConfigRepo(databaseDriverFactory: DbDriverFactory, backgroundScope: Cor
     )
 
     fun getAppConfig(appId: String): Flow<ResourceResult<AppConfig>> {
-        return getResourceById(appId) { loadRemoteAppConfig(appId) }
+        return getResourceById(appId, { loadRemoteAppConfig(appId) })
     }
 
     private suspend fun loadRemoteAppConfig(appId: String) : String {

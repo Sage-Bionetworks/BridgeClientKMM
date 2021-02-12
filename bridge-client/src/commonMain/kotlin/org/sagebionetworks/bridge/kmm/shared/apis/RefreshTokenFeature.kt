@@ -42,35 +42,38 @@ class RefreshTokenFeature(
 
         override fun install(feature: RefreshTokenFeature, scope: HttpClient) {
             scope.receivePipeline.intercept(HttpReceivePipeline.After) { subject ->
-                if (context.response.status != HttpStatusCode.Unauthorized) {
-                    proceedWith(subject)
-                    return@intercept
-                }
+                //Only applicable if we are making a call to Bridge server
+                if (context.request.url.host.contains(AbstractApi.BRIDGE_SERVER_CHECK)) {
+                    if (context.response.status != HttpStatusCode.Unauthorized) {
+                        proceedWith(subject)
+                        return@intercept
+                    }
 
-                refreshTokenHttpFeatureMutex.lock()
+                    refreshTokenHttpFeatureMutex.lock()
 
-                // If token of the request isn't actual, then token has already been updated and
-                // let's just to try repeat request.
-                if (!feature.isCredentialsActual(context.request)) {
-                    refreshTokenHttpFeatureMutex.unlock()
-                    val requestBuilder = HttpRequestBuilder().takeFrom(context.request)
-                    val result: HttpResponse = context.client!!.request(requestBuilder)
-                    proceedWith(result)
-                    return@intercept
-                }
+                    // If token of the request isn't actual, then token has already been updated and
+                    // let's just to try repeat request.
+                    if (!feature.isCredentialsActual(context.request)) {
+                        refreshTokenHttpFeatureMutex.unlock()
+                        val requestBuilder = HttpRequestBuilder().takeFrom(context.request)
+                        val result: HttpResponse = context.client!!.request(requestBuilder)
+                        proceedWith(result)
+                        return@intercept
+                    }
 
-                // Else if token of the request is actual (same as in the storage), then need to send
-                // refresh request.
-                if (feature.updateTokenHandler.invoke()) {
-                    // If the request refresh was successful, then let's just to try repeat request
-                    refreshTokenHttpFeatureMutex.unlock()
-                    val requestBuilder = HttpRequestBuilder().takeFrom(context.request)
-                    val result: HttpResponse = context.client!!.request(requestBuilder)
-                    proceedWith(result)
-                } else {
-                    // If the request refresh was unsuccessful.
-                    refreshTokenHttpFeatureMutex.unlock()
-                    proceedWith(subject)
+                    // Else if token of the request is actual (same as in the storage), then need to send
+                    // refresh request.
+                    if (feature.updateTokenHandler.invoke()) {
+                        // If the request refresh was successful, then let's just to try repeat request
+                        refreshTokenHttpFeatureMutex.unlock()
+                        val requestBuilder = HttpRequestBuilder().takeFrom(context.request)
+                        val result: HttpResponse = context.client!!.request(requestBuilder)
+                        proceedWith(result)
+                    } else {
+                        // If the request refresh was unsuccessful.
+                        refreshTokenHttpFeatureMutex.unlock()
+                        proceedWith(subject)
+                    }
                 }
             }
         }

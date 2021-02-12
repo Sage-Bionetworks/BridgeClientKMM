@@ -9,6 +9,7 @@ import io.ktor.client.features.HttpClientFeature
 import io.ktor.client.request.HttpRequestPipeline
 import io.ktor.client.request.header
 import io.ktor.util.AttributeKey
+import org.sagebionetworks.bridge.kmm.shared.apis.AbstractApi.Companion.BRIDGE_SERVER_CHECK
 
 class SessionTokenFeature constructor(
     private val sessionTokenHeaderName: String,
@@ -32,9 +33,12 @@ class SessionTokenFeature constructor(
 
         override fun install(feature: SessionTokenFeature, scope: HttpClient) {
             scope.requestPipeline.intercept(HttpRequestPipeline.State) {
-                feature.sessionTokenProvider.getSessionToken()?.apply {
-                    context.headers.remove(feature.sessionTokenHeaderName)
-                    context.header(feature.sessionTokenHeaderName, this)
+                //Only applicable if we are making a call to Bridge server
+                if (this.context.url.host.contains(BRIDGE_SERVER_CHECK)) {
+                    feature.sessionTokenProvider.getSessionToken()?.apply {
+                        context.headers.remove(feature.sessionTokenHeaderName)
+                        context.header(feature.sessionTokenHeaderName, this)
+                    }
                 }
             }
         }

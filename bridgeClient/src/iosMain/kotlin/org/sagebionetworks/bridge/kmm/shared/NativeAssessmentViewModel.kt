@@ -16,7 +16,7 @@ class NativeAssessmentViewModel (
     private val viewUpdate: (String?) -> Unit
 ) : KoinComponent {
 
-    private val repo : AssessmentConfigRepo by inject(mode = LazyThreadSafetyMode.NONE) // = AssessmentConfigRepo(DefaultHttpClient.httpClient, ResourceDatabaseHelper(databaseDriverFactory.createDriver()), scope)
+    private val repo : AssessmentConfigRepo by inject(mode = LazyThreadSafetyMode.NONE)
     private val authManager: AuthenticationRepository by inject(mode = LazyThreadSafetyMode.NONE)
 
     private val scope = MainScope()

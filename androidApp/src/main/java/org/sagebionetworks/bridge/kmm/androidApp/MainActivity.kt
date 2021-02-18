@@ -37,8 +37,7 @@ class MainActivity : AppCompatActivity() {
         val tv: TextView = findViewById(R.id.text_view)
 
         if (AccountDAO().hasSignedIn) {
-            val repo = AssessmentConfigRepo(DatabaseDriverFactory(this), MainScope())
-            repo.getAssessmentById("eGhiQTT2a6SCCmjTod6CDb0t").asLiveData()
+            assessmentConfigRepo.getAssessmentById("eGhiQTT2a6SCCmjTod6CDb0t").asLiveData()
                 .observe(this, Observer { t ->
                     when (t) {
                         is ResourceResult.Success -> {tv.text = t.data.config.toString()}

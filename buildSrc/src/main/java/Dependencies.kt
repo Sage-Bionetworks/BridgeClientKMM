@@ -10,7 +10,7 @@ object Versions {
     const val kotlinxSerialization = "1.0.1"
     const val kotlinxDateTime = "0.1.1"
     const val multiplatformSettings = "0.7"
-    const val koin = "3.0.0-alpha-4"
+    const val koin = "3.0.1-alpha-3"
     const val sqlDelight = "1.4.4"
     const val okio = "3.0.0-alpha.1"
     const val stately = "1.1.1"
@@ -76,6 +76,7 @@ object Deps {
         val test = "org.koin:koin-test:${Versions.koin}"
         val android = "org.koin:koin-android:${Versions.koin}"
         val androidViewModel = "org.koin:koin-androidx-viewmodel:${Versions.koin}"
+        val androidWorkManager =  "org.koin:koin-androidx-workmanager:${Versions.koin}"
     }
 
     object Ktor {

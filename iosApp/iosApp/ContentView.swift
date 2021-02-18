@@ -40,7 +40,7 @@ extension ContentView {
         }
         
         func loadNativeViewModel() {
-            self.nvm = NativeAssessmentViewModel(databaseDriverFactory: dbDriverFactory, viewUpdate: { [weak self] summary in
+            self.nvm = NativeAssessmentViewModel( viewUpdate: { [weak self] summary in
                 self?.configString = summary ?? ""
             })
         }

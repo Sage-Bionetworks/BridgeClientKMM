@@ -8,12 +8,10 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import org.sagebionetworks.bridge.kmm.shared.TestDatabaseDriverFactory
-import org.sagebionetworks.bridge.kmm.shared.apis.DefaultHttpClient
 import org.sagebionetworks.bridge.kmm.shared.cache.Resource
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
 import org.sagebionetworks.bridge.kmm.shared.getTestClient
-import org.sagebionetworks.bridge.kmm.shared.repo.AuthenticationRepository
 import org.sagebionetworks.bridge.mpp.network.generated.models.UploadSession
 import java.io.PrintWriter
 import kotlin.test.*

@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.MainScope
+import org.koin.android.ext.android.inject
 import org.sagebionetworks.bridge.kmm.androidApp.ui.login.LoginActivity
 import org.sagebionetworks.bridge.kmm.shared.cache.AccountDAO
 import org.sagebionetworks.bridge.kmm.shared.cache.DatabaseDriverFactory
@@ -14,6 +15,9 @@ import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
 import org.sagebionetworks.bridge.kmm.shared.repo.AssessmentConfigRepo
 
 class MainActivity : AppCompatActivity() {
+
+    val assessmentConfigRepo: AssessmentConfigRepo by inject()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)

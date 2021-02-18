@@ -11,11 +11,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import org.sagebionetworks.bridge.kmm.shared.cache.*
 
-abstract class AbstractResourceRepo(databaseDriverFactory: DbDriverFactory, private val resourceType: ResourceType, private val backgroundScope: CoroutineScope) {
-
-
-    internal val database = ResourceDatabaseHelper(databaseDriverFactory)
-
+abstract class AbstractResourceRepo(val database: ResourceDatabaseHelper, private val resourceType: ResourceType, private val backgroundScope: CoroutineScope) {
 
     internal inline fun <reified T: Any> getResourceById(identifier: String,
                                                          noinline remoteLoad: suspend () -> String,
@@ -24,7 +20,7 @@ abstract class AbstractResourceRepo(databaseDriverFactory: DbDriverFactory, priv
             var filterResource = true //Return current item in the flow
             if (curResource == null ||
                 shouldUpdate(curResource) ||
-                (ResourceStatus.PENDING != curResource.status && curResource.lastUpdate + defaultUpdateFrequency < Clock.System.now().toEpochMilliseconds())
+                (curResource.lastUpdate + defaultUpdateFrequency < Clock.System.now().toEpochMilliseconds())
             ) {
                 filterResource = false // don't return current item since we are going to update it
 

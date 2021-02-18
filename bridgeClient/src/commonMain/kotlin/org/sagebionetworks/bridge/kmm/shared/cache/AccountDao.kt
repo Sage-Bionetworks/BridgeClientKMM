@@ -20,10 +20,6 @@ class AccountDAO() {
 
     val hasSignedIn = reauthToken != null
 
-    // TODO: syoung 11/25/2020 Replace hardcoded appId? This looks like test test code.
-
-    val appId = "sage-assessment-test"
-
     var email: String?
         get() = settings.getStringOrNull(KEY_EMAIL)
         set(email) {

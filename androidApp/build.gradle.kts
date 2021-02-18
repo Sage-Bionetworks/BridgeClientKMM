@@ -22,6 +22,10 @@ dependencies {
     implementation(Deps.AndroidX.appcompat)
     implementation(Deps.AndroidX.constraintlayout)
 
+    implementation(Deps.Koin.android)
+    implementation(Deps.Koin.androidWorkManager)
+    implementation(Deps.Koin.androidViewModel)
+
     // ViewModel
     implementation(Deps.AndroidX.lifecycle_viewmodel_ktx)
     // LiveData

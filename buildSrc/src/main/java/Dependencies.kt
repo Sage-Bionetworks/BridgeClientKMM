@@ -25,7 +25,7 @@ object Versions {
         val recyclerview = "1.1.0"
         val test = "1.3.0"
         val test_ext = "1.1.2"
-        val workManager = "2.4.0"
+        val workManager = "2.5.0"
     }
 
     const val slf4j = "1.7.30"

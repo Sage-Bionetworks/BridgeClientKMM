@@ -14,9 +14,9 @@ class AndroidBridgeConfig(context: Context) : BridgeConfig {
 
     private val applicationContext = context.applicationContext
 
-    override val appId: String = "sage-assessment-test"//applicationContext.getResources().getString(R.string.app_id)
+    override val appId: String = applicationContext.resources.getString(R.string.bridge_app_id)
 
-    override val appName: String = ""//applicationContext.getResources().getString(R.string.app_name)
+    override val appName: String = applicationContext.getResources().getString(R.string.bridge_app_name)
 
     override val sdkVersion: Int = BuildConfig.VERSION_CODE
 

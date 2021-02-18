@@ -11,7 +11,6 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okio.*
 import okio.Path.Companion.toPath
-import org.sagebionetworks.bridge.kmm.shared.apis.DefaultHttpClient
 import org.sagebionetworks.bridge.kmm.shared.cache.*
 import java.io.IOException
 import java.io.OutputStream

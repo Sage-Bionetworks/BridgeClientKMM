@@ -24,7 +24,6 @@ dependencies {
 
     implementation(Deps.Koin.android)
     implementation(Deps.Koin.androidWorkManager)
-    implementation(Deps.Koin.androidViewModel)
 
     // ViewModel
     implementation(Deps.AndroidX.lifecycle_viewmodel_ktx)

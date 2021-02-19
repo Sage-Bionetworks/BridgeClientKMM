@@ -30,12 +30,10 @@ extension ContentView {
     // ...
 
     class ViewModel: ObservableObject {
-        let dbDriverFactory: DatabaseDriverFactory
         var nvm: NativeAssessmentViewModel? = nil
         @Published var configString = "Loading..."
 
-        init(dbDriverFactory: DatabaseDriverFactory) {
-            self.dbDriverFactory = dbDriverFactory
+        init() {
             self.loadNativeViewModel()
         }
         

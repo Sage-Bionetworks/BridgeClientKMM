@@ -25,6 +25,6 @@ actual val platformModule: Module = module {
 
     single<BridgeConfig> {AndroidBridgeConfig(get())}
 
-    worker { CoroutineUploadWorker(get(), get(), get()) }
+    worker { CoroutineUploadWorker(get(), get(), get(), get()) }
 
 }

@@ -81,7 +81,7 @@ abstract class AbstractResourceRepo(val database: ResourceDatabaseHelper, privat
             throwable: Throwable
         ): Resource {
             var status = ResourceStatus.FAILED
-            var lastUpdate = curResource?.lastUpdate ?: Clock.System.now().toEpochMilliseconds()
+            var lastUpdate = Clock.System.now().toEpochMilliseconds()
             var json = curResource?.json
             when (throwable) {
 

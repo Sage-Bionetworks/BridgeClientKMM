@@ -7,13 +7,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.sagebionetworks.bridge.kmm.shared.apis.PublicApi
-import org.sagebionetworks.bridge.kmm.shared.cache.DbDriverFactory
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
 import org.sagebionetworks.bridge.mpp.network.generated.models.AppConfig
 
-class AppConfigRepo(httpClient: HttpClient, databaseHelper: ResourceDatabaseHelper, databaseDriverFactory: DbDriverFactory, backgroundScope: CoroutineScope) :
+class AppConfigRepo(httpClient: HttpClient, databaseHelper: ResourceDatabaseHelper, backgroundScope: CoroutineScope) :
     AbstractResourceRepo(databaseHelper, resourceType = ResourceType.APP_CONFIG, backgroundScope) {
 
     init {

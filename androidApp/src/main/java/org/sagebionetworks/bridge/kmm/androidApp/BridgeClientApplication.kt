@@ -13,7 +13,7 @@ class BridgeClientApplication : Application(), KoinComponent {
     override fun onCreate() {
         super.onCreate()
 
-        initKoin {
+        initKoin (enableNetworkLogs = BuildConfig.DEBUG){
             androidLogger()
             androidContext(this@BridgeClientApplication)
             workManagerFactory()

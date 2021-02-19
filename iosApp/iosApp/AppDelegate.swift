@@ -8,7 +8,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        KoinKt.doInitKoin()
+        var enableNetworkLogs = false
+        #if DEBUG
+           enableNetworkLogs = true
+        #endif
+        KoinKt.doInitKoin(enableNetworkLogs: enableNetworkLogs)
         return true
     }
 

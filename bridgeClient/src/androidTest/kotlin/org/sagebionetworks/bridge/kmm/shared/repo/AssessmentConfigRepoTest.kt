@@ -6,7 +6,9 @@ import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import org.koin.test.KoinTest
 import org.sagebionetworks.bridge.kmm.shared.apis.AssessmentsApi
+import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
 import org.sagebionetworks.bridge.kmm.shared.getTestClient
@@ -24,8 +26,7 @@ class AssessmentConfigRepoTest {
     fun testAssessmentConfig() {
         runBlocking {
             val assessmentConfigId = "testId"
-            val repo = AssessmentConfigRepo(testDatabaseDriverFactory(), CoroutineScope(Dispatchers.Default))
-            repo.assessmentsApi = AssessmentsApi(httpClient = getTestClient(assessmentJson))
+            val repo = AssessmentConfigRepo(getTestClient(assessmentJson), ResourceDatabaseHelper(testDatabaseDriverFactory().createDriver()), CoroutineScope(Dispatchers.Default))
 
             val resultJson = repo.getAssessmentById(assessmentConfigId).filterNot { ResourceResult.InProgress == it }.first()
             assertNotNull(resultJson)

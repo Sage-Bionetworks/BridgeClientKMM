@@ -30,7 +30,7 @@ class UploadManager(
 
     private val uploadsApi = UploadsApi(httpClient = httpClient)
     private val s3UploadApi = S3UploadApi(httpClient = httpClient)
-    internal val database = ResourceDatabaseHelper(databaseDriverFactory)
+    internal val database = ResourceDatabaseHelper(databaseDriverFactory.createDriver())
 
 
     /**

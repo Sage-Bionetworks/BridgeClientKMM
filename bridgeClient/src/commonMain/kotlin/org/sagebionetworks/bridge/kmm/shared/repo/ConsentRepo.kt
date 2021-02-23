@@ -1,15 +1,15 @@
 package org.sagebionetworks.bridge.kmm.shared.repo
 
+import io.ktor.client.*
 import org.sagebionetworks.bridge.kmm.shared.apis.ConsentApi
-import org.sagebionetworks.bridge.kmm.shared.apis.DefaultHttpClient
 import org.sagebionetworks.bridge.kmm.shared.models.ConsentSignature
 import org.sagebionetworks.bridge.kmm.shared.models.SharingScope
 import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
 
-class ConsentRepo {
+class ConsentRepo(httpClient: HttpClient) {
 
     private val consentApi = ConsentApi(
-        httpClient = DefaultHttpClient.httpClient
+        httpClient = httpClient
     )
 
     suspend fun createConsentSignature(subpopulationGuid: String, scope: SharingScope = SharingScope.ALL_QUALIFIED_RESEARCHERS) : UserSessionInfo {

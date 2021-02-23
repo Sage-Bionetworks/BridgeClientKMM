@@ -10,7 +10,7 @@ object Versions {
     const val kotlinxSerialization = "1.0.1"
     const val kotlinxDateTime = "0.1.1"
     const val multiplatformSettings = "0.7"
-    const val koin = "3.0.0-alpha-4"
+    const val koin = "3.0.1-alpha-3"
     const val sqlDelight = "1.4.4"
     const val okio = "3.0.0-alpha.1"
     const val stately = "1.1.1"
@@ -25,7 +25,7 @@ object Versions {
         val recyclerview = "1.1.0"
         val test = "1.3.0"
         val test_ext = "1.1.2"
-        val workManager = "2.4.0"
+        val workManager = "2.5.0"
     }
 
     const val slf4j = "1.7.30"
@@ -76,6 +76,7 @@ object Deps {
         val test = "org.koin:koin-test:${Versions.koin}"
         val android = "org.koin:koin-android:${Versions.koin}"
         val androidViewModel = "org.koin:koin-androidx-viewmodel:${Versions.koin}"
+        val androidWorkManager =  "org.koin:koin-androidx-workmanager:${Versions.koin}"
     }
 
     object Ktor {

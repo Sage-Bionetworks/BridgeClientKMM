@@ -67,6 +67,8 @@ kotlin {
                 implementation(Deps.multiplatformSettings)
                 implementation(Deps.multiplatformSettingsNoArg)
                 implementation(Deps.okio)
+                // koin
+                api(Deps.Koin.core)
             }
         }
         val commonTest by getting {
@@ -74,6 +76,7 @@ kotlin {
                 implementation(kotlin("test-common"))
                 implementation(kotlin("test-annotations-common"))
                 implementation(Deps.Ktor.clientMock)
+                api(Deps.Koin.test)
             }
         }
         val androidMain by getting {
@@ -83,6 +86,8 @@ kotlin {
                 implementation(Deps.Ktor.clientAndroid)
                 implementation(Deps.AndroidX.work_runtime)
                 implementation(Deps.AndroidX.work_runtime_kts)
+                implementation(Deps.Koin.android)
+                implementation(Deps.Koin.androidWorkManager)
             }
         }
         val androidTest by getting {
@@ -106,6 +111,7 @@ kotlin {
 android {
     compileSdkVersion(Versions.compile_sdk)
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+    sourceSets["main"].res.srcDirs("src/androidMain/res")
     defaultConfig {
         minSdkVersion(Versions.min_sdk)
         targetSdkVersion(Versions.target_sdk)

@@ -9,7 +9,6 @@ import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.MainScope
 import org.koin.android.ext.android.inject
 import org.sagebionetworks.bridge.kmm.androidApp.ui.login.LoginActivity
-import org.sagebionetworks.bridge.kmm.shared.cache.AccountDAO
 import org.sagebionetworks.bridge.kmm.shared.cache.DatabaseDriverFactory
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
 import org.sagebionetworks.bridge.kmm.shared.repo.AssessmentConfigRepo

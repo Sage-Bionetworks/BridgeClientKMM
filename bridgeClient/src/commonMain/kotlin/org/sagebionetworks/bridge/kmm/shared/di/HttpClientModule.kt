@@ -8,11 +8,8 @@ import io.ktor.client.features.logging.*
 import io.ktor.client.request.*
 import org.koin.dsl.module
 import org.sagebionetworks.bridge.kmm.shared.BridgeConfig
-import org.sagebionetworks.bridge.kmm.shared.apis.AuthenticationApi
 import org.sagebionetworks.bridge.kmm.shared.apis.RefreshTokenFeature
 import org.sagebionetworks.bridge.kmm.shared.apis.SessionTokenFeature
-import org.sagebionetworks.bridge.kmm.shared.cache.AccountDAO
-import org.sagebionetworks.bridge.kmm.shared.models.SignIn
 import org.sagebionetworks.bridge.kmm.shared.repo.AuthenticationRepository
 
 fun httpClientModule(enableNetworkLogs: Boolean) = module {

@@ -26,7 +26,7 @@ val commonModule = module {
     single {ResourceDatabaseHelper(get())}
 
     single<AssessmentConfigRepo> {AssessmentConfigRepo(get(), get(), get(named("background"))) }
-    single<AuthenticationRepository> {AuthenticationRepository(get())}
+    single<AuthenticationRepository> {AuthenticationRepository(get(), get())}
 
 }
 

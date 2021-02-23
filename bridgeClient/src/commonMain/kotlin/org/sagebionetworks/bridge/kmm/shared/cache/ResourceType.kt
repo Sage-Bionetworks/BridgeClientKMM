@@ -9,7 +9,8 @@ enum class ResourceType() {
     ASSESSMENT_CONFIG,
     APP_CONFIG,
     UPLOAD_SESSION,
-    FILE_UPLOAD
+    FILE_UPLOAD,
+    USER_SESSION_INFO
 
 }
 

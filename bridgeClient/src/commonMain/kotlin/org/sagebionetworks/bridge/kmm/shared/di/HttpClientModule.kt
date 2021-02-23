@@ -47,7 +47,7 @@ fun createHttpClient(enableNetworkLogs: Boolean, bridgeConfig: BridgeConfig, aut
         sessionTokenProvider = object: SessionTokenFeature.SessionTokenProvider {
 
             override fun getSessionToken(): String? {
-                return authenticationRepository.accountDAO.sessionToken
+                return authenticationRepository.session()?.sessionToken
             }
         }
     }
@@ -56,7 +56,7 @@ fun createHttpClient(enableNetworkLogs: Boolean, bridgeConfig: BridgeConfig, aut
             authenticationRepository.reAuth()
         }
         isCredentialsActual = fun(request: HttpRequest): Boolean {
-            authenticationRepository.accountDAO.sessionToken?.let {
+            authenticationRepository.session()?.sessionToken?.let {
                 return it.equals(request.headers.get(sessionTokenHeaderKey))
             }
             return true

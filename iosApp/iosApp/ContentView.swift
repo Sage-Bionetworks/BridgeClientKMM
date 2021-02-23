@@ -9,7 +9,7 @@ struct ContentView: View {
     
     var body: some View {
         VStack {
-            if (AccountDAO().hasSignedIn) {
+            if (viewModel.nvm?.isAuthenticated() == true) {
                 Text(viewModel.configString)
             } else {
                 TextField("Username", text: $userName)

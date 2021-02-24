@@ -6,6 +6,7 @@ import org.koin.android.ext.koin.androidLogger
 import org.koin.androidx.workmanager.koin.workManagerFactory
 import org.koin.core.component.KoinComponent
 import org.sagebionetworks.bridge.kmm.androidApp.di.appModule
+import org.sagebionetworks.bridge.kmm.presentation.di.presentationModule
 import org.sagebionetworks.bridge.kmm.shared.di.initKoin
 
 class BridgeClientApplication : Application(), KoinComponent {
@@ -18,6 +19,7 @@ class BridgeClientApplication : Application(), KoinComponent {
             androidContext(this@BridgeClientApplication)
             workManagerFactory()
             modules(appModule)
+            modules(presentationModule)
         }
 
     }

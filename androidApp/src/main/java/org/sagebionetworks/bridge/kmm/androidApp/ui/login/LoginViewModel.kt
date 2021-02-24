@@ -21,9 +21,9 @@ class LoginViewModel(private val authenticationRepository: AuthenticationReposit
     fun login(username: String, password: String) {
         // can be launched in a separate asynchronous job
         viewModelScope.launch {
-            val userSession = authenticationRepository.signIn(username, password)
+            val userSession = authenticationRepository.signInEmail(username, password)
             _loginResult.value =
-                LoginResult(success = LoggedInUserView(displayName = userSession.email!!))
+                LoginResult(success = LoggedInUserView(displayName = userSession.email?: "No Email"))
 
         }
     }

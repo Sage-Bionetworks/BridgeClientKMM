@@ -18,6 +18,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:${Versions.kotlin}")
     implementation(Deps.AndroidX.annotation)
     implementation(project(":bridgeClient"))
+    implementation(project(":bridgeClientPresentation"))
     implementation(Deps.AndroidX.material)
     implementation(Deps.AndroidX.appcompat)
     implementation(Deps.AndroidX.constraintlayout)

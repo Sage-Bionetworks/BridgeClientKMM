@@ -1,3 +1,4 @@
+include(":bridgeClientPresentation")
 pluginManagement {
     repositories {
         gradlePluginPortal()

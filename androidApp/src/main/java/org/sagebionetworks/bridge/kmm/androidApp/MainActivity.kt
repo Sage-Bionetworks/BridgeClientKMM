@@ -9,6 +9,7 @@ import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.MainScope
 import org.koin.android.ext.android.inject
 import org.sagebionetworks.bridge.kmm.androidApp.ui.login.LoginActivity
+import org.sagebionetworks.bridge.kmm.presentation.auth.ExternalIdSignInActivity
 import org.sagebionetworks.bridge.kmm.shared.cache.DatabaseDriverFactory
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
 import org.sagebionetworks.bridge.kmm.shared.repo.AssessmentConfigRepo
@@ -24,7 +25,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         if (!authenticationRepository.isAuthenticated()) {
-            val launchIntent = Intent(this, LoginActivity::class.java)
+            val launchIntent = Intent(this, ExternalIdSignInActivity::class.java)
                 .setData(intent.data)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
 

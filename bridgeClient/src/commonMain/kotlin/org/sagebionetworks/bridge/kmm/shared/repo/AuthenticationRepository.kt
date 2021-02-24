@@ -37,33 +37,28 @@ class AuthenticationRepository(val bridgeConfig: BridgeConfig, val database: Res
         return session()?.authenticated ?: false
     }
 
-    suspend fun signIn(externalId: String) : UserSessionInfo {
-        val authApi = AuthenticationApi()
+    suspend fun signInExternalId(externalId: String, password: String) : UserSessionInfo {
         val signIn = SignIn(
             bridgeConfig.appId,
             externalId = externalId,
-            password = externalId,
+            password = password,
         )
-        val userSession = authApi.signIn(signIn)
-        updateCachedSession(null, userSession)
-        return userSession
+        return signIn(signIn)
     }
 
-    suspend fun signIn(email: String, password: String) : UserSessionInfo {
-        val authApi = AuthenticationApi()
+    suspend fun signInEmail(email: String, password: String) : UserSessionInfo {
         val signIn = SignIn(
             appId = bridgeConfig.appId,
             email = email,
             password = password,
         )
+        return signIn(signIn)
+    }
+
+    private suspend fun signIn(signIn: SignIn) : UserSessionInfo {
+        val authApi = AuthenticationApi()
         val userSession = authApi.signIn(signIn)
         updateCachedSession(null, userSession)
-
-        // TODO: syoung 11/25/2020 Is this test code to get around consenting the user? Should it be here? And if so, please add a comment. Thanks!
-//        if (!userSession.consented) {
-//            ConsentRepo().createConsentSignature("sage-assessment-test")
-//        }
-
         return userSession
     }
 

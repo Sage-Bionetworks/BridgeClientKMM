@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="osb_signin_failure_message">Unable to sign in</string>
+
+
+</resources>

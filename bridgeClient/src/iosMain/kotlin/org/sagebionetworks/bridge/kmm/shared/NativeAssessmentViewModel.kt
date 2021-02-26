@@ -32,9 +32,13 @@ class NativeAssessmentViewModel (
         }
     }
 
+    fun isAuthenticated() : Boolean {
+        return authManager.isAuthenticated()
+    }
+
     fun signIn(userName: String, password: String, callBack: (UserSessionInfo?) -> Unit) {
         scope.launch {
-            val userSession = authManager.signIn(email = userName, password = password)
+            val userSession = authManager.signInEmail(email = userName, password = password)
             callBack(userSession)
         }
     }

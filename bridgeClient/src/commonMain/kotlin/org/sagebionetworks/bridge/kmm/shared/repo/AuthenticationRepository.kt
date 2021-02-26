@@ -1,50 +1,124 @@
 package org.sagebionetworks.bridge.kmm.shared.repo
 
+import io.ktor.client.*
+import io.ktor.client.features.*
+import io.ktor.http.*
+import io.ktor.util.network.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.datetime.Clock
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.sagebionetworks.bridge.kmm.shared.BridgeConfig
+import org.sagebionetworks.bridge.kmm.shared.apis.AssessmentsApi
 import org.sagebionetworks.bridge.kmm.shared.apis.AuthenticationApi
-import org.sagebionetworks.bridge.kmm.shared.cache.AccountDAO
+import org.sagebionetworks.bridge.kmm.shared.cache.*
 import org.sagebionetworks.bridge.kmm.shared.models.SignIn
 import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
 
-class AuthenticationRepository(val bridgeConfig: BridgeConfig) {
+class AuthenticationRepository(httpClient: HttpClient, val bridgeConfig: BridgeConfig, val database: ResourceDatabaseHelper) {
 
-    val accountDAO = AccountDAO()
+    companion object {
+        const val USER_SESSION_ID = "UserSessionId"
+    }
 
-    suspend fun signIn(email: String, password: String) : UserSessionInfo {
-        val authApi = AuthenticationApi()
+    private val authenticationApi = AuthenticationApi(httpClient = httpClient)
+
+    /**
+     * Get the current [UserSessionInfo] object as a Flow. The flow will emit a new value whenever
+     * the session is updated. This allows observers to watch for changes to authentication or
+     * consent status.
+     */
+    fun sessionAsFlow() : Flow<UserSessionInfo?> {
+        return database.getResourceAsFlow(USER_SESSION_ID).map { curResource -> curResource?.loadResource() }
+    }
+
+    /**
+     * Get the current [UserSessionInfo] object.
+     */
+    fun session() : UserSessionInfo? {
+        return database.getResource(USER_SESSION_ID)?.loadResource()
+    }
+
+    fun isAuthenticated() : Boolean {
+        return session()?.authenticated ?: false
+    }
+
+    fun signOut() {
+        database.removeResource(USER_SESSION_ID)
+    }
+
+    suspend fun signInExternalId(externalId: String, password: String) : ResourceResult<UserSessionInfo> {
         val signIn = SignIn(
             bridgeConfig.appId,
-            email,
+            externalId = externalId,
             password = password,
         )
-        val userSession = authApi.signIn(signIn)
-        accountDAO.email = userSession.email
-        accountDAO.sessionToken = userSession.sessionToken
-        accountDAO.reauthToken = userSession.reauthToken
+        return signIn(signIn)
+    }
 
-        // TODO: syoung 11/25/2020 Is this test code to get around consenting the user? Should it be here? And if so, please add a comment. Thanks!
-//        if (!userSession.consented) {
-//            ConsentRepo().createConsentSignature("sage-assessment-test")
-//        }
+    suspend fun signInEmail(email: String, password: String) : ResourceResult<UserSessionInfo> {
+        val signIn = SignIn(
+            appId = bridgeConfig.appId,
+            email = email,
+            password = password,
+        )
+        return signIn(signIn)
+    }
 
-        return userSession
+    private suspend fun signIn(signIn: SignIn) : ResourceResult<UserSessionInfo> {
+        try {
+            val userSession = authenticationApi.signIn(signIn)
+            updateCachedSession(null, userSession)
+            return ResourceResult.Success(userSession, ResourceStatus.SUCCESS)
+        } catch (err: Throwable) {
+            database.removeResource(USER_SESSION_ID)
+            println(err)
+        }
+        return ResourceResult.Failed(ResourceStatus.FAILED)
     }
 
     suspend fun reAuth() : Boolean {
-        val accountDAO = AccountDAO()
-        return accountDAO.reauthToken?.let {
+        val sessionInfo = session()
+        return sessionInfo?.reauthToken?.let {
             val signIn = SignIn(
-                bridgeConfig.appId,
-                accountDAO.email,
-                reauthToken = accountDAO.reauthToken
+                appId = bridgeConfig.appId,
+                email = sessionInfo.email,
+                externalId = sessionInfo.externalId,
+                reauthToken = it
             )
-            val authApi = AuthenticationApi()
-            val userSession = authApi.reauthenticate(signIn)
-            authApi.close()
-            accountDAO.sessionToken = userSession.sessionToken
-            accountDAO.reauthToken = userSession.reauthToken
-            true
+            var success = false
+            try {
+                val userSession = authenticationApi.reauthenticate(signIn)
+                updateCachedSession(sessionInfo, userSession)
+                success = true
+            } catch (err: Throwable) {
+                println(err)
+                if (err is ResponseException) {
+                    // We got a response from Bridge and it was an error.
+                    // Clear the cached session
+                    database.removeResource(USER_SESSION_ID)
+                } else {
+                    // Some sort of network error leave the session alone so we can try again
+                }
+            }
+            success
         } ?: false
+    }
+
+    private fun updateCachedSession(oldUserSessionInfo: UserSessionInfo?, newUserSession: UserSessionInfo) {
+        var toCacheSession = newUserSession
+        if (newUserSession.reauthToken == null && oldUserSessionInfo?.reauthToken != null) {
+            toCacheSession = newUserSession.copy(reauthToken = oldUserSessionInfo.reauthToken)
+        }
+        var resource = Resource(
+            USER_SESSION_ID,
+            ResourceType.USER_SESSION_INFO,
+            Json.encodeToString(toCacheSession),
+            Clock.System.now().toEpochMilliseconds(),
+            ResourceStatus.SUCCESS
+        )
+        database.insertUpdateResource(resource)
     }
 
 }

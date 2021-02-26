@@ -11,9 +11,7 @@ import io.ktor.http.*
 import org.sagebionetworks.bridge.kmm.shared.models.AssessmentConfig
 import org.sagebionetworks.bridge.mpp.network.generated.models.AppConfig
 
-internal class PublicApi(basePath: kotlin.String = BASE_PATH, httpClient: HttpClient) : AbstractApi(basePath) {
-
-    override val httpClient = httpClient
+internal class PublicApi(basePath: kotlin.String = BASE_PATH, httpClient: HttpClient) : AbstractApi(basePath, httpClient) {
 
     /**
      * Get the config for the current version of the app making the request.

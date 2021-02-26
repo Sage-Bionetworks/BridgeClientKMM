@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="bridge_app_id" translatable="false">sage-assessment-test</string>
-    <string name="bridge_app_name">Sage Assessment Test</string>
+    <string name="osb_app_id" translatable="false">sage-assessment-test</string>
+    <string name="osb_app_name">Sage Assessment Test</string>
 
 </resources>

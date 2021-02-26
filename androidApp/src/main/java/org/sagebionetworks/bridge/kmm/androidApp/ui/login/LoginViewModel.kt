@@ -1,5 +1,6 @@
 package org.sagebionetworks.bridge.kmm.androidApp.ui.login
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -8,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 
 import org.sagebionetworks.bridge.kmm.androidApp.R
+import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
 import org.sagebionetworks.bridge.kmm.shared.repo.AuthenticationRepository
 
 class LoginViewModel(private val authenticationRepository: AuthenticationRepository) : ViewModel() {
@@ -21,9 +23,17 @@ class LoginViewModel(private val authenticationRepository: AuthenticationReposit
     fun login(username: String, password: String) {
         // can be launched in a separate asynchronous job
         viewModelScope.launch {
-            val userSession = authenticationRepository.signIn(username, password)
-            _loginResult.value =
-                LoginResult(success = LoggedInUserView(displayName = userSession.email!!))
+            val userSessionResult = authenticationRepository.signInEmail(username, password)
+            if (userSessionResult is ResourceResult.Success) {
+                _loginResult.value =
+                    LoginResult(
+                        success = LoggedInUserView(
+                            displayName = userSessionResult.data.email ?: "No Email"
+                        )
+                    )
+            } else {
+                _loginResult.value = LoginResult(error = R.string.login_failed)
+            }
 
         }
     }

@@ -10,36 +10,7 @@ import io.ktor.client.features.logging.*
 import org.sagebionetworks.bridge.kmm.shared.models.SignIn
 import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
 
-internal class AuthenticationApi(basePath: kotlin.String = BASE_PATH) : AbstractApi(basePath) {
-
-    // Authentication uses its own HttpClient so as not to include the re-authentication feature found in DefaultHttpClient,
-    // which would cause a dependency loop
-    override val httpClient = HttpClient {
-
-        install(JsonFeature) {
-            serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
-                ignoreUnknownKeys = true
-            })
-        }
-
-        install(Logging) {
-            level = LogLevel.ALL
-            logger = object : Logger {
-                override fun log(message: String) {
-                    // TODO: syoung 11/25/2020 Given that this is an authentication service, is there a risk that the message will include PII?
-                    println(message)
-                }
-            }
-        }
-        expectSuccess = false //Turns off automatic response code validation
-    }
-
-    /**
-     * Close the httpclient used by this api
-     */
-    fun close() {
-        httpClient.close()
-    }
+internal class AuthenticationApi(basePath: kotlin.String = BASE_PATH, httpClient: HttpClient) : AbstractApi(basePath, httpClient) {
 
     /**
     * 

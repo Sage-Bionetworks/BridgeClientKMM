@@ -1,5 +1,6 @@
 package org.sagebionetworks.bridge.kmm.shared.upload
 
+import com.squareup.sqldelight.db.SqlDriver
 import io.ktor.client.*
 import kotlinx.datetime.*
 import kotlinx.serialization.encodeToString
@@ -20,7 +21,7 @@ import org.sagebionetworks.bridge.mpp.network.generated.models.UploadSession
 
 class UploadManager(
     httpClient: HttpClient,
-    databaseDriverFactory: DbDriverFactory
+    sqlDriver: SqlDriver
 ) {
 
     companion object {
@@ -30,7 +31,7 @@ class UploadManager(
 
     private val uploadsApi = UploadsApi(httpClient = httpClient)
     private val s3UploadApi = S3UploadApi(httpClient = httpClient)
-    internal val database = ResourceDatabaseHelper(databaseDriverFactory.createDriver())
+    internal val database = ResourceDatabaseHelper(sqlDriver)
 
 
     /**

@@ -64,8 +64,6 @@ kotlin {
                 implementation(Deps.Ktor.clientLogging)
                 implementation(Deps.kotlinxDateTime)
                 implementation(Deps.stately)
-                implementation(Deps.multiplatformSettings)
-                implementation(Deps.multiplatformSettingsNoArg)
                 implementation(Deps.okio)
                 // koin
                 api(Deps.Koin.core)

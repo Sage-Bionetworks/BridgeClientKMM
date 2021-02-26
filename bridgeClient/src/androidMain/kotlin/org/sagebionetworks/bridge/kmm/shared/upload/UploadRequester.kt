@@ -3,6 +3,7 @@ package org.sagebionetworks.bridge.kmm.shared.upload
 import android.content.Context
 import android.util.Log
 import androidx.work.*
+import com.squareup.sqldelight.db.SqlDriver
 import io.ktor.client.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -19,11 +20,9 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
 class UploadRequester(
-    databaseDriverFactory: DbDriverFactory,
+    val database: ResourceDatabaseHelper,
     private val context: Context
 ) {
-
-    internal val database = ResourceDatabaseHelper(databaseDriverFactory.createDriver())
 
     /**
      * Persist the file on disk and add it to the queue of pending uploads. Schedule WorkManager to
@@ -116,16 +115,15 @@ class UploadRequester(
 class CoroutineUploadWorker(
     context: Context,
     params: WorkerParameters,
-    private val httpClient: HttpClient
+    private val httpClient: HttpClient,
+    private val sqlDriver: SqlDriver
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
         return withContext(Dispatchers.IO) {
             Log.d("Upload", "Upload worker started")
             val uploadManager = UploadManager(
-                httpClient, DatabaseDriverFactory(
-                    applicationContext
-                )
+                httpClient, sqlDriver
             )
             if (uploadManager.processUploads()) {
                 Result.success()

@@ -9,7 +9,7 @@ object Versions {
     const val ktor = "1.5.0"//"1.4.2"//"1.5.0"
     const val kotlinxSerialization = "1.0.1"
     const val kotlinxDateTime = "0.1.1"
-    const val multiplatformSettings = "0.7"
+    const val multiplatformSettings = "0.7.1"
     const val koin = "3.0.1-alpha-3"
     const val sqlDelight = "1.4.4"
     const val okio = "3.0.0-alpha.1"
@@ -37,9 +37,6 @@ object Versions {
 object Deps {
 
     val kotlinxDateTime = "org.jetbrains.kotlinx:kotlinx-datetime:${Versions.kotlinxDateTime}"
-    val multiplatformSettings = "com.russhwolf:multiplatform-settings:${Versions.multiplatformSettings}"
-    val multiplatformSettingsNoArg = "com.russhwolf:multiplatform-settings-no-arg:${Versions.multiplatformSettings}"
-    val multiplatformSettingsTest = "com.russhwolf:multiplatform-settings-test:${Versions.multiplatformSettings}"
     val okio = "com.squareup.okio:okio-multiplatform:${Versions.okio}"
     val stately = "co.touchlab:stately-common:${Versions.stately}"
 
@@ -105,5 +102,13 @@ object Deps {
 
         val nativeDriver = "com.squareup.sqldelight:native-driver:${Versions.sqlDelight}"
         val sqlliteDriver = "com.squareup.sqldelight:sqlite-driver:${Versions.sqlDelight}"
+    }
+
+    //Not currently using, but may be useful in the future
+    object MultiplatformSettings {
+        val multiplatformSettings = "com.russhwolf:multiplatform-settings:${Versions.multiplatformSettings}"
+        val multiplatformSettingsNoArg = "com.russhwolf:multiplatform-settings-no-arg:${Versions.multiplatformSettings}"
+        val multiplatformSettingsCoroutines = "com.russhwolf:multiplatform-settings-coroutines-native-mt:${Versions.multiplatformSettings}"
+        val multiplatformSettingsTest = "com.russhwolf:multiplatform-settings-test:${Versions.multiplatformSettings}"
     }
 }

@@ -1,7 +1,5 @@
 package org.sagebionetworks.bridge.kmm.shared.di
 
-import com.russhwolf.settings.AndroidSettings
-import com.russhwolf.settings.Settings
 import com.squareup.sqldelight.android.AndroidSqliteDriver
 import com.squareup.sqldelight.db.SqlDriver
 import kotlinx.coroutines.CoroutineScope

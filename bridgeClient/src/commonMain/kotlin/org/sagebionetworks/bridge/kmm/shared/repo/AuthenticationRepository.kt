@@ -1,21 +1,28 @@
 package org.sagebionetworks.bridge.kmm.shared.repo
 
+import io.ktor.client.*
+import io.ktor.client.features.*
+import io.ktor.http.*
+import io.ktor.util.network.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Clock
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.sagebionetworks.bridge.kmm.shared.BridgeConfig
+import org.sagebionetworks.bridge.kmm.shared.apis.AssessmentsApi
 import org.sagebionetworks.bridge.kmm.shared.apis.AuthenticationApi
 import org.sagebionetworks.bridge.kmm.shared.cache.*
 import org.sagebionetworks.bridge.kmm.shared.models.SignIn
 import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
 
-class AuthenticationRepository(val bridgeConfig: BridgeConfig, val database: ResourceDatabaseHelper) {
+class AuthenticationRepository(httpClient: HttpClient, val bridgeConfig: BridgeConfig, val database: ResourceDatabaseHelper) {
 
     companion object {
         const val USER_SESSION_ID = "UserSessionId"
     }
+
+    private val authenticationApi = AuthenticationApi(httpClient = httpClient)
 
     /**
      * Get the current [UserSessionInfo] object as a Flow. The flow will emit a new value whenever
@@ -37,7 +44,11 @@ class AuthenticationRepository(val bridgeConfig: BridgeConfig, val database: Res
         return session()?.authenticated ?: false
     }
 
-    suspend fun signInExternalId(externalId: String, password: String) : UserSessionInfo {
+    fun signOut() {
+        database.removeResource(USER_SESSION_ID)
+    }
+
+    suspend fun signInExternalId(externalId: String, password: String) : ResourceResult<UserSessionInfo> {
         val signIn = SignIn(
             bridgeConfig.appId,
             externalId = externalId,
@@ -46,7 +57,7 @@ class AuthenticationRepository(val bridgeConfig: BridgeConfig, val database: Res
         return signIn(signIn)
     }
 
-    suspend fun signInEmail(email: String, password: String) : UserSessionInfo {
+    suspend fun signInEmail(email: String, password: String) : ResourceResult<UserSessionInfo> {
         val signIn = SignIn(
             appId = bridgeConfig.appId,
             email = email,
@@ -55,16 +66,20 @@ class AuthenticationRepository(val bridgeConfig: BridgeConfig, val database: Res
         return signIn(signIn)
     }
 
-    private suspend fun signIn(signIn: SignIn) : UserSessionInfo {
-        val authApi = AuthenticationApi()
-        val userSession = authApi.signIn(signIn)
-        updateCachedSession(null, userSession)
-        return userSession
+    private suspend fun signIn(signIn: SignIn) : ResourceResult<UserSessionInfo> {
+        try {
+            val userSession = authenticationApi.signIn(signIn)
+            updateCachedSession(null, userSession)
+            return ResourceResult.Success(userSession, ResourceStatus.SUCCESS)
+        } catch (err: Throwable) {
+            database.removeResource(USER_SESSION_ID)
+            println(err)
+        }
+        return ResourceResult.Failed(ResourceStatus.FAILED)
     }
 
     suspend fun reAuth() : Boolean {
         val sessionInfo = session()
-        //val accountDAO = AccountDAO()
         return sessionInfo?.reauthToken?.let {
             val signIn = SignIn(
                 appId = bridgeConfig.appId,
@@ -72,12 +87,22 @@ class AuthenticationRepository(val bridgeConfig: BridgeConfig, val database: Res
                 externalId = sessionInfo.externalId,
                 reauthToken = it
             )
-            val authApi = AuthenticationApi()
-            val userSession = authApi.reauthenticate(signIn)
-            authApi.close()
-            //TODO: Handle failure cases, currently errors result in an empty UserSessionInfo -nbrown 02/23/2021
-            updateCachedSession(sessionInfo, userSession)
-            true
+            var success = false
+            try {
+                val userSession = authenticationApi.reauthenticate(signIn)
+                updateCachedSession(sessionInfo, userSession)
+                success = true
+            } catch (err: Throwable) {
+                println(err)
+                if (err is ResponseException) {
+                    // We got a response from Bridge and it was an error.
+                    // Clear the cached session
+                    database.removeResource(USER_SESSION_ID)
+                } else {
+                    // Some sort of network error leave the session alone so we can try again
+                }
+            }
+            success
         } ?: false
     }
 

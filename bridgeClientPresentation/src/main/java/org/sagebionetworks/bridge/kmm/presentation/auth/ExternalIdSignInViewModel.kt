@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
 import org.sagebionetworks.bridge.kmm.shared.repo.AuthenticationRepository
 
 class ExternalIdSignInViewModel(private val authenticationRepository: AuthenticationRepository) : ViewModel() {
@@ -16,8 +17,8 @@ class ExternalIdSignInViewModel(private val authenticationRepository: Authentica
 
         viewModelScope.launch {
 
-            val userSession = authenticationRepository.signInExternalId(externalId, externalId)
-            if (userSession.authenticated == true) {
+            val userSessionResult = authenticationRepository.signInExternalId(externalId, externalId)
+            if (userSessionResult is ResourceResult.Success && userSessionResult.data.authenticated == true) {
                 _signInResult.value = SignInResult.Success
             } else {
                 _signInResult.value = SignInResult.Failed

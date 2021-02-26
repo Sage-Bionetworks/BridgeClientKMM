@@ -15,11 +15,7 @@ import io.ktor.client.*
 import org.sagebionetworks.bridge.mpp.network.generated.models.UploadRequest
 import org.sagebionetworks.bridge.mpp.network.generated.models.UploadSession
 
-internal class UploadsApi(basePath: String = BASE_PATH, httpClient: HttpClient): AbstractApi(
-    basePath
-)  {
-
-    override val httpClient = httpClient
+internal class UploadsApi(basePath: String = BASE_PATH, httpClient: HttpClient): AbstractApi(basePath, httpClient)  {
 
     /**
     * Request an upload session

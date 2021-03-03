@@ -38,8 +38,11 @@ class NativeAssessmentViewModel (
 
     fun signIn(userName: String, password: String, callBack: (UserSessionInfo?) -> Unit) {
         scope.launch {
-            val userSession = authManager.signInEmail(email = userName, password = password)
-            callBack(userSession)
+            val userSessionResult = authManager.signInEmail(email = userName, password = password)
+            when(userSessionResult) {
+                is ResourceResult.Success -> callBack(userSessionResult.data)
+                is ResourceResult.Failed -> callBack(null)
+            }
         }
     }
 

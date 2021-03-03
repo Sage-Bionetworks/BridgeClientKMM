@@ -34,7 +34,7 @@ public class UploadManagerTest {
 
             val uploadSession = UploadSession("uploadSessionId", "http://testurl", "expires", "UploadSession")
 
-            val uploadManager = UploadManager(getTestClient(Json.encodeToString(uploadSession)), TestDatabaseDriverFactory())
+            val uploadManager = UploadManager(getTestClient(Json.encodeToString(uploadSession)), TestDatabaseDriverFactory().createDriver())
             val database = uploadManager.database
             val resource = Resource(
                 uploadFile.getUploadFileResourceId(),

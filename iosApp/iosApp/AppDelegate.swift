@@ -1,5 +1,5 @@
 import UIKit
-import bridgeClient
+import bridge_client
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {

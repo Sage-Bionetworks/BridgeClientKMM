@@ -1,5 +1,5 @@
 import SwiftUI
-import bridgeClient
+import bridge_client
 
 struct ContentView: View {
     

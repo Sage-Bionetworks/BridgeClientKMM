@@ -34,7 +34,7 @@ android {
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:${Versions.kotlin}")
-    implementation(project(":bridgeClient"))
+    implementation(project(":bridge-client"))
     implementation(Deps.AndroidX.core_ktx)
     implementation(Deps.AndroidX.material)
     implementation(Deps.AndroidX.appcompat)

@@ -1,4 +1,4 @@
-include(":bridgeClientPresentation")
+include(":bridge-client-presentation")
 pluginManagement {
     repositories {
         gradlePluginPortal()
@@ -18,5 +18,5 @@ rootProject.name = "BridgeClientKMM"
 
 
 include(":androidApp")
-include(":bridgeClient")
+include(":bridge-client")
 

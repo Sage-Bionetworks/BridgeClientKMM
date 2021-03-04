@@ -3,6 +3,7 @@ plugins {
     kotlin("android")
     id("kotlin-android-extensions")
     id("kotlin-android")
+    id ("maven-publish")
 }
 
 android {
@@ -53,6 +54,18 @@ dependencies {
     testImplementation(Deps.Test.junit)
     androidTestImplementation("androidx.test.ext:junit:1.1.2")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
+}
+
+project.afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("maven") {
+                artifactId = "bridge-client-presentation"
+                from(components["release"])
+            }
+        }
+    }
+
 }
 
 apply("../config/artifact-deploy.gradle")

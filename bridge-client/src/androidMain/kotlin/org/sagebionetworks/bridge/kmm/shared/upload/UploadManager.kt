@@ -49,7 +49,17 @@ class UploadManager(
             }
         }
         //Check that all uploads succeeded and have been removed
-        return database.getResources(ResourceType.FILE_UPLOAD).isEmpty()
+        val success = database.getResources(ResourceType.FILE_UPLOAD).isEmpty()
+        if (success) {
+            //Check if we have any sessions that have been uploaded and still need completing
+            for (resource in database.getResources(ResourceType.UPLOAD_SESSION)) {
+                resource.loadResource<UploadSession>()?.let {
+                    completeUploadSession(it, resource.identifier)
+                }
+            }
+        }
+
+        return success
     }
 
     private suspend fun processUploadFile(uploadFile: UploadFile) {
@@ -57,6 +67,7 @@ class UploadManager(
         val uploadSession = getUploadSession(uploadFile)
         uploadSession?.let {
             uploadToS3(uploadFile, uploadSession)
+            completeUploadSession(uploadSession, uploadFile.getUploadSessionResourceId())
         }
     }
 
@@ -103,13 +114,19 @@ class UploadManager(
         try {
             s3UploadApi.uploadFile(uploadSession.url, uploadFile)
             FileSystem.SYSTEM.delete(uploadFile.filePath.toPath(Path.DIRECTORY_SEPARATOR)) //TODO: Handle delete failure -nbrown 12/16/20
-            //Remove UploadFile unless we want to keep a history of successful uploads?
             database.removeResource(uploadFile.getUploadFileResourceId())
-            database.removeResource(uploadFile.getUploadSessionResourceId())
         } catch (error: Throwable) {
             //TODO: Handle failure cases -nbrown 12/16/20
             throw error
         }
+    }
+
+    private suspend fun completeUploadSession(uploadSession: UploadSession, resourceid: String) {
+        uploadSession.id?.let {
+            uploadsApi.completeUploadSession(uploadSession.id)
+            database.removeResource(resourceid)
+        }
+
     }
 
 

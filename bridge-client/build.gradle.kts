@@ -3,9 +3,8 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
-    id("kotlin-android-extensions")
-    id("com.squareup.sqldelight")
     kotlin("plugin.serialization")
+    id("com.squareup.sqldelight")
     id("com.github.dcendents.android-maven")
 }
 
@@ -57,7 +56,7 @@ kotlin {
                 implementation(Deps.SqlDelight.runtime)
                 //Copied CoroutinesExtensions from SqlDelight repo to workaround dependency issue. -nathaniel 11/30/20
                 //implementation("com.squareup.sqldelight:coroutines-extensions:$sqlDelightVersion")
-                implementation(Deps.Serialization.core)
+                api(Deps.Serialization.core)
                 implementation(Deps.Ktor.clientCore)
                 //Is api to give depending modules access to JsonElement
                 api(Deps.Ktor.clientSerialization)

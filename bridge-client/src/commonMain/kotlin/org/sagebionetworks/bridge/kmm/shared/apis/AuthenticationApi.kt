@@ -4,9 +4,15 @@
 package org.sagebionetworks.bridge.kmm.shared.apis
 
 import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.features.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
 import io.ktor.client.features.logging.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import org.sagebionetworks.bridge.kmm.shared.models.Message
 import org.sagebionetworks.bridge.kmm.shared.models.SignIn
 import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
 
@@ -31,6 +37,31 @@ internal class AuthenticationApi(basePath: kotlin.String = BASE_PATH, httpClient
     */
     suspend fun signIn(signIn: SignIn) : UserSessionInfo {
         return postData(signIn, "v3/auth/signIn")
+    }
+
+    suspend fun signOut(sessionInfo: UserSessionInfo) : Message {
+        val builder = HttpRequestBuilder()
+
+        builder.method = HttpMethod.Post
+        builder.url {
+            takeFrom(basePath)
+            encodedPath = encodedPath.let { startingPath ->
+                path("v4/auth/signOut")
+                return@let startingPath + encodedPath.substring(1)
+            }
+        }
+
+        with(builder.headers) {
+            append("Accept", "application/json")
+            append("Content-Type", "application/json; charset=UTF-8")
+            sessionInfo.sessionToken?.let { append("Bridge-Session", it) }
+        }
+
+        try {
+            return httpClient.post(builder)
+        } catch (pipeline: ReceivePipelineException) {
+            throw pipeline.cause
+        }
     }
 
 }

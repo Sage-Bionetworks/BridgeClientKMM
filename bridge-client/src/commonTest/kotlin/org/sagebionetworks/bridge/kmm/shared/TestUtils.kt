@@ -1,5 +1,6 @@
 package org.sagebionetworks.bridge.kmm.shared
 
+import com.squareup.sqldelight.db.SqlDriver
 import io.ktor.client.*
 import io.ktor.client.engine.*
 import io.ktor.client.engine.mock.*
@@ -10,7 +11,7 @@ import io.ktor.http.*
 import kotlinx.serialization.json.Json
 import org.sagebionetworks.bridge.kmm.shared.cache.DbDriverFactory
 
-internal expect fun testDatabaseDriverFactory() : DbDriverFactory
+internal expect fun testDatabaseDriver() : SqlDriver
 
 fun getTestClient(json: String): HttpClient {
     val mockEngine = MockEngine.config {

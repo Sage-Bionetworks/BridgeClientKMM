@@ -1,8 +1,6 @@
 name: Build CI
 
 on:
-  push:
-    branches: [ adding-tests ]
   pull_request:
     branches: [ main ]
 

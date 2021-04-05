@@ -16,7 +16,7 @@ class AuthenticationIntegrationTest: AbstractBaseIntegrationTest() {
 
             //Test signIn
             assertFalse(authRepo.isAuthenticated())
-            val externalId = System.getenv("testExternalId01")
+            val externalId = "fail" // System.getenv("testExternalId01")
             assertNotNull(externalId)
             val signInResult = authRepo.signInExternalId(externalId, externalId)
             assertTrue(signInResult is ResourceResult.Success<*>)

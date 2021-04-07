@@ -12,6 +12,7 @@
 package org.sagebionetworks.bridge.kmm.shared.apis
 
 import io.ktor.client.*
+import org.sagebionetworks.bridge.kmm.shared.models.UploadValidationStatus
 import org.sagebionetworks.bridge.mpp.network.generated.models.UploadRequest
 import org.sagebionetworks.bridge.mpp.network.generated.models.UploadSession
 
@@ -25,6 +26,15 @@ internal class UploadsApi(basePath: String = BASE_PATH, httpClient: HttpClient):
     */
     suspend fun requestUploadSession(uploadRequest: UploadRequest) : UploadSession {
         return postData<UploadRequest, UploadSession>(uploadRequest, "v3/uploads")
+    }
+
+    /**
+     * Notify Bridge an upload is complete
+     * Notify Bridge an upload is complete. Either a consented user or a worker  process can access this endpoing, but failure to have the worker role will  be treated like a consent error.  In synchronous mode, this API will poll until upload validation is complete (or failed or is otherwise in a non-transient state), and return the upload validation status. In asynchronous mode, this API will return immediately and will also return the upload validation status, which is likely to be in \&quot;validation_in_progress\&quot;.
+     * @param uploadId Upload ID
+     */
+    suspend fun completeUploadSession(uploadId: String) : UploadValidationStatus {
+        return postData(null, "v3/uploads/$uploadId/complete")
     }
 
 }

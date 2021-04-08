@@ -1,6 +1,6 @@
 import UIKit
 import SwiftUI
-import bridge_client
+import BridgeClient
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 

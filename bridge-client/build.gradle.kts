@@ -42,7 +42,7 @@ kotlin {
     iOSTarget("ios") {
         binaries {
             framework {
-                baseName = "bridge_client"
+                baseName = "BridgeClient"
             }
         }
     }

@@ -16,8 +16,8 @@
 		7555FF96242A565B00829871 /* iosAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF95242A565B00829871 /* iosAppTests.swift */; };
 		7555FFA1242A565B00829871 /* iosAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FFA0242A565B00829871 /* iosAppUITests.swift */; };
 		E97B76A825546D05000BEDF0 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97B76A725546D05000BEDF0 /* LoginView.swift */; };
-		E9B7695725D73E8D0031D67E /* bridge_client.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9B7695625D73E8D0031D67E /* bridge_client.framework */; };
-		E9B7695825D73E8D0031D67E /* bridge_client.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E9B7695625D73E8D0031D67E /* bridge_client.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		FF8F8D1F261F858900366307 /* BridgeClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF8F8D1E261F858900366307 /* BridgeClient.framework */; };
+		FF8F8D20261F858900366307 /* BridgeClient.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FF8F8D1E261F858900366307 /* BridgeClient.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,13 +38,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		7555FFB4242A642300829871 /* Embed Frameworks */ = {
+		FF8F8D21261F858900366307 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				E9B7695825D73E8D0031D67E /* bridge_client.framework in Embed Frameworks */,
+				FF8F8D20261F858900366307 /* BridgeClient.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -68,6 +68,7 @@
 		7555FFA2242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E97B76A725546D05000BEDF0 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		E9B7695625D73E8D0031D67E /* bridge_client.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = bridge_client.framework; path = "../bridge-client/build/xcode-frameworks/bridge_client.framework"; sourceTree = "<group>"; };
+		FF8F8D1E261F858900366307 /* BridgeClient.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BridgeClient.framework; path = "../bridge-client/build/bin/ios/debugFramework/BridgeClient.framework"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,7 +76,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E9B7695725D73E8D0031D67E /* bridge_client.framework in Frameworks */,
+				FF8F8D1F261F858900366307 /* BridgeClient.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -161,6 +162,7 @@
 		7555FFB0242A642200829871 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				FF8F8D1E261F858900366307 /* BridgeClient.framework */,
 				E9B7695625D73E8D0031D67E /* bridge_client.framework */,
 			);
 			name = Frameworks;
@@ -177,7 +179,7 @@
 				7555FF77242A565900829871 /* Sources */,
 				7555FF78242A565900829871 /* Frameworks */,
 				7555FF79242A565900829871 /* Resources */,
-				7555FFB4242A642300829871 /* Embed Frameworks */,
+				FF8F8D21261F858900366307 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);

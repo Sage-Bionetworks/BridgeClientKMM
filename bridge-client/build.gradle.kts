@@ -34,8 +34,9 @@ kotlin {
         publishLibraryVariants("release", "debug")
     }
     // Block from https://github.com/cashapp/sqldelight/issues/2044#issuecomment-721299517.
+    val iOSTargetName  = System.getenv("SDK_NAME") ?: project.findProperty("XCODE_SDK_NAME") as? String ?: "iphonesimulator"
     val iOSTarget: (String, KotlinNativeTarget.() -> Unit) -> KotlinNativeTarget =
-        if (System.getenv("SDK_NAME")?.startsWith("iphoneos") == true)
+        if (iOSTargetName.startsWith("iphoneos"))
             ::iosArm64
         else
             ::iosX64
@@ -132,8 +133,8 @@ android {
 
 val packForXcode by tasks.creating(Sync::class) {
     group = "build"
-    val mode = System.getenv("CONFIGURATION") ?: "DEBUG"
-    val sdkName = System.getenv("SDK_NAME") ?: "iphonesimulator"
+    val mode = System.getenv("CONFIGURATION") ?: project.findProperty("XCODE_CONFIGURATION") as? String ?: "DEBUG"
+    val sdkName = System.getenv("SDK_NAME") ?: project.findProperty("XCODE_SDK_NAME") as? String ?: "iphonesimulator"
     val targetName = "ios"// + if (sdkName.startsWith("iphoneos")) "Arm64" else "X64"
     val framework = kotlin.targets.getByName<KotlinNativeTarget>(targetName).binaries.getFramework(mode)
     inputs.property("mode", mode)

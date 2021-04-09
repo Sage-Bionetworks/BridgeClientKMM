@@ -11,7 +11,6 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
 }
 
-
 kotlin {
     android {
         publishLibraryVariants("release", "debug")
@@ -35,7 +34,15 @@ kotlin {
 
         val commonMain by getting {
             dependencies {
-
+                // koin
+                api(Deps.Koin.core)
+            }
+        }
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test-common"))
+                implementation(kotlin("test-annotations-common"))
+                api(Deps.Koin.test)
             }
         }
         val androidMain by getting {
@@ -46,6 +53,23 @@ kotlin {
 
                 implementation(project(":bridge-client-presentation"))
                 implementation("org.sagebionetworks.assessmentmodel:presentation:$assessment_version")
+
+                implementation(Deps.Koin.android)
+
+                // legacy Bridge dependencies
+                // migrate to use kotlinx/java8 time and see if we can publish multi-platform
+                // which will work with bridge - liujoshua 04/02/21
+                implementation("org.sagebionetworks:BridgeDataUploadUtils:0.2.6") {
+                    exclude("joda-time", "joda-time")
+                    exclude("org.bouncycastle")
+                    exclude("com.madgag.spongycastle")
+                }
+                api("net.danlew:android.joda:2.9.9.4")
+                val spongycastle = "1.58.0.0"
+                implementation("com.madgag.spongycastle:core:$spongycastle")
+                implementation("com.madgag.spongycastle:prov:$spongycastle")
+                // marked api due to propagation of CMSException
+                api("com.madgag.spongycastle:bcpkix-jdk15on:$spongycastle")
             }
         }
         val iosMain by getting
@@ -81,7 +105,8 @@ val packForXcode by tasks.creating(Sync::class) {
     val mode = System.getenv("CONFIGURATION") ?: "DEBUG"
     val sdkName = System.getenv("SDK_NAME") ?: "iphonesimulator"
     val targetName = "ios"// + if (sdkName.startsWith("iphoneos")) "Arm64" else "X64"
-    val framework = kotlin.targets.getByName<KotlinNativeTarget>(targetName).binaries.getFramework(mode)
+    val framework =
+        kotlin.targets.getByName<KotlinNativeTarget>(targetName).binaries.getFramework(mode)
     inputs.property("mode", mode)
     dependsOn(framework.linkTask)
     val targetDir = File(buildDir, "xcode-frameworks")

@@ -25,5 +25,8 @@ allprojects {
         mavenCentral()
         maven(url = "https://kotlin.bintray.com/kotlinx/")
         maven(url = "https://dl.bintray.com/ekito/koin")
+
+        maven(url = "https://dl.bintray.com/sage-bionetworks/AssessmentModel-KotlinNative")
+        maven(url = "https://dl.bintray.com/sage-bionetworks/BridgeClientKMM")
     }
 }

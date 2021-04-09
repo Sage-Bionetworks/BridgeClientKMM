@@ -3,7 +3,6 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
-    id("kotlin-android-extensions")
     id("com.squareup.sqldelight")
     kotlin("plugin.serialization")
     id("com.github.dcendents.android-maven")
@@ -16,7 +15,6 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 repositories {
     gradlePluginPortal()
     google()
-    jcenter()
     mavenCentral()
     maven(url = "https://kotlin.bintray.com/kotlinx/")
     maven(url = "https://oss.sonatype.org/content/repositories/snapshots")

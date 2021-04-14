@@ -4,15 +4,11 @@ import BridgeClient
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
-
+    let bridgeManager = BridgeClientAppManager()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        var enableNetworkLogs = false
-        #if DEBUG
-           enableNetworkLogs = true
-        #endif
-        KoinKt.doInitKoin(enableNetworkLogs: enableNetworkLogs)
+        bridgeManager.appDidLaunch(with: launchOptions)
         return true
     }
 

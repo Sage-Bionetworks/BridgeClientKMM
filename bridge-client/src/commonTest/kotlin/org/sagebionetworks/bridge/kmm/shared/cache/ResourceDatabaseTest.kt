@@ -1,21 +1,19 @@
 package org.sagebionetworks.bridge.kmm.shared.cache
 
-import com.squareup.sqldelight.db.SqlDriver
-import com.squareup.sqldelight.sqlite.driver.JdbcSqliteDriver
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
-import org.sagebionetworks.bridge.kmm.shared.TestDatabaseDriverFactory
+import org.sagebionetworks.bridge.kmm.shared.testDatabaseDriver
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.Test
 
 class ResourceDatabaseTest {
 
     @Test
     fun testDatabase() {
         runBlocking {
-            val db = ResourceDatabaseHelper(TestDatabaseDriverFactory().createDriver())
+            val db = ResourceDatabaseHelper(testDatabaseDriver())
             val testId = "TestId"
             val resource = Resource(testId, ResourceType.ASSESSMENT_CONFIG, "{}", 0, ResourceStatus.SUCCESS)
             db.insertUpdateResource(resource)

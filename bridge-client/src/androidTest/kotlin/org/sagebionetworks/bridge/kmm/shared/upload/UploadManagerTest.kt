@@ -12,7 +12,6 @@ import kotlinx.serialization.json.Json
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
-import org.sagebionetworks.bridge.kmm.shared.TestDatabaseDriverFactory
 import org.sagebionetworks.bridge.kmm.shared.cache.Resource
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
@@ -20,6 +19,7 @@ import org.sagebionetworks.bridge.kmm.shared.getJsonReponseHandler
 import org.sagebionetworks.bridge.kmm.shared.getTestClient
 import org.sagebionetworks.bridge.kmm.shared.models.UploadStatus
 import org.sagebionetworks.bridge.kmm.shared.models.UploadValidationStatus
+import org.sagebionetworks.bridge.kmm.shared.testDatabaseDriver
 import org.sagebionetworks.bridge.mpp.network.generated.models.UploadSession
 import java.io.File
 import java.io.PrintWriter
@@ -38,7 +38,7 @@ public class UploadManagerTest {
 
         val uploadFile = UploadFile(tempFile.absolutePath, "application/zip", tempFile.length(), "md5Hash")
 
-        val uploadManager = UploadManager(testHttpClient, TestDatabaseDriverFactory().createDriver())
+        val uploadManager = UploadManager(testHttpClient, testDatabaseDriver())
         val database = uploadManager.database
         val resource = Resource(
             uploadFile.getUploadFileResourceId(),

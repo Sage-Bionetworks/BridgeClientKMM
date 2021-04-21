@@ -19,6 +19,8 @@ repositories {
     mavenCentral()
     maven(url = "https://kotlin.bintray.com/kotlinx/")
     maven(url = "https://oss.sonatype.org/content/repositories/snapshots")
+    // Using snapshot build of kotlinx.datetime so we can use date parsing
+    maven(url = "https://teamcity.jetbrains.com/guestAuth/app/rest/builds/buildType:(KotlinTools_KotlinxDatetime_Build_All),status:success,branch:master/artifacts/content/maven/")
 }
 
 sqldelight {
@@ -60,6 +62,7 @@ kotlin {
                 implementation(Deps.Ktor.clientCore)
                 //Is api to give depending modules access to JsonElement
                 api(Deps.Ktor.clientSerialization)
+                implementation(Deps.Serialization.core)
                 implementation(Deps.Ktor.clientLogging)
                 implementation(Deps.kotlinxDateTime)
                 implementation(Deps.stately)

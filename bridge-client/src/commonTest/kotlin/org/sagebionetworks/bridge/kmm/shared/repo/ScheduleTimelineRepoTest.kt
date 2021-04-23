@@ -298,7 +298,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
     }
 
     @Test
-    fun testScheduleTimelineDay1() {
+    fun testScheduledSessionsDay1() {
         runTest {
             val repo = ScheduleTimelineRepo(getTestClient(scheduleJson), ResourceDatabaseHelper(testDatabaseDriver()), MainScope())
             val activityEventList = getActivityEventList(Clock.System.now().minus(DateTimeUnit.DAY, TimeZone.currentSystemDefault()))
@@ -328,7 +328,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
     }
 
     @Test
-    fun testScheduleTimelineDay3() {
+    fun testScheduledSessionsDay3() {
         runTest {
             val repo = ScheduleTimelineRepo(getTestClient(scheduleJson), ResourceDatabaseHelper(testDatabaseDriver()), MainScope())
             val activityEventList = getActivityEventList(Clock.System.now().minus(3, DateTimeUnit.DAY, TimeZone.currentSystemDefault()))
@@ -354,7 +354,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
     }
 
     @Test
-    fun testScheduleTimelineDay4() {
+    fun testScheduledSessionsDay4() {
         runTest {
             val repo = ScheduleTimelineRepo(getTestClient(scheduleJson), ResourceDatabaseHelper(testDatabaseDriver()), MainScope())
             val activityEventList = getActivityEventList(Clock.System.now().minus(4, DateTimeUnit.DAY, TimeZone.currentSystemDefault()))

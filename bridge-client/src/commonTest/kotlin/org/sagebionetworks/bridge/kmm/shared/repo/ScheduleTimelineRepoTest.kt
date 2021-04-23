@@ -17,10 +17,10 @@ import kotlin.test.assertTrue
 
 class ScheduleTimelineRepoTest: BaseTest() {
 
-    private val currentHour = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).hour
-    private val lastHourString = (currentHour - 1).toString().padStart(2,'0')
-    private val currentHourString = currentHour.toString().padStart(2,'0')
-    private val nextHourString = (currentHour + 1).toString().padStart(2,'0')
+    private val testHour = 12//Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).hour
+    private val lastHourString = (testHour - 1).toString().padStart(2,'0')
+    private val currentHourString = testHour.toString().padStart(2,'0')
+    private val nextHourString = (testHour + 1).toString().padStart(2,'0')
 
     private val scheduleJson = "{\n" +
             "  \"duration\": \"P4D\",\n" +
@@ -297,13 +297,19 @@ class ScheduleTimelineRepoTest: BaseTest() {
         return ActivityEventList(items = listOf(ActivityEvent(eventId = "study_start_date", timestamp = timeStamp)))
     }
 
+    private fun getTodayInstant(): Instant {
+        val nowDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+        val todayNoonDateTime = LocalDateTime(year = nowDateTime.year, month = nowDateTime.month, dayOfMonth = nowDateTime.dayOfMonth, hour = testHour, minute = 0, second = 0)
+        return todayNoonDateTime.toInstant(TimeZone.currentSystemDefault())
+    }
+
     @Test
     fun testScheduledSessionsDay1() {
         runTest {
             val repo = ScheduleTimelineRepo(getTestClient(scheduleJson), ResourceDatabaseHelper(testDatabaseDriver()), MainScope())
             val activityEventList = getActivityEventList(Clock.System.now().minus(DateTimeUnit.DAY, TimeZone.currentSystemDefault()))
 
-            val resourceResult = repo.getSessionsForToday("sage-assessment-test", activityEventList).firstOrNull { it is ResourceResult.Success }
+            val resourceResult = repo.getSessionsForDay("sage-assessment-test", activityEventList, getTodayInstant()).firstOrNull { it is ResourceResult.Success }
 
             assertTrue(resourceResult is ResourceResult.Success)
             val sessionList = resourceResult.data
@@ -333,7 +339,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val repo = ScheduleTimelineRepo(getTestClient(scheduleJson), ResourceDatabaseHelper(testDatabaseDriver()), MainScope())
             val activityEventList = getActivityEventList(Clock.System.now().minus(3, DateTimeUnit.DAY, TimeZone.currentSystemDefault()))
 
-            val resourceResult = repo.getSessionsForToday("sage-assessment-test", activityEventList).firstOrNull { it is ResourceResult.Success }
+            val resourceResult = repo.getSessionsForDay("sage-assessment-test", activityEventList, getTodayInstant()).firstOrNull { it is ResourceResult.Success }
 
             assertTrue(resourceResult is ResourceResult.Success)
             val sessionList = resourceResult.data
@@ -359,7 +365,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val repo = ScheduleTimelineRepo(getTestClient(scheduleJson), ResourceDatabaseHelper(testDatabaseDriver()), MainScope())
             val activityEventList = getActivityEventList(Clock.System.now().minus(4, DateTimeUnit.DAY, TimeZone.currentSystemDefault()))
 
-            val resourceResult = repo.getSessionsForToday("sage-assessment-test", activityEventList).firstOrNull { it is ResourceResult.Success }
+            val resourceResult = repo.getSessionsForDay("sage-assessment-test", activityEventList, getTodayInstant()).firstOrNull { it is ResourceResult.Success }
 
             assertTrue(resourceResult is ResourceResult.Success)
             val sessionList = resourceResult.data

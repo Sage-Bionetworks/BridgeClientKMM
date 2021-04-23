@@ -44,25 +44,42 @@ class ScheduleTimelineRepo(httpClient: HttpClient, databaseHelper: ResourceDatab
         return Json.encodeToString(scheduleApi.getTimelineForUser(studyId))
     }
 
+    /**
+     * Get all the scheduled sessions for today that have not expired.
+     */
     fun getSessionsForToday(studyId: String, eventList: ActivityEventList) : Flow<ResourceResult<List<ScheduledSessionWindow>>> {
         return getTimeline(studyId).map {
-            extractSessions(eventList, it)
+            extractSessions(eventList, it, Clock.System.now())
         }
     }
 
-    private fun extractSessions(eventList: ActivityEventList, resource: ResourceResult<Timeline>): ResourceResult<List<ScheduledSessionWindow>> {
+    /**
+     * Used for testing so that we can specify a consistent point in time.
+     */
+    internal fun getSessionsForDay(studyId: String, eventList: ActivityEventList, instantInDay: Instant) : Flow<ResourceResult<List<ScheduledSessionWindow>>> {
+        return getTimeline(studyId).map {
+            extractSessions(eventList, it, instantInDay)
+        }
+    }
+
+    private fun extractSessions(eventList: ActivityEventList, resource: ResourceResult<Timeline>, instantInDay: Instant): ResourceResult<List<ScheduledSessionWindow>> {
         return when (resource) {
             is ResourceResult.Success -> {
                 val timeline = resource.data
-                ResourceResult.Success(extractSessionsForToday(eventList, timeline), resource.status)
+                ResourceResult.Success(extractSessionsForDay(eventList, timeline, instantInDay), resource.status)
             }
             is ResourceResult.InProgress -> resource
             is ResourceResult.Failed -> resource
         }
     }
 
+    /**
+     * Extract the scheduled sessions from the [Timeline] for the day specified by [instantInDay].
+     * The returned list of [ScheduledSessionWindow]s will include all sessions that are active on the
+     * day specified by [instantInDay]. Sessions that expire before [instantInDay] will be excluded.
+     */
     @OptIn(ExperimentalTime::class)
-    private fun extractSessionsForToday(eventList: ActivityEventList, timeline: Timeline) : List<ScheduledSessionWindow> {
+    private fun extractSessionsForDay(eventList: ActivityEventList, timeline: Timeline, instantInDay: Instant) : List<ScheduledSessionWindow> {
         // Map of eventID to SessionInfo
         val sessionInfoMap = timeline.sessions?.groupBy({it.startEventId})
         // Map of key to AssessmentInfo
@@ -74,9 +91,8 @@ class ScheduleTimelineRepo(httpClient: HttpClient, databaseHelper: ResourceDatab
             return emptyList()
         }
 
-        val now: Instant = Clock.System.now()
-        // Get today as a LocalDate
-        val today: LocalDate = now.toLocalDateTime(TimeZone.currentSystemDefault()).date
+        // Get date portion of instantInDay
+        val day: LocalDate = instantInDay.toLocalDateTime(TimeZone.currentSystemDefault()).date
 
         val scheduledSessionWindowList = mutableListOf<ScheduledSessionWindow>()
         eventList.items?.let {
@@ -84,7 +100,7 @@ class ScheduleTimelineRepo(httpClient: HttpClient, databaseHelper: ResourceDatab
                 // Convert the event timestamp to a LocalDate
                 val eventLocalDate = event.timestamp.toLocalDateTime(TimeZone.currentSystemDefault()).date
                 // Get number of days since the event date
-                val daysSince = eventLocalDate.daysUntil(today)
+                val daysSince = eventLocalDate.daysUntil(day)
 
                 sessionInfoMap.get(event.eventId)?.let { sessionInfoList ->
                     for (session in sessionInfoList) {
@@ -101,7 +117,7 @@ class ScheduleTimelineRepo(httpClient: HttpClient, databaseHelper: ResourceDatab
                                         // LocalTime support is hopefully coming: https://github.com/Kotlin/kotlinx-datetime/issues/57#issuecomment-800287971
                                         // Construct a startDateTime from today and startTime
                                         val startDateTimeString =
-                                            today.toString() + "T" + scheduledSession.startTime!!
+                                            day.toString() + "T" + scheduledSession.startTime!!
                                         val startDateTime = LocalDateTime.parse(startDateTimeString)
 
                                         val startInstant =
@@ -110,7 +126,7 @@ class ScheduleTimelineRepo(httpClient: HttpClient, databaseHelper: ResourceDatab
                                             expirationPeriod,
                                             TimeZone.currentSystemDefault()
                                         )
-                                        if (expirationInstant.minus(now).isNegative()) {
+                                        if (expirationInstant.minus(instantInDay).isNegative()) {
                                             // Expiration is in the past so don't include it
                                             includeSession = false
                                         }

@@ -298,12 +298,12 @@ class ScheduleTimelineRepoTest: BaseTest() {
     }
 
     @Test
-    fun testScheduleTimeline() {
+    fun testScheduleTimelineDay1() {
         runTest {
             val repo = ScheduleTimelineRepo(getTestClient(scheduleJson), ResourceDatabaseHelper(testDatabaseDriver()), MainScope())
             val activityEventList = getActivityEventList(Clock.System.now().minus(DateTimeUnit.DAY, TimeZone.currentSystemDefault()))
 
-            val resourceResult = repo.getSessionsForToday("sage-assessment-test", activityEventList).firstOrNull()
+            val resourceResult = repo.getSessionsForToday("sage-assessment-test", activityEventList).firstOrNull { it is ResourceResult.Success }
 
             assertTrue(resourceResult is ResourceResult.Success)
             val sessionList = resourceResult.data
@@ -323,9 +323,49 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val session3 = sessionList.get(2)
             assertEquals("Daily Sessions", session3.sessionInfo.label)
             assertEquals("c6fBm4HPKOs3uj76VVbLzg", session3.instanceGuid)
-
         }
 
+    }
+
+    @Test
+    fun testScheduleTimelineDay3() {
+        runTest {
+            val repo = ScheduleTimelineRepo(getTestClient(scheduleJson), ResourceDatabaseHelper(testDatabaseDriver()), MainScope())
+            val activityEventList = getActivityEventList(Clock.System.now().minus(3, DateTimeUnit.DAY, TimeZone.currentSystemDefault()))
+
+            val resourceResult = repo.getSessionsForToday("sage-assessment-test", activityEventList).firstOrNull { it is ResourceResult.Success }
+
+            assertTrue(resourceResult is ResourceResult.Success)
+            val sessionList = resourceResult.data
+            assertNotNull(sessionList)
+            assertEquals(2, sessionList.size)
+
+            //First session should have started in current hour
+            val session2 = sessionList.get(0)
+            assertEquals("Daily Sessions", session2.sessionInfo.label)
+            assertEquals("SI3hC2o0hdDTanRwqVVYIQ", session2.instanceGuid)
+
+            //Second session will be starting next hour
+            val session3 = sessionList.get(1)
+            assertEquals("Daily Sessions", session3.sessionInfo.label)
+            assertEquals("OjDKErILgVF04xlYktOF0g", session3.instanceGuid)
+
+        }
+    }
+
+    @Test
+    fun testScheduleTimelineDay4() {
+        runTest {
+            val repo = ScheduleTimelineRepo(getTestClient(scheduleJson), ResourceDatabaseHelper(testDatabaseDriver()), MainScope())
+            val activityEventList = getActivityEventList(Clock.System.now().minus(4, DateTimeUnit.DAY, TimeZone.currentSystemDefault()))
+
+            val resourceResult = repo.getSessionsForToday("sage-assessment-test", activityEventList).firstOrNull { it is ResourceResult.Success }
+
+            assertTrue(resourceResult is ResourceResult.Success)
+            val sessionList = resourceResult.data
+            assertNotNull(sessionList)
+            assertTrue(sessionList.isEmpty())
+        }
     }
 
 }

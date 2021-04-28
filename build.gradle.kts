@@ -25,7 +25,5 @@ allprojects {
         mavenCentral()
         maven(url = "https://kotlin.bintray.com/kotlinx/")
         maven(url = "https://dl.bintray.com/ekito/koin")
-        // Using snapshot build of kotlinx.datetime so we can use date parsing
-        maven(url = "https://teamcity.jetbrains.com/guestAuth/app/rest/builds/buildType:(KotlinTools_KotlinxDatetime_Build_All),status:success,branch:master/artifacts/content/maven/")
     }
 }

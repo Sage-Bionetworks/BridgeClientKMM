@@ -23,6 +23,9 @@ allprojects {
         jcenter()
         google()
         mavenCentral()
+        maven(url = "http://repo-maven.sagebridge.org/")
         maven(url = "https://kotlin.bintray.com/kotlinx/")
+        maven(url = "https://dl.bintray.com/sage-bionetworks/AssessmentModel-KotlinNative")
+        maven(url = "https://dl.bintray.com/sage-bionetworks/BridgeClientKMM")
     }
 }

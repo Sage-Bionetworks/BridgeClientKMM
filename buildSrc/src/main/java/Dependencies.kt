@@ -4,13 +4,13 @@ object Versions {
     const val compile_sdk = 29
 
     //Kotlin
-    const val kotlin = "1.4.21"// "1.4.10"//"1.4.21-2"
-    const val kotlinCoroutines = "1.4.2-native-mt"//"1.3.9-native-mt-2"//"1.4.2-native-mt"
-    const val ktor = "1.5.0"//"1.4.2"//"1.5.0"
+    const val kotlin = "1.4.30"
+    const val kotlinCoroutines = "1.4.2-native-mt"
+    const val ktor = "1.5.2"
     const val kotlinxSerialization = "1.0.1"
     const val kotlinxDateTime = "0.1.1"
     const val multiplatformSettings = "0.7.1"
-    const val koin = "3.0.1-alpha-3"
+    const val koin = "3.0.1-beta-2"
     const val sqlDelight = "1.4.4"
     const val okio = "3.0.0-alpha.1"
     const val stately = "1.1.1"
@@ -69,11 +69,11 @@ object Deps {
     }
 
     object Koin {
-        val core = "org.koin:koin-core:${Versions.koin}"
-        val test = "org.koin:koin-test:${Versions.koin}"
-        val android = "org.koin:koin-android:${Versions.koin}"
-        val androidViewModel = "org.koin:koin-androidx-viewmodel:${Versions.koin}"
-        val androidWorkManager =  "org.koin:koin-androidx-workmanager:${Versions.koin}"
+        val core = "io.insert-koin:koin-core:${Versions.koin}"
+        val test = "io.insert-koin:koin-test:${Versions.koin}"
+        val android = "io.insert-koin:koin-android:${Versions.koin}"
+        val androidViewModel = "io.insert-koin:koin-androidx-viewmodel:${Versions.koin}"
+        val androidWorkManager =  "io.insert-koin:koin-androidx-workmanager:${Versions.koin}"
     }
 
     object Ktor {
@@ -90,7 +90,7 @@ object Deps {
 
     object Serialization {
         val core =
-            "org.jetbrains.kotlinx:kotlinx-serialization-core:${Versions.kotlinxSerialization}"
+            "org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.kotlinxSerialization}"
     }
 
     object SqlDelight {

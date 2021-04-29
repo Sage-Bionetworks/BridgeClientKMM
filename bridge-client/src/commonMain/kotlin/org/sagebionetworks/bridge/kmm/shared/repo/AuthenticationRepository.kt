@@ -6,11 +6,11 @@ import io.ktor.http.*
 import io.ktor.util.network.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.sagebionetworks.bridge.kmm.shared.BridgeConfig
-import org.sagebionetworks.bridge.kmm.shared.apis.AssessmentsApi
 import org.sagebionetworks.bridge.kmm.shared.apis.AuthenticationApi
 import org.sagebionetworks.bridge.kmm.shared.cache.*
 import org.sagebionetworks.bridge.kmm.shared.models.SignIn
@@ -45,7 +45,10 @@ class AuthenticationRepository(httpClient: HttpClient, val bridgeConfig: BridgeC
     }
 
     fun signOut() {
-        database.removeResource(USER_SESSION_ID)
+        session()?.let {
+            runBlocking { authenticationApi.signOut(it) }
+            database.removeResource(USER_SESSION_ID)
+        }
     }
 
     suspend fun signInExternalId(externalId: String, password: String) : ResourceResult<UserSessionInfo> {

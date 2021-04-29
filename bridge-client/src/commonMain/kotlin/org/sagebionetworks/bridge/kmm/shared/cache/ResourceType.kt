@@ -10,8 +10,9 @@ enum class ResourceType() {
     APP_CONFIG,
     UPLOAD_SESSION,
     FILE_UPLOAD,
-    USER_SESSION_INFO
-
+    USER_SESSION_INFO,
+    TIMELINE,
+    ACTIVITY_EVENTS_LIST,
 }
 
 enum class ResourceStatus {

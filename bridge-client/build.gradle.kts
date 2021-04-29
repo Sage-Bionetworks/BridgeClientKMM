@@ -60,6 +60,7 @@ kotlin {
                 implementation(Deps.Ktor.clientCore)
                 //Is api to give depending modules access to JsonElement
                 api(Deps.Ktor.clientSerialization)
+                implementation(Deps.Serialization.core)
                 implementation(Deps.Ktor.clientLogging)
                 implementation(Deps.kotlinxDateTime)
                 implementation(Deps.stately)

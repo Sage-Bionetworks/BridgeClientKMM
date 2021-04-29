@@ -63,18 +63,18 @@ data class UserSessionInfo (
     /* Two letter language codes to assign to this user (these are initially retrieved from the user's `Accept-Language` header and then persisted as part of account configuration).   */
     @SerialName("languages")
     val languages: kotlin.collections.List<kotlin.String>? = null,
-    /* The substudies this participant is associated to. */
-    @SerialName("substudyIds")
-    val substudyIds: kotlin.collections.List<kotlin.String>? = null,
-    /* The exernal IDs this participant is associated to, mapped to the substudy that issued the external ID. Typically a user signs up with the external ID, and is assigned to that substudy as a result. */
+    /* The studies this participant is associated to. */
+    @SerialName("studyIds")
+    val studyIds: kotlin.collections.List<kotlin.String>,
+    /* The exernal IDs this participant is associated to, mapped to the study that issued the external ID. Typically a user signs up with the external ID, and is assigned to that study as a result. */
     @SerialName("externalIds")
     val externalIds: kotlin.collections.Map<kotlin.String, kotlin.String>? = null,
     /* Is the user currently authenticated? */
     @SerialName("authenticated")
-    val authenticated: kotlin.Boolean? = null,
+    val authenticated: kotlin.Boolean,
     /* The session token that must be returned to the server to access services requiring authentication. */
     @SerialName("sessionToken")
-    val sessionToken: kotlin.String? = null,
+    val sessionToken: kotlin.String,
     /* A token, supplied when a new session is returned, that can be used to refresh the session at a later time. The API to reauthenticate with the token will refresh your session token and reset the session's timeout value. The reauthentication token can only be used one time.   */
     @SerialName("reauthToken")
     val reauthToken: kotlin.String? = null,
@@ -100,6 +100,9 @@ data class UserSessionInfo (
     /* A mapping from a subpopulation GUID to information about the participant's consent status in that subpopulation (whether consented or not). Only the subpopulations that currently apply to this user will have a ConsentStatus object in the map.  */
     @SerialName("consentStatuses")
     val consentStatuses: kotlin.collections.Map<kotlin.String, ConsentStatus>? = null,
+    /* The identifier of the organization this account is a member of (this will be an administrative account and not a study participant). */
+    @SerialName("orgMembership")
+    val orgMembership: kotlin.String? = null,
     /* UserSessionInfo */
     @SerialName("type")
     val type: kotlin.String? = null

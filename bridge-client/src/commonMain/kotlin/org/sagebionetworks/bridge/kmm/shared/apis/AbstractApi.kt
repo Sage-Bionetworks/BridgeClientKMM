@@ -40,7 +40,7 @@ abstract class AbstractApi(protected val basePath: String, protected val httpCli
         }
     }
 
-    protected suspend inline fun <reified S: Any> getData(path: String) : S {
+    protected suspend inline fun <reified S: Any> getData(path: String, modifiedDateTimeString: String? = null) : S {
         val builder = HttpRequestBuilder()
 
         builder.method = HttpMethod.Get
@@ -54,6 +54,11 @@ abstract class AbstractApi(protected val basePath: String, protected val httpCli
 
         with(builder.headers) {
             append("Accept", "application/json")
+        }
+        if (modifiedDateTimeString != null) {
+            with(builder.headers) {
+                append("If-Modified-Since", modifiedDateTimeString)
+            }
         }
 
         try {

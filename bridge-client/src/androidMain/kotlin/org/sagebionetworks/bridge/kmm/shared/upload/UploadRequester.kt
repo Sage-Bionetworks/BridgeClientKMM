@@ -118,18 +118,26 @@ class CoroutineUploadWorker(
     private val httpClient: HttpClient,
     private val sqlDriver: SqlDriver
 ) : CoroutineWorker(context, params) {
-
+    val TAG = "CoroutingUploadWorker"
+    
     override suspend fun doWork(): Result {
         return withContext(Dispatchers.IO) {
-            Log.d("Upload", "Upload worker started")
+            Log.d(TAG, "Upload worker started")
             val uploadManager = UploadManager(
                 httpClient, sqlDriver
             )
-            if (uploadManager.processUploads()) {
-                Result.success()
-            } else {
-                //TODO: Handle failure and retry scenarios -nbrown 12/21/20
-                Result.retry()
+            return@withContext try {
+                if (uploadManager.processUploads()) {
+                    Log.d(TAG, "Sucessfully processed all uploads")
+                    Result.success()
+                } else {
+                    Log.w(TAG, "uploadManager.processUploads did not finish all uploads")
+                    //TODO: Handle failure and retry scenarios -nbrown 12/21/20
+                    Result.retry()
+                }
+            } catch (t: Throwable) {
+                Log.e(TAG, "Error calling uploadManager.ProcessUploads", t)
+                Result.failure()
             }
         }
 

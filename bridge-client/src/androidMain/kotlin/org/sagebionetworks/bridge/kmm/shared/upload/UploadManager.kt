@@ -1,5 +1,6 @@
 package org.sagebionetworks.bridge.kmm.shared.upload
 
+import android.util.Log
 import com.squareup.sqldelight.db.SqlDriver
 import io.ktor.client.*
 import kotlinx.datetime.*
@@ -112,10 +113,13 @@ class UploadManager(
     private suspend fun uploadToS3(uploadFile: UploadFile, uploadSession: UploadSession) {
         //Make call to S3 using url from UploadSession
         try {
+            Log.i("UploadManager", "uploadingToS3 $uploadFile")
             s3UploadApi.uploadFile(uploadSession.url, uploadFile)
             FileSystem.SYSTEM.delete(uploadFile.filePath.toPath(Path.DIRECTORY_SEPARATOR)) //TODO: Handle delete failure -nbrown 12/16/20
             database.removeResource(uploadFile.getUploadFileResourceId())
         } catch (error: Throwable) {
+            Log.w("UploadManager", "Error uploadingToS3 $uploadFile", error)
+
             //TODO: Handle failure cases -nbrown 12/16/20
             throw error
         }

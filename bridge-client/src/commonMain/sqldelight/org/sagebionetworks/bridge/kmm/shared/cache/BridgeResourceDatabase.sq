@@ -3,10 +3,10 @@ import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus;
 
 CREATE TABLE Resource (
 identifier TEXT NOT NULL,
-type TEXT as ResourceType NOT NULL,
+type TEXT AS ResourceType NOT NULL,
 json TEXT,
-lastUpdate INTEGER as Long NOT NULL,
-status TEXT as ResourceStatus NOT NULL,
+lastUpdate INTEGER AS Long NOT NULL,
+status TEXT AS ResourceStatus NOT NULL,
 PRIMARY KEY (identifier)
 );
 

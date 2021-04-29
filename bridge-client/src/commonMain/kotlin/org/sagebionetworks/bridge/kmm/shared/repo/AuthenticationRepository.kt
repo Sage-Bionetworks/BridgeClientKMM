@@ -2,11 +2,8 @@ package org.sagebionetworks.bridge.kmm.shared.repo
 
 import io.ktor.client.*
 import io.ktor.client.features.*
-import io.ktor.http.*
-import io.ktor.util.network.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -44,9 +41,9 @@ class AuthenticationRepository(httpClient: HttpClient, val bridgeConfig: BridgeC
         return session()?.authenticated ?: false
     }
 
-    fun signOut() {
+    suspend fun signOut() {
         session()?.let {
-            runBlocking { authenticationApi.signOut(it) }
+            authenticationApi.signOut(it)
             database.removeResource(USER_SESSION_ID)
         }
     }

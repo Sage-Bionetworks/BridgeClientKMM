@@ -12,14 +12,6 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
 }
 
-repositories {
-    gradlePluginPortal()
-    google()
-    mavenCentral()
-    maven(url = "https://kotlin.bintray.com/kotlinx/")
-    maven(url = "https://oss.sonatype.org/content/repositories/snapshots")
-}
-
 sqldelight {
     database("BridgeResourceDatabase") {
         packageName = "org.sagebionetworks.bridge.kmm.shared.cache"

@@ -6,11 +6,9 @@ import android.content.Context.MODE_PRIVATE
 import android.content.res.AssetManager
 import android.os.Build
 import android.util.Log
-import com.google.common.io.BaseEncoding
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.joda.time.DateTime
-import org.koin.java.KoinJavaComponent.inject
 import org.sagebionetworks.assessmentmodel.AssessmentResult
 import org.sagebionetworks.bridge.data.AndroidStudyUploadEncryptor
 import org.sagebionetworks.bridge.data.Archive
@@ -28,18 +26,18 @@ import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.security.cert.CertificateException
 import java.security.cert.X509Certificate
-import java.util.Base64
+import java.util.*
 import org.sagebionetworks.bridge.kmm.shared.BridgeConfig as KmmBridgeConfig
 
-abstract class AssessmentResultArchiveUploader() {
+abstract class AssessmentResultArchiveUploader(
+    val context: Context,
+    val bridgeConfig: KmmBridgeConfig,
+    val uploadRequester: UploadRequester,
+    val authenticationRepository: AuthenticationRepository) {
+
     val CONTENT_TYPE_DATA_ARCHIVE = "application/zip"
 
     val STUDY_PUBLIC_KEY = "study_public_key.pem"
-    val bridgeConfig by inject(KmmBridgeConfig::class.java)
-    val context by inject(Context::class.java)
-    val uploadRequester by inject(UploadRequester::class.java)
-    val authenticationRepository by inject(AuthenticationRepository::class.java)
-
 
     // maybe we can pull from AppConfig? -liujoshua 04/02/2021
     abstract open fun getArchiveBuilderForActivity(assessmentResult: AssessmentResult): Archive.Builder

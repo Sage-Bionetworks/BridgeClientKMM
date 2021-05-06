@@ -4,15 +4,15 @@ object Versions {
     const val compile_sdk = 29
 
     //Kotlin
-    const val kotlin = "1.4.30"
-    const val kotlinCoroutines = "1.4.2-native-mt"
-    const val ktor = "1.5.2"
-    const val kotlinxSerialization = "1.0.1"
+    const val kotlin = "1.4.32"
+    const val kotlinCoroutines = "1.4.3-native-mt"
+    const val ktor = "1.5.3"
+    const val kotlinxSerialization = "1.1.0"
     const val kotlinxDateTime = "0.2.0"
     const val multiplatformSettings = "0.7.1"
     const val koin = "3.0.1"
-    const val sqlDelight = "1.4.4"
-    const val okio = "3.0.0-alpha.1"
+    const val sqlDelight = "1.5.0"
+    const val okio = "3.0.0-alpha.4"
     const val stately = "1.1.1"
 
     object AndroidX {
@@ -95,7 +95,6 @@ object Deps {
 
     object SqlDelight {
         val runtime = "com.squareup.sqldelight:runtime:${Versions.sqlDelight}"
-        //Copied CoroutinesExtensions from SqlDelight repo to workaround dependency issue. -nathaniel 11/30/20
         val coroutineExtensions =
             "com.squareup.sqldelight:coroutines-extensions:${Versions.sqlDelight}"
         val androidDriver = "com.squareup.sqldelight:android-driver:${Versions.sqlDelight}"

@@ -114,8 +114,8 @@ class UploadManager(
         //Make call to S3 using url from UploadSession
         try {
             Log.i("UploadManager", "uploadingToS3 $uploadFile")
-            s3UploadApi.uploadFile(uploadSession.url, uploadFile)
-            FileSystem.SYSTEM.delete(uploadFile.filePath.toPath(Path.DIRECTORY_SEPARATOR)) //TODO: Handle delete failure -nbrown 12/16/20
+            s3UploadApi.uploadFile(uploadSession.url, uploadFile) //TODO: Handle network exceptions -nbrown 4/26/21
+            FileSystem.SYSTEM.delete(uploadFile.filePath.toPath()) //TODO: Handle delete failure -nbrown 12/16/20
             database.removeResource(uploadFile.getUploadFileResourceId())
         } catch (error: Throwable) {
             Log.w("UploadManager", "Error uploadingToS3 $uploadFile", error)

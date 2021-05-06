@@ -107,7 +107,7 @@ class UploadRequester(
     @OptIn(ExperimentalFileSystem::class)
     private fun getFile(filename: String): Path {
         val pathString = context.filesDir.absolutePath + Path.DIRECTORY_SEPARATOR + filename
-        return pathString.toPath(Path.DIRECTORY_SEPARATOR)
+        return pathString.toPath()
     }
 
 }

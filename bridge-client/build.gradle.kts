@@ -6,7 +6,6 @@ plugins {
     kotlin("plugin.serialization")
     id("com.squareup.sqldelight")
     id ("maven-publish")
-    id( "com.jfrog.artifactory")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
@@ -122,6 +121,18 @@ android {
     }
     testOptions {
         unitTests.isReturnDefaultValues = true
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            url = uri("https://sagebionetworks.jfrog.io/artifactory/mobile-sdks/")
+            credentials {
+                username = System.getenv("artifactoryUser")
+                password = System.getenv("artifactoryPwd")
+            }
+        }
     }
 }
 

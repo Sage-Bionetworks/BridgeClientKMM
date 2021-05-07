@@ -17,7 +17,7 @@ buildscript {
 
 allprojects {
     group = "org.sagebionetworks.bridge.kmm"
-    version = "0.2.9"
+    version = "0.2.10"
     repositories {
         google()
         mavenCentral()

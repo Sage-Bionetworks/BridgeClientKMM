@@ -126,7 +126,7 @@ class ScheduleTimelineRepo(httpClient: HttpClient, databaseHelper: ResourceDatab
                                             expirationPeriod,
                                             TimeZone.currentSystemDefault()
                                         )
-                                        if (expirationInstant.minus(instantInDay).isNegative()) {
+                                        if ((expirationInstant.toEpochMilliseconds() - instantInDay.toEpochMilliseconds()) < 0) {
                                             // Expiration is in the past so don't include it
                                             includeSession = false
                                         }

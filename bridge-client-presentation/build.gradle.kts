@@ -3,6 +3,7 @@ plugins {
     kotlin("android")
     id("kotlin-android")
     id ("maven-publish")
+    id( "com.jfrog.artifactory")
 }
 
 android {
@@ -55,16 +56,10 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
 }
 
-project.afterEvaluate {
-    publishing {
-        publications {
-            create<MavenPublication>("maven") {
-                artifactId = "bridge-client-presentation"
-                from(components["release"])
-            }
+publishing {
+    publications {
+        create<MavenPublication>("aar") {
+            artifact("$buildDir/outputs/aar/${project.name}-release.aar")
         }
     }
-
 }
-
-apply("../config/artifact-deploy.gradle")

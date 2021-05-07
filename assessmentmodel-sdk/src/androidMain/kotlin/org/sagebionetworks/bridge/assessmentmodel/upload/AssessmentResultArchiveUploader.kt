@@ -9,6 +9,8 @@ import android.util.Log
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
+import org.joda.time.Instant
 import org.sagebionetworks.assessmentmodel.AssessmentResult
 import org.sagebionetworks.bridge.data.AndroidStudyUploadEncryptor
 import org.sagebionetworks.bridge.data.Archive
@@ -19,7 +21,6 @@ import org.sagebionetworks.bridge.kmm.shared.upload.UploadFile
 import org.sagebionetworks.bridge.kmm.shared.upload.UploadRequester
 import org.spongycastle.cms.CMSException
 import org.spongycastle.jcajce.provider.asymmetric.x509.CertificateFactory
-import java.io.FileOutputStream
 import java.io.IOException
 import java.security.DigestOutputStream
 import java.security.MessageDigest
@@ -40,14 +41,15 @@ abstract class AssessmentResultArchiveUploader(
     val STUDY_PUBLIC_KEY = "study_public_key.pem"
 
     // maybe we can pull from AppConfig? -liujoshua 04/02/2021
-    abstract open fun getArchiveBuilderForActivity(assessmentResult: AssessmentResult): Archive.Builder
+    abstract fun getArchiveBuilderForActivity(assessmentResult: AssessmentResult): Archive.Builder
 
     fun archiveResultAndQueueUpload(assessmentResult: AssessmentResult, jsonCoder: Json) {
         if (assessmentResult.schemaIdentifier == null) {
-            Log.w(
+            Log.e(
                 "Archiver",
-                "No schema found for assessment ${assessmentResult.assessmentIdentifier}"
+                "Quitting: No schema found for assessment ${assessmentResult.assessmentIdentifier}"
             )
+            return
         }
 
         val appVersion = "version ${bridgeConfig.appVersionName}, build ${bridgeConfig.appVersion}"
@@ -56,14 +58,15 @@ abstract class AssessmentResultArchiveUploader(
             .withPhoneInfo(bridgeConfig.deviceName)
 
         val metadataMap = getMetadataMap(assessmentResult, jsonCoder)
-
-        // migrate once upload utils moved to use kotlinx/java8 time - liujoshua 04/02/2021
-        val endDate = DateTime.parse(assessmentResult.endDateString!!.substringBefore("["))
+        
+        val kotlinEndTimeInstant = assessmentResult.endDateTime!!
+        val jodaEndTime = Instant(kotlinEndTimeInstant.toEpochMilliseconds())
+            .toDateTime(DateTimeZone.UTC)
 
         builder.addDataFile(
             JsonArchiveFile(
                 "metadata.json",
-                endDate,
+                jodaEndTime,
                 jsonCoder.encodeToString(metadataMap)
             )
         )
@@ -72,7 +75,14 @@ abstract class AssessmentResultArchiveUploader(
             builder.addDataFile(archiveFile)
         }
 
-        val uploadFile = persist(assessmentResult.runUUIDString, builder.build())
+        val assessmentRunUUID =  if (assessmentResult.runUUIDString.isEmpty()) {
+            Log.e("Archiver", "No runUUIDString in assessmentResult, created")
+            UUID.randomUUID().toString()
+        } else {
+            assessmentResult.runUUIDString
+        }
+
+        val uploadFile = persist(assessmentRunUUID, builder.build())
         Log.i("Archiver", "UploadFile $uploadFile")
         uploadRequester.queueAndRequestUpload(context, uploadFile)
     }
@@ -84,7 +94,6 @@ abstract class AssessmentResultArchiveUploader(
     )
     fun persist(filename: String, archive: Archive): UploadFile {
         val encryptor = AndroidStudyUploadEncryptor(getPublicKey())
-        val fos: FileOutputStream
 
         val md5: MessageDigest = try {
             MessageDigest.getInstance("MD5")
@@ -162,9 +171,14 @@ abstract class AssessmentResultArchiveUploader(
         // val startDate =jsonCoder.encodeToString(assessmentResult.startDateTime)
         // val endDate = jsonCoder.encodeToString(assessmentResult.endDateTime)
 
-        val endDate = DateTime.parse(assessmentResult.endDateString!!.substringBefore("["))
-        val startDate = DateTime.parse(assessmentResult.startDateString!!.substringBefore("["))
-            .withZone(endDate.zone)
+
+        val kotlinStartTimeInstant = assessmentResult.startDateTime!!
+        val jodaStartTime = Instant(kotlinStartTimeInstant.toEpochMilliseconds())
+            .toDateTime(DateTimeZone.UTC)
+
+        val kotlinEndTimeInstant = assessmentResult.endDateTime!!
+        val jodaEndTime = Instant(kotlinEndTimeInstant.toEpochMilliseconds())
+            .toDateTime(DateTimeZone.UTC)
 
         // add Android equivalent of rsdFrameworkVersion - liujoshua 04/01/2021
         return mutableMapOf(
@@ -174,8 +188,8 @@ abstract class AssessmentResultArchiveUploader(
             "deviceTypeIdentifier" to bridgeConfig.deviceName,
             "taskRunUUID" to assessmentResult.runUUIDString,
             "dataGroups" to dataGroups,
-            "startDate" to startDate.toString(),
-            "endDate" to endDate.toString()
+            "startDate" to jodaStartTime.toString(),
+            "endDate" to jodaEndTime.toString()
         )
     }
 

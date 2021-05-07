@@ -30,7 +30,7 @@ kotlin {
         }
     }
     sourceSets {
-        val assessment_version = "0.4.2"
+        val assessment_version = "0.4.3"
 
         val commonMain by getting {
             dependencies {
@@ -48,13 +48,13 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 // these dependencies should go in commonMain - liujoshua 04/02/2021
-                implementation(project(":bridge-client"))
+                api(project(":bridge-client"))
                 api("org.sagebionetworks.assessmentmodel:assessmentModel:$assessment_version")
 
                 implementation(project(":bridge-client-presentation"))
                 implementation("org.sagebionetworks.assessmentmodel:presentation:$assessment_version")
 
-                implementation(Deps.Koin.android)
+                api(Deps.Koin.android)
 
                 // legacy Bridge dependencies
                 // migrate to use kotlinx/java8 time and see if we can publish multi-platform

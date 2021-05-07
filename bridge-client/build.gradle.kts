@@ -5,7 +5,8 @@ plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
     id("com.squareup.sqldelight")
-    id("com.github.dcendents.android-maven")
+    id ("maven-publish")
+    id( "com.jfrog.artifactory")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
@@ -21,7 +22,7 @@ sqldelight {
 
 kotlin {
     android {
-        publishLibraryVariants("release", "debug")
+        publishAllLibraryVariants()
     }
     // Block from https://github.com/cashapp/sqldelight/issues/2044#issuecomment-721299517.
     val iOSTargetName  = System.getenv("SDK_NAME") ?: project.findProperty("XCODE_SDK_NAME") as? String ?: "iphonesimulator"
@@ -137,5 +138,3 @@ val packForXcode by tasks.creating(Sync::class) {
     into(targetDir)
 }
 tasks.getByName("build").dependsOn(packForXcode)
-
-apply("../config/artifact-deploy.gradle")

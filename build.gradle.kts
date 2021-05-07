@@ -2,10 +2,8 @@ buildscript {
 
     repositories {
         gradlePluginPortal()
-        jcenter()
         google()
         mavenCentral()
-        maven(url = "https://kotlin.bintray.com/kotlinx/")
     }
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}")
@@ -14,18 +12,32 @@ buildscript {
         classpath("org.jetbrains.kotlin:kotlin-serialization:${Versions.kotlin}")
         classpath("com.github.dcendents:android-maven-gradle-plugin:2.1")
     }
+
 }
 
 allprojects {
     group = "org.sagebionetworks.bridge.kmm"
     version = "0.2.9"
     repositories {
-        jcenter()
         google()
         mavenCentral()
         maven(url = "http://repo-maven.sagebridge.org/")
-        maven(url = "https://kotlin.bintray.com/kotlinx/")
-        maven(url = "https://dl.bintray.com/sage-bionetworks/AssessmentModel-KotlinNative")
-        maven(url = "https://dl.bintray.com/sage-bionetworks/BridgeClientKMM")
+        maven(url = "https://sagebionetworks.jfrog.io/artifactory/mobile-sdks/")
+    }
+    configurations.all {
+        resolutionStrategy.eachDependency(Action {
+            with(requested) {
+                // remove after our transitive dependencies migrate - liujoshua 05/06/2021
+                if (group == "org.koin") {
+                    useTarget( "io.insert-koin:${name}:${version}")
+                    because("Koin moved groups")
+                }
+                if (group == "org.jetbrains.kotlin") {
+                    if (name.startsWith("kotlin-stdlib")) {
+                        useTarget("org.jetbrains.kotlin:${name}:${Versions.kotlin}")
+                    }
+                }
+            }
+        })
     }
 }

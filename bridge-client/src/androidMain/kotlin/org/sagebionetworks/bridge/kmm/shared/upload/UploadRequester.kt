@@ -118,7 +118,7 @@ class CoroutineUploadWorker(
     private val httpClient: HttpClient,
     private val sqlDriver: SqlDriver
 ) : CoroutineWorker(context, params) {
-    val TAG = "CoroutingUploadWorker"
+    private val TAG = "CoroutineUploadWorker"
     
     override suspend fun doWork(): Result {
         return withContext(Dispatchers.IO) {
@@ -128,7 +128,7 @@ class CoroutineUploadWorker(
             )
             return@withContext try {
                 if (uploadManager.processUploads()) {
-                    Log.d(TAG, "Sucessfully processed all uploads")
+                    Log.d(TAG, "Successfully processed all uploads")
                     Result.success()
                 } else {
                     Log.w(TAG, "uploadManager.processUploads did not finish all uploads")

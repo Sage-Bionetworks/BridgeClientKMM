@@ -10,14 +10,12 @@ buildscript {
         classpath("com.android.tools.build:gradle:4.1.3")
         classpath("com.squareup.sqldelight:gradle-plugin:${Versions.sqlDelight}")
         classpath("org.jetbrains.kotlin:kotlin-serialization:${Versions.kotlin}")
-        classpath("org.jfrog.buildinfo:build-info-extractor-gradle:4.21.0")
     }
 
 }
 
 plugins {
     id("maven-publish")
-    id( "com.jfrog.artifactory") version "4.21.0"
 }
 
 allprojects {
@@ -45,25 +43,4 @@ allprojects {
             }
         })
     }
-}
-
-artifactory {
-    setContextUrl("https://sagebionetworks.jfrog.io/artifactory")
-    publish(delegateClosureOf<org.jfrog.gradle.plugin.artifactory.dsl.PublisherConfig> {
-        repository(delegateClosureOf<org.jfrog.gradle.plugin.artifactory.dsl.DoubleDelegateWrapper> {
-            val username = System.getenv("artifactoryUser")
-            val password = System.getenv("artifactoryPwd")
-            setProperty("repoKey", "mobile-sdks")
-            setProperty("username", username)
-            setProperty("password", password)
-            setProperty("maven", true)
-        })
-        defaults(delegateClosureOf<groovy.lang.GroovyObject> {
-            invokeMethod("publications", kotlin.arrayOf(
-                "ALL_PUBLICATIONS"
-            )
-            )
-            setProperty("publishArtifacts", true)
-        })
-    })
 }

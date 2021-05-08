@@ -3,7 +3,6 @@ plugins {
     kotlin("android")
     id("kotlin-android")
     id ("maven-publish")
-    id( "com.jfrog.artifactory")
 }
 
 android {
@@ -63,10 +62,25 @@ dependencies {
 
 
 
-publishing {
-    publications {
-        create<MavenPublication>("aar") {
-            artifact("$buildDir/outputs/aar/${project.name}-release.aar")
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("assessmentmodel-sdk") {
+                from(components.getByName("release"))
+            }
         }
     }
 }
+
+publishing {
+    repositories {
+        maven {
+            url = uri("https://sagebionetworks.jfrog.io/artifactory/mobile-sdks/")
+            credentials {
+                username = System.getenv("artifactoryUser")
+                password = System.getenv("artifactoryPwd")
+            }
+        }
+    }
+}
+

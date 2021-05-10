@@ -21,16 +21,16 @@ class ResourceDatabaseHelper(sqlDriver: SqlDriver) {
         }
     }
 
-    internal fun getResourceAsFlow(id: String): Flow<Resource?> {
-        return dbQuery.selectResourceById(id).asFlow().mapToOneOrNull()
+    internal fun getResourceAsFlow(id: String, type: ResourceType): Flow<Resource?> {
+        return dbQuery.selectResourceById(id, type).asFlow().mapToOneOrNull()
     }
 
-    internal fun getResource(id: String): Resource? {
-        return dbQuery.selectResourceById(id).executeAsOneOrNull()
+    internal fun getResource(id: String, type: ResourceType): Resource? {
+        return dbQuery.selectResourceById(id, type).executeAsOneOrNull()
     }
 
-    internal fun removeResource(id: String) {
-        dbQuery.removeResourceById(id)
+    internal fun removeResource(id: String, type: ResourceType) {
+        dbQuery.removeResourceById(id, type)
     }
 
     internal fun insertUpdateResource(resource: Resource) {

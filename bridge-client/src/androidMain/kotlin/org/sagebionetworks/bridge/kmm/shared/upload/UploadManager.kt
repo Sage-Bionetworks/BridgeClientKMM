@@ -78,7 +78,7 @@ class UploadManager(
      */
     private suspend fun getUploadSession(uploadFile: UploadFile): UploadSession? {
         val identifier = uploadFile.getUploadSessionResourceId()
-        val resource = database.getResource(identifier)
+        val resource = database.getResource(identifier, ResourceType.UPLOAD_SESSION)
         resource?.let {
             val uploadSession = resource.loadResource<UploadSession>()
             uploadSession?.expires?.let {
@@ -116,7 +116,7 @@ class UploadManager(
             Log.i("UploadManager", "uploadingToS3 $uploadFile")
             s3UploadApi.uploadFile(uploadSession.url, uploadFile) //TODO: Handle network exceptions -nbrown 4/26/21
             FileSystem.SYSTEM.delete(uploadFile.filePath.toPath()) //TODO: Handle delete failure -nbrown 12/16/20
-            database.removeResource(uploadFile.getUploadFileResourceId())
+            database.removeResource(uploadFile.getUploadFileResourceId(), ResourceType.FILE_UPLOAD)
         } catch (error: Throwable) {
             Log.w("UploadManager", "Error uploadingToS3 $uploadFile", error)
 
@@ -128,7 +128,7 @@ class UploadManager(
     private suspend fun completeUploadSession(uploadSession: UploadSession, resourceid: String) {
         uploadSession.id?.let {
             uploadsApi.completeUploadSession(uploadSession.id)
-            database.removeResource(resourceid)
+            database.removeResource(resourceid, ResourceType.UPLOAD_SESSION)
         }
 
     }

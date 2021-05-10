@@ -17,13 +17,13 @@ class ResourceDatabaseTest {
             val testId = "TestId"
             val resource = Resource(testId, ResourceType.ASSESSMENT_CONFIG, "{}", 0, ResourceStatus.SUCCESS)
             db.insertUpdateResource(resource)
-            val r1 = db.getResourceAsFlow(testId).first()
+            val r1 = db.getResourceAsFlow(testId, ResourceType.ASSESSMENT_CONFIG).first()
             assertNotNull(r1)
             assertEquals(ResourceType.ASSESSMENT_CONFIG, r1.type)
             assertEquals("{}", r1.json)
             assertEquals(0, r1.lastUpdate)
             db.clearDatabase()
-            val r2 = db.getResourceAsFlow(testId).first()
+            val r2 = db.getResourceAsFlow(testId, ResourceType.ASSESSMENT_CONFIG).first()
             assertNull(r2)
         }
     }

@@ -16,7 +16,7 @@ abstract class AbstractResourceRepo(val database: ResourceDatabaseHelper, privat
     internal inline fun <reified T: Any> getResourceById(identifier: String,
                                                          noinline remoteLoad: suspend () -> String,
                                                          noinline shouldUpdate: (Resource) -> Boolean = {false}): Flow<ResourceResult<T>> {
-        return database.getResourceAsFlow(identifier).filter { curResource ->
+        return database.getResourceAsFlow(identifier, resourceType).filter { curResource ->
             var filterResource = true //Return current item in the flow
             if (curResource == null ||
                 shouldUpdate(curResource) ||

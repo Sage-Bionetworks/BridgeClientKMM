@@ -27,14 +27,14 @@ class AuthenticationRepository(httpClient: HttpClient, val bridgeConfig: BridgeC
      * consent status.
      */
     fun sessionAsFlow() : Flow<UserSessionInfo?> {
-        return database.getResourceAsFlow(USER_SESSION_ID).map { curResource -> curResource?.loadResource() }
+        return database.getResourceAsFlow(USER_SESSION_ID, ResourceType.USER_SESSION_INFO).map { curResource -> curResource?.loadResource() }
     }
 
     /**
      * Get the current [UserSessionInfo] object.
      */
     fun session() : UserSessionInfo? {
-        return database.getResource(USER_SESSION_ID)?.loadResource()
+        return database.getResource(USER_SESSION_ID, ResourceType.USER_SESSION_INFO)?.loadResource()
     }
 
     fun isAuthenticated() : Boolean {
@@ -44,7 +44,7 @@ class AuthenticationRepository(httpClient: HttpClient, val bridgeConfig: BridgeC
     suspend fun signOut() {
         session()?.let {
             authenticationApi.signOut(it)
-            database.removeResource(USER_SESSION_ID)
+            database.removeResource(USER_SESSION_ID, ResourceType.USER_SESSION_INFO)
         }
     }
 
@@ -72,7 +72,7 @@ class AuthenticationRepository(httpClient: HttpClient, val bridgeConfig: BridgeC
             updateCachedSession(null, userSession)
             return ResourceResult.Success(userSession, ResourceStatus.SUCCESS)
         } catch (err: Throwable) {
-            database.removeResource(USER_SESSION_ID)
+            database.removeResource(USER_SESSION_ID, ResourceType.USER_SESSION_INFO)
             println(err)
         }
         return ResourceResult.Failed(ResourceStatus.FAILED)
@@ -97,7 +97,7 @@ class AuthenticationRepository(httpClient: HttpClient, val bridgeConfig: BridgeC
                 if (err is ResponseException) {
                     // We got a response from Bridge and it was an error.
                     // Clear the cached session
-                    database.removeResource(USER_SESSION_ID)
+                    database.removeResource(USER_SESSION_ID, ResourceType.USER_SESSION_INFO)
                 } else {
                     // Some sort of network error leave the session alone so we can try again
                 }

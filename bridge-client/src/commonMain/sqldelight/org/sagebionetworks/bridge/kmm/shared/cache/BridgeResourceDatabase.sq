@@ -7,7 +7,7 @@ type TEXT AS ResourceType NOT NULL,
 json TEXT,
 lastUpdate INTEGER AS Long NOT NULL,
 status TEXT AS ResourceStatus NOT NULL,
-PRIMARY KEY (identifier)
+PRIMARY KEY (identifier, type)
 );
 
 insertUpdateResource:
@@ -27,8 +27,8 @@ WHERE type = ?;
 
 selectResourceById:
 SELECT * FROM Resource
-WHERE identifier = ?;
+WHERE identifier = ? AND type = ?;
 
 removeResourceById:
 DELETE FROM Resource
-WHERE identifier = ?;
+WHERE identifier = ? AND type = ?;

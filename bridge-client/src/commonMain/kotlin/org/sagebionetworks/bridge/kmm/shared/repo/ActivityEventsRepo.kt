@@ -39,7 +39,7 @@ class ActivityEventsRepo(httpClient: HttpClient, databaseHelper: ResourceDatabas
      * @return ActivityEventList
      */
     fun getActivityEvents(studyId: String): Flow<ResourceResult<ActivityEventList>> {
-        return getResourceById(ACTIVITY_EVENTS_LIST_ID+studyId, remoteLoad =  { loadRemoteEvents(studyId) })
+        return getResourceById(ACTIVITY_EVENTS_LIST_ID+studyId, remoteLoad =  { loadRemoteEvents(studyId) }, studyId = studyId)
     }
 
     private suspend fun loadRemoteEvents(studyId: String) : String {

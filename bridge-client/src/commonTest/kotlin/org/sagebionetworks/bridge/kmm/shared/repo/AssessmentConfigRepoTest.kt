@@ -31,7 +31,9 @@ class AssessmentConfigRepoTest: BaseTest() {
             assertNotNull(resultJson)
 
             val db = repo.database
-            val r1 = db.getResourceAsFlow(assessmentConfigId, ResourceType.ASSESSMENT_CONFIG).first()
+            val r1 = db.getResourceAsFlow(assessmentConfigId, ResourceType.ASSESSMENT_CONFIG,
+                ResourceDatabaseHelper.APP_WIDE_STUDY_ID
+            ).first()
             assertNotNull(r1)
             assertEquals(ResourceType.ASSESSMENT_CONFIG, r1.type)
             assertTrue(r1.json?.contains("identifier")?: false)

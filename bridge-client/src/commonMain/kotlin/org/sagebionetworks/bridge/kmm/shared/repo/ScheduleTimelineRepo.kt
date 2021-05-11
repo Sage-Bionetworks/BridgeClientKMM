@@ -37,7 +37,7 @@ class ScheduleTimelineRepo(httpClient: HttpClient, databaseHelper: ResourceDatab
     )
 
     fun getTimeline(studyId: String): Flow<ResourceResult<Timeline>> {
-        return getResourceById(SCHEDULE_TIMELINE_ID+studyId, remoteLoad =  { loadRemoteTimeline(studyId) })
+        return getResourceById(SCHEDULE_TIMELINE_ID+studyId, remoteLoad =  { loadRemoteTimeline(studyId) }, studyId = studyId)
     }
 
     private suspend fun loadRemoteTimeline(studyId: String) : String {
@@ -49,7 +49,7 @@ class ScheduleTimelineRepo(httpClient: HttpClient, databaseHelper: ResourceDatab
      */
     fun getSessionsForToday(studyId: String, eventList: ActivityEventList) : Flow<ResourceResult<List<ScheduledSessionWindow>>> {
         return getTimeline(studyId).map {
-            extractSessions(eventList, it, Clock.System.now())
+            extractSessions(eventList, it, Clock.System.now(), studyId)
         }
     }
 
@@ -58,15 +58,15 @@ class ScheduleTimelineRepo(httpClient: HttpClient, databaseHelper: ResourceDatab
      */
     internal fun getSessionsForDay(studyId: String, eventList: ActivityEventList, instantInDay: Instant) : Flow<ResourceResult<List<ScheduledSessionWindow>>> {
         return getTimeline(studyId).map {
-            extractSessions(eventList, it, instantInDay)
+            extractSessions(eventList, it, instantInDay, studyId)
         }
     }
 
-    private fun extractSessions(eventList: ActivityEventList, resource: ResourceResult<Timeline>, instantInDay: Instant): ResourceResult<List<ScheduledSessionWindow>> {
+    private fun extractSessions(eventList: ActivityEventList, resource: ResourceResult<Timeline>, instantInDay: Instant, studyId: String): ResourceResult<List<ScheduledSessionWindow>> {
         return when (resource) {
             is ResourceResult.Success -> {
                 val timeline = resource.data
-                ResourceResult.Success(extractSessionsForDay(eventList, timeline, instantInDay), resource.status)
+                ResourceResult.Success(extractSessionsForDay(eventList, timeline, instantInDay, studyId), resource.status)
             }
             is ResourceResult.InProgress -> resource
             is ResourceResult.Failed -> resource
@@ -79,7 +79,7 @@ class ScheduleTimelineRepo(httpClient: HttpClient, databaseHelper: ResourceDatab
      * day specified by [instantInDay]. Sessions that expire before [instantInDay] will be excluded.
      */
     @OptIn(ExperimentalTime::class)
-    private fun extractSessionsForDay(eventList: ActivityEventList, timeline: Timeline, instantInDay: Instant) : List<ScheduledSessionWindow> {
+    private fun extractSessionsForDay(eventList: ActivityEventList, timeline: Timeline, instantInDay: Instant, studyId: String) : List<ScheduledSessionWindow> {
         // Map of eventID to SessionInfo
         val sessionInfoMap = timeline.sessions?.groupBy({it.startEventId})
         // Map of key to AssessmentInfo

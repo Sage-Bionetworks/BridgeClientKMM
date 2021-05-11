@@ -35,11 +35,13 @@ class UploadRequester(
     fun queueAndRequestUpload(context: Context, uploadFile: UploadFile) {
         //Store uploadFile in local cache
         val resource = Resource(
-            uploadFile.getUploadFileResourceId(),
-            ResourceType.FILE_UPLOAD,
-            Json.encodeToString(uploadFile),
-            Clock.System.now().toEpochMilliseconds(),
-            ResourceStatus.SUCCESS
+            identifier = uploadFile.getUploadFileResourceId(),
+            type = ResourceType.FILE_UPLOAD,
+            studyId = ResourceDatabaseHelper.APP_WIDE_STUDY_ID,
+            json = Json.encodeToString(uploadFile),
+            lastUpdate = Clock.System.now().toEpochMilliseconds(),
+            status = ResourceStatus.SUCCESS,
+            needSave = false
         )
         database.insertUpdateResource(resource)
 

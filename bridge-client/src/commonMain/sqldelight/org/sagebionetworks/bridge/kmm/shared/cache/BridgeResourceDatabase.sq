@@ -4,31 +4,41 @@ import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus;
 CREATE TABLE Resource (
 identifier TEXT NOT NULL,
 type TEXT AS ResourceType NOT NULL,
+studyId TEXT NOT NULL,
 json TEXT,
 lastUpdate INTEGER AS Long NOT NULL,
 status TEXT AS ResourceStatus NOT NULL,
-PRIMARY KEY (identifier, type)
+needSave INTEGER AS Boolean NOT NULL DEFAULT 0,
+PRIMARY KEY (identifier, type, studyId)
 );
 
 insertUpdateResource:
-INSERT OR REPLACE INTO Resource(identifier, type, json, lastUpdate, status)
-VALUES(?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO Resource(identifier, type, studyId, json, lastUpdate, status, needSave)
+VALUES(?, ?, ?, ?, ?, ?, ?);
 
 removeAllResources:
 DELETE FROM Resource;
 
 selectAllResourcesByType:
 SELECT * FROM Resource
-WHERE type = ?;
+WHERE type = ? AND studyId = ?;
 
 removeAllResourcesByType:
 DELETE FROM Resource
-WHERE type = ?;
+WHERE type = ? AND studyId = ?;
 
 selectResourceById:
 SELECT * FROM Resource
-WHERE identifier = ? AND type = ?;
+WHERE identifier = ? AND type = ? AND studyId = ?;
 
 removeResourceById:
 DELETE FROM Resource
-WHERE identifier = ? AND type = ?;
+WHERE identifier = ? AND type = ? AND studyId = ?;
+
+selectResourceByIds:
+SELECT * FROM Resource
+WHERE identifier IN ? AND type = ? AND studyId = ?;
+
+selectResourceNeedSave:
+SELECT * FROM Resource
+WHERE needSave = 1 AND type = ? AND studyId = ?;

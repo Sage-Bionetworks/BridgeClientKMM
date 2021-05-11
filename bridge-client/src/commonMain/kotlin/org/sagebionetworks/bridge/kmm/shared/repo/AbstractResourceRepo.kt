@@ -11,22 +11,23 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import org.sagebionetworks.bridge.kmm.shared.cache.*
 
-abstract class AbstractResourceRepo(val database: ResourceDatabaseHelper, private val resourceType: ResourceType, private val backgroundScope: CoroutineScope) {
+abstract class AbstractResourceRepo(val database: ResourceDatabaseHelper, protected val resourceType: ResourceType, private val backgroundScope: CoroutineScope) {
 
     internal inline fun <reified T: Any> getResourceById(identifier: String,
+                                                         studyId: String,
                                                          noinline remoteLoad: suspend () -> String,
                                                          noinline shouldUpdate: (Resource) -> Boolean = {false}): Flow<ResourceResult<T>> {
-        return database.getResourceAsFlow(identifier, resourceType).filter { curResource ->
+        return database.getResourceAsFlow(identifier, resourceType, studyId).filter { curResource ->
             var filterResource = true //Return current item in the flow
             if (curResource == null ||
-                shouldUpdate(curResource) ||
-                (curResource.lastUpdate + defaultUpdateFrequency < Clock.System.now().toEpochMilliseconds())
+                (!curResource.needSave && (shouldUpdate(curResource) ||
+                (curResource.lastUpdate + defaultUpdateFrequency < Clock.System.now().toEpochMilliseconds())))
             ) {
                 filterResource = false // don't return current item since we are going to update it
 
                 //Need to load resource from Bridge
                 backgroundScope.launch() {
-                    remoteLoadResource(database, identifier, resourceType, curResource, remoteLoad)
+                    remoteLoadResource(database, identifier, resourceType, studyId, curResource, remoteLoad)
                 }
             }
             filterResource
@@ -44,31 +45,36 @@ abstract class AbstractResourceRepo(val database: ResourceDatabaseHelper, privat
             database: ResourceDatabaseHelper,
             identifier: String,
             resourceType: ResourceType,
+            studyId: String,
             curResource: Resource?, //Current resource from local cache if there is one
             remoteLoad: suspend () -> String
         ): Resource {
             //Mark the resource as pending update
             var resource = Resource(
-                identifier,
-                resourceType,
-                curResource?.json,
-                Clock.System.now().toEpochMilliseconds(),
-                ResourceStatus.PENDING
+                identifier = identifier,
+                type = resourceType,
+                studyId = studyId,
+                json = curResource?.json,
+                lastUpdate = Clock.System.now().toEpochMilliseconds(),
+                status = ResourceStatus.PENDING,
+                needSave = false
             )
             database.insertUpdateResource(resource)
 
             try {
                 val resourceJson = remoteLoad()
                 resource = Resource(
-                    identifier,
-                    resourceType,
-                    resourceJson,
-                    Clock.System.now().toEpochMilliseconds(),
-                    ResourceStatus.SUCCESS
+                    identifier = identifier,
+                    type = resourceType,
+                    studyId = studyId,
+                    json = resourceJson,
+                    lastUpdate = Clock.System.now().toEpochMilliseconds(),
+                    status = ResourceStatus.SUCCESS,
+                    needSave = false
                 )
                 database.insertUpdateResource(resource)
             } catch (err: Throwable) {
-                resource = processResponseException(identifier, resourceType, curResource, err)
+                resource = processResponseException(identifier, resourceType, studyId, curResource, err)
                 database.insertUpdateResource(resource)
             }
             return resource
@@ -77,6 +83,7 @@ abstract class AbstractResourceRepo(val database: ResourceDatabaseHelper, privat
         private fun processResponseException(
             identifier: String,
             resourceType: ResourceType,
+            studyId: String,
             curResource: Resource?,
             throwable: Throwable
         ): Resource {
@@ -126,11 +133,13 @@ abstract class AbstractResourceRepo(val database: ResourceDatabaseHelper, privat
 
             }
             val resource = Resource(
-                identifier,
-                resourceType,
-                json,
-                lastUpdate,
-                status
+                identifier = identifier,
+                type = resourceType,
+                studyId = studyId,
+                json = json,
+                lastUpdate = lastUpdate,
+                status = status,
+                needSave = false
             )
             return resource
         }

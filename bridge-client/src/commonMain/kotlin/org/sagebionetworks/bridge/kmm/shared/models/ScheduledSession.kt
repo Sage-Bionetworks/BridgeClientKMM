@@ -40,15 +40,15 @@ data class ScheduledSession (
     @SerialName("endDay")
     val endDay: kotlin.Int,
     @SerialName("startTime")
-    val startTime: kotlin.String? = null,
+    val startTime: kotlin.String,
     @SerialName("delayTime")
     val delayTime: kotlin.String? = null,
     @SerialName("expiration")
-    val expiration: DateTimePeriod? = null,
+    val expiration: DateTimePeriod,
     @SerialName("persistent")
-    val persistent: kotlin.Boolean? = null,
+    val persistent: kotlin.Boolean = false,
     @SerialName("assessments")
-    val assessments: kotlin.collections.List<ScheduledAssessment>? = null,
+    val assessments: kotlin.collections.List<ScheduledAssessment>,
     /* ScheduledSession */
     @SerialName("type")
     val type: kotlin.String? = null

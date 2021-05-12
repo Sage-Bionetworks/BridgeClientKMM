@@ -4,24 +4,22 @@ import co.touchlab.stately.ensureNeverFrozen
 import io.ktor.client.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.*
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.sagebionetworks.bridge.kmm.shared.apis.AssessmentsApi
 import org.sagebionetworks.bridge.kmm.shared.apis.SchedulesV2Api
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
-import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
 import org.sagebionetworks.bridge.kmm.shared.models.*
-import kotlin.time.Duration
+import kotlin.math.exp
 import kotlin.time.ExperimentalTime
 
-class ScheduleTimelineRepo(httpClient: HttpClient, databaseHelper: ResourceDatabaseHelper, backgroundScope: CoroutineScope) :
+class ScheduleTimelineRepo(val adherenceRecordRepo: AdherenceRecordRepo,
+                           httpClient: HttpClient,
+                           databaseHelper: ResourceDatabaseHelper,
+                           backgroundScope: CoroutineScope) :
     AbstractResourceRepo(databaseHelper, resourceType = ResourceType.TIMELINE, backgroundScope) {
 
     companion object {
@@ -112,42 +110,51 @@ class ScheduleTimelineRepo(httpClient: HttpClient, databaseHelper: ResourceDatab
                                 for (scheduledSession in todaySessionList) {
                                     var includeSession = true
                                     // For sessions with an expiration we need to check if it is passed
-                                    scheduledSession.expiration?.let { expirationPeriod ->
 
-                                        // LocalTime support is hopefully coming: https://github.com/Kotlin/kotlinx-datetime/issues/57#issuecomment-800287971
-                                        // Construct a startDateTime from today and startTime
-                                        val startDateTimeString =
-                                            day.toString() + "T" + scheduledSession.startTime!!
-                                        val startDateTime = LocalDateTime.parse(startDateTimeString)
+                                    //Used for sorting when sessions span multiple days
+                                    val startDaysFromToday = scheduledSession.startDay - daysSince
+                                    val startDate = day.plus(startDaysFromToday.toLong(), DateTimeUnit.DateBased.DayBased(1))
 
-                                        val startInstant =
-                                            startDateTime.toInstant(TimeZone.currentSystemDefault())
-                                        val expirationInstant = startInstant.plus(
-                                            expirationPeriod,
-                                            TimeZone.currentSystemDefault()
-                                        )
-                                        if ((expirationInstant.toEpochMilliseconds() - instantInDay.toEpochMilliseconds()) < 0) {
-                                            // Expiration is in the past so don't include it
-                                            includeSession = false
-                                        }
+                                    // LocalTime support is hopefully coming: https://github.com/Kotlin/kotlinx-datetime/issues/57#issuecomment-800287971
+                                    // Construct a startDateTime from today and startTime
+                                    val startDateTimeString =
+                                        startDate.toString() + "T" + scheduledSession.startTime
+                                    val startDateTime = LocalDateTime.parse(startDateTimeString)
+
+                                    val startInstant =
+                                        startDateTime.toInstant(TimeZone.currentSystemDefault())
+                                    val expirationInstant = startInstant.plus(
+                                        scheduledSession.expiration,
+                                        TimeZone.currentSystemDefault()
+                                    )
+                                    if ((expirationInstant.toEpochMilliseconds() - instantInDay.toEpochMilliseconds()) < 0) {
+                                        // Expiration is in the past so don't include it
+                                        includeSession = false
                                     }
-                                    if (includeSession) {
+                                    val endDateTime = expirationInstant.toLocalDateTime(TimeZone.currentSystemDefault())
 
-                                        val assessmentList = scheduledSession.assessments?.map {
+
+                                    if (includeSession) {
+                                        val adherenceRecords = adherenceRecordRepo.getCachedAdherenceRecords(scheduledSession.assessments.map { it.instanceGuid }, studyId)
+                                        val assessmentList = scheduledSession.assessments.map {assessment ->
+                                            val recordsList = adherenceRecords.get(assessment.instanceGuid)
                                             ScheduledAssessmentReference(
-                                                it.instanceGuid!!,
-                                                assessmentInfoMap[it.refKey]!!
+                                                instanceGuid = assessment.instanceGuid,
+                                                assessmentInfo = assessmentInfoMap[assessment.refKey]!!,
+                                                adherenceRecordList = recordsList
                                             )
                                         }
 
-                                        //Used for sorting when sessions span multiple days
-                                        val startDaysFromToday = scheduledSession.startDay - daysSince
+
                                         val sessionWindow =
                                             ScheduledSessionWindow.createScheduledSessionWindow(
-                                                scheduledSession,
-                                                session,
-                                                assessmentList!!,
-                                                startDaysFromToday
+                                                scheduledSession = scheduledSession,
+                                                sessionInfo = session,
+                                                assessments = assessmentList,
+                                                startDaysFromToday = startDaysFromToday,
+                                                eventTimeStamp = event.timestamp,
+                                                startDateTime = startDateTime,
+                                                endDateTime = endDateTime
                                             )
                                         scheduledSessionWindowList.add(sessionWindow)
                                     }
@@ -167,23 +174,43 @@ class ScheduleTimelineRepo(httpClient: HttpClient, databaseHelper: ResourceDatab
 data class ScheduledSessionWindow (
 
     val refGuid: String? = null,
-    val instanceGuid: String? = null,
+    val instanceGuid: String,
+    val eventTimeStamp: Instant,
     val startDaysFromToday: Int,
+    val startDateTime: LocalDateTime,
+    val endDateTime: LocalDateTime,
+
     val startDay: Int,
     val endDay: Int,
     val startTime: String? = null,
     val delayTime: String? = null,
     val expiration: DateTimePeriod? = null,
-    val persistent: Boolean? = null,
-    val assessments: List<ScheduledAssessmentReference>? = null,
+    val persistent: Boolean = false,
+    val assessments: List<ScheduledAssessmentReference>,
     val sessionInfo: SessionInfo
 ) {
+
+    /**
+     * Session is completed if all assessments are completed and it is not persistent
+     */
+    val isCompleted = assessments.find { !it.isCompleted } == null && !persistent
+
     companion object {
 
-        fun createScheduledSessionWindow(scheduledSession: ScheduledSession, sessionInfo: SessionInfo, assessments: List<ScheduledAssessmentReference>, startDaysFromToday: Int): ScheduledSessionWindow {
+        fun createScheduledSessionWindow(
+            scheduledSession: ScheduledSession,
+            sessionInfo: SessionInfo,
+            assessments: List<ScheduledAssessmentReference>,
+            startDaysFromToday: Int,
+            eventTimeStamp: Instant,
+            startDateTime: LocalDateTime,
+            endDateTime: LocalDateTime,
+            ): ScheduledSessionWindow {
+
             return ScheduledSessionWindow(
                 refGuid = scheduledSession.refGuid,
                 instanceGuid = scheduledSession.instanceGuid,
+                eventTimeStamp = eventTimeStamp,
                 startDay = scheduledSession.startDay,
                 endDay = scheduledSession.endDay,
                 startTime = scheduledSession.startTime,
@@ -192,7 +219,9 @@ data class ScheduledSessionWindow (
                 persistent = scheduledSession.persistent,
                 sessionInfo = sessionInfo,
                 assessments = assessments,
-                startDaysFromToday = startDaysFromToday
+                startDaysFromToday = startDaysFromToday,
+                startDateTime = startDateTime,
+                endDateTime = endDateTime
             )
         }
 
@@ -201,5 +230,8 @@ data class ScheduledSessionWindow (
 
 data class ScheduledAssessmentReference (
     val instanceGuid: kotlin.String,
-    val assessmentInfo: AssessmentInfo
-)
+    val assessmentInfo: AssessmentInfo,
+    val adherenceRecordList: List<AdherenceRecord>?,
+) {
+    val isCompleted = adherenceRecordList != null && adherenceRecordList.find { it.finishedOn != null } != null
+}

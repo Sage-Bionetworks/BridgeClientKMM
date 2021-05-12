@@ -303,10 +303,16 @@ class ScheduleTimelineRepoTest: BaseTest() {
         return todayNoonDateTime.toInstant(TimeZone.currentSystemDefault())
     }
 
+    private fun getTestScheduleTimelineRepo() : ScheduleTimelineRepo {
+        val databaseHelper = ResourceDatabaseHelper(testDatabaseDriver())
+        val adherenceRecordRepo = AdherenceRecordRepo(getTestClient(""), databaseHelper, MainScope())
+        return ScheduleTimelineRepo(adherenceRecordRepo, getTestClient(scheduleJson), databaseHelper, MainScope())
+    }
+
     @Test
     fun testScheduledSessionsDay1() {
         runTest {
-            val repo = ScheduleTimelineRepo(getTestClient(scheduleJson), ResourceDatabaseHelper(testDatabaseDriver()), MainScope())
+            val repo = getTestScheduleTimelineRepo()
             val activityEventList = getActivityEventList(Clock.System.now().minus(DateTimeUnit.DAY, TimeZone.currentSystemDefault()))
 
             val resourceResult = repo.getSessionsForDay("sage-assessment-test", activityEventList, getTodayInstant()).firstOrNull { it is ResourceResult.Success }
@@ -336,7 +342,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
     @Test
     fun testScheduledSessionsDay3() {
         runTest {
-            val repo = ScheduleTimelineRepo(getTestClient(scheduleJson), ResourceDatabaseHelper(testDatabaseDriver()), MainScope())
+            val repo = getTestScheduleTimelineRepo()
             val activityEventList = getActivityEventList(Clock.System.now().minus(3, DateTimeUnit.DAY, TimeZone.currentSystemDefault()))
 
             val resourceResult = repo.getSessionsForDay("sage-assessment-test", activityEventList, getTodayInstant()).firstOrNull { it is ResourceResult.Success }
@@ -362,7 +368,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
     @Test
     fun testScheduledSessionsDay4() {
         runTest {
-            val repo = ScheduleTimelineRepo(getTestClient(scheduleJson), ResourceDatabaseHelper(testDatabaseDriver()), MainScope())
+            val repo = getTestScheduleTimelineRepo()
             val activityEventList = getActivityEventList(Clock.System.now().minus(4, DateTimeUnit.DAY, TimeZone.currentSystemDefault()))
 
             val resourceResult = repo.getSessionsForDay("sage-assessment-test", activityEventList, getTodayInstant()).firstOrNull { it is ResourceResult.Success }

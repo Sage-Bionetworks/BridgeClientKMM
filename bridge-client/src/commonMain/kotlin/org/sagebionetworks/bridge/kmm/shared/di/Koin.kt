@@ -6,10 +6,7 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
-import org.sagebionetworks.bridge.kmm.shared.repo.ActivityEventsRepo
-import org.sagebionetworks.bridge.kmm.shared.repo.AssessmentConfigRepo
-import org.sagebionetworks.bridge.kmm.shared.repo.AuthenticationRepository
-import org.sagebionetworks.bridge.kmm.shared.repo.ScheduleTimelineRepo
+import org.sagebionetworks.bridge.kmm.shared.repo.*
 
 fun initKoin(enableNetworkLogs: Boolean = false, appDeclaration: KoinAppDeclaration = {}) =
     startKoin {
@@ -28,8 +25,9 @@ val commonModule = module {
     single {ResourceDatabaseHelper(get())}
 
     single<AssessmentConfigRepo> {AssessmentConfigRepo(get(), get(), get(named("background"))) }
-    single<ScheduleTimelineRepo> {ScheduleTimelineRepo(get(), get(), get(named("background"))) }
+    single<ScheduleTimelineRepo> {ScheduleTimelineRepo(get(), get(), get(), get(named("background"))) }
     single<ActivityEventsRepo> { ActivityEventsRepo(get(), get(), get(named("background"))) }
+    single<AdherenceRecordRepo> { AdherenceRecordRepo(get(), get(), get(named("background"))) }
     single<AuthenticationRepository> {AuthenticationRepository(get(named("authHttpClient")), get(), get())}
 
 }

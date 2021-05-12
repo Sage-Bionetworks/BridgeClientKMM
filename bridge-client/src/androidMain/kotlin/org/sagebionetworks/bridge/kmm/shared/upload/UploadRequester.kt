@@ -13,6 +13,8 @@ import kotlinx.serialization.json.Json
 import okio.*
 import okio.Path.Companion.toPath
 import org.sagebionetworks.bridge.kmm.shared.cache.*
+import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper.Companion.APP_WIDE_STUDY_ID
+import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper.Companion.DEFAULT_SECONDARY_ID
 import java.io.IOException
 import java.io.OutputStream
 import java.nio.charset.StandardCharsets
@@ -37,7 +39,8 @@ class UploadRequester(
         val resource = Resource(
             identifier = uploadFile.getUploadFileResourceId(),
             type = ResourceType.FILE_UPLOAD,
-            studyId = ResourceDatabaseHelper.APP_WIDE_STUDY_ID,
+            secondaryId = DEFAULT_SECONDARY_ID,
+            studyId = APP_WIDE_STUDY_ID,
             json = Json.encodeToString(uploadFile),
             lastUpdate = Clock.System.now().toEpochMilliseconds(),
             status = ResourceStatus.SUCCESS,

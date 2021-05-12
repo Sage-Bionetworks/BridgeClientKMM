@@ -18,6 +18,7 @@ class ResourceDatabaseTest {
             val testId = "TestId"
             val resource = Resource(
                 identifier = testId,
+                secondaryId = ResourceDatabaseHelper.DEFAULT_SECONDARY_ID,
                 type = ResourceType.ASSESSMENT_CONFIG,
                 studyId = APP_WIDE_STUDY_ID,
                 json = "{}",

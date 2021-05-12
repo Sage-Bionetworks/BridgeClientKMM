@@ -36,6 +36,7 @@ class ResourceDatabaseHelper(sqlDriver: SqlDriver) {
     internal fun insertUpdateResource(resource: Resource) {
         dbQuery.insertUpdateResource(
             identifier = resource.identifier,
+            secondaryId = resource.secondaryId,
             type = resource.type,
             json = resource.json,
             lastUpdate = resource.lastUpdate,
@@ -85,6 +86,11 @@ class ResourceDatabaseHelper(sqlDriver: SqlDriver) {
          * For caching resources that are not specific to an individual study.
          */
         const val APP_WIDE_STUDY_ID = "AppWideStudyId"
+
+        /**
+         * For caching resources that don't have/need a secondary identifier.
+         */
+        const val DEFAULT_SECONDARY_ID = "DefaultSecondaryId"
 
     }
 

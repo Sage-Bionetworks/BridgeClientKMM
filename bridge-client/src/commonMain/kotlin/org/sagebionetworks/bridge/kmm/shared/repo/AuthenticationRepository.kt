@@ -118,6 +118,7 @@ class AuthenticationRepository(httpClient: HttpClient, val bridgeConfig: BridgeC
         }
         var resource = Resource(
             identifier = USER_SESSION_ID,
+            secondaryId = ResourceDatabaseHelper.DEFAULT_SECONDARY_ID,
             type = ResourceType.USER_SESSION_INFO,
             studyId = APP_WIDE_STUDY_ID,
             json = Json.encodeToString(toCacheSession),

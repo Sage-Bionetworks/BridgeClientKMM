@@ -15,6 +15,7 @@ import org.junit.rules.TemporaryFolder
 import org.sagebionetworks.bridge.kmm.shared.cache.Resource
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper.Companion.APP_WIDE_STUDY_ID
+import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper.Companion.DEFAULT_SECONDARY_ID
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
 import org.sagebionetworks.bridge.kmm.shared.getJsonReponseHandler
@@ -43,13 +44,14 @@ public class UploadManagerTest {
         val uploadManager = UploadManager(testHttpClient, testDatabaseDriver())
         val database = uploadManager.database
         val resource = Resource(
-            uploadFile.getUploadFileResourceId(),
-            ResourceType.FILE_UPLOAD,
-            APP_WIDE_STUDY_ID,
-            Json.encodeToString(uploadFile),
-            Clock.System.now().toEpochMilliseconds(),
-            ResourceStatus.SUCCESS,
-            false
+            identifier = uploadFile.getUploadFileResourceId(),
+            secondaryId = DEFAULT_SECONDARY_ID,
+            type = ResourceType.FILE_UPLOAD,
+            studyId = APP_WIDE_STUDY_ID,
+            json = Json.encodeToString(uploadFile),
+            lastUpdate = Clock.System.now().toEpochMilliseconds(),
+            status = ResourceStatus.SUCCESS,
+            needSave = false
         )
         database.insertUpdateResource(resource)
         return uploadManager

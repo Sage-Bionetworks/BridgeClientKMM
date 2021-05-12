@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import org.sagebionetworks.bridge.kmm.shared.cache.*
 
-abstract class AbstractResourceRepo(val database: ResourceDatabaseHelper, protected val resourceType: ResourceType, private val backgroundScope: CoroutineScope) {
+abstract class AbstractResourceRepo(val database: ResourceDatabaseHelper, protected val resourceType: ResourceType, protected val backgroundScope: CoroutineScope) {
 
     internal inline fun <reified T: Any> getResourceById(identifier: String,
                                                          studyId: String,
@@ -52,6 +52,7 @@ abstract class AbstractResourceRepo(val database: ResourceDatabaseHelper, protec
             //Mark the resource as pending update
             var resource = Resource(
                 identifier = identifier,
+                secondaryId = ResourceDatabaseHelper.DEFAULT_SECONDARY_ID,
                 type = resourceType,
                 studyId = studyId,
                 json = curResource?.json,
@@ -65,6 +66,7 @@ abstract class AbstractResourceRepo(val database: ResourceDatabaseHelper, protec
                 val resourceJson = remoteLoad()
                 resource = Resource(
                     identifier = identifier,
+                    secondaryId = ResourceDatabaseHelper.DEFAULT_SECONDARY_ID,
                     type = resourceType,
                     studyId = studyId,
                     json = resourceJson,
@@ -134,6 +136,7 @@ abstract class AbstractResourceRepo(val database: ResourceDatabaseHelper, protec
             }
             val resource = Resource(
                 identifier = identifier,
+                secondaryId = ResourceDatabaseHelper.DEFAULT_SECONDARY_ID,
                 type = resourceType,
                 studyId = studyId,
                 json = json,

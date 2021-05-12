@@ -3,6 +3,7 @@ import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus;
 
 CREATE TABLE Resource (
 identifier TEXT NOT NULL,
+secondaryId TEXT NOT NULL,
 type TEXT AS ResourceType NOT NULL,
 studyId TEXT NOT NULL,
 json TEXT,
@@ -13,8 +14,8 @@ PRIMARY KEY (identifier, type, studyId)
 );
 
 insertUpdateResource:
-INSERT OR REPLACE INTO Resource(identifier, type, studyId, json, lastUpdate, status, needSave)
-VALUES(?, ?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO Resource(identifier, secondaryId, type, studyId, json, lastUpdate, status, needSave)
+VALUES(?, ?,?, ?, ?, ?, ?, ?);
 
 removeAllResources:
 DELETE FROM Resource;

@@ -12,5 +12,5 @@ json TEXT,
 lastUpdate INTEGER AS Long NOT NULL,
 status TEXT AS ResourceStatus NOT NULL,
 needSave INTEGER AS Boolean NOT NULL DEFAULT 0,
-PRIMARY KEY (identifier, type, studyId)
+PRIMARY KEY (identifier, secondaryId, type, studyId)
 );

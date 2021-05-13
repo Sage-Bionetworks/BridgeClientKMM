@@ -10,10 +10,7 @@ import org.sagebionetworks.bridge.kmm.shared.getTestClient
 import org.sagebionetworks.bridge.kmm.shared.models.ActivityEvent
 import org.sagebionetworks.bridge.kmm.shared.models.ActivityEventList
 import org.sagebionetworks.bridge.kmm.shared.testDatabaseDriver
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class ScheduleTimelineRepoTest: BaseTest() {
 
@@ -292,6 +289,22 @@ class ScheduleTimelineRepoTest: BaseTest() {
             "  \"type\": \"Timeline\"\n" +
             "}"
 
+    val assessmentInstanceGuid = "sGH_BkWl2SVbPxOH0VwVKQ"
+
+    val adherenceRecordjson = "{\n" +
+            "   \"items\":[\n" +
+            "      {\n" +
+            "         \"instanceGuid\":\""+ assessmentInstanceGuid + "\",\n" +
+            "         \"startedOn\":\"2021-05-12T23:44:54.319Z\",\n" +
+            "         \"finishedOn\":\"2021-05-12T23:44:54.319Z\",\n" +
+            "         \"eventTimestamp\":\"2021-05-12T23:44:51.872Z\",\n" +
+            "         \"type\":\"AdherenceRecord\"\n" +
+            "      }\n" +
+            "   ],\n" +
+            "   \"total\":1,\n" +
+            "   \"type\":\"PagedResourceList\"\n" +
+            "}"
+
 
     private fun getActivityEventList(timeStamp: Instant): ActivityEventList {
         return ActivityEventList(items = listOf(ActivityEvent(eventId = "study_start_date", timestamp = timeStamp)))
@@ -303,9 +316,9 @@ class ScheduleTimelineRepoTest: BaseTest() {
         return todayNoonDateTime.toInstant(TimeZone.currentSystemDefault())
     }
 
-    private fun getTestScheduleTimelineRepo() : ScheduleTimelineRepo {
+    private fun getTestScheduleTimelineRepo(adherenceRecordJson: String = "") : ScheduleTimelineRepo {
         val databaseHelper = ResourceDatabaseHelper(testDatabaseDriver())
-        val adherenceRecordRepo = AdherenceRecordRepo(getTestClient(""), databaseHelper, MainScope())
+        val adherenceRecordRepo = AdherenceRecordRepo(getTestClient(adherenceRecordJson), databaseHelper, MainScope())
         return ScheduleTimelineRepo(adherenceRecordRepo, getTestClient(scheduleJson), databaseHelper, MainScope())
     }
 
@@ -356,6 +369,36 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val session2 = sessionList.get(0)
             assertEquals("Daily Sessions", session2.sessionInfo.label)
             assertEquals("SI3hC2o0hdDTanRwqVVYIQ", session2.instanceGuid)
+            assertFalse(session2.isCompleted)
+
+            //Second session will be starting next hour
+            val session3 = sessionList.get(1)
+            assertEquals("Daily Sessions", session3.sessionInfo.label)
+            assertEquals("OjDKErILgVF04xlYktOF0g", session3.instanceGuid)
+
+        }
+    }
+
+    @Test
+    fun testScheduledSessionsDay3WithCompletion() {
+        runTest {
+            val studyId = "sage-assessment-test"
+            val repo = getTestScheduleTimelineRepo(adherenceRecordjson)
+            repo.adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)
+            val activityEventList = getActivityEventList(Clock.System.now().minus(3, DateTimeUnit.DAY, TimeZone.currentSystemDefault()))
+
+            val resourceResult = repo.getSessionsForDay(studyId, activityEventList, getTodayInstant()).firstOrNull { it is ResourceResult.Success }
+
+            assertTrue(resourceResult is ResourceResult.Success)
+            val sessionList = resourceResult.data
+            assertNotNull(sessionList)
+            assertEquals(2, sessionList.size)
+
+            //First session should have started in current hour and be completed
+            val session2 = sessionList.get(0)
+            assertEquals("Daily Sessions", session2.sessionInfo.label)
+            assertEquals("SI3hC2o0hdDTanRwqVVYIQ", session2.instanceGuid)
+            assertTrue(session2.isCompleted)
 
             //Second session will be starting next hour
             val session3 = sessionList.get(1)

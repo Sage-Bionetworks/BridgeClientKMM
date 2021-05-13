@@ -53,7 +53,7 @@ data class AdherenceRecord (
     val clientData: kotlinx.serialization.json.JsonElement? = null,
     /* AdherenceRecord */
     @SerialName("type")
-    val type: kotlin.String? = null
+    val type: kotlin.String = "AdherenceRecord"
 ) {
 
 }

@@ -16,7 +16,7 @@ import org.sagebionetworks.bridge.kmm.shared.models.*
 import kotlin.math.exp
 import kotlin.time.ExperimentalTime
 
-class ScheduleTimelineRepo(val adherenceRecordRepo: AdherenceRecordRepo,
+class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo,
                            httpClient: HttpClient,
                            databaseHelper: ResourceDatabaseHelper,
                            backgroundScope: CoroutineScope) :

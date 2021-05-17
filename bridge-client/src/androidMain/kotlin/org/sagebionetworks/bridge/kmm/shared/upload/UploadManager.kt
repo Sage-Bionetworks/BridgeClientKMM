@@ -14,6 +14,7 @@ import org.sagebionetworks.bridge.kmm.shared.apis.S3UploadApi
 import org.sagebionetworks.bridge.kmm.shared.apis.UploadsApi
 import org.sagebionetworks.bridge.kmm.shared.cache.DbDriverFactory
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
+import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper.Companion.APP_WIDE_STUDY_ID
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
 import org.sagebionetworks.bridge.kmm.shared.cache.loadResource
 import org.sagebionetworks.bridge.kmm.shared.repo.AbstractResourceRepo
@@ -39,21 +40,21 @@ class UploadManager(
      * Clears all queued uploads.
      */
     fun clearUploads() {
-        database.removeAllResources(ResourceType.FILE_UPLOAD)
-        database.removeAllResources(ResourceType.UPLOAD_SESSION)
+        database.removeAllResources(ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID)
+        database.removeAllResources(ResourceType.UPLOAD_SESSION, APP_WIDE_STUDY_ID)
     }
 
     suspend fun processUploads(): Boolean {
-        for (resource in database.getResources(ResourceType.FILE_UPLOAD)) {
+        for (resource in database.getResources(ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID)) {
             resource.loadResource<UploadFile>()?.let {
                 processUploadFile(it)
             }
         }
         //Check that all uploads succeeded and have been removed
-        val success = database.getResources(ResourceType.FILE_UPLOAD).isEmpty()
+        val success = database.getResources(ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID).isEmpty()
         if (success) {
             //Check if we have any sessions that have been uploaded and still need completing
-            for (resource in database.getResources(ResourceType.UPLOAD_SESSION)) {
+            for (resource in database.getResources(ResourceType.UPLOAD_SESSION, APP_WIDE_STUDY_ID)) {
                 resource.loadResource<UploadSession>()?.let {
                     completeUploadSession(it, resource.identifier)
                 }
@@ -78,7 +79,7 @@ class UploadManager(
      */
     private suspend fun getUploadSession(uploadFile: UploadFile): UploadSession? {
         val identifier = uploadFile.getUploadSessionResourceId()
-        val resource = database.getResource(identifier)
+        val resource = database.getResource(identifier, ResourceType.UPLOAD_SESSION, APP_WIDE_STUDY_ID)
         resource?.let {
             val uploadSession = resource.loadResource<UploadSession>()
             uploadSession?.expires?.let {
@@ -98,6 +99,7 @@ class UploadManager(
             database = database,
             identifier = identifier,
             resourceType = ResourceType.UPLOAD_SESSION,
+            studyId = APP_WIDE_STUDY_ID,
             curResource = null,
             remoteLoad = {loadRemoteUploadSession(uploadFile.getUploadRequest())}
         )
@@ -116,7 +118,7 @@ class UploadManager(
             Log.i("UploadManager", "uploadingToS3 $uploadFile")
             s3UploadApi.uploadFile(uploadSession.url, uploadFile) //TODO: Handle network exceptions -nbrown 4/26/21
             FileSystem.SYSTEM.delete(uploadFile.filePath.toPath()) //TODO: Handle delete failure -nbrown 12/16/20
-            database.removeResource(uploadFile.getUploadFileResourceId())
+            database.removeResource(uploadFile.getUploadFileResourceId(), ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID)
         } catch (error: Throwable) {
             Log.w("UploadManager", "Error uploadingToS3 $uploadFile", error)
 
@@ -128,7 +130,7 @@ class UploadManager(
     private suspend fun completeUploadSession(uploadSession: UploadSession, resourceid: String) {
         uploadSession.id?.let {
             uploadsApi.completeUploadSession(uploadSession.id)
-            database.removeResource(resourceid)
+            database.removeResource(resourceid, ResourceType.UPLOAD_SESSION, APP_WIDE_STUDY_ID)
         }
 
     }

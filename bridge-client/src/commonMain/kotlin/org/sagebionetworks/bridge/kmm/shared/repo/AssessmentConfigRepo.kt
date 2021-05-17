@@ -8,6 +8,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.sagebionetworks.bridge.kmm.shared.apis.AssessmentsApi
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
+import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper.Companion.APP_WIDE_STUDY_ID
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
 import org.sagebionetworks.bridge.kmm.shared.models.AssessmentConfig
@@ -25,7 +26,9 @@ class AssessmentConfigRepo(httpClient: HttpClient, databaseHelper: ResourceDatab
     )
 
     fun getAssessmentById(identifier: String): Flow<ResourceResult<AssessmentConfig>> {
-        return getResourceById(identifier, remoteLoad =  { loadRemoteAssessmentConfig(identifier) })
+        return getResourceById(identifier, remoteLoad =  { loadRemoteAssessmentConfig(identifier) },
+            studyId = APP_WIDE_STUDY_ID
+        )
     }
 
     private suspend fun loadRemoteAssessmentConfig(identifier: String) : String {

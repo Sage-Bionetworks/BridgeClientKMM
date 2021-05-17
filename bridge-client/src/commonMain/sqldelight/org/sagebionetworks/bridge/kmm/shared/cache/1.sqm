@@ -1,0 +1,16 @@
+import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus;
+import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType;
+
+DROP TABLE Resource;
+
+CREATE TABLE Resource (
+identifier TEXT NOT NULL,
+secondaryId TEXT NOT NULL,
+type TEXT AS ResourceType NOT NULL,
+studyId TEXT NOT NULL,
+json TEXT,
+lastUpdate INTEGER AS Long NOT NULL,
+status TEXT AS ResourceStatus NOT NULL,
+needSave INTEGER AS Boolean NOT NULL DEFAULT 0,
+PRIMARY KEY (identifier, secondaryId, type, studyId)
+);

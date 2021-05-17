@@ -13,6 +13,7 @@ enum class ResourceType() {
     USER_SESSION_INFO,
     TIMELINE,
     ACTIVITY_EVENTS_LIST,
+    ADHERENCE_RECORD,
 }
 
 enum class ResourceStatus {

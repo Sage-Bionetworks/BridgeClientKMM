@@ -13,6 +13,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import org.sagebionetworks.bridge.kmm.shared.cache.Resource
+import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
+import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper.Companion.APP_WIDE_STUDY_ID
+import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper.Companion.DEFAULT_SECONDARY_ID
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
 import org.sagebionetworks.bridge.kmm.shared.getJsonReponseHandler
@@ -41,11 +44,14 @@ public class UploadManagerTest {
         val uploadManager = UploadManager(testHttpClient, testDatabaseDriver())
         val database = uploadManager.database
         val resource = Resource(
-            uploadFile.getUploadFileResourceId(),
-            ResourceType.FILE_UPLOAD,
-            Json.encodeToString(uploadFile),
-            Clock.System.now().toEpochMilliseconds(),
-            ResourceStatus.SUCCESS
+            identifier = uploadFile.getUploadFileResourceId(),
+            secondaryId = DEFAULT_SECONDARY_ID,
+            type = ResourceType.FILE_UPLOAD,
+            studyId = APP_WIDE_STUDY_ID,
+            json = Json.encodeToString(uploadFile),
+            lastUpdate = Clock.System.now().toEpochMilliseconds(),
+            status = ResourceStatus.SUCCESS,
+            needSave = false
         )
         database.insertUpdateResource(resource)
         return uploadManager
@@ -77,13 +83,13 @@ public class UploadManagerTest {
             val uploadManager = setupUploadManager(testClient, tempFile)
             val database = uploadManager.database
 
-            assertFalse(database.getResources(ResourceType.FILE_UPLOAD).isEmpty())
+            assertFalse(database.getResources(ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID).isEmpty())
             uploadManager.processUploads()
 
-            assertTrue(database.getResources(ResourceType.FILE_UPLOAD).isEmpty())
+            assertTrue(database.getResources(ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID).isEmpty())
             assertFalse(tempFile.exists())
 
-            assertTrue(database.getResources(ResourceType.UPLOAD_SESSION).isEmpty())
+            assertTrue(database.getResources(ResourceType.UPLOAD_SESSION, APP_WIDE_STUDY_ID).isEmpty())
         }
     }
 
@@ -115,20 +121,20 @@ public class UploadManagerTest {
             val uploadManager = setupUploadManager(testClient, tempFile)
             val database = uploadManager.database
 
-            assertFalse(database.getResources(ResourceType.FILE_UPLOAD).isEmpty())
+            assertFalse(database.getResources(ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID).isEmpty())
             try {
                 //First try will throw an error with the s3 call
                 uploadManager.processUploads()
             } catch (throwable: Throwable) {
 
             }
-            assertFalse(database.getResources(ResourceType.FILE_UPLOAD).isEmpty())
-            assertFalse(database.getResources(ResourceType.UPLOAD_SESSION).isEmpty())
+            assertFalse(database.getResources(ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID).isEmpty())
+            assertFalse(database.getResources(ResourceType.UPLOAD_SESSION, APP_WIDE_STUDY_ID).isEmpty())
             //Retry processing uploads, this time should reuse cached uploadSession
             uploadManager.processUploads()
-            assertTrue(database.getResources(ResourceType.FILE_UPLOAD).isEmpty())
+            assertTrue(database.getResources(ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID).isEmpty())
             assertFalse(tempFile.exists())
-            assertTrue(database.getResources(ResourceType.UPLOAD_SESSION).isEmpty())
+            assertTrue(database.getResources(ResourceType.UPLOAD_SESSION, APP_WIDE_STUDY_ID).isEmpty())
         }
     }
 
@@ -160,7 +166,7 @@ public class UploadManagerTest {
             val uploadManager = setupUploadManager(testClient, tempFile)
             val database = uploadManager.database
 
-            assertFalse(database.getResources(ResourceType.FILE_UPLOAD).isEmpty())
+            assertFalse(database.getResources(ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID).isEmpty())
             try {
                 //First try will throw an error with the completeUploadSession call
                 uploadManager.processUploads()
@@ -168,13 +174,13 @@ public class UploadManagerTest {
 
             }
             //File upload and temp file should be gone
-            assertTrue(database.getResources(ResourceType.FILE_UPLOAD).isEmpty())
+            assertTrue(database.getResources(ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID).isEmpty())
             assertFalse(tempFile.exists())
             //Should still have an upload session
-            assertFalse(database.getResources(ResourceType.UPLOAD_SESSION).isEmpty())
+            assertFalse(database.getResources(ResourceType.UPLOAD_SESSION, APP_WIDE_STUDY_ID).isEmpty())
             //Retry processing uploads, this time should pass
             uploadManager.processUploads()
-            assertTrue(database.getResources(ResourceType.UPLOAD_SESSION).isEmpty())
+            assertTrue(database.getResources(ResourceType.UPLOAD_SESSION, APP_WIDE_STUDY_ID).isEmpty())
         }
     }
 }

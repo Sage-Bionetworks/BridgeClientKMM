@@ -25,7 +25,7 @@ class AppConfigRepo(httpClient: HttpClient, databaseHelper: ResourceDatabaseHelp
     )
 
     fun getAppConfig(appId: String): Flow<ResourceResult<AppConfig>> {
-        return getResourceById(appId, { loadRemoteAppConfig(appId) })
+        return getResourceById(identifier = appId, remoteLoad = { loadRemoteAppConfig(appId) }, studyId =  ResourceDatabaseHelper.APP_WIDE_STUDY_ID)
     }
 
     private suspend fun loadRemoteAppConfig(appId: String) : String {

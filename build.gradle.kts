@@ -20,7 +20,7 @@ plugins {
 
 allprojects {
     group = "org.sagebionetworks.bridge.kmm"
-    version = "0.2.11"
+    version = "0.2.15"
     repositories {
         google()
         mavenCentral()
@@ -35,6 +35,8 @@ allprojects {
                     useTarget( "io.insert-koin:${name}:${version}")
                     because("Koin moved groups")
                 }
+                // Needed due to dependency on kotlinx.datetime 0.2 which depends on kotlin 1.5.0
+                // Remove after project moves to kotlin 1.5 -nbrown 5/19/2021
                 if (group == "org.jetbrains.kotlin") {
                     if (name.startsWith("kotlin-stdlib")) {
                         useTarget("org.jetbrains.kotlin:${name}:${Versions.kotlin}")

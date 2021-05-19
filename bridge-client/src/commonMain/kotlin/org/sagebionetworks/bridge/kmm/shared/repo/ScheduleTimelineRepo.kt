@@ -45,7 +45,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
     /**
      * Get all the scheduled sessions for today that have not expired.
      */
-    fun getSessionsForToday(studyId: String, eventList: ActivityEventList) : Flow<ResourceResult<List<ScheduledSessionWindow>>> {
+    fun getSessionsForToday(studyId: String, eventList: StudyActivityEventList) : Flow<ResourceResult<List<ScheduledSessionWindow>>> {
         return getTimeline(studyId).map {
             extractSessions(eventList, it, Clock.System.now(), studyId)
         }
@@ -54,13 +54,13 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
     /**
      * Used for testing so that we can specify a consistent point in time.
      */
-    internal fun getSessionsForDay(studyId: String, eventList: ActivityEventList, instantInDay: Instant) : Flow<ResourceResult<List<ScheduledSessionWindow>>> {
+    internal fun getSessionsForDay(studyId: String, eventList: StudyActivityEventList, instantInDay: Instant) : Flow<ResourceResult<List<ScheduledSessionWindow>>> {
         return getTimeline(studyId).map {
             extractSessions(eventList, it, instantInDay, studyId)
         }
     }
 
-    private fun extractSessions(eventList: ActivityEventList, resource: ResourceResult<Timeline>, instantInDay: Instant, studyId: String): ResourceResult<List<ScheduledSessionWindow>> {
+    private fun extractSessions(eventList: StudyActivityEventList, resource: ResourceResult<Timeline>, instantInDay: Instant, studyId: String): ResourceResult<List<ScheduledSessionWindow>> {
         return when (resource) {
             is ResourceResult.Success -> {
                 val timeline = resource.data
@@ -77,7 +77,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
      * day specified by [instantInDay]. Sessions that expire before [instantInDay] will be excluded.
      */
     @OptIn(ExperimentalTime::class)
-    private fun extractSessionsForDay(eventList: ActivityEventList, timeline: Timeline, instantInDay: Instant, studyId: String) : List<ScheduledSessionWindow> {
+    private fun extractSessionsForDay(eventList: StudyActivityEventList, timeline: Timeline, instantInDay: Instant, studyId: String) : List<ScheduledSessionWindow> {
         // Map of eventID to SessionInfo
         val sessionInfoMap = timeline.sessions?.groupBy({it.startEventId})
         // Map of key to AssessmentInfo

@@ -7,8 +7,8 @@ import org.sagebionetworks.bridge.kmm.shared.BaseTest
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
 import org.sagebionetworks.bridge.kmm.shared.getTestClient
-import org.sagebionetworks.bridge.kmm.shared.models.ActivityEvent
-import org.sagebionetworks.bridge.kmm.shared.models.ActivityEventList
+import org.sagebionetworks.bridge.kmm.shared.models.StudyActivityEvent
+import org.sagebionetworks.bridge.kmm.shared.models.StudyActivityEventList
 import org.sagebionetworks.bridge.kmm.shared.testDatabaseDriver
 import kotlin.test.*
 
@@ -306,8 +306,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             "}"
 
 
-    private fun getActivityEventList(timeStamp: Instant): ActivityEventList {
-        return ActivityEventList(items = listOf(ActivityEvent(eventId = "study_start_date", timestamp = timeStamp)))
+    private fun getActivityEventList(timeStamp: Instant): StudyActivityEventList {
+        return StudyActivityEventList(items = listOf(StudyActivityEvent(eventId = "study_start_date", timestamp = timeStamp)))
     }
 
     private fun getTodayInstant(): Instant {

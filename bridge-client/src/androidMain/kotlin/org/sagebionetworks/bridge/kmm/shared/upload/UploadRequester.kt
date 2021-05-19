@@ -62,6 +62,9 @@ class UploadRequester(
         ).enqueue()
     }
 
+    val pendingUploads = database.getResources(ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID).isNotEmpty()
+            || database.getResources(ResourceType.UPLOAD_SESSION, APP_WIDE_STUDY_ID).isNotEmpty()
+
     // This is a temporary helper method for testing upload with Bridge -nbrown 01/08/21
     @Throws(IOException::class)
     private fun writeTestZipFileTo(os: OutputStream?): ZipOutputStream {

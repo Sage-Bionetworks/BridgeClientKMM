@@ -172,7 +172,7 @@ abstract class AssessmentResultArchiveUploader(
         // val endDate = jsonCoder.encodeToString(assessmentResult.endDateTime)
 
 
-        val kotlinStartTimeInstant = assessmentResult.startDateTime!!
+        val kotlinStartTimeInstant = assessmentResult.startDateTime
         val jodaStartTime = Instant(kotlinStartTimeInstant.toEpochMilliseconds())
             .toDateTime(DateTimeZone.UTC)
 

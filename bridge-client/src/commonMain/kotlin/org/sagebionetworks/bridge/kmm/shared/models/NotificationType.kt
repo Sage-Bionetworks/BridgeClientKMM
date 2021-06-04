@@ -16,20 +16,17 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
 
 /**
-* They type of notification to provide relative to a session. If present, this enum specifies when the notification should be shown to the participant.  |Status|Description| |---|---| |participant_choice|The participant can specify when to receive the notification.| |start_of_window|The notification should be delivered at the start of each session window instance.| |random|The notification should be delivered at a random point in time during each session window instance.| 
-* Values: "participant_choice","start_of_window","random"
-*/
+ * They type of notification to provide relative to a session’s time window. This enum specifies when the notification should be shown to the participant.  |Status|Description| |---|---| |after_window_start|Issue the notification the `offset` after the window starts| |before_window_end|Issue the notification the `offset` before the window ends|
+ * Values: "after_window_start","before_window_end"
+ */
 @Serializable
 enum class NotificationType(val serialName: String? = null) {
 
-    @SerialName("participant_choice")
-    PARTICIPANT_CHOICE,
+    @SerialName("after_window_start")
+    AFTER_WINDOW_START,
 
-    @SerialName("start_of_window")
-    START_OF_WINDOW,
-
-    @SerialName("random")
-    RANDOM;
+    @SerialName("before_window_end")
+    BEFORE_WINDOW_END;
 
 }
 

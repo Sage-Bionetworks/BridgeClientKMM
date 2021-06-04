@@ -48,7 +48,7 @@ data class SessionInfo (
     @SerialName("minutesToComplete")
     val minutesToComplete: kotlin.Int? = null,
     @SerialName("notifications")
-    val notifications: kotlin.collections.List<NotificationInfo>,
+    val notifications: kotlin.collections.List<NotificationInfo>? = null,
     /* SessionInfo */
     @SerialName("type")
     val type: kotlin.String? = null

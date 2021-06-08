@@ -45,7 +45,7 @@ open class BridgeClientAppViewModel : ObservableObject {
     
     public init(appId: String) {
         self.platformConfig = Self.instantiatePlatformConfig(appId: appId)
-        IOSBridgeConfig.Companion().initialize(platformConfig: self.platformConfig)
+        IOSBridgeConfig().initialize(platformConfig: self.platformConfig)
     }
     
     open class func instantiatePlatformConfig(appId: String) -> PlatformConfig {

@@ -3,18 +3,19 @@ package org.sagebionetworks.bridge.kmm.shared
 import kotlin.native.concurrent.AtomicReference
 import kotlin.native.concurrent.freeze
 
-class IOSBridgeConfig private constructor(private val platformConfig : PlatformConfig = PlatformConfigImpl()) : BridgeConfig {
-    @ThreadLocal
-    companion object {
-        private var atomicRef: AtomicReference<IOSBridgeConfig?> = AtomicReference(null)
-        fun initialize(platformConfig : PlatformConfig) {
-            val instance = IOSBridgeConfig(platformConfig)
-            atomicRef.compareAndSet(null, instance.freeze())
-        }
-        fun getInstance(): IOSBridgeConfig {
-            return atomicRef.value ?: IOSBridgeConfig()
-        }
+object IOSBridgeConfig  : BridgeConfig {
+
+    private var atomicRef: AtomicReference<PlatformConfig?> = AtomicReference(null)
+
+    fun initialize(platformConfig : PlatformConfig) {
+        atomicRef.compareAndSet(null, platformConfig.freeze())
     }
+
+    private val platformConfig: PlatformConfig
+        get() {
+            return atomicRef.value ?: defaultPlatformConfig
+        }
+    private val defaultPlatformConfig = PlatformConfigImpl()
 
     override val sdkVersion: Int
         get() = 0   // TODO: syoung 06/07/2021 Figure out how to get the version of the BridgeClient framework.

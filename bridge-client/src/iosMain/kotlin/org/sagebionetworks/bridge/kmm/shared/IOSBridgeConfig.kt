@@ -5,7 +5,7 @@ import kotlin.native.concurrent.freeze
 
 object IOSBridgeConfig  : BridgeConfig {
 
-    private var atomicRef: AtomicReference<PlatformConfig?> = AtomicReference(null)
+    private val atomicRef: AtomicReference<PlatformConfig?> = AtomicReference(null)
 
     fun initialize(platformConfig : PlatformConfig) {
         atomicRef.compareAndSet(null, platformConfig.freeze())

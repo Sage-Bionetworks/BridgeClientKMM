@@ -2,21 +2,25 @@ package org.sagebionetworks.bridge.kmm.shared
 
 import org.sagebionetworks.bridge.kmm.shared.models.ClientInfo
 
-interface BridgeConfig {
-
+interface PlatformConfig {
     val appId: String
 
     val appName: String
-
-    val sdkVersion: Int
 
     val appVersion: Int
 
     val appVersionName: String
 
-    val osName: String
-
     val osVersion: String
+
+    val deviceName: String
+
+    val osName: String
+}
+
+interface BridgeConfig : PlatformConfig {
+
+    val sdkVersion: Int
 
     /**
      * Uses [.getStudyName], [.getAppVersion], [.getDeviceName], [ ][VERSION.RELEASE], and [.getSdkVersion]
@@ -38,8 +42,6 @@ interface BridgeConfig {
             return userAgent ?:
             appName + "/" + appVersion + " (" + deviceName + "; " + osName + "/" + osVersion + ") BridgeClientKMM/" + sdkVersion
         }
-
-    val deviceName: String
 
     /**
      *

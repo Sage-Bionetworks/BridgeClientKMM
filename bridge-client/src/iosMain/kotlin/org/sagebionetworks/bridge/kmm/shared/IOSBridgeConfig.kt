@@ -1,23 +1,48 @@
 package org.sagebionetworks.bridge.kmm.shared
 
-class IOSBridgeConfig() : BridgeConfig {
+import kotlin.native.concurrent.AtomicReference
+import kotlin.native.concurrent.freeze
 
-    override val appId: String = "sage-assessment-test"//applicationContext.getResources().getString(R.string.app_id)
+class IOSBridgeConfig private constructor(private val platformConfig : PlatformConfig = PlatformConfigImpl()) : BridgeConfig {
+    @ThreadLocal
+    companion object {
+        private var atomicRef: AtomicReference<IOSBridgeConfig?> = AtomicReference(null)
+        fun initialize(platformConfig : PlatformConfig) {
+            val instance = IOSBridgeConfig(platformConfig)
+            atomicRef.compareAndSet(null, instance.freeze())
+        }
+        fun getInstance(): IOSBridgeConfig {
+            return atomicRef.value ?: throw UninitializedPropertyAccessException("IOSBridgeConfig is not initialised yet")
+        }
+    }
 
-    override val appName: String = "Sage Assessment Test"//applicationContext.getResources().getString(R.string.app_name)
+    override val sdkVersion: Int
+        get() = 0   // TODO: syoung 06/07/2021 Figure out how to get the version of the BridgeClient framework.
 
-    override val sdkVersion: Int = 0
+    // Wrapped values
 
-    override val appVersion: Int = 0
-
-    override val appVersionName: String = "TODO"
-
-    override val osName: String = "iOS"
-
-    override val osVersion: String = "TODO"
-
-    override val deviceName: String = "TODO"
-
-
-
+    override val appId: String
+        get() = platformConfig.appId
+    override val appName: String
+        get() = platformConfig.appName
+    override val appVersion: Int
+        get() = platformConfig.appVersion
+    override val appVersionName: String
+        get() = platformConfig.appVersionName
+    override val osName: String
+        get() = platformConfig.osName
+    override val osVersion: String
+        get() = platformConfig.osVersion
+    override val deviceName: String
+        get() = platformConfig.deviceName
 }
+
+internal data class PlatformConfigImpl(
+    override val appId: String = "sage-assessment-test",
+    override val appName: String = "Sage Assessment Test",
+    override val appVersion: Int = 99,
+    override val appVersionName: String = "Unknown",
+    override val osVersion: String = "Unknown",
+    override val deviceName: String = "Unknown",
+    override val osName: String = "iOS") : PlatformConfig
+

@@ -7,12 +7,12 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
-import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
+import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus
 import org.sagebionetworks.bridge.kmm.shared.repo.AssessmentConfigRepo
 import org.sagebionetworks.bridge.kmm.shared.repo.AuthenticationRepository
 
 class NativeAssessmentViewModel (
-    private val viewUpdate: (String?) -> Unit
+    private val viewUpdate: (String?, ResourceStatus?) -> Unit
 ) : KoinComponent {
 
     private val repo : AssessmentConfigRepo by inject(mode = LazyThreadSafetyMode.NONE)
@@ -24,9 +24,11 @@ class NativeAssessmentViewModel (
         scope.launch {
             repo.getAssessmentById(identifier).collect { resourceResult ->
                 when (resourceResult) {
-                    is ResourceResult.Success -> {viewUpdate(resourceResult.data.config.toString())}
-                    is ResourceResult.InProgress -> {viewUpdate("loading...")}
-                    is ResourceResult.Failed -> {viewUpdate("failed to load")}
+                    is ResourceResult.Success -> {
+                        viewUpdate(resourceResult.data.config.toString(), resourceResult.status)
+                    }
+                    is ResourceResult.InProgress -> {viewUpdate(null, ResourceStatus.PENDING)}
+                    is ResourceResult.Failed -> {viewUpdate(null, ResourceStatus.FAILED)}
                 }
             }
         }
@@ -36,19 +38,7 @@ class NativeAssessmentViewModel (
         return authManager.isAuthenticated()
     }
 
-    fun signIn(userName: String, password: String, callBack: (UserSessionInfo?) -> Unit) {
-        scope.launch {
-            val userSessionResult = authManager.signInEmail(email = userName, password = password)
-            when(userSessionResult) {
-                is ResourceResult.Success -> callBack(userSessionResult.data)
-                is ResourceResult.Failed -> callBack(null)
-            }
-        }
-    }
-
     fun onCleared() {
         scope.cancel()
     }
-
-
 }

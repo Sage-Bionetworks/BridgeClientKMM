@@ -16,15 +16,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         // Use a UIHostingController as window root view controller.
         if let windowScene = scene as? UIWindowScene {
-            let viewModel = ContentView.ViewModel()
-            let contentView =  ContentView.init(viewModel: viewModel)
+            let contentView =  ContentView()
             let window = UIWindow(windowScene: windowScene)
             window.rootViewController = UIHostingController(rootView: contentView)
             self.window = window
             window.makeKeyAndVisible()
-            if (viewModel.nvm?.isAuthenticated() == true) {
-                viewModel.loadConfig()
-            }
         }
     }
 

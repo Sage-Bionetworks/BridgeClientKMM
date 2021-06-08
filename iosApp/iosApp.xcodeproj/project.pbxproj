@@ -16,7 +16,8 @@
 		7555FF96242A565B00829871 /* iosAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF95242A565B00829871 /* iosAppTests.swift */; };
 		7555FFA1242A565B00829871 /* iosAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FFA0242A565B00829871 /* iosAppUITests.swift */; };
 		E97B76A825546D05000BEDF0 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97B76A725546D05000BEDF0 /* LoginView.swift */; };
-		FF8D1F7926276DD200C44DE9 /* BridgeClientAppManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF8D1F7826276DD200C44DE9 /* BridgeClientAppManager.swift */; };
+		FF5657BE266F12C7008671B5 /* BridgeClientAppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF5657BA266F12C7008671B5 /* BridgeClientAppViewModel.swift */; };
+		FF5657BF266F12C7008671B5 /* PlatformConfigImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF5657BB266F12C7008671B5 /* PlatformConfigImpl.swift */; };
 		FF8D1F7E26276F3100C44DE9 /* Research in Frameworks */ = {isa = PBXBuildFile; productRef = FF8D1F7D26276F3100C44DE9 /* Research */; };
 		FF8D1F8026276F3100C44DE9 /* ResearchUI in Frameworks */ = {isa = PBXBuildFile; productRef = FF8D1F7F26276F3100C44DE9 /* ResearchUI */; };
 		FF8D1F8526276F5700C44DE9 /* BridgeArchiver in Frameworks */ = {isa = PBXBuildFile; productRef = FF8D1F8426276F5700C44DE9 /* BridgeArchiver */; };
@@ -73,7 +74,8 @@
 		7555FFA2242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E97B76A725546D05000BEDF0 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		E9B7695625D73E8D0031D67E /* bridge_client.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = bridge_client.framework; path = "../bridge-client/build/xcode-frameworks/bridge_client.framework"; sourceTree = "<group>"; };
-		FF8D1F7826276DD200C44DE9 /* BridgeClientAppManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BridgeClientAppManager.swift; sourceTree = "<group>"; };
+		FF5657BA266F12C7008671B5 /* BridgeClientAppViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BridgeClientAppViewModel.swift; sourceTree = "<group>"; };
+		FF5657BB266F12C7008671B5 /* PlatformConfigImpl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlatformConfigImpl.swift; sourceTree = "<group>"; };
 		FF8D1F892627705C00C44DE9 /* BridgeUploaderInfoV2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BridgeUploaderInfoV2.swift; sourceTree = "<group>"; };
 		FF8F8D1E261F858900366307 /* BridgeClient.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BridgeClient.framework; path = "../bridge-client/build/bin/ios/debugFramework/BridgeClient.framework"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -179,11 +181,20 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		FF5657BC266F12C7008671B5 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		FF8D1F7326276A5800C44DE9 /* BridgeClientUI */ = {
 			isa = PBXGroup;
 			children = (
+				FF5657BA266F12C7008671B5 /* BridgeClientAppViewModel.swift */,
+				FF5657BB266F12C7008671B5 /* PlatformConfigImpl.swift */,
+				FF5657BC266F12C7008671B5 /* Views */,
 				FF8D1F882627702D00C44DE9 /* Data Archiving */,
-				FF8D1F7826276DD200C44DE9 /* BridgeClientAppManager.swift */,
 			);
 			name = BridgeClientUI;
 			path = ../../SwiftPackage/Sources/BridgeClientUI;
@@ -361,10 +372,11 @@
 			files = (
 				7555FF7F242A565900829871 /* AppDelegate.swift in Sources */,
 				7555FF81242A565900829871 /* SceneDelegate.swift in Sources */,
-				FF8D1F7926276DD200C44DE9 /* BridgeClientAppManager.swift in Sources */,
+				FF5657BE266F12C7008671B5 /* BridgeClientAppViewModel.swift in Sources */,
 				FF8D1F8A2627705C00C44DE9 /* BridgeUploaderInfoV2.swift in Sources */,
 				E97B76A825546D05000BEDF0 /* LoginView.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
+				FF5657BF266F12C7008671B5 /* PlatformConfigImpl.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

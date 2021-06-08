@@ -1,5 +1,6 @@
 //
-//  BridgeClientAppManager.swift
+//  ExternalIdLoginView.swift
+//
 //
 //  Copyright © 2021 Sage Bionetworks. All rights reserved.
 //
@@ -30,19 +31,40 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-import UIKit
+import SwiftUI
 import BridgeClient
 
-open class BridgeClientAppManager {
+public struct ExternalIdLoginView: View {
+    @EnvironmentObject var bridgeManager: BridgeClientAppViewModel
+    @State var externalId: String = ""
+    @State var status: ResourceStatus?
     
-    public init() {
+    public var body: some View {
+        VStack {
+            TextField("Participant Id", text: $externalId)
+            Button("Sign In") {
+                self.status = ResourceStatus.pending
+                bridgeManager.loginWithExternalId(externalId) { status in
+                    self.status = status
+                }
+            }
+            .disabled(status == ResourceStatus.success ||
+                        status == ResourceStatus.pending)
+            if status == ResourceStatus.pending {
+                ProgressView()
+            }
+            else if status == ResourceStatus.failed {
+                Text("This Participant Id will not work for this study.")
+                    .foregroundColor(.red)
+            }
+        }
+        .padding()
     }
-    
-    open func appDidLaunch(with launchOptions: [UIApplication.LaunchOptionsKey: Any]?) {
-        var enableNetworkLogs = false
-        #if DEBUG
-           enableNetworkLogs = true
-        #endif
-        KoinKt.doInitKoin(enableNetworkLogs: enableNetworkLogs)
+}
+
+struct ExternalIdLoginView_Previews: PreviewProvider {
+    static var previews: some View {
+        ExternalIdLoginView()
+            .environmentObject(BridgeClientAppViewModel(appId: "preview"))
     }
 }

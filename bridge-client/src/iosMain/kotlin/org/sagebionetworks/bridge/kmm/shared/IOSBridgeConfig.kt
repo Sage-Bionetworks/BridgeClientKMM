@@ -12,7 +12,7 @@ class IOSBridgeConfig private constructor(private val platformConfig : PlatformC
             atomicRef.compareAndSet(null, instance.freeze())
         }
         fun getInstance(): IOSBridgeConfig {
-            return atomicRef.value ?: throw UninitializedPropertyAccessException("IOSBridgeConfig is not initialised yet")
+            return atomicRef.value ?: IOSBridgeConfig()
         }
     }
 

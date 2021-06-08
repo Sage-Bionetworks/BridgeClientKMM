@@ -15,7 +15,6 @@
 		7555FF8B242A565B00829871 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7555FF89242A565B00829871 /* LaunchScreen.storyboard */; };
 		7555FF96242A565B00829871 /* iosAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF95242A565B00829871 /* iosAppTests.swift */; };
 		7555FFA1242A565B00829871 /* iosAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FFA0242A565B00829871 /* iosAppUITests.swift */; };
-		E97B76A825546D05000BEDF0 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97B76A725546D05000BEDF0 /* LoginView.swift */; };
 		FF5657BE266F12C7008671B5 /* BridgeClientAppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF5657BA266F12C7008671B5 /* BridgeClientAppViewModel.swift */; };
 		FF5657BF266F12C7008671B5 /* PlatformConfigImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF5657BB266F12C7008671B5 /* PlatformConfigImpl.swift */; };
 		FF8D1F7E26276F3100C44DE9 /* Research in Frameworks */ = {isa = PBXBuildFile; productRef = FF8D1F7D26276F3100C44DE9 /* Research */; };
@@ -72,7 +71,6 @@
 		7555FF9C242A565B00829871 /* iosAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iosAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FFA0242A565B00829871 /* iosAppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iosAppUITests.swift; sourceTree = "<group>"; };
 		7555FFA2242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		E97B76A725546D05000BEDF0 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		E9B7695625D73E8D0031D67E /* bridge_client.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = bridge_client.framework; path = "../bridge-client/build/xcode-frameworks/bridge_client.framework"; sourceTree = "<group>"; };
 		FF5657BA266F12C7008671B5 /* BridgeClientAppViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BridgeClientAppViewModel.swift; sourceTree = "<group>"; };
 		FF5657BB266F12C7008671B5 /* PlatformConfigImpl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlatformConfigImpl.swift; sourceTree = "<group>"; };
@@ -141,7 +139,6 @@
 				7555FF89242A565B00829871 /* LaunchScreen.storyboard */,
 				7555FF8C242A565B00829871 /* Info.plist */,
 				7555FF86242A565B00829871 /* Preview Content */,
-				E97B76A725546D05000BEDF0 /* LoginView.swift */,
 			);
 			path = iosApp;
 			sourceTree = "<group>";
@@ -374,7 +371,6 @@
 				7555FF81242A565900829871 /* SceneDelegate.swift in Sources */,
 				FF5657BE266F12C7008671B5 /* BridgeClientAppViewModel.swift in Sources */,
 				FF8D1F8A2627705C00C44DE9 /* BridgeUploaderInfoV2.swift in Sources */,
-				E97B76A825546D05000BEDF0 /* LoginView.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
 				FF5657BF266F12C7008671B5 /* PlatformConfigImpl.swift in Sources */,
 			);

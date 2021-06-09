@@ -37,15 +37,28 @@ open class BridgeClientAppViewModel : ObservableObject {
     
     open private(set) var platformConfig: PlatformConfig
         
-    @Published public private(set) var appConfig: AppConfig?
-    @Published public private(set) var userSessionInfo: UserSessionInfo?
+    @Published public var title: String
+    @Published public var studyId: String?
+    
+    @Published public var appConfig: AppConfig?
+    
+    @Published public var userSessionInfo: UserSessionInfo? {
+        didSet {
+            self.studyId = userSessionInfo?.studyIds.first
+        }
+    }
     
     private var appConfigState: NativeAppConfigState!
     public private(set) var authManager: NativeAuthenticationManager!
     
     public init(appId: String) {
         self.platformConfig = Self.instantiatePlatformConfig(appId: appId)
-        IOSBridgeConfig().initialize(platformConfig: self.platformConfig)
+        self.title = self.platformConfig.localizedAppName
+        let isPreview = (appId == "preview")
+        self.studyId = isPreview ? "01234567" : nil
+        if !isPreview {
+            IOSBridgeConfig().initialize(platformConfig: self.platformConfig)
+        }
     }
     
     open class func instantiatePlatformConfig(appId: String) -> PlatformConfig {
@@ -73,6 +86,7 @@ open class BridgeClientAppViewModel : ObservableObject {
             guard userSessionInfo == nil || !userSessionInfo!.isEqual(userSessionInfo) else { return }
             self.userSessionInfo = userSessionInfo
         }
+        self.userSessionInfo = self.authManager.session()
         self.authManager.observeUserSessionInfo()
     }
     
@@ -80,6 +94,7 @@ open class BridgeClientAppViewModel : ObservableObject {
         self.authManager.signInExternalId(externalId: externalId, password: externalId) { (userSessionInfo, status) in
             guard status == ResourceStatus.success || status == ResourceStatus.failed else { return }
             self.userSessionInfo = userSessionInfo
+            
             completion(status)
         }
     }

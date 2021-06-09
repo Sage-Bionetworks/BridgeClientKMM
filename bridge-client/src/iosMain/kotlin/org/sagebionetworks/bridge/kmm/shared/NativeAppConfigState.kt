@@ -36,3 +36,11 @@ class NativeAppConfigState(
         scope.cancel()
     }
 }
+
+fun AppConfig.configElementJson(identifier: String) : String? {
+    return this.configElements?.get(identifier)?.toString()
+}
+
+fun AppConfig.clientDataJson() : String {
+    return this.clientData.toString()
+}

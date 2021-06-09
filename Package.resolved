@@ -20,30 +20,12 @@
         }
       },
       {
-        "package": "JsonModel",
-        "repositoryURL": "https://github.com/Sage-Bionetworks/JsonModel-Swift.git",
+        "package": "SharedMobileUI",
+        "repositoryURL": "https://github.com/Sage-Bionetworks/SharedMobileUI-AppleOS.git",
         "state": {
           "branch": null,
-          "revision": "d45397f95a7ca9368efbf94ab1ab720edf0a08a9",
-          "version": "1.2.1"
-        }
-      },
-      {
-        "package": "MobilePassiveData",
-        "repositoryURL": "https://github.com/Sage-Bionetworks/MobilePassiveData-SDK.git",
-        "state": {
-          "branch": null,
-          "revision": "6b8b0205e226ec25960f1369db107665334e0d34",
-          "version": "1.0.0"
-        }
-      },
-      {
-        "package": "SageResearch",
-        "repositoryURL": "https://github.com/Sage-Bionetworks/SageResearch.git",
-        "state": {
-          "branch": null,
-          "revision": "9a639da0b74d3fb81c20d107fd5b5dbfb1dd2fdd",
-          "version": "4.1.4"
+          "revision": "0fefce5ae5237be1718f4b00f7257df847584b2a",
+          "version": "0.1.0"
         }
       },
       {

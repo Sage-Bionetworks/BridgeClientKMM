@@ -4,14 +4,26 @@ import BridgeClient
 // TODO: syoung 06/07/2021 Build example app?
 
 struct ContentView: View {
+    @EnvironmentObject var bridgeManager: BridgeClientAppManager
+    
     var body: some View {
-        /*@START_MENU_TOKEN@*/Text("Hello, World!")/*@END_MENU_TOKEN@*/
+        switch bridgeManager.appState {
+        case .launching:
+            Text("Launching")
+        case .login:
+            ExternalIdLoginView()
+        default:
+            Text("Main")
+        }
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        Group {
+            ContentView()
+                .environmentObject(BridgeClientAppManager(appId: "preview"))
+        }
     }
 }
 

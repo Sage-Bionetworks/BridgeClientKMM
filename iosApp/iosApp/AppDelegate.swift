@@ -1,10 +1,10 @@
 import UIKit
 import BridgeClient
 
+let bridgeManager = BridgeClientAppManager(appId: "sage-assessment-test")
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-
-    let bridgeManager = BridgeClientAppViewModel(appId: "sage-assessment-test")
     
     func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         bridgeManager.appWillFinishLaunching(launchOptions)

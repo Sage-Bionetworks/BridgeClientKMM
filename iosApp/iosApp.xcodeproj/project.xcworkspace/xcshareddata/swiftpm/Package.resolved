@@ -47,6 +47,15 @@
         }
       },
       {
+        "package": "SharedMobileUI",
+        "repositoryURL": "https://github.com/Sage-Bionetworks/SharedMobileUI-AppleOS.git",
+        "state": {
+          "branch": "main",
+          "revision": "11a6ed4019aa7eca673ac28b686a86546b04a662",
+          "version": null
+        }
+      },
+      {
         "package": "ZIPFoundation",
         "repositoryURL": "https://github.com/weichsel/ZIPFoundation.git",
         "state": {

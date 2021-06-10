@@ -41,7 +41,7 @@ public final class BridgeClientAppManager : ObservableObject {
         case launching, login, onboarding, main
     }
     
-    public private(set) var platformConfig: PlatformConfig
+    public let platformConfig: PlatformConfig
     public let isPreview: Bool
         
     @Published public var title: String
@@ -73,18 +73,18 @@ public final class BridgeClientAppManager : ObservableObject {
     private var appConfigState: NativeAppConfigState!
     public private(set) var authManager: NativeAuthenticationManager!
     
-    public init(appId: String) {
-        self.platformConfig = Self.instantiatePlatformConfig(appId: appId)
+    public convenience init(appId: String) {
+        self.init(platformConfig: PlatformConfigImpl(appId: appId))
+    }
+    
+    public init(platformConfig: PlatformConfig) {
+        self.platformConfig = platformConfig
         self.title = self.platformConfig.localizedAppName
-        self.isPreview = (appId == "preview")
+        self.isPreview = (platformConfig.appId == "preview")
         self.studyId = self.isPreview ? "01234567" : nil
         if !self.isPreview {
             IOSBridgeConfig().initialize(platformConfig: self.platformConfig)
         }
-    }
-    
-    public class func instantiatePlatformConfig(appId: String) -> PlatformConfig {
-        PlatformConfigImpl(appId: appId)
     }
     
     public func appWillFinishLaunching(_ launchOptions: [UIApplication.LaunchOptionsKey : Any]? ) {
@@ -111,6 +111,7 @@ public final class BridgeClientAppManager : ObservableObject {
         self.userSessionInfo = self.authManager.session()
         self.authManager.observeUserSessionInfo()
         
+        // Update the app state
         updateAppState()
     }
     

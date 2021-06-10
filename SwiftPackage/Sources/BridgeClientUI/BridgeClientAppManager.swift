@@ -33,18 +33,40 @@
 import SwiftUI
 import BridgeClient
 
-open class BridgeClientAppViewModel : ObservableObject {
+fileprivate let kOnboardingStateKey = "isOnboardingFinished"
+
+public final class BridgeClientAppManager : ObservableObject {
     
-    open private(set) var platformConfig: PlatformConfig
+    public enum AppState : String {
+        case launching, login, onboarding, main
+    }
+    
+    public private(set) var platformConfig: PlatformConfig
+    public let isPreview: Bool
         
     @Published public var title: String
     @Published public var studyId: String?
+    @Published public var appState: AppState = .launching
     
-    @Published public var appConfig: AppConfig?
+    @Published public var appConfig: AppConfig? {
+        didSet {
+            updateAppState()
+        }
+    }
     
     @Published public var userSessionInfo: UserSessionInfo? {
         didSet {
-            self.studyId = userSessionInfo?.studyIds.first
+            if studyId == nil {
+                self.studyId = userSessionInfo?.studyIds.first
+            }
+            updateAppState()
+        }
+    }
+    
+    @Published public var isOnboardingFinished: Bool = UserDefaults.standard.bool(forKey: kOnboardingStateKey) {
+        didSet {
+            UserDefaults.standard.set(isOnboardingFinished, forKey: kOnboardingStateKey)
+            updateAppState()
         }
     }
     
@@ -54,18 +76,18 @@ open class BridgeClientAppViewModel : ObservableObject {
     public init(appId: String) {
         self.platformConfig = Self.instantiatePlatformConfig(appId: appId)
         self.title = self.platformConfig.localizedAppName
-        let isPreview = (appId == "preview")
-        self.studyId = isPreview ? "01234567" : nil
-        if !isPreview {
+        self.isPreview = (appId == "preview")
+        self.studyId = self.isPreview ? "01234567" : nil
+        if !self.isPreview {
             IOSBridgeConfig().initialize(platformConfig: self.platformConfig)
         }
     }
     
-    open class func instantiatePlatformConfig(appId: String) -> PlatformConfig {
+    public class func instantiatePlatformConfig(appId: String) -> PlatformConfig {
         PlatformConfigImpl(appId: appId)
     }
     
-    open func appWillFinishLaunching(_ launchOptions: [UIApplication.LaunchOptionsKey : Any]? ) {
+    public func appWillFinishLaunching(_ launchOptions: [UIApplication.LaunchOptionsKey : Any]? ) {
 
         // Initialize koin
         #if DEBUG
@@ -88,14 +110,30 @@ open class BridgeClientAppViewModel : ObservableObject {
         }
         self.userSessionInfo = self.authManager.session()
         self.authManager.observeUserSessionInfo()
+        
+        updateAppState()
     }
     
-    open func loginWithExternalId(_ externalId: String, completion: @escaping ((BridgeClient.ResourceStatus) -> Void)) {
+    public func loginWithExternalId(_ externalId: String, completion: @escaping ((BridgeClient.ResourceStatus) -> Void)) {
         self.authManager.signInExternalId(externalId: externalId, password: externalId) { (userSessionInfo, status) in
             guard status == ResourceStatus.success || status == ResourceStatus.failed else { return }
             self.userSessionInfo = userSessionInfo
-            
             completion(status)
+        }
+    }
+    
+    private func updateAppState() {
+        if appConfig == nil {
+            appState = .launching
+        }
+        else if userSessionInfo == nil {
+            appState = .login
+        }
+        else if !isOnboardingFinished {
+            appState = .onboarding
+        }
+        else {
+            appState = .main
         }
     }
 }

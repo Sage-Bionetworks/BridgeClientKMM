@@ -36,7 +36,7 @@ import BridgeClient
 import SharedMobileUI
 
 public struct ExternalIdLoginView: View {
-    @EnvironmentObject var bridgeManager: BridgeClientAppViewModel
+    @EnvironmentObject var bridgeManager: BridgeClientAppManager
     @State var externalId: String = ""
     @State var status: ResourceStatus?
     
@@ -99,10 +99,10 @@ struct ExternalIdLoginView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             ExternalIdLoginView()
-                .environmentObject(BridgeClientAppViewModel(appId: "preview"))
+                .environmentObject(BridgeClientAppManager(appId: "preview"))
             ExternalIdLoginView()
                 .preferredColorScheme(.dark)
-                .environmentObject(BridgeClientAppViewModel(appId: "preview"))
+                .environmentObject(BridgeClientAppManager(appId: "preview"))
         }
     }
 }

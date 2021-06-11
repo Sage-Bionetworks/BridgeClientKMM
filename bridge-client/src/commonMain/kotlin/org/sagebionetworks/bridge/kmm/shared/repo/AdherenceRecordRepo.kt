@@ -7,16 +7,17 @@ import io.ktor.http.*
 import io.ktor.util.network.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.sagebionetworks.bridge.kmm.shared.apis.SchedulesV2Api
 import org.sagebionetworks.bridge.kmm.shared.cache.*
-import org.sagebionetworks.bridge.kmm.shared.models.*
+import org.sagebionetworks.bridge.kmm.shared.models.AdherenceRecord
 import org.sagebionetworks.bridge.kmm.shared.models.AdherenceRecordList
+import org.sagebionetworks.bridge.kmm.shared.models.AdherenceRecordsSearch
+import org.sagebionetworks.bridge.kmm.shared.models.SortOrder
 
 class AdherenceRecordRepo(httpClient: HttpClient, databaseHelper: ResourceDatabaseHelper, backgroundScope: CoroutineScope) :
         AbstractResourceRepo(databaseHelper, resourceType = ResourceType.ADHERENCE_RECORD, backgroundScope) {
@@ -29,6 +30,13 @@ class AdherenceRecordRepo(httpClient: HttpClient, databaseHelper: ResourceDataba
     internal var scheduleV2Api = SchedulesV2Api(
         httpClient = httpClient
     )
+
+    /**
+     * Get all of the locally cached [AdherenceRecord]s.
+     */
+    fun getAllCachedAdherenceRecords(studyId: String) : Flow<Map<String, List<AdherenceRecord>>> {
+        return database.getResourcesAsFlow(resourceType, studyId).mapNotNull { it.mapNotNull { resource -> resource.loadResource<AdherenceRecord>() }.groupBy { adherenceRecord -> adherenceRecord.instanceGuid } }
+    }
 
     /**
      * Get the locally cached [AdherenceRecord]s for the specified [instanceIds].

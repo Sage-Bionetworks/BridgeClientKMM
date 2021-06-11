@@ -5,6 +5,7 @@ import io.ktor.http.*
 import io.ktor.util.network.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -31,7 +32,7 @@ abstract class AbstractResourceRepo(val database: ResourceDatabaseHelper, protec
                 }
             }
             filterResource
-        }.map {
+        }.distinctUntilChanged(areEquivalent = {old, new -> old?.json == new?.json}).map {
             processResult(it)
         }
 
@@ -39,7 +40,7 @@ abstract class AbstractResourceRepo(val database: ResourceDatabaseHelper, protec
 
     companion object {
 
-        const val defaultUpdateFrequency = 10000// 60000 * 60
+        const val defaultUpdateFrequency = 60000// 1 minute
 
         internal suspend fun remoteLoadResource(
             database: ResourceDatabaseHelper,

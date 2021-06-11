@@ -25,7 +25,7 @@ val commonModule = module {
     single {ResourceDatabaseHelper(get())}
 
     single<AssessmentConfigRepo> {AssessmentConfigRepo(get(), get(), get(named("background"))) }
-    single<ScheduleTimelineRepo> {ScheduleTimelineRepo(get(), get(), get(), get(named("background"))) }
+    single<ScheduleTimelineRepo> {ScheduleTimelineRepo(get(), get(), get(), get(), get(named("background"))) }
     single<ActivityEventsRepo> { ActivityEventsRepo(get(), get(), get(named("background"))) }
     single<AdherenceRecordRepo> { AdherenceRecordRepo(get(), get(), get(named("background"))) }
     single<AuthenticationRepository> {AuthenticationRepository(get(named("authHttpClient")), get(), get())}

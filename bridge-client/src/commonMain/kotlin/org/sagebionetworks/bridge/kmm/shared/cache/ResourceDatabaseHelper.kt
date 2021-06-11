@@ -6,6 +6,7 @@ import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.squareup.sqldelight.runtime.coroutines.mapToOneOrNull
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 class ResourceDatabaseHelper(sqlDriver: SqlDriver) {
     internal val database = BridgeResourceDatabase(
@@ -22,7 +23,7 @@ class ResourceDatabaseHelper(sqlDriver: SqlDriver) {
     }
 
     internal fun getResourceAsFlow(id: String, type: ResourceType, studyId: String): Flow<Resource?> {
-        return dbQuery.selectResourceById(id, type, studyId).asFlow().mapToOneOrNull()
+        return dbQuery.selectResourceById(id, type, studyId).asFlow().mapToOneOrNull().distinctUntilChanged(areEquivalent = {old, new -> old == new })
     }
 
     internal fun getResource(id: String, type: ResourceType, studyId: String): Resource? {
@@ -55,7 +56,7 @@ class ResourceDatabaseHelper(sqlDriver: SqlDriver) {
     }
 
     internal fun getResourcesAsFlow(type: ResourceType, studyId: String): Flow<List<Resource>> {
-        return dbQuery.selectAllResourcesByType(type, studyId).asFlow().mapToList()
+        return dbQuery.selectAllResourcesByType(type, studyId).asFlow().mapToList().distinctUntilChanged(areEquivalent = {old, new -> old == new })
     }
 
     internal fun getResources(type: ResourceType, studyId: String): List<Resource> {

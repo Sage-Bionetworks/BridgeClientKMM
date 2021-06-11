@@ -4,6 +4,7 @@ import co.touchlab.stately.ensureNeverFrozen
 import io.ktor.client.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.*
 import kotlinx.serialization.encodeToString
@@ -13,10 +14,10 @@ import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
 import org.sagebionetworks.bridge.kmm.shared.models.*
-import kotlin.math.exp
 import kotlin.time.ExperimentalTime
 
 class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo,
+                           internal val activityEventsRepo: ActivityEventsRepo,
                            httpClient: HttpClient,
                            databaseHelper: ResourceDatabaseHelper,
                            backgroundScope: CoroutineScope) :
@@ -34,7 +35,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         httpClient = httpClient
     )
 
-    fun getTimeline(studyId: String): Flow<ResourceResult<Timeline>> {
+    private fun getTimeline(studyId: String): Flow<ResourceResult<Timeline>> {
         return getResourceById(SCHEDULE_TIMELINE_ID+studyId, remoteLoad =  { loadRemoteTimeline(studyId) }, studyId = studyId)
     }
 
@@ -45,18 +46,31 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
     /**
      * Get all the scheduled sessions for today that have not expired.
      */
-    fun getSessionsForToday(studyId: String, eventList: StudyActivityEventList) : Flow<ResourceResult<List<ScheduledSessionWindow>>> {
-        return getTimeline(studyId).map {
-            extractSessions(eventList, it, Clock.System.now(), studyId)
-        }
+    fun getSessionsForToday(studyId: String) : Flow<ResourceResult<List<ScheduledSessionWindow>>> {
+        return getSessionsForDay(studyId, Clock.System.now())
     }
 
     /**
      * Used for testing so that we can specify a consistent point in time.
      */
-    internal fun getSessionsForDay(studyId: String, eventList: StudyActivityEventList, instantInDay: Instant) : Flow<ResourceResult<List<ScheduledSessionWindow>>> {
-        return getTimeline(studyId).map {
-            extractSessions(eventList, it, instantInDay, studyId)
+    internal fun getSessionsForDay(studyId: String, instantInDay: Instant) : Flow<ResourceResult<List<ScheduledSessionWindow>>> {
+        return combine(getTimeline(studyId), activityEventsRepo.getActivityEvents(studyId), adherenceRecordRepo.getAllCachedAdherenceRecords(studyId)) { timeLineResource, eventsResource, adherence ->
+            extractSessionsForDay(timeLineResource, eventsResource, adherence, studyId, instantInDay)
+        }
+    }
+
+    private fun extractSessionsForDay(timelineResult: ResourceResult<Timeline>,
+                                        eventsResult: ResourceResult<StudyActivityEventList>,
+                                        adherenceRecords: Map<String, List<AdherenceRecord>>,
+                                        studyId: String,
+                                        instantInDay: Instant
+                                        ) : ResourceResult<List<ScheduledSessionWindow>> {
+        return when (eventsResult) {
+            is ResourceResult.Success -> {
+                return extractSessions(eventsResult.data, timelineResult, instantInDay, studyId)
+            }
+            is ResourceResult.InProgress -> eventsResult
+            is ResourceResult.Failed -> eventsResult
         }
     }
 

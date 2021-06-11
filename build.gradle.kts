@@ -7,7 +7,7 @@ buildscript {
     }
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}")
-        classpath("com.android.tools.build:gradle:4.1.3")
+        classpath("com.android.tools.build:gradle:4.2.1")
         classpath("com.squareup.sqldelight:gradle-plugin:${Versions.sqlDelight}")
         classpath("org.jetbrains.kotlin:kotlin-serialization:${Versions.kotlin}")
     }
@@ -20,7 +20,7 @@ plugins {
 
 allprojects {
     group = "org.sagebionetworks.bridge.kmm"
-    version = "0.2.16"
+    version = "0.2.17"
     repositories {
         google()
         mavenCentral()

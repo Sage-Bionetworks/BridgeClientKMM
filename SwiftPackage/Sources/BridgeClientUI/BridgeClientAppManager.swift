@@ -81,7 +81,7 @@ public final class BridgeClientAppManager : ObservableObject {
         self.platformConfig = platformConfig
         self.title = self.platformConfig.localizedAppName
         self.isPreview = (platformConfig.appId == "preview")
-        self.studyId = self.isPreview ? "01234567" : nil
+        self.studyId = self.isPreview ? "preview" : nil
         if !self.isPreview {
             IOSBridgeConfig().initialize(platformConfig: self.platformConfig)
         }

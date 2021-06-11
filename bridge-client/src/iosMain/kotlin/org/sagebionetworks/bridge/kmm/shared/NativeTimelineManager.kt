@@ -21,20 +21,15 @@ class NativeTimelineManager(
     private val viewUpdate: (List<NativeScheduledSessionWindow>) -> Unit
 ) : KoinComponent {
 
-    private val timelineRepo : ScheduleTimelineRepo by inject(mode = LazyThreadSafetyMode.NONE)
-    private val activityEventsRepo : ActivityEventsRepo by inject(mode = LazyThreadSafetyMode.NONE)
+    private val repo : ScheduleTimelineRepo by inject(mode = LazyThreadSafetyMode.NONE)
 
     private val scope = MainScope()
 
     fun observeTodaySchedule() {
         scope.launch {
-            activityEventsRepo.getActivityEvents(studyId).collect { eventsResource ->
-                (eventsResource as? ResourceResult.Success)?.data?.let { eventList ->
-                    timelineRepo.getSessionsForToday(studyId, eventList).collect { timelineResource ->
-                        (timelineResource as? ResourceResult.Success)?.data?.let { list ->
-                            viewUpdate( list.map { it.toNative() } )
-                        }
-                    }
+            repo.getSessionsForToday(studyId).collect { timelineResource ->
+                (timelineResource as? ResourceResult.Success)?.data?.let { list ->
+                    viewUpdate( list.map { it.toNative() } )
                 }
             }
         }

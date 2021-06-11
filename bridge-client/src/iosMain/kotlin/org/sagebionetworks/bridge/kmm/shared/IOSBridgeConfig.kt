@@ -1,23 +1,49 @@
 package org.sagebionetworks.bridge.kmm.shared
 
-class IOSBridgeConfig() : BridgeConfig {
+import kotlin.native.concurrent.AtomicReference
+import kotlin.native.concurrent.freeze
 
-    override val appId: String = "sage-assessment-test"//applicationContext.getResources().getString(R.string.app_id)
+object IOSBridgeConfig  : BridgeConfig {
 
-    override val appName: String = "Sage Assessment Test"//applicationContext.getResources().getString(R.string.app_name)
+    private val atomicRef: AtomicReference<PlatformConfig?> = AtomicReference(null)
 
-    override val sdkVersion: Int = 0
+    fun initialize(platformConfig : PlatformConfig) {
+        atomicRef.compareAndSet(null, platformConfig.freeze())
+    }
 
-    override val appVersion: Int = 0
+    private val platformConfig: PlatformConfig
+        get() {
+            return atomicRef.value ?: defaultPlatformConfig
+        }
+    private val defaultPlatformConfig = PlatformConfigImpl()
 
-    override val appVersionName: String = "TODO"
+    override val sdkVersion: Int
+        get() = 0   // TODO: syoung 06/07/2021 Figure out how to get the version of the BridgeClient framework.
 
-    override val osName: String = "iOS"
+    // Wrapped values
 
-    override val osVersion: String = "TODO"
-
-    override val deviceName: String = "TODO"
-
-
-
+    override val appId: String
+        get() = platformConfig.appId
+    override val appName: String
+        get() = platformConfig.appName
+    override val appVersion: Int
+        get() = platformConfig.appVersion
+    override val appVersionName: String
+        get() = platformConfig.appVersionName
+    override val osName: String
+        get() = platformConfig.osName
+    override val osVersion: String
+        get() = platformConfig.osVersion
+    override val deviceName: String
+        get() = platformConfig.deviceName
 }
+
+internal data class PlatformConfigImpl(
+    override val appId: String = "sage-assessment-test",
+    override val appName: String = "Sage Assessment Test",
+    override val appVersion: Int = 99,
+    override val appVersionName: String = "Unknown",
+    override val osVersion: String = "Unknown",
+    override val deviceName: String = "Unknown",
+    override val osName: String = "iOS") : PlatformConfig
+

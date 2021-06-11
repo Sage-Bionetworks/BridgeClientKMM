@@ -6,13 +6,17 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.sagebionetworks.bridge.kmm.shared.BridgeConfig
 import org.sagebionetworks.bridge.kmm.shared.apis.PublicApi
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
 import org.sagebionetworks.bridge.mpp.network.generated.models.AppConfig
 
-class AppConfigRepo(httpClient: HttpClient, databaseHelper: ResourceDatabaseHelper, backgroundScope: CoroutineScope) :
+class AppConfigRepo(httpClient: HttpClient,
+                    databaseHelper: ResourceDatabaseHelper,
+                    backgroundScope: CoroutineScope,
+                    val bridgeConfig: BridgeConfig ) :
     AbstractResourceRepo(databaseHelper, resourceType = ResourceType.APP_CONFIG, backgroundScope) {
 
     init {
@@ -24,12 +28,15 @@ class AppConfigRepo(httpClient: HttpClient, databaseHelper: ResourceDatabaseHelp
         httpClient = httpClient
     )
 
-    fun getAppConfig(appId: String): Flow<ResourceResult<AppConfig>> {
-        return getResourceById(identifier = appId, remoteLoad = { loadRemoteAppConfig(appId) }, studyId =  ResourceDatabaseHelper.APP_WIDE_STUDY_ID)
+    fun getAppConfig(): Flow<ResourceResult<AppConfig>> {
+        return getResourceById(
+            identifier = bridgeConfig.appId,
+            remoteLoad = { loadRemoteAppConfig() },
+            studyId =  ResourceDatabaseHelper.APP_WIDE_STUDY_ID)
     }
 
-    private suspend fun loadRemoteAppConfig(appId: String) : String {
-        return Json.encodeToString(publicApi.getConfigForApp(appId))
+    private suspend fun loadRemoteAppConfig() : String {
+        return Json.encodeToString(publicApi.getConfigForApp(bridgeConfig.appId))
     }
 
 }

@@ -30,19 +30,111 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-import UIKit
+import SwiftUI
 import BridgeClient
 
-open class BridgeClientAppManager {
+fileprivate let kOnboardingStateKey = "isOnboardingFinished"
+
+public final class BridgeClientAppManager : ObservableObject {
     
-    public init() {
+    public enum AppState : String {
+        case launching, login, onboarding, main
     }
     
-    open func appDidLaunch(with launchOptions: [UIApplication.LaunchOptionsKey: Any]?) {
-        var enableNetworkLogs = false
+    public let platformConfig: PlatformConfig
+    public let isPreview: Bool
+        
+    @Published public var title: String
+    @Published public var studyId: String?
+    @Published public var appState: AppState = .launching
+    
+    @Published public var appConfig: AppConfig? {
+        didSet {
+            updateAppState()
+        }
+    }
+    
+    @Published public var userSessionInfo: UserSessionInfo? {
+        didSet {
+            if studyId == nil {
+                self.studyId = userSessionInfo?.studyIds.first
+            }
+            updateAppState()
+        }
+    }
+    
+    @Published public var isOnboardingFinished: Bool = UserDefaults.standard.bool(forKey: kOnboardingStateKey) {
+        didSet {
+            UserDefaults.standard.set(isOnboardingFinished, forKey: kOnboardingStateKey)
+            updateAppState()
+        }
+    }
+    
+    private var appConfigState: NativeAppConfigState!
+    public private(set) var authManager: NativeAuthenticationManager!
+    
+    public convenience init(appId: String) {
+        self.init(platformConfig: PlatformConfigImpl(appId: appId))
+    }
+    
+    public init(platformConfig: PlatformConfig) {
+        self.platformConfig = platformConfig
+        self.title = self.platformConfig.localizedAppName
+        self.isPreview = (platformConfig.appId == "preview")
+        self.studyId = self.isPreview ? "01234567" : nil
+        if !self.isPreview {
+            IOSBridgeConfig().initialize(platformConfig: self.platformConfig)
+        }
+    }
+    
+    public func appWillFinishLaunching(_ launchOptions: [UIApplication.LaunchOptionsKey : Any]? ) {
+
+        // Initialize koin
         #if DEBUG
-           enableNetworkLogs = true
+            let enableNetworkLogs = true
+        #else
+            let enableNetworkLogs = false
         #endif
         KoinKt.doInitKoin(enableNetworkLogs: enableNetworkLogs)
+        
+        // Hook up app config
+        self.appConfigState = NativeAppConfigState() { appConfig, _ in
+            self.appConfig = appConfig ?? self.appConfig
+        }
+        self.appConfigState.observeAppConfig()
+        
+        // Hook up user session info
+        self.authManager = NativeAuthenticationManager() { userSessionInfo in
+            guard userSessionInfo == nil || !userSessionInfo!.isEqual(userSessionInfo) else { return }
+            self.userSessionInfo = userSessionInfo
+        }
+        self.userSessionInfo = self.authManager.session()
+        self.authManager.observeUserSessionInfo()
+        
+        // Update the app state
+        updateAppState()
+    }
+    
+    public func loginWithExternalId(_ externalId: String, completion: @escaping ((BridgeClient.ResourceStatus) -> Void)) {
+        self.authManager.signInExternalId(externalId: externalId, password: externalId) { (userSessionInfo, status) in
+            guard status == ResourceStatus.success || status == ResourceStatus.failed else { return }
+            self.userSessionInfo = userSessionInfo
+            completion(status)
+        }
+    }
+    
+    private func updateAppState() {
+        if appConfig == nil {
+            appState = .launching
+        }
+        else if userSessionInfo == nil {
+            appState = .login
+        }
+        else if !isOnboardingFinished {
+            appState = .onboarding
+        }
+        else {
+            appState = .main
+        }
     }
 }

@@ -15,6 +15,5 @@ actual val platformModule = module {
 
     single<CoroutineScope>(named("background"))  { MainScope() }
 
-    single<BridgeConfig> { IOSBridgeConfig() }
-
+    single<BridgeConfig> { IOSBridgeConfig }
 }

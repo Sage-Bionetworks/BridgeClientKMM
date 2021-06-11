@@ -29,6 +29,7 @@ val commonModule = module {
     single<ActivityEventsRepo> { ActivityEventsRepo(get(), get(), get(named("background"))) }
     single<AdherenceRecordRepo> { AdherenceRecordRepo(get(), get(), get(named("background"))) }
     single<AuthenticationRepository> {AuthenticationRepository(get(named("authHttpClient")), get(), get())}
+    single<AppConfigRepo> { AppConfigRepo(get(), get(), get(named("background")), get()) }
 
 }
 

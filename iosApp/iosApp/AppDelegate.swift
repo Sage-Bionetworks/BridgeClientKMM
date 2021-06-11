@@ -1,14 +1,13 @@
 import UIKit
 import BridgeClient
 
+let bridgeManager = BridgeClientAppManager(appId: "sage-assessment-test")
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-
-    let bridgeManager = BridgeClientAppManager()
-
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
-        bridgeManager.appDidLaunch(with: launchOptions)
+    
+    func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+        bridgeManager.appWillFinishLaunching(launchOptions)
         return true
     }
 

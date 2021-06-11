@@ -85,3 +85,4 @@ lint/tmp/
 # lint/reports/
 *.xcuserdatad
 .DS_Store
+/.idea/misc.xml

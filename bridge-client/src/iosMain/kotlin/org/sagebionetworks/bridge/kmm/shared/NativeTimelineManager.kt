@@ -5,6 +5,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.toNSDateComponents
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.sagebionetworks.bridge.kmm.shared.cache.*
@@ -45,21 +46,11 @@ class NativeTimelineManager(
     }
 }
 
-fun LocalDateTime.toNative() : NSDate? {
-    val components = NSDateComponents()
-    components.year = this.year.toLong()
-    components.month = this.month.ordinal.toLong()
-    components.day = this.dayOfMonth.toLong()
-    components.hour = this.hour.toLong()
-    components.minute = this.minute.toLong()
-    return components.date
-}
-
 fun ScheduledSessionWindow.toNative() : NativeScheduledSessionWindow =
     NativeScheduledSessionWindow(
         instanceGuid,
-        startDateTime.toNative() ?: NSDate.distantPast(),
-        endDateTime.toNative() ?: NSDate.distantFuture(),
+        startDateTime.toNSDateComponents().date ?: NSDate.distantPast(),
+        endDateTime.toNSDateComponents().date ?: NSDate.distantFuture(),
         persistent,
         startTime != null,
         expiration?.let { it.hours > 0 || it.minutes > 0 } ?: false,

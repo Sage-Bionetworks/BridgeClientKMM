@@ -34,12 +34,28 @@ class UploadRequester(
      * to create the UploadFile. Once this method returns, the UploadManager is now responsible
      * for deleting the specified UploadFile after a successful upload.
      */
-    fun queueAndRequestUpload(context: Context, uploadFile: UploadFile) {
+    @OptIn(ExperimentalFileSystem::class)
+    fun queueAndRequestUpload(context: Context, uploadFile: UploadFile, assessmentInstanceId: String) {
+        val pendingUploads = database.getResourcesBySecondaryId(assessmentInstanceId, ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID)
+        if (pendingUploads.isNotEmpty()) {
+            for (uploadResource in pendingUploads) {
+                uploadResource.loadResource<UploadFile>()?.let { uploadFile ->
+                    if (uploadFile.sessionExpires != null) {
+                        //We already have pending upload for this assessmentInstanceID waiting for
+                        //the scheduled session to expire before uploading. It will be replaced
+                        //with the new one.
+                        FileSystem.SYSTEM.delete(uploadFile.filePath.toPath())
+                        database.removeResource(uploadFile.getUploadFileResourceId(), ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID)
+                    }
+                }
+            }
+        }
+
         //Store uploadFile in local cache
         val resource = Resource(
             identifier = uploadFile.getUploadFileResourceId(),
             type = ResourceType.FILE_UPLOAD,
-            secondaryId = DEFAULT_SECONDARY_ID,
+            secondaryId = assessmentInstanceId,
             studyId = APP_WIDE_STUDY_ID,
             json = Json.encodeToString(uploadFile),
             lastUpdate = Clock.System.now().toEpochMilliseconds(),

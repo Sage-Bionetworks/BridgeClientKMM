@@ -30,6 +30,10 @@ class ResourceDatabaseHelper(sqlDriver: SqlDriver) {
         return dbQuery.selectResourceById(id, type, studyId).executeAsOneOrNull()
     }
 
+    internal fun getResourcesBySecondaryId(secondaryId: String, type: ResourceType, studyId: String): List<Resource> {
+        return dbQuery.selectResourceBySecondaryId(secondaryId, type, studyId).executeAsList()
+    }
+
     internal fun removeResource(id: String, type: ResourceType, studyId: String) {
         dbQuery.removeResourceById(id, type, studyId)
     }

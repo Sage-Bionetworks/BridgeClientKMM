@@ -1,5 +1,6 @@
 package org.sagebionetworks.bridge.kmm.shared.upload
 
+import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import org.sagebionetworks.bridge.mpp.network.generated.models.UploadRequest
 
@@ -9,7 +10,8 @@ data class UploadFile (
     val contentType: String,
     val fileLength: Long,
     val md5Hash: String,
-    val encrypted: Boolean = true
+    val encrypted: Boolean = true,
+    val sessionExpires: Instant? = null // Delay doing upload until after session expires
 ) {
 
     internal fun getUploadFileResourceId(): String {

@@ -32,6 +32,10 @@ selectResourceById:
 SELECT * FROM Resource
 WHERE identifier = ? AND type = ? AND studyId = ?;
 
+selectResourceBySecondaryId:
+SELECT * FROM Resource
+WHERE secondaryId = ? AND type = ? AND studyId = ?;
+
 removeResourceById:
 DELETE FROM Resource
 WHERE identifier = ? AND type = ? AND studyId = ?;

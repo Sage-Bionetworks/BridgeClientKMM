@@ -43,7 +43,15 @@ abstract class AssessmentResultArchiveUploader(
     // maybe we can pull from AppConfig? -liujoshua 04/02/2021
     abstract fun getArchiveBuilderForActivity(assessmentResult: AssessmentResult): Archive.Builder
 
-    fun archiveResultAndQueueUpload(assessmentResult: AssessmentResult, jsonCoder: Json) {
+    /**
+     * Archive and queue the [assessmentResult] for upload using the specified [jsonCoder].
+     * Specifying a [sessionWindowExpiration] will delay the upload until after that point in time.
+     * Subsequent calls to this method with the same [assessmentInstanceId] will replace any delayed uploads.
+     */
+    fun archiveResultAndQueueUpload(assessmentResult: AssessmentResult,
+                                    jsonCoder: Json,
+                                    assessmentInstanceId: String,
+                                    sessionWindowExpiration: kotlinx.datetime.Instant? = null) {
         if (assessmentResult.schemaIdentifier == null) {
             Log.e(
                 "Archiver",
@@ -82,9 +90,9 @@ abstract class AssessmentResultArchiveUploader(
             assessmentResult.runUUIDString
         }
 
-        val uploadFile = persist(assessmentRunUUID, builder.build())
+        val uploadFile = persist(assessmentRunUUID, builder.build(), sessionWindowExpiration)
         Log.i("Archiver", "UploadFile $uploadFile")
-        uploadRequester.queueAndRequestUpload(context, uploadFile)
+        uploadRequester.queueAndRequestUpload(context, uploadFile, assessmentInstanceId)
     }
 
     @Throws(
@@ -92,7 +100,7 @@ abstract class AssessmentResultArchiveUploader(
         CMSException::class,
         NoSuchAlgorithmException::class
     )
-    fun persist(filename: String, archive: Archive): UploadFile {
+    fun persist(filename: String, archive: Archive, sessionWindowExpiration: kotlinx.datetime.Instant?): UploadFile {
         val encryptor = AndroidStudyUploadEncryptor(getPublicKey())
 
         val md5: MessageDigest = try {

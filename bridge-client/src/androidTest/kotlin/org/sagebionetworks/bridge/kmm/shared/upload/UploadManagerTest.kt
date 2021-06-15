@@ -34,12 +34,22 @@ public class UploadManagerTest {
     @get:Rule
     var tempFolder = TemporaryFolder()
 
-    private fun setupUploadManager(testHttpClient: HttpClient, tempFile: File): UploadManager {
+    private fun setupUploadManager(testHttpClient: HttpClient,
+                                   tempFile: File,
+                                   assessmentInstanceId: String = DEFAULT_SECONDARY_ID,
+                                   sessionExpiration: Instant? = null
+
+    ): UploadManager {
         val printWriter = PrintWriter(tempFile)
         printWriter.println("hello world")
         printWriter.close()
 
-        val uploadFile = UploadFile(tempFile.absolutePath, "application/zip", tempFile.length(), "md5Hash")
+        val uploadFile = UploadFile(tempFile.absolutePath,
+            "application/zip",
+            tempFile.length(),
+            "md5Hash",
+            sessionExpires = sessionExpiration
+        )
 
         val uploadManager = UploadManager(testHttpClient, testDatabaseDriver())
         val database = uploadManager.database
@@ -180,6 +190,74 @@ public class UploadManagerTest {
             assertFalse(database.getResources(ResourceType.UPLOAD_SESSION, APP_WIDE_STUDY_ID).isEmpty())
             //Retry processing uploads, this time should pass
             uploadManager.processUploads()
+            assertTrue(database.getResources(ResourceType.UPLOAD_SESSION, APP_WIDE_STUDY_ID).isEmpty())
+        }
+    }
+
+    @Test
+    fun testBeforeSessionExpires() {
+        runBlocking {
+            val tempFile = tempFolder.newFile("tempFileHappyCase.txt")
+
+            val sessionId = "uploadSessionId"
+            val uploadSession = UploadSession(sessionId, "http://testurl", "expires", "UploadSession")
+            val uploadValidationStatus = UploadValidationStatus(sessionId, null, UploadStatus.VALIDATION_IN_PROGRESS, null, null)
+
+            val mockEngine = MockEngine.config {
+                // 1 - getUploadSession call
+                addHandler {
+                    assertTrue(false, "Http call should not have been made")
+                    respondOk()
+                }
+                reuseHandlers = false
+            }
+            val testClient = getTestClient(mockEngine)
+            val expiresFuture = Instant.fromEpochMilliseconds(Clock.System.now().toEpochMilliseconds() + 10000)
+            val uploadManager = setupUploadManager(testClient, tempFile, "BeforeSessionExpiresInstanceID", expiresFuture)
+            val database = uploadManager.database
+
+            assertTrue(database.getResources(ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID).isNotEmpty())
+            uploadManager.processUploads()
+            //Verify upload has not been processed
+            assertTrue(database.getResources(ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID).isNotEmpty())
+            assertTrue(tempFile.exists())
+
+        }
+    }
+
+    @Test
+    fun testAfterSessionExpires() {
+        runBlocking {
+            val tempFile = tempFolder.newFile("tempFileHappyCase.txt")
+
+            val sessionId = "uploadSessionId"
+            val uploadSession = UploadSession(sessionId, "http://testurl", "expires", "UploadSession")
+            val uploadValidationStatus = UploadValidationStatus(sessionId, null, UploadStatus.VALIDATION_IN_PROGRESS, null, null)
+
+            val mockEngine = MockEngine.config {
+                // 1 - getUploadSession call
+                addHandler (
+                    getJsonReponseHandler(Json.encodeToString(uploadSession))
+                )
+                // 2 - s3 call
+                addHandler { respondOk() }
+                // 3 - completeUploadSession call
+                addHandler (
+                    getJsonReponseHandler(Json.encodeToString(uploadValidationStatus))
+                )
+                reuseHandlers = false
+            }
+            val testClient = getTestClient(mockEngine)
+            val expiresFuture = Instant.fromEpochMilliseconds(Clock.System.now().toEpochMilliseconds() - 10000)
+            val uploadManager = setupUploadManager(testClient, tempFile, "AfterSessionExpiresInstanceID", expiresFuture)
+            val database = uploadManager.database
+
+            assertFalse(database.getResources(ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID).isEmpty())
+            uploadManager.processUploads()
+
+            assertTrue(database.getResources(ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID).isEmpty())
+            assertFalse(tempFile.exists())
+
             assertTrue(database.getResources(ResourceType.UPLOAD_SESSION, APP_WIDE_STUDY_ID).isEmpty())
         }
     }

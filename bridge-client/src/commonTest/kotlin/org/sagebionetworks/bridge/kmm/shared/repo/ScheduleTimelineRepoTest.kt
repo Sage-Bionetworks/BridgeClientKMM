@@ -21,307 +21,307 @@ class ScheduleTimelineRepoTest: BaseTest() {
     private val currentHourString = testHour.toString().padStart(2,'0')
     private val nextHourString = (testHour + 1).toString().padStart(2,'0')
 
-    private val scheduleJson = "{\n" +
-            "  \"duration\": \"P4D\",\n" +
-            "  \"assessments\": [\n" +
-            "    {\n" +
-            "      \"key\": \"711cde8b711cde8b\",\n" +
-            "      \"guid\": \"6GvgSebKPGM5tGT5t-gw7COj\",\n" +
-            "      \"appId\": \"sage-assessment-test\",\n" +
-            "      \"identifier\": \"dccs\",\n" +
-            "      \"revision\": 5,\n" +
-            "      \"label\": \"Shape-Color Sorting\",\n" +
-            "      \"minutesToComplete\": 3,\n" +
-            "      \"colorScheme\": {\n" +
-            "        \"background\": \"#FFFFFF\",\n" +
-            "        \"foreground\": \"#F5F5F5\",\n" +
-            "        \"activated\": \"#CDCDCD\",\n" +
-            "        \"inactivated\": \"#D8D8D8\",\n" +
-            "        \"type\": \"ColorScheme\"\n" +
-            "      },\n" +
-            "      \"configUrl\": \"https://ws.sagebridge.org/v1/assessments/6GvgSebKPGM5tGT5t-gw7COj/config\",\n" +
-            "      \"type\": \"AssessmentInfo\"\n" +
-            "    },\n" +
-            "    {\n" +
-            "      \"key\": \"6e06751e6e06751e\",\n" +
-            "      \"guid\": \"eGhiQTT2a6SCCmjTod6CDb0t\",\n" +
-            "      \"appId\": \"sage-assessment-test\",\n" +
-            "      \"identifier\": \"Assessment_Test_1\",\n" +
-            "      \"revision\": 1,\n" +
-            "      \"label\": \"Assessment Test 1\",\n" +
-            "      \"minutesToComplete\": 0,\n" +
-            "      \"configUrl\": \"https://ws.sagebridge.org/v1/assessments/eGhiQTT2a6SCCmjTod6CDb0t/config\",\n" +
-            "      \"type\": \"AssessmentInfo\"\n" +
-            "    }\n" +
-            "  ],\n" +
-            "  \"sessions\": [\n" +
-            "    {\n" +
-            "      \"guid\": \"iErUfmT0AzIe7DIiwBzFtxZW\",\n" +
-            "      \"label\": \"One time 3 day session\",\n" +
-            "      \"startEventId\": \"timeline_retrieved\",\n" +
-            "      \"performanceOrder\": \"sequential\",\n" +
-            "      \"timeWindowGuids\": [\n" +
-            "        \"pFWgzjk-7wOa3GSDbvpy-JDc\"\n" +
-            "      ],\n" +
-            "      \"notifications\": [],\n" +
-            "      \"type\": \"SessionInfo\"\n" +
-            "    },\n" +
-            "    {\n" +
-            "      \"guid\": \"p-oBPW7EDXSEt_ZrXcFd0fAD\",\n" +
-            "      \"label\": \"Daily Sessions\",\n" +
-            "      \"startEventId\": \"timeline_retrieved\",\n" +
-            "      \"performanceOrder\": \"sequential\",\n" +
-            "      \"minutesToComplete\": 3,\n" +
-            "      \"timeWindowGuids\": [\n" +
-            "        \"VbyQ7IElHmGZ-jcelaEy2NCE\",\n" +
-            "        \"h2wxlJbf7DRYsBgdcQ3exCh7\",\n" +
-            "        \"41j9nQyyeNVcHAJJB0d1vl2j\"\n" +
-            "      ],\n" +
-            "      \"notifications\": [\n" +
-            "        {\n" +
-            "          \"notifyAt\": \"after_window_start\",\n" +
-            "          \"allowSnooze\": true,\n" +
-            "          \"message\": {\n" +
-            "            \"lang\": \"en\",\n" +
-            "            \"subject\": \"Reminder Title\",\n" +
-            "            \"message\": \"Reminder Text\",\n" +
-            "            \"type\": \"NotificationMessage\"\n" +
-            "          },\n" +
-            "          \"type\": \"NotificationInfo\"\n" +
-            "        }\n" +
-            "      ],\n" +
-            "      \"type\": \"SessionInfo\"\n" +
-            "    }\n" +
-            "  ],\n" +
-            "  \"schedule\": [\n" +
-            "    {\n" +
-            "      \"instanceGuid\": \"mvhyXpjhxHDp7R9fyH02SA\",\n" +
-            "      \"startDay\": 0,\n" +
-            "      \"endDay\": 0,\n" +
-            "      \"startTime\": \"$lastHourString:00\",\n" +
-            "      \"expiration\": \"PT30M\",\n" +
-            "      \"persistent\": true,\n" +
-            "      \"assessments\": [\n" +
-            "        {\n" +
-            "          \"refKey\": \"711cde8b711cde8b\",\n" +
-            "          \"instanceGuid\": \"FowEZJgOmdxO-UKA5-ZqLw\",\n" +
-            "          \"type\": \"ScheduledAssessment\"\n" +
-            "        }\n" +
-            "      ],\n" +
-            "      \"timeWindowGuid\": \"VbyQ7IElHmGZ-jcelaEy2NCE\",\n" +
-            "      \"refGuid\": \"p-oBPW7EDXSEt_ZrXcFd0fAD\",\n" +
-            "      \"type\": \"ScheduledSession\"\n" +
-            "    },\n" +
-            "    {\n" +
-            "      \"instanceGuid\": \"QaqwdxDjRc5FzUIAhBHRwA\",\n" +
-            "      \"startDay\": 0,\n" +
-            "      \"endDay\": 0,\n" +
-            "      \"startTime\": \"$currentHourString:00\",\n" +
-            "      \"expiration\": \"PT1H\",\n" +
-            "      \"assessments\": [\n" +
-            "        {\n" +
-            "          \"refKey\": \"711cde8b711cde8b\",\n" +
-            "          \"instanceGuid\": \"84cIJmOLnSN4vtAkGfPmQw\",\n" +
-            "          \"type\": \"ScheduledAssessment\"\n" +
-            "        }\n" +
-            "      ],\n" +
-            "      \"timeWindowGuid\": \"h2wxlJbf7DRYsBgdcQ3exCh7\",\n" +
-            "      \"refGuid\": \"p-oBPW7EDXSEt_ZrXcFd0fAD\",\n" +
-            "      \"type\": \"ScheduledSession\"\n" +
-            "    },\n" +
-            "    {\n" +
-            "      \"instanceGuid\": \"SL97UWo1ZQEA1tQKKVFkUA\",\n" +
-            "      \"startDay\": 0,\n" +
-            "      \"endDay\": 0,\n" +
-            "      \"startTime\": \"$nextHourString:00\",\n" +
-            "      \"expiration\": \"PT1H\",\n" +
-            "      \"assessments\": [\n" +
-            "        {\n" +
-            "          \"refKey\": \"711cde8b711cde8b\",\n" +
-            "          \"instanceGuid\": \"e21215jfezzHCKvIp2TyyA\",\n" +
-            "          \"type\": \"ScheduledAssessment\"\n" +
-            "        }\n" +
-            "      ],\n" +
-            "      \"timeWindowGuid\": \"41j9nQyyeNVcHAJJB0d1vl2j\",\n" +
-            "      \"refGuid\": \"p-oBPW7EDXSEt_ZrXcFd0fAD\",\n" +
-            "      \"type\": \"ScheduledSession\"\n" +
-            "    },\n" +
-            "    {\n" +
-            "      \"instanceGuid\": \"GMJvrk1HuOmw7Uote5J4sw\",\n" +
-            "      \"startDay\": 0,\n" +
-            "      \"endDay\": 2,\n" +
-            "      \"startTime\": \"00:00\",\n" +
-            "      \"expiration\": \"P3D\",\n" +
-            "      \"assessments\": [\n" +
-            "        {\n" +
-            "          \"refKey\": \"6e06751e6e06751e\",\n" +
-            "          \"instanceGuid\": \"fR4uTueyQSMDEumdMAZdnA\",\n" +
-            "          \"type\": \"ScheduledAssessment\"\n" +
-            "        }\n" +
-            "      ],\n" +
-            "      \"timeWindowGuid\": \"pFWgzjk-7wOa3GSDbvpy-JDc\",\n" +
-            "      \"refGuid\": \"iErUfmT0AzIe7DIiwBzFtxZW\",\n" +
-            "      \"type\": \"ScheduledSession\"\n" +
-            "    },\n" +
-            "    {\n" +
-            "      \"instanceGuid\": \"lVJ-cmbE3cxDWvXcc61tWw\",\n" +
-            "      \"startDay\": 1,\n" +
-            "      \"endDay\": 1,\n" +
-            "      \"startTime\": \"$lastHourString:00\",\n" +
-            "      \"expiration\": \"PT30M\",\n" +
-            "      \"persistent\": true,\n" +
-            "      \"assessments\": [\n" +
-            "        {\n" +
-            "          \"refKey\": \"711cde8b711cde8b\",\n" +
-            "          \"instanceGuid\": \"mv8cxYLK8vrgWQ2F7Um71Q\",\n" +
-            "          \"type\": \"ScheduledAssessment\"\n" +
-            "        }\n" +
-            "      ],\n" +
-            "      \"timeWindowGuid\": \"VbyQ7IElHmGZ-jcelaEy2NCE\",\n" +
-            "      \"refGuid\": \"p-oBPW7EDXSEt_ZrXcFd0fAD\",\n" +
-            "      \"type\": \"ScheduledSession\"\n" +
-            "    },\n" +
-            "    {\n" +
-            "      \"instanceGuid\": \"XlZ3SrLpmEQ2E8PuUUcs7g\",\n" +
-            "      \"startDay\": 1,\n" +
-            "      \"endDay\": 1,\n" +
-            "      \"startTime\": \"$currentHourString:00\",\n" +
-            "      \"expiration\": \"PT1H\",\n" +
-            "      \"assessments\": [\n" +
-            "        {\n" +
-            "          \"refKey\": \"711cde8b711cde8b\",\n" +
-            "          \"instanceGuid\": \"GgQVjdjyI0uksdnuKpd6SA\",\n" +
-            "          \"type\": \"ScheduledAssessment\"\n" +
-            "        }\n" +
-            "      ],\n" +
-            "      \"timeWindowGuid\": \"h2wxlJbf7DRYsBgdcQ3exCh7\",\n" +
-            "      \"refGuid\": \"p-oBPW7EDXSEt_ZrXcFd0fAD\",\n" +
-            "      \"type\": \"ScheduledSession\"\n" +
-            "    },\n" +
-            "    {\n" +
-            "      \"instanceGuid\": \"-B_yTKp8eTGK7NY_qJ0UTA\",\n" +
-            "      \"startDay\": 1,\n" +
-            "      \"endDay\": 1,\n" +
-            "      \"startTime\": \"$nextHourString:00\",\n" +
-            "      \"expiration\": \"PT1H\",\n" +
-            "      \"assessments\": [\n" +
-            "        {\n" +
-            "          \"refKey\": \"711cde8b711cde8b\",\n" +
-            "          \"instanceGuid\": \"evLwKAYAD_f0Ecln4QmY_Q\",\n" +
-            "          \"type\": \"ScheduledAssessment\"\n" +
-            "        }\n" +
-            "      ],\n" +
-            "      \"timeWindowGuid\": \"41j9nQyyeNVcHAJJB0d1vl2j\",\n" +
-            "      \"refGuid\": \"p-oBPW7EDXSEt_ZrXcFd0fAD\",\n" +
-            "      \"type\": \"ScheduledSession\"\n" +
-            "    },\n" +
-            "    {\n" +
-            "      \"instanceGuid\": \"6YyBNuEPir0Vkd3a-crQbA\",\n" +
-            "      \"startDay\": 2,\n" +
-            "      \"endDay\": 2,\n" +
-            "      \"startTime\": \"$lastHourString:00\",\n" +
-            "      \"expiration\": \"PT30M\",\n" +
-            "      \"persistent\": true,\n" +
-            "      \"assessments\": [\n" +
-            "        {\n" +
-            "          \"refKey\": \"711cde8b711cde8b\",\n" +
-            "          \"instanceGuid\": \"d5zbbpFUcGeganSy_TJIxg\",\n" +
-            "          \"type\": \"ScheduledAssessment\"\n" +
-            "        }\n" +
-            "      ],\n" +
-            "      \"timeWindowGuid\": \"VbyQ7IElHmGZ-jcelaEy2NCE\",\n" +
-            "      \"refGuid\": \"p-oBPW7EDXSEt_ZrXcFd0fAD\",\n" +
-            "      \"type\": \"ScheduledSession\"\n" +
-            "    },\n" +
-            "    {\n" +
-            "      \"instanceGuid\": \"CDWlxjraDB_yn_jUl0YagA\",\n" +
-            "      \"startDay\": 2,\n" +
-            "      \"endDay\": 2,\n" +
-            "      \"startTime\": \"$currentHourString:00\",\n" +
-            "      \"expiration\": \"PT1H\",\n" +
-            "      \"assessments\": [\n" +
-            "        {\n" +
-            "          \"refKey\": \"711cde8b711cde8b\",\n" +
-            "          \"instanceGuid\": \"8W35QTL5ph2DAnd1lvnejA\",\n" +
-            "          \"type\": \"ScheduledAssessment\"\n" +
-            "        }\n" +
-            "      ],\n" +
-            "      \"timeWindowGuid\": \"h2wxlJbf7DRYsBgdcQ3exCh7\",\n" +
-            "      \"refGuid\": \"p-oBPW7EDXSEt_ZrXcFd0fAD\",\n" +
-            "      \"type\": \"ScheduledSession\"\n" +
-            "    },\n" +
-            "    {\n" +
-            "      \"instanceGuid\": \"wSFtq35JbCog5s4TXXMNRw\",\n" +
-            "      \"startDay\": 2,\n" +
-            "      \"endDay\": 2,\n" +
-            "      \"startTime\": \"$nextHourString:00\",\n" +
-            "      \"expiration\": \"PT1H\",\n" +
-            "      \"assessments\": [\n" +
-            "        {\n" +
-            "          \"refKey\": \"711cde8b711cde8b\",\n" +
-            "          \"instanceGuid\": \"GYMXqSOe1JFKifK2XWx2Gg\",\n" +
-            "          \"type\": \"ScheduledAssessment\"\n" +
-            "        }\n" +
-            "      ],\n" +
-            "      \"timeWindowGuid\": \"41j9nQyyeNVcHAJJB0d1vl2j\",\n" +
-            "      \"refGuid\": \"p-oBPW7EDXSEt_ZrXcFd0fAD\",\n" +
-            "      \"type\": \"ScheduledSession\"\n" +
-            "    },\n" +
-            "    {\n" +
-            "      \"instanceGuid\": \"T8X0XUUwUwcr3k6zEh7cBw\",\n" +
-            "      \"startDay\": 3,\n" +
-            "      \"endDay\": 3,\n" +
-            "      \"startTime\": \"$lastHourString:00\",\n" +
-            "      \"expiration\": \"PT30M\",\n" +
-            "      \"persistent\": true,\n" +
-            "      \"assessments\": [\n" +
-            "        {\n" +
-            "          \"refKey\": \"711cde8b711cde8b\",\n" +
-            "          \"instanceGuid\": \"tFtJNUMcUssPezzwKmrB2w\",\n" +
-            "          \"type\": \"ScheduledAssessment\"\n" +
-            "        }\n" +
-            "      ],\n" +
-            "      \"timeWindowGuid\": \"VbyQ7IElHmGZ-jcelaEy2NCE\",\n" +
-            "      \"refGuid\": \"p-oBPW7EDXSEt_ZrXcFd0fAD\",\n" +
-            "      \"type\": \"ScheduledSession\"\n" +
-            "    },\n" +
-            "    {\n" +
-            "      \"instanceGuid\": \"ud-UBuDNBFHDtDrx9YodFA\",\n" +
-            "      \"startDay\": 3,\n" +
-            "      \"endDay\": 3,\n" +
-            "      \"startTime\": \"$currentHourString:00\",\n" +
-            "      \"expiration\": \"PT1H\",\n" +
-            "      \"assessments\": [\n" +
-            "        {\n" +
-            "          \"refKey\": \"711cde8b711cde8b\",\n" +
-            "          \"instanceGuid\": \"oJp7v2cGXZHVZlLhy1lLuw\",\n" +
-            "          \"type\": \"ScheduledAssessment\"\n" +
-            "        }\n" +
-            "      ],\n" +
-            "      \"timeWindowGuid\": \"h2wxlJbf7DRYsBgdcQ3exCh7\",\n" +
-            "      \"refGuid\": \"p-oBPW7EDXSEt_ZrXcFd0fAD\",\n" +
-            "      \"type\": \"ScheduledSession\"\n" +
-            "    },\n" +
-            "    {\n" +
-            "      \"instanceGuid\": \"CukddPZ9eXREe7lxuL0cXQ\",\n" +
-            "      \"startDay\": 3,\n" +
-            "      \"endDay\": 3,\n" +
-            "      \"startTime\": \"$nextHourString:00\",\n" +
-            "      \"expiration\": \"PT1H\",\n" +
-            "      \"assessments\": [\n" +
-            "        {\n" +
-            "          \"refKey\": \"711cde8b711cde8b\",\n" +
-            "          \"instanceGuid\": \"Q2QqJtScMENGF23bmizvjQ\",\n" +
-            "          \"type\": \"ScheduledAssessment\"\n" +
-            "        }\n" +
-            "      ],\n" +
-            "      \"timeWindowGuid\": \"41j9nQyyeNVcHAJJB0d1vl2j\",\n" +
-            "      \"refGuid\": \"p-oBPW7EDXSEt_ZrXcFd0fAD\",\n" +
-            "      \"type\": \"ScheduledSession\"\n" +
-            "    }\n" +
-            "  ],\n" +
-            "  \"type\": \"Timeline\"\n" +
-            "}"
+    private val scheduleJson = """{
+  "duration": "P4D",
+  "assessments": [
+    {
+      "key": "711cde8b711cde8b",
+      "guid": "6GvgSebKPGM5tGT5t-gw7COj",
+      "appId": "sage-assessment-test",
+      "identifier": "dccs",
+      "revision": 5,
+      "label": "Shape-Color Sorting",
+      "minutesToComplete": 3,
+      "colorScheme": {
+        "background": "#FFFFFF",
+        "foreground": "#F5F5F5",
+        "activated": "#CDCDCD",
+        "inactivated": "#D8D8D8",
+        "type": "ColorScheme"
+      },
+      "configUrl": "https://ws.sagebridge.org/v1/assessments/6GvgSebKPGM5tGT5t-gw7COj/config",
+      "type": "AssessmentInfo"
+    },
+    {
+      "key": "6e06751e6e06751e",
+      "guid": "eGhiQTT2a6SCCmjTod6CDb0t",
+      "appId": "sage-assessment-test",
+      "identifier": "Assessment_Test_1",
+      "revision": 1,
+      "label": "Assessment Test 1",
+      "minutesToComplete": 0,
+      "configUrl": "https://ws.sagebridge.org/v1/assessments/eGhiQTT2a6SCCmjTod6CDb0t/config",
+      "type": "AssessmentInfo"
+    }
+  ],
+  "sessions": [
+    {
+      "guid": "iErUfmT0AzIe7DIiwBzFtxZW",
+      "label": "One time 3 day session",
+      "startEventId": "timeline_retrieved",
+      "performanceOrder": "sequential",
+      "timeWindowGuids": [
+        "pFWgzjk-7wOa3GSDbvpy-JDc"
+      ],
+      "notifications": [],
+      "type": "SessionInfo"
+    },
+    {
+      "guid": "p-oBPW7EDXSEt_ZrXcFd0fAD",
+      "label": "Daily Sessions",
+      "startEventId": "timeline_retrieved",
+      "performanceOrder": "sequential",
+      "minutesToComplete": 3,
+      "timeWindowGuids": [
+        "VbyQ7IElHmGZ-jcelaEy2NCE",
+        "h2wxlJbf7DRYsBgdcQ3exCh7",
+        "41j9nQyyeNVcHAJJB0d1vl2j"
+      ],
+      "notifications": [
+        {
+          "notifyAt": "after_window_start",
+          "allowSnooze": true,
+          "message": {
+            "lang": "en",
+            "subject": "Reminder Title",
+            "message": "Reminder Text",
+            "type": "NotificationMessage"
+          },
+          "type": "NotificationInfo"
+        }
+      ],
+      "type": "SessionInfo"
+    }
+  ],
+  "schedule": [
+    {
+      "instanceGuid": "mvhyXpjhxHDp7R9fyH02SA",
+      "startDay": 0,
+      "endDay": 0,
+      "startTime": "$lastHourString:00",
+      "expiration": "PT30M",
+      "persistent": true,
+      "assessments": [
+        {
+          "refKey": "711cde8b711cde8b",
+          "instanceGuid": "FowEZJgOmdxO-UKA5-ZqLw",
+          "type": "ScheduledAssessment"
+        }
+      ],
+      "timeWindowGuid": "VbyQ7IElHmGZ-jcelaEy2NCE",
+      "refGuid": "p-oBPW7EDXSEt_ZrXcFd0fAD",
+      "type": "ScheduledSession"
+    },
+    {
+      "instanceGuid": "QaqwdxDjRc5FzUIAhBHRwA",
+      "startDay": 0,
+      "endDay": 0,
+      "startTime": "$currentHourString:00",
+      "expiration": "PT1H",
+      "assessments": [
+        {
+          "refKey": "711cde8b711cde8b",
+          "instanceGuid": "84cIJmOLnSN4vtAkGfPmQw",
+          "type": "ScheduledAssessment"
+        }
+      ],
+      "timeWindowGuid": "h2wxlJbf7DRYsBgdcQ3exCh7",
+      "refGuid": "p-oBPW7EDXSEt_ZrXcFd0fAD",
+      "type": "ScheduledSession"
+    },
+    {
+      "instanceGuid": "SL97UWo1ZQEA1tQKKVFkUA",
+      "startDay": 0,
+      "endDay": 0,
+      "startTime": "$nextHourString:00",
+      "expiration": "PT1H",
+      "assessments": [
+        {
+          "refKey": "711cde8b711cde8b",
+          "instanceGuid": "e21215jfezzHCKvIp2TyyA",
+          "type": "ScheduledAssessment"
+        }
+      ],
+      "timeWindowGuid": "41j9nQyyeNVcHAJJB0d1vl2j",
+      "refGuid": "p-oBPW7EDXSEt_ZrXcFd0fAD",
+      "type": "ScheduledSession"
+    },
+    {
+      "instanceGuid": "GMJvrk1HuOmw7Uote5J4sw",
+      "startDay": 0,
+      "endDay": 2,
+      "startTime": "00:00",
+      "expiration": "P3D",
+      "assessments": [
+        {
+          "refKey": "6e06751e6e06751e",
+          "instanceGuid": "fR4uTueyQSMDEumdMAZdnA",
+          "type": "ScheduledAssessment"
+        }
+      ],
+      "timeWindowGuid": "pFWgzjk-7wOa3GSDbvpy-JDc",
+      "refGuid": "iErUfmT0AzIe7DIiwBzFtxZW",
+      "type": "ScheduledSession"
+    },
+    {
+      "instanceGuid": "lVJ-cmbE3cxDWvXcc61tWw",
+      "startDay": 1,
+      "endDay": 1,
+      "startTime": "$lastHourString:00",
+      "expiration": "PT30M",
+      "persistent": true,
+      "assessments": [
+        {
+          "refKey": "711cde8b711cde8b",
+          "instanceGuid": "mv8cxYLK8vrgWQ2F7Um71Q",
+          "type": "ScheduledAssessment"
+        }
+      ],
+      "timeWindowGuid": "VbyQ7IElHmGZ-jcelaEy2NCE",
+      "refGuid": "p-oBPW7EDXSEt_ZrXcFd0fAD",
+      "type": "ScheduledSession"
+    },
+    {
+      "instanceGuid": "XlZ3SrLpmEQ2E8PuUUcs7g",
+      "startDay": 1,
+      "endDay": 1,
+      "startTime": "$currentHourString:00",
+      "expiration": "PT1H",
+      "assessments": [
+        {
+          "refKey": "711cde8b711cde8b",
+          "instanceGuid": "GgQVjdjyI0uksdnuKpd6SA",
+          "type": "ScheduledAssessment"
+        }
+      ],
+      "timeWindowGuid": "h2wxlJbf7DRYsBgdcQ3exCh7",
+      "refGuid": "p-oBPW7EDXSEt_ZrXcFd0fAD",
+      "type": "ScheduledSession"
+    },
+    {
+      "instanceGuid": "-B_yTKp8eTGK7NY_qJ0UTA",
+      "startDay": 1,
+      "endDay": 1,
+      "startTime": "$nextHourString:00",
+      "expiration": "PT1H",
+      "assessments": [
+        {
+          "refKey": "711cde8b711cde8b",
+          "instanceGuid": "evLwKAYAD_f0Ecln4QmY_Q",
+          "type": "ScheduledAssessment"
+        }
+      ],
+      "timeWindowGuid": "41j9nQyyeNVcHAJJB0d1vl2j",
+      "refGuid": "p-oBPW7EDXSEt_ZrXcFd0fAD",
+      "type": "ScheduledSession"
+    },
+    {
+      "instanceGuid": "6YyBNuEPir0Vkd3a-crQbA",
+      "startDay": 2,
+      "endDay": 2,
+      "startTime": "$lastHourString:00",
+      "expiration": "PT30M",
+      "persistent": true,
+      "assessments": [
+        {
+          "refKey": "711cde8b711cde8b",
+          "instanceGuid": "d5zbbpFUcGeganSy_TJIxg",
+          "type": "ScheduledAssessment"
+        }
+      ],
+      "timeWindowGuid": "VbyQ7IElHmGZ-jcelaEy2NCE",
+      "refGuid": "p-oBPW7EDXSEt_ZrXcFd0fAD",
+      "type": "ScheduledSession"
+    },
+    {
+      "instanceGuid": "CDWlxjraDB_yn_jUl0YagA",
+      "startDay": 2,
+      "endDay": 2,
+      "startTime": "$currentHourString:00",
+      "expiration": "PT1H",
+      "assessments": [
+        {
+          "refKey": "711cde8b711cde8b",
+          "instanceGuid": "8W35QTL5ph2DAnd1lvnejA",
+          "type": "ScheduledAssessment"
+        }
+      ],
+      "timeWindowGuid": "h2wxlJbf7DRYsBgdcQ3exCh7",
+      "refGuid": "p-oBPW7EDXSEt_ZrXcFd0fAD",
+      "type": "ScheduledSession"
+    },
+    {
+      "instanceGuid": "wSFtq35JbCog5s4TXXMNRw",
+      "startDay": 2,
+      "endDay": 2,
+      "startTime": "$nextHourString:00",
+      "expiration": "PT1H",
+      "assessments": [
+        {
+          "refKey": "711cde8b711cde8b",
+          "instanceGuid": "GYMXqSOe1JFKifK2XWx2Gg",
+          "type": "ScheduledAssessment"
+        }
+      ],
+      "timeWindowGuid": "41j9nQyyeNVcHAJJB0d1vl2j",
+      "refGuid": "p-oBPW7EDXSEt_ZrXcFd0fAD",
+      "type": "ScheduledSession"
+    },
+    {
+      "instanceGuid": "T8X0XUUwUwcr3k6zEh7cBw",
+      "startDay": 3,
+      "endDay": 3,
+      "startTime": "$lastHourString:00",
+      "expiration": "PT30M",
+      "persistent": true,
+      "assessments": [
+        {
+          "refKey": "711cde8b711cde8b",
+          "instanceGuid": "tFtJNUMcUssPezzwKmrB2w",
+          "type": "ScheduledAssessment"
+        }
+      ],
+      "timeWindowGuid": "VbyQ7IElHmGZ-jcelaEy2NCE",
+      "refGuid": "p-oBPW7EDXSEt_ZrXcFd0fAD",
+      "type": "ScheduledSession"
+    },
+    {
+      "instanceGuid": "ud-UBuDNBFHDtDrx9YodFA",
+      "startDay": 3,
+      "endDay": 3,
+      "startTime": "$currentHourString:00",
+      "expiration": "PT1H",
+      "assessments": [
+        {
+          "refKey": "711cde8b711cde8b",
+          "instanceGuid": "oJp7v2cGXZHVZlLhy1lLuw",
+          "type": "ScheduledAssessment"
+        }
+      ],
+      "timeWindowGuid": "h2wxlJbf7DRYsBgdcQ3exCh7",
+      "refGuid": "p-oBPW7EDXSEt_ZrXcFd0fAD",
+      "type": "ScheduledSession"
+    },
+    {
+      "instanceGuid": "CukddPZ9eXREe7lxuL0cXQ",
+      "startDay": 3,
+      "endDay": 3,
+      "startTime": "$nextHourString:00",
+      "expiration": "PT1H",
+      "assessments": [
+        {
+          "refKey": "711cde8b711cde8b",
+          "instanceGuid": "Q2QqJtScMENGF23bmizvjQ",
+          "type": "ScheduledAssessment"
+        }
+      ],
+      "timeWindowGuid": "41j9nQyyeNVcHAJJB0d1vl2j",
+      "refGuid": "p-oBPW7EDXSEt_ZrXcFd0fAD",
+      "type": "ScheduledSession"
+    }
+  ],
+  "type": "Timeline"
+}"""
     
     val assessmentInstanceGuid = "oJp7v2cGXZHVZlLhy1lLuw"
 

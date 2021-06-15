@@ -65,6 +65,10 @@ class UploadManager(
     }
 
     private suspend fun processUploadFile(uploadFile: UploadFile) {
+        if (uploadFile.sessionExpires != null && Clock.System.now().toEpochMilliseconds() < uploadFile.sessionExpires.toEpochMilliseconds()) {
+            // If we have a sessionExpires value, we need to wait to upload
+            return
+        }
         //Does upload order matter to Bridge? -nbrown 01/11/21
         val uploadSession = getUploadSession(uploadFile)
         uploadSession?.let {

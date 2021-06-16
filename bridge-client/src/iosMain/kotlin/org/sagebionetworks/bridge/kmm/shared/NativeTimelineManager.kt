@@ -60,19 +60,34 @@ class NativeTimelineManager(
 
 internal fun ScheduledSessionWindow.toNative() : NativeScheduledSessionWindow =
     NativeScheduledSessionWindow(
-        instanceGuid,
-        eventTimeStamp.toString(),
-        startDateTime.toNSDateComponents().date ?: NSDate.distantPast(),
-        endDateTime.toNSDateComponents().date ?: NSDate.distantFuture(),
-        persistent,
-        startTime != null,
-        expiration?.let { it.hours > 0 || it.minutes > 0 } ?: false,
-        assessments.map { it.toNative(this) },
-        sessionInfo
+        instanceGuid = instanceGuid,
+        eventTimestamp = eventTimeStamp.toString(),
+        startDateTime = startDateTime.toNSDateComponents().date ?: NSDate.distantPast(),
+        endDateTime = endDateTime.toNSDateComponents().date ?: NSDate.distantFuture(),
+        persistent = persistent,
+        hasStartTimeOfDay = startTime != null,
+        hasEndTimeOfDay = expiration?.let { it.hours > 0 || it.minutes > 0 } ?: false,
+        assessments = assessments.map { it.toNative(this) },
+        sessionInfo = sessionInfo,
     )
 
 internal fun ScheduledAssessmentReference.toNative(parent: ScheduledSessionWindow) : NativeScheduledAssessment =
-    NativeScheduledAssessment(instanceGuid, assessmentInfo, isCompleted)
+    NativeScheduledAssessment(
+        instanceGuid = instanceGuid,
+        assessmentInfo = assessmentInfo,
+        isCompleted = isCompleted,
+        adherenceRecords = this.adherenceRecordList?.map { it.toNative() },
+    )
+
+internal fun AdherenceRecord.toNative() : NativeAdherenceRecord =
+    NativeAdherenceRecord(
+        instanceGuid = instanceGuid,
+        eventTimestamp = eventTimestamp,
+        startedOn = startedOn?.toNSDate(),
+        finishedOn = finishedOn?.toNSDate(),
+        declined = declined,
+        clientData = clientData,
+    )
 
 data class NativeScheduledSessionWindow(
     val instanceGuid: String,
@@ -90,6 +105,7 @@ data class NativeScheduledAssessment(
     val instanceGuid: String,
     val assessmentInfo: AssessmentInfo,
     val isCompleted: Boolean,
+    val adherenceRecords: List<NativeAdherenceRecord>?,
 )
 
 data class NativeAdherenceRecord(

@@ -67,11 +67,11 @@ internal fun ScheduledSessionWindow.toNative() : NativeScheduledSessionWindow =
         persistent = persistent,
         hasStartTimeOfDay = startTime != null,
         hasEndTimeOfDay = expiration?.let { it.hours > 0 || it.minutes > 0 } ?: false,
-        assessments = assessments.map { it.toNative(this) },
+        assessments = assessments.map { it.toNative() },
         sessionInfo = sessionInfo,
     )
 
-internal fun ScheduledAssessmentReference.toNative(parent: ScheduledSessionWindow) : NativeScheduledAssessment =
+internal fun ScheduledAssessmentReference.toNative() : NativeScheduledAssessment =
     NativeScheduledAssessment(
         instanceGuid = instanceGuid,
         assessmentInfo = assessmentInfo,

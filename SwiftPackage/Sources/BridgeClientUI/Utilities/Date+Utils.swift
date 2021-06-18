@@ -1,5 +1,6 @@
 //
-//  BridgeUploaderInfoV2.swift
+//  Date+Utils.swift
+//
 //
 //  Copyright © 2021 Sage Bionetworks. All rights reserved.
 //
@@ -31,29 +32,18 @@
 //
 
 import Foundation
-import BridgeArchiver
 
-struct BridgeUploaderInfoV2 : Codable {
-    var files: [FileEntry] = []
-     
-    let item: String
-    let dataFilename: String
-    let appName: String
-    let appVersion: String
-    let phoneInfo: String
-    let format: FormatVersion
+extension Date {
     
-    init(schemaIdentifier: String, dataFilename: String = "answers.json") {
-        self.item = schemaIdentifier
-        self.dataFilename = dataFilename
-        self.format = .v2_generic
-        let platformContext = PlatformInfo()
-        self.phoneInfo = platformContext.deviceInfo
-        self.appName = platformContext.appName
-        self.appVersion = platformContext.appVersion
+    public func startOfDay() -> Date {
+        Calendar.current.startOfDay(for: self)
     }
     
-    enum FormatVersion : String, Codable {
-        case v1_legacy, v2_generic
+    public var isToday: Bool {
+        Calendar.current.isDateInToday(self)
+    }
+    
+    public var isTomorrow: Bool {
+        Calendar.current.isDateInTomorrow(self)
     }
 }

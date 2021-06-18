@@ -41,9 +41,14 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
     @Published open var today: Date = Date()
     @Published open var studyId: String?
     @Published open var isCompleted: Bool = false
-    @Published open var sessions: [TimelineSession] = []
-    @Published open var isPresentingAssessment: Bool = false
     
+    @Published open var sessions: [TimelineSession] = [] {
+        didSet {
+            self.isCompleted = self.sessions.reduce(true) { $0 && $1.isCompleted }
+        }
+    }
+    
+    @Published open var isPresentingAssessment: Bool = false
     public var selectedAssessment: AssessmentScheduleInfo?
     
     internal func now() -> Date { Date() }
@@ -59,7 +64,6 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
                 return existingSession
             }
             self.sessions = newSessions
-            self.isCompleted = self.sessions.reduce(true) { $0 && $1.isCompleted }
         }
     }
     
@@ -142,6 +146,11 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
             session.updateState()
             self.isCompleted = self.sessions.reduce(true) { $0 && $1.isCompleted }
         }
+    }
+    
+    public final func current() -> (session: TimelineSession, assessment: TimelineAssessment)? {
+        guard let selected = self.selectedAssessment else { return nil }
+        return findTimelineModel(sessionGuid: selected.session.instanceGuid, assessmentGuid: selected.instanceGuid)
     }
     
     public final func findTimelineModel(sessionGuid: String, assessmentGuid: String) -> (session: TimelineSession, assessment: TimelineAssessment)? {

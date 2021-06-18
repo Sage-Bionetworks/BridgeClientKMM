@@ -1,5 +1,6 @@
 //
-//  AssessmentScheduleInfo.swift
+//  NativeScheduledSessionWindow+View.swift
+//
 //
 //  Copyright © 2021 Sage Bionetworks. All rights reserved.
 //
@@ -30,37 +31,28 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-import Foundation
+import SwiftUI
 import BridgeClient
 
-/// Thread-safe assessment schedule info. Kotlin objects can only be accessed from the main thread or it causes
-/// a crash so this must be initialized on the main thread.
-public struct AssessmentScheduleInfo {
-    public let instanceGuid: String
-    public let session: Session
-    public let assessmentInfo: Info
+extension NativeScheduledSessionWindow {
     
-    public init(session: NativeScheduledSessionWindow, assessment: NativeScheduledAssessment) {
-        self.instanceGuid = assessment.instanceGuid
-        self.session = Session(instanceGuid: session.instanceGuid,
-                               eventTimestamp: session.eventTimestamp,
-                               scheduledOn: session.startDateTime)
-        self.assessmentInfo = Info(identifier: assessment.assessmentInfo.identifier!,
-                                   key: assessment.assessmentInfo.key,
-                                   guid: assessment.assessmentInfo.identifier,
-                                   label: assessment.assessmentInfo.label)
+    public func availableNow(_ now: Date = Date()) -> Bool {
+        startDateTime < now && now < endDateTime
     }
     
-    public struct Info : Hashable, Codable {
-        let identifier: String
-        let key: String?
-        let guid: String?
-        let label: String?
+    public func isExpired(_ now: Date = Date()) -> Bool {
+        now > endDateTime
     }
     
-    public struct Session : Hashable, Codable {
-        public let instanceGuid: String
-        public let eventTimestamp: String
-        public let scheduledOn: Date
+    public var performInOrder: Bool {
+        sessionInfo.performanceOrder != .participantChoice
+    }
+    
+    public var availableDateString: String {
+        startDateTime.localizeDate(hasTimeOfDay: hasStartTimeOfDay)
+    }
+    
+    public var dueDateString: String {
+        endDateTime.localizeDate(hasTimeOfDay: hasEndTimeOfDay)
     }
 }

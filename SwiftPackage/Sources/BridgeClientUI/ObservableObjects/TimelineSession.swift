@@ -58,9 +58,14 @@ public class TimelineSession : ObservableObject, Identifiable {
     }
     
     @Published public var assessments: [TimelineAssessment]
-    @Published public var availableNow: Bool = false
-    @Published public var isExpired: Bool = false
     @Published public var isCompleted: Bool = false
+    @Published public var state: SessionState = .availableLater
+    
+    public var dateString: String = ""
+    
+    public enum SessionState : Int {
+        case completed, expired, availableLater, willExpire
+    }
     
     public init(_ window: NativeScheduledSessionWindow) {
         self.window = window
@@ -69,15 +74,41 @@ public class TimelineSession : ObservableObject, Identifiable {
     }
     
     public func updateState(_ now: Date = Date()) {
-        self.availableNow = window.availableNow()
-        self.isExpired = window.isExpired()
+        let availableNow = window.availableNow()
+        let isExpired = window.isExpired()
         let performInOrder = window.performInOrder
         var found = false
+        var finishedOn: Date?
         self.isCompleted = self.assessments.reduce(true) { (initial, assessment) in
             let isNext = !found && !assessment.isCompleted
-            assessment.isLocked = !window.persistent && (!availableNow || (performInOrder && !isNext))
+            assessment.isLocked = !availableNow
+            assessment.isEnabled = availableNow && (!performInOrder || isNext)
             if isNext { found = true }
+            if let newFinishedOn = assessment.finishedOn,
+               (finishedOn == nil || finishedOn! < newFinishedOn) {
+                finishedOn = newFinishedOn
+            }
             return initial && assessment.isCompleted
+        }
+        if window.persistent && availableNow {
+            self.dateString = window.dueDateString
+            self.state = .willExpire
+        }
+        else if isCompleted {
+            self.dateString = (finishedOn ?? Date()).localizeDate(hasTimeOfDay: true)
+            self.state = .completed
+        }
+        else if isExpired {
+            self.dateString = window.dueDateString
+            self.state = .expired
+        }
+        else if !availableNow {
+            self.dateString = window.availableDateString
+            self.state = .availableLater
+        }
+        else {
+            self.dateString = window.dueDateString
+            self.state = .willExpire
         }
     }
 }

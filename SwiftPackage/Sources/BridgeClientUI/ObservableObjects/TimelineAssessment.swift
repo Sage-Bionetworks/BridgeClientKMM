@@ -48,12 +48,30 @@ public class TimelineAssessment : ObservableObject, Identifiable {
         }
     }
     
-    @Published public var isLocked: Bool
-    @Published public var isCompleted: Bool
+    /// Is the assessment enabled?
+    @Published public var isEnabled: Bool
     
-    public init(_ assessment: NativeScheduledAssessment, _ isLocked: Bool = false) {
+    /// Is the assessment locked (not available)?
+    @Published public var isLocked: Bool
+    
+    /// Is the assessment completed?
+    @Published public var isCompleted: Bool {
+        didSet {
+            self.finishedOn = finishedOn ?? Date()
+        }
+    }
+    
+    /// When was it finished?
+    @Published public var finishedOn: Date?
+    
+    public init(_ assessment: NativeScheduledAssessment, isLocked: Bool = false, isEnabled: Bool = true) {
         self.assessment = assessment
         self.isLocked = isLocked
         self.isCompleted = assessment.isCompleted
+        self.isEnabled = isEnabled
+        self.finishedOn = assessment.adherenceRecords?
+            .filter({ $0.finishedOn != nil })
+            .sorted(by: { $0.finishedOn! < $1.finishedOn! })
+            .last?.finishedOn
     }
 }

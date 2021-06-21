@@ -5,7 +5,6 @@ import io.ktor.client.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.datetime.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -247,5 +246,6 @@ data class ScheduledAssessmentReference (
     val assessmentInfo: AssessmentInfo,
     val adherenceRecordList: List<AdherenceRecord>?,
 ) {
-    val isCompleted = adherenceRecordList != null && adherenceRecordList.find { it.finishedOn != null } != null
+    val isCompleted = adherenceRecordList?.let { records -> records.any { it.finishedOn != null }} ?: false
+    val isDeclined = adherenceRecordList?.let { records -> records.any { it.declined == true }} ?: false
 }

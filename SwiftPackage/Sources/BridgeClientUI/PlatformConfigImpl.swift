@@ -43,6 +43,10 @@ public class PlatformConfigImpl : PlatformConfig {
     public let osName: String
     public let osVersion: String
     
+    public var deviceInfo: String {
+        "\(deviceName); \(osName)/\(osVersion)"
+    }
+    
     init(appId: String? = nil) {
         
         self.appId = appId ?? Bundle.main.bridgeAppId

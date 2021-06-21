@@ -70,7 +70,7 @@ public final class BridgeClientAppManager : ObservableObject {
         }
     }
     
-    private var appConfigState: NativeAppConfigState!
+    private var appConfigManager: NativeAppConfigManager!
     public private(set) var authManager: NativeAuthenticationManager!
     
     public convenience init(appId: String) {
@@ -98,10 +98,10 @@ public final class BridgeClientAppManager : ObservableObject {
         KoinKt.doInitKoin(enableNetworkLogs: enableNetworkLogs)
         
         // Hook up app config
-        self.appConfigState = NativeAppConfigState() { appConfig, _ in
+        self.appConfigManager = NativeAppConfigManager() { appConfig, _ in
             self.appConfig = appConfig ?? self.appConfig
         }
-        self.appConfigState.observeAppConfig()
+        self.appConfigManager.observeAppConfig()
         
         // Hook up user session info
         self.authManager = NativeAuthenticationManager() { userSessionInfo in
@@ -136,5 +136,10 @@ public final class BridgeClientAppManager : ObservableObject {
         else {
             appState = .main
         }
+    }
+    
+    public func encryptAndUpload(_ archives: [DataArchive]) {
+        // TODO: syoung 06/17/2021 Figure out what needs to happen to allow uploading files to S3.
+        // Note: This will have to dispatch to the main queue before accessing the Kotlin framework.
     }
 }

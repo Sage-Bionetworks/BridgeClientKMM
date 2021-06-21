@@ -12,7 +12,7 @@ import org.sagebionetworks.bridge.kmm.shared.repo.AppConfigRepo
 import org.sagebionetworks.bridge.kmm.shared.repo.AuthenticationRepository
 import org.sagebionetworks.bridge.mpp.network.generated.models.AppConfig
 
-class NativeAppConfigState(
+class NativeAppConfigManager(
     private val viewUpdate: (AppConfig?, ResourceStatus?) -> Unit
 ) : KoinComponent {
 

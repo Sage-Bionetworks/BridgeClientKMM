@@ -1,5 +1,5 @@
 //
-//  BridgeUploaderInfoV2.swift
+//  AssessmentScheduleInfo.swift
 //
 //  Copyright © 2021 Sage Bionetworks. All rights reserved.
 //
@@ -31,29 +31,36 @@
 //
 
 import Foundation
-import BridgeArchiver
+import BridgeClient
 
-struct BridgeUploaderInfoV2 : Codable {
-    var files: [FileEntry] = []
-     
-    let item: String
-    let dataFilename: String
-    let appName: String
-    let appVersion: String
-    let phoneInfo: String
-    let format: FormatVersion
+/// Thread-safe assessment schedule info. Kotlin objects can only be accessed from the main thread or it causes
+/// a crash so this must be initialized on the main thread.
+public struct AssessmentScheduleInfo {
+    public let instanceGuid: String
+    public let session: Session
+    public let assessmentInfo: Info
     
-    init(schemaIdentifier: String, dataFilename: String = "answers.json") {
-        self.item = schemaIdentifier
-        self.dataFilename = dataFilename
-        self.format = .v2_generic
-        let platformContext = PlatformInfo()
-        self.phoneInfo = platformContext.deviceInfo
-        self.appName = platformContext.appName
-        self.appVersion = platformContext.appVersion
+    public init(session: NativeScheduledSessionWindow, assessment: NativeScheduledAssessment) {
+        self.instanceGuid = assessment.instanceGuid
+        self.session = Session(instanceGuid: session.instanceGuid,
+                               eventTimestamp: session.eventTimestamp,
+                               scheduledOn: session.startDateTime)
+        self.assessmentInfo = Info(identifier: assessment.assessmentInfo.identifier!,
+                                   key: assessment.assessmentInfo.key,
+                                   guid: assessment.assessmentInfo.identifier,
+                                   label: assessment.assessmentInfo.label)
     }
     
-    enum FormatVersion : String, Codable {
-        case v1_legacy, v2_generic
+    public struct Info : Hashable, Codable {
+        let identifier: String
+        let key: String?
+        let guid: String?
+        let label: String?
+    }
+    
+    public struct Session : Hashable, Codable {
+        public let instanceGuid: String
+        public let eventTimestamp: String
+        public let scheduledOn: Date
     }
 }

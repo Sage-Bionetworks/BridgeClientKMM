@@ -74,8 +74,7 @@ public struct ExternalIdLoginView: View {
                                 .colorInvert()
                                 .opacity(status == ResourceStatus.pending ? 1.0 : 0.0)
                         , alignment: .trailing)
-                    .disabled(status == ResourceStatus.success ||
-                                status == ResourceStatus.pending)
+                    .disabled(status == ResourceStatus.success || status == ResourceStatus.pending)
             }
             .padding(.top, 20)
             if status == ResourceStatus.failed {

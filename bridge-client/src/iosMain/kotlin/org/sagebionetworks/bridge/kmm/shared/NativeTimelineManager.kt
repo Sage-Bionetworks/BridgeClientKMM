@@ -76,6 +76,7 @@ internal fun ScheduledAssessmentReference.toNative() : NativeScheduledAssessment
         instanceGuid = instanceGuid,
         assessmentInfo = assessmentInfo,
         isCompleted = isCompleted,
+        isDeclined = isDeclined,
         adherenceRecords = this.adherenceRecordList?.map { it.toNative() },
     )
 
@@ -105,6 +106,7 @@ data class NativeScheduledAssessment(
     val instanceGuid: String,
     val assessmentInfo: AssessmentInfo,
     val isCompleted: Boolean,
+    val isDeclined: Boolean,
     val adherenceRecords: List<NativeAdherenceRecord>?,
 )
 

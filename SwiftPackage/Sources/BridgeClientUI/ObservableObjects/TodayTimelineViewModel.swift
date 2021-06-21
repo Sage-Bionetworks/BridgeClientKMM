@@ -44,7 +44,7 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
     
     @Published open var sessions: [TimelineSession] = [] {
         didSet {
-            self.isCompleted = self.sessions.reduce(true) { $0 && $1.isCompleted }
+            updateCompletionState()
         }
     }
     
@@ -144,8 +144,12 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
         if endedOn != nil && !declined && !session.window.persistent {
             assessment.isCompleted = true
             session.updateState()
-            self.isCompleted = self.sessions.reduce(true) { $0 && $1.isCompleted }
+            updateCompletionState()
         }
+    }
+    
+    private func updateCompletionState() {
+        self.isCompleted = self.sessions.reduce(true) { $0 && ($1.isCompleted || $1.state == .expired) }
     }
     
     public final func current() -> (session: TimelineSession, assessment: TimelineAssessment)? {

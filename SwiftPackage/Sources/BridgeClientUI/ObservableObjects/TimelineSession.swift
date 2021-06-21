@@ -33,7 +33,7 @@
 import SwiftUI
 import BridgeClient
 
-public class TimelineSession : ObservableObject, Identifiable {
+open class TimelineSession : ObservableObject, Identifiable {
     public var id: String {
         self.window.instanceGuid
     }
@@ -59,12 +59,12 @@ public class TimelineSession : ObservableObject, Identifiable {
     
     @Published public var assessments: [TimelineAssessment]
     @Published public var isCompleted: Bool = false
-    @Published public var state: SessionState = .availableLater
+    @Published public var state: SessionState = .upNext
     
     public var dateString: String = ""
     
-    public enum SessionState : Int {
-        case completed, expired, availableLater, willExpire
+    public enum SessionState : Int, CaseIterable {
+        case completed, expired, availableNow, upNext
     }
     
     public init(_ window: NativeScheduledSessionWindow) {
@@ -92,7 +92,7 @@ public class TimelineSession : ObservableObject, Identifiable {
         }
         if window.persistent && availableNow {
             self.dateString = window.dueDateString
-            self.state = .willExpire
+            self.state = .availableNow
         }
         else if isCompleted {
             self.dateString = (finishedOn ?? Date()).localizeDate(hasTimeOfDay: true)
@@ -104,11 +104,11 @@ public class TimelineSession : ObservableObject, Identifiable {
         }
         else if !availableNow {
             self.dateString = window.availableDateString
-            self.state = .availableLater
+            self.state = .upNext
         }
         else {
             self.dateString = window.dueDateString
-            self.state = .willExpire
+            self.state = .availableNow
         }
     }
 }

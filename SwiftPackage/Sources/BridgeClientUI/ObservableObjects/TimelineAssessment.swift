@@ -33,7 +33,7 @@
 import SwiftUI
 import BridgeClient
 
-public class TimelineAssessment : ObservableObject, Identifiable {
+open class TimelineAssessment : ObservableObject, Identifiable {
     public var id: String {
         self.assessment.instanceGuid
     }
@@ -45,6 +45,7 @@ public class TimelineAssessment : ObservableObject, Identifiable {
     public var assessment: NativeScheduledAssessment {
         didSet {
             self.isCompleted = assessment.isCompleted
+            self.isDeclined = assessment.isDeclined
         }
     }
     
@@ -61,6 +62,9 @@ public class TimelineAssessment : ObservableObject, Identifiable {
         }
     }
     
+    // Has the assessment been declined (participant asked *not* to finish).
+    @Published public var isDeclined: Bool
+            
     /// When was it finished?
     @Published public var finishedOn: Date?
     
@@ -68,6 +72,7 @@ public class TimelineAssessment : ObservableObject, Identifiable {
         self.assessment = assessment
         self.isLocked = isLocked
         self.isCompleted = assessment.isCompleted
+        self.isDeclined = assessment.isDeclined
         self.isEnabled = isEnabled
         self.finishedOn = assessment.adherenceRecords?
             .filter({ $0.finishedOn != nil })

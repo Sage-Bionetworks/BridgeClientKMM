@@ -40,13 +40,7 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
     
     @Published open var today: Date = Date()
     @Published open var studyId: String?
-    @Published open var isCompleted: Bool = false
-    
-    @Published open var sessions: [TimelineSession] = [] {
-        didSet {
-            updateCompletionState()
-        }
-    }
+    @Published open var sessions: [TimelineSession] = []
     
     @Published open var isPresentingAssessment: Bool = false
     public var selectedAssessment: AssessmentScheduleInfo?
@@ -144,12 +138,7 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
         if endedOn != nil && !declined && !session.window.persistent {
             assessment.isCompleted = true
             session.updateState()
-            updateCompletionState()
         }
-    }
-    
-    private func updateCompletionState() {
-        self.isCompleted = self.sessions.reduce(true) { $0 && ($1.isCompleted || $1.state == .expired) }
     }
     
     public final func current() -> (session: TimelineSession, assessment: TimelineAssessment)? {

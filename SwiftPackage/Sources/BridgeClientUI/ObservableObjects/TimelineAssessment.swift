@@ -52,9 +52,6 @@ open class TimelineAssessment : ObservableObject, Identifiable {
     /// Is the assessment enabled?
     @Published public var isEnabled: Bool
     
-    /// Is the assessment locked (not available)?
-    @Published public var isLocked: Bool
-    
     /// Is the assessment completed?
     @Published public var isCompleted: Bool {
         didSet {
@@ -68,9 +65,8 @@ open class TimelineAssessment : ObservableObject, Identifiable {
     /// When was it finished?
     @Published public var finishedOn: Date?
     
-    public init(_ assessment: NativeScheduledAssessment, isLocked: Bool = false, isEnabled: Bool = true) {
+    public init(_ assessment: NativeScheduledAssessment, isEnabled: Bool = true) {
         self.assessment = assessment
-        self.isLocked = isLocked
         self.isCompleted = assessment.isCompleted
         self.isDeclined = assessment.isDeclined
         self.isEnabled = isEnabled

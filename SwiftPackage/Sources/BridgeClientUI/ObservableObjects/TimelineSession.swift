@@ -81,7 +81,6 @@ open class TimelineSession : ObservableObject, Identifiable {
         var finishedOn: Date?
         self.isCompleted = self.assessments.reduce(true) { (initial, assessment) in
             let isNext = !found && !assessment.isCompleted
-            assessment.isLocked = !availableNow
             assessment.isEnabled = availableNow && (!performInOrder || isNext)
             if isNext { found = true }
             if let newFinishedOn = assessment.finishedOn,

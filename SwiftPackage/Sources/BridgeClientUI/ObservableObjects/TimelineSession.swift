@@ -33,12 +33,12 @@
 import SwiftUI
 import BridgeClient
 
-open class TimelineSession : ObservableObject, Identifiable {
-    public var id: String {
+public final class TimelineSession : ObservableObject, Identifiable {
+    public final var id: String {
         self.window.instanceGuid
     }
     
-    public var instanceGuid: String {
+    public final var instanceGuid: String {
         self.window.instanceGuid
     }
     
@@ -81,7 +81,6 @@ open class TimelineSession : ObservableObject, Identifiable {
         var finishedOn: Date?
         self.isCompleted = self.assessments.reduce(true) { (initial, assessment) in
             let isNext = !found && !assessment.isCompleted
-            assessment.isLocked = !availableNow
             assessment.isEnabled = availableNow && (!performInOrder || isNext)
             if isNext { found = true }
             if let newFinishedOn = assessment.finishedOn,

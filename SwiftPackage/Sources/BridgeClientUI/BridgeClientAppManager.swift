@@ -48,6 +48,9 @@ public final class BridgeClientAppManager : ObservableObject {
     @Published public var studyId: String?
     @Published public var appState: AppState = .launching
     
+    @Published public var isUploadingResults: Bool = false
+    @Published public var isStudyComplete: Bool = false
+    
     @Published public var appConfig: AppConfig? {
         didSet {
             updateAppState()
@@ -139,7 +142,10 @@ public final class BridgeClientAppManager : ObservableObject {
     }
     
     public func encryptAndUpload(_ archives: [DataArchive]) {
-        // TODO: syoung 06/17/2021 Figure out what needs to happen to allow uploading files to S3.
-        // Note: This will have to dispatch to the main queue before accessing the Kotlin framework.
+        DispatchQueue.main.async {
+            self.isUploadingResults = true
+            // TODO: syoung 06/17/2021 Figure out what needs to happen to allow uploading files to S3.
+            // Note: This will have to dispatch to the main queue before accessing the Kotlin framework.
+        }
     }
 }

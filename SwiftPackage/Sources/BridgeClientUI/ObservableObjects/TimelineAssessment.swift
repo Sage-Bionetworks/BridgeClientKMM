@@ -33,7 +33,7 @@
 import SwiftUI
 import BridgeClient
 
-open class TimelineAssessment : ObservableObject, Identifiable {
+public final class TimelineAssessment : ObservableObject, Identifiable {
     public var id: String {
         self.assessment.instanceGuid
     }

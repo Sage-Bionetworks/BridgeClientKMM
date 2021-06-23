@@ -33,12 +33,12 @@
 import SwiftUI
 import BridgeClient
 
-open class TimelineSession : ObservableObject, Identifiable {
-    public var id: String {
+public final class TimelineSession : ObservableObject, Identifiable {
+    public final var id: String {
         self.window.instanceGuid
     }
     
-    public var instanceGuid: String {
+    public final var instanceGuid: String {
         self.window.instanceGuid
     }
     

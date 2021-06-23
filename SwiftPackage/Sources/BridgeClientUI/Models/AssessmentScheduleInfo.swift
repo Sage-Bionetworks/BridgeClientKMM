@@ -36,8 +36,14 @@ import BridgeClient
 /// Thread-safe assessment schedule info. Kotlin objects can only be accessed from the main thread or it causes
 /// a crash so this must be initialized on the main thread.
 public struct AssessmentScheduleInfo {
+    
+    /// The ``BridgeClient.ScheduledAssessment/instanceGuid`` for this scheduled assessment.
     public let instanceGuid: String
+    
+    /// Information about the session.
     public let session: Session
+    
+    /// Information about the assessment.
     public let assessmentInfo: Info
     
     public init(session: NativeScheduledSessionWindow, assessment: NativeScheduledAssessment) {
@@ -51,16 +57,28 @@ public struct AssessmentScheduleInfo {
                                    label: assessment.assessmentInfo.label)
     }
     
+    /// A thread-safe struct with information required to load and save the results from an assessment.
     public struct Info : Hashable, Codable {
+        /// The ``BridgeClient.AssessmentInfo/identifier``.
         let identifier: String
+        /// The ``BridgeClient.AssessmentInfo/key``.
         let key: String?
+        /// The ``BridgeClient.AssessmentInfo/guid``.
         let guid: String?
+        /// The ``BridgeClient.AssessmentInfo/label``.
         let label: String?
     }
     
+    /// A thread-safe struct with information needed to find and update the Kotlin ``BridgeClient.NativeScheduledSessionWindow``
+    /// for the session to which this assessment belongs.
     public struct Session : Hashable, Codable {
+        /// The ``BridgeClient.ScheduledSession/instanceGuid`` for this scheduled assessment.
         public let instanceGuid: String
+        /// The ``BridgeClient.StudyActivityEvent/timestamp`` for the event used as the reference
+        /// when *this* schedule was built. This value is mutable on the server so the timestamp is used rather
+        /// than the event id.
         public let eventTimestamp: String
+        /// The calculated start time for when this session opens.
         public let scheduledOn: Date
     }
 }

@@ -125,7 +125,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         includeExpired: Boolean = false,
         timezone: TimeZone = TimeZone.currentSystemDefault(),
     ): List<ScheduledSessionWindow> {
-        return extractSessionWindows(
+        val todaySessions = extractSessionWindows(
             eventList,
             timeline,
             instantInDay,
@@ -134,6 +134,21 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
             includeExpired,
             timezone
         )
+        if (!todaySessions.all { it.isCompleted || it.isExpired }) {
+            return todaySessions
+        }
+        val futureWindows = extractSessionWindows(
+            eventList,
+            timeline,
+            instantInDay,
+            studyId,
+            true,
+            includeExpired,
+            timezone
+        )
+        val first = futureWindows.firstOrNull() ?: return todaySessions
+        val nextWindows = futureWindows.filter { it.startDateTime.date == first.startDateTime.date }
+        return todaySessions.plus(nextWindows)
     }
 
     @OptIn(ExperimentalTime::class)
@@ -281,6 +296,6 @@ data class ScheduledAssessmentReference (
     val assessmentInfo: AssessmentInfo,
     val adherenceRecordList: List<AdherenceRecord>?,
 ) {
-    val isCompleted = adherenceRecordList?.let { records -> records.any { it.finishedOn != null }} ?: false
-    val isDeclined = !isCompleted && adherenceRecordList?.let { records -> records.any { it.declined == true }} ?: false
+    val isCompleted = adherenceRecordList?.any { it.finishedOn != null } ?: false
+    val isDeclined = !isCompleted && adherenceRecordList?.any { it.declined == true } ?: false
 }

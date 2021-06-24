@@ -130,7 +130,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
             timeline,
             instantInDay,
             studyId,
-            false,
+            WindowFilterType.Today,
             includeExpired,
             timezone
         )
@@ -142,7 +142,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
             timeline,
             instantInDay,
             studyId,
-            true,
+            WindowFilterType.Future,
             includeExpired,
             timezone
         )
@@ -151,13 +151,17 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         return todaySessions.plus(nextWindows)
     }
 
+    private enum class WindowFilterType {
+        Future, Past, Today, Notifications
+    }
+
     @OptIn(ExperimentalTime::class)
     private fun extractSessionWindows(
         eventList: StudyActivityEventList,
         timeline: Timeline,
         instantInDay: Instant,
         studyId: String,
-        future: Boolean,
+        filterType: WindowFilterType,
         includeExpired: Boolean,
         timezone: TimeZone,
     ): List<ScheduledSessionWindow> {
@@ -183,34 +187,35 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
             sessions.map { session ->
                 //Find the list of scheduled sessions for the given session
                 val scheduledSessionList = scheduleSessionMap[session.guid] ?: emptyList()
-                //Filter the list to today's sessions (start on or before and end on or after today)
-                scheduledSessionList.filterByDaysSince(daysSince, future)
-                    .mapNotNull { scheduledSession ->
-                        createScheduledSessionWindow(
-                            scheduledSession,
-                            daysSince,
-                            day,
-                            instantInDay,
-                            studyId,
-                            assessmentInfoMap,
-                            session,
-                            event,
-                            includeExpired,
-                            timezone
-                        )
+                //Map the schedules to windows
+                scheduledSessionList.mapNotNull { scheduledSession ->
+                    createScheduledSessionWindow(
+                        scheduledSession,
+                        filterType,
+                        daysSince,
+                        day,
+                        instantInDay,
+                        studyId,
+                        assessmentInfoMap,
+                        session,
+                        event,
+                        includeExpired,
+                        timezone
+                    )
                 }
             }.flatten()
         }.flatten()
         .sortedBy { it.startDateTime }
     }
 
-    private fun List<ScheduledSession>.filterByDaysSince(daysSince: Int, future: Boolean): List<ScheduledSession> {
-        return if (future) filter { it.startDay > daysSince }
-        else filter { it.startDay <= daysSince && it.endDay >= daysSince }
-    }
-
+    /**
+     * This is pulled out into a function to make it a little easier to read and to
+     * allow for using explicit returns in the `mapNotNull` method. I find mapping
+     * functions in Kotlin with early exits difficult to grok. syoung 06/24/2021
+     */
     private fun createScheduledSessionWindow(
         scheduledSession: ScheduledSession,
+        filterType: WindowFilterType,
         daysSince: Int,
         day: LocalDate,
         instantInDay: Instant,
@@ -221,7 +226,21 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         includeExpired: Boolean,
         timezone: TimeZone,
     ): ScheduledSessionWindow? {
-        // For sessions with an expiration we need to check if it is passed
+
+        // Exit early if this schedule is not in the range that we are looking for
+        if (!when (filterType) {
+            WindowFilterType.Notifications -> scheduledSession.startDay >= daysSince
+            WindowFilterType.Future -> scheduledSession.startDay > daysSince
+            WindowFilterType.Today -> daysSince in scheduledSession.startDay..scheduledSession.endDay
+            WindowFilterType.Past -> scheduledSession.startDay <= daysSince
+        }) return null
+
+        // Exit early if all the assessments are completed and this filtering does
+        // not include them.
+        val assessments = mapAssessments(scheduledSession, studyId, assessmentInfoMap)
+        val isCompleted = assessments.all { it.isCompleted || it.isDeclined }
+        val includeCompleted = (filterType == WindowFilterType.Today || filterType == WindowFilterType.Past)
+        if (!includeCompleted && isCompleted) return null
 
         //Used for sorting when sessions span multiple days
         val startDaysFromToday = scheduledSession.startDay - daysSince
@@ -244,9 +263,10 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
             ScheduledSessionWindow(
                 scheduledSession = scheduledSession,
                 sessionInfo = session,
-                assessments = mapAssessments(scheduledSession, studyId, assessmentInfoMap),
+                assessments = assessments,
                 event = event,
                 isExpired = isExpired,
+                isCompleted = isCompleted,
                 startDateTime = startDateTime,
                 endDateTime = endDateTime
             ) else null
@@ -280,6 +300,7 @@ data class ScheduledSessionWindow (
     val startDateTime: LocalDateTime,
     val endDateTime: LocalDateTime,
     val isExpired: Boolean,
+    val isCompleted: Boolean,
     val assessments: List<ScheduledAssessmentReference>,
     val sessionInfo: SessionInfo
 ) {
@@ -287,7 +308,6 @@ data class ScheduledSessionWindow (
     val eventTimeStamp = event.timestamp
     val hasStartTimeOfDay = startDateTime.hour == 0 && startDateTime.minute == 0
     val hasEndTimeOfDay = scheduledSession.expiration.let { it.hours > 0 || it.minutes > 0 }
-    val isCompleted = assessments.all { it.isCompleted || it.isDeclined }
     val persistent = scheduledSession.persistent
 }
 

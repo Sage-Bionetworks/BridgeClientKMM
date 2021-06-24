@@ -63,7 +63,21 @@ class ScheduleTimelineRepoTest: BaseTest() {
       "timeWindowGuids": [
         "pFWgzjk-7wOa3GSDbvpy-JDc"
       ],
-      "notifications": [],
+      "notifications": [
+        {
+          "notifyAt": "after_window_start",
+          "allowSnooze": true,
+          "offset": "PT8H",
+          "interval": "P1D",
+          "message": {
+            "lang": "en",
+            "subject": "Reminder One time 3 day session",
+            "message": "Reminder Text",
+            "type": "NotificationMessage"
+          },
+          "type": "NotificationInfo"
+        }
+      ],
       "type": "SessionInfo"
     },
     {
@@ -354,16 +368,9 @@ class ScheduleTimelineRepoTest: BaseTest() {
             "         \"finishedOn\":\"2021-05-12T23:44:54.319Z\",\n" +
             "         \"eventTimestamp\":\"2021-05-12T23:44:51.872Z\",\n" +
             "         \"type\":\"AdherenceRecord\"\n" +
-            "      },\n" +
-            "      {\n" +
-            "         \"instanceGuid\":\"GYMXqSOe1JFKifK2XWx2Gg\",\n" +
-            "         \"startedOn\":\"2021-05-12T23:44:54.319Z\",\n" +
-            "         \"finishedOn\":\"2021-05-12T23:44:54.319Z\",\n" +
-            "         \"eventTimestamp\":\"2021-05-12T23:44:51.872Z\",\n" +
-            "         \"type\":\"AdherenceRecord\"\n" +
             "      }\n" +
             "   ],\n" +
-            "   \"total\":3,\n" +
+            "   \"total\":2,\n" +
             "   \"type\":\"PagedResourceList\"\n" +
             "}"
 
@@ -402,6 +409,9 @@ class ScheduleTimelineRepoTest: BaseTest() {
             //First session should be the 3 day session that started yesterday
             val session1 = sessionList[0]
             assertEquals("One time 3 day session", session1.sessionInfo.label)
+            val notification1 = session1.notifications?.firstOrNull()
+            assertNotNull(notification1)
+            //assertEquals(notification1.scheduleOn)
 
             //Second session should have started in current hour
             val session2 = sessionList[1]
@@ -413,7 +423,82 @@ class ScheduleTimelineRepoTest: BaseTest() {
             assertEquals("Daily Sessions", session3.sessionInfo.label)
             assertEquals("-B_yTKp8eTGK7NY_qJ0UTA", session3.instanceGuid)
         }
+    }
 
+    @Test
+    fun testScheduledSessionsDay1TodayAndNotifications() {
+        runTest {
+            val eventTimeStamp = Clock.System.now().minus(DateTimeUnit.DAY, TimeZone.currentSystemDefault())
+            val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
+
+            val resourceResult = repo.getSessionsForDay(
+                "sage-assessment-test",
+                getTodayInstant(),
+                ScheduleTimelineRepo.WindowFilterType.TodayAndNotifications
+            ).firstOrNull { it is ResourceResult.Success }
+
+            assertTrue(resourceResult is ResourceResult.Success)
+            val sessionList = resourceResult.data
+            assertNotNull(sessionList)
+            assertEquals(9, sessionList.size)
+
+            //First session should be the 3 day session that started yesterday
+            val session1 = sessionList[0]
+            assertEquals("One time 3 day session", session1.sessionInfo.label)
+
+            //Second session should have started in current hour
+            val session2 = sessionList[1]
+            assertEquals("Daily Sessions", session2.sessionInfo.label)
+            assertEquals("XlZ3SrLpmEQ2E8PuUUcs7g", session2.instanceGuid)
+
+            //Third session will be starting next hour
+            val session3 = sessionList[2]
+            assertEquals("Daily Sessions", session3.sessionInfo.label)
+            assertEquals("-B_yTKp8eTGK7NY_qJ0UTA", session3.instanceGuid)
+
+
+        }
+    }
+
+    @Test
+    fun testScheduledSessionsDay1NoUpNextOnToday() {
+        runTest {
+            val eventTimeStamp = Clock.System.now().minus(DateTimeUnit.DAY, TimeZone.currentSystemDefault())
+            val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
+
+            val todayInstant = getTodayInstant().plus(90, DateTimeUnit.MINUTE, TimeZone.currentSystemDefault())
+            val resourceResult = repo.getSessionsForDay("sage-assessment-test", todayInstant).firstOrNull { it is ResourceResult.Success }
+
+            assertTrue(resourceResult is ResourceResult.Success)
+            val sessionList = resourceResult.data
+            assertNotNull(sessionList)
+            assertEquals(5, sessionList.size)
+
+            //First session should be the 3 day session that started yesterday
+            val session1 = sessionList[0]
+            assertEquals("One time 3 day session", session1.sessionInfo.label)
+            assertFalse(session1.isCompleted)
+
+            //Second session should have started today
+            val session2 = sessionList[1]
+            assertEquals("Daily Sessions", session2.sessionInfo.label)
+            assertEquals("-B_yTKp8eTGK7NY_qJ0UTA", session2.instanceGuid)
+            assertFalse(session2.isCompleted)
+
+            // Next day is shown b/c the current day is finished or available
+
+            val session3 = sessionList[2]
+            assertEquals("Daily Sessions", session3.sessionInfo.label)
+            assertEquals("6YyBNuEPir0Vkd3a-crQbA", session3.instanceGuid)
+
+            val session4 = sessionList[3]
+            assertEquals("Daily Sessions", session4.sessionInfo.label)
+            assertEquals("CDWlxjraDB_yn_jUl0YagA", session4.instanceGuid)
+
+            val session5 = sessionList[4]
+            assertEquals("Daily Sessions", session5.sessionInfo.label)
+            assertEquals("wSFtq35JbCog5s4TXXMNRw", session5.instanceGuid)
+        }
     }
 
     @Test
@@ -423,7 +508,9 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val eventTimeStamp = Clock.System.now().minus(2, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
             val repo = getTestScheduleTimelineRepo(adherenceRecordDay2json, timeStamp = eventTimeStamp)
             repo.adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)
-            val resourceResult = repo.getSessionsForDay(studyId, getTodayInstant()).firstOrNull { it is ResourceResult.Success }
+
+            val todayInstant = getTodayInstant().plus(90, DateTimeUnit.MINUTE, TimeZone.currentSystemDefault())
+            val resourceResult = repo.getSessionsForDay(studyId, todayInstant).firstOrNull { it is ResourceResult.Success }
             assertTrue(resourceResult is ResourceResult.Success)
             val sessionList = resourceResult.data
             assertNotNull(sessionList)
@@ -434,19 +521,19 @@ class ScheduleTimelineRepoTest: BaseTest() {
             assertEquals("One time 3 day session", session1.sessionInfo.label)
             assertTrue(session1.isCompleted)
 
-            //Second session should have started in current hour and be completed
+            //Second session should have started today
             val session2 = sessionList[1]
             assertEquals("Daily Sessions", session2.sessionInfo.label)
             assertEquals("CDWlxjraDB_yn_jUl0YagA", session2.instanceGuid)
             assertTrue(session2.isCompleted)
 
-            //Third session will be starting next hour
+            //Third session should have started today
             val session3 = sessionList[2]
             assertEquals("Daily Sessions", session3.sessionInfo.label)
             assertEquals("wSFtq35JbCog5s4TXXMNRw", session3.instanceGuid)
-            assertTrue(session3.isCompleted)
+            assertFalse(session3.isCompleted)
 
-            // Next day is shown b/c the current day is finished.
+            // Next day is shown b/c the current day is finished or available
 
             //Fourth session will start tomorrow
             val session4 = sessionList[3]

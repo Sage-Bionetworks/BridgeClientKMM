@@ -65,8 +65,8 @@ internal fun ScheduledSessionWindow.toNative() : NativeScheduledSessionWindow =
         startDateTime = startDateTime.toNSDateComponents().date ?: NSDate.distantPast(),
         endDateTime = endDateTime.toNSDateComponents().date ?: NSDate.distantFuture(),
         persistent = persistent,
-        hasStartTimeOfDay = startTime != null,
-        hasEndTimeOfDay = expiration?.let { it.hours > 0 || it.minutes > 0 } ?: false,
+        hasStartTimeOfDay = hasStartTimeOfDay,
+        hasEndTimeOfDay = hasEndTimeOfDay,
         assessments = assessments.map { it.toNative() },
         sessionInfo = sessionInfo,
     )

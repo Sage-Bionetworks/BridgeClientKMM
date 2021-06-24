@@ -56,3 +56,4 @@ extension NativeScheduledSessionWindow {
         endDateTime.localizeDate(hasTimeOfDay: hasEndTimeOfDay)
     }
 }
+

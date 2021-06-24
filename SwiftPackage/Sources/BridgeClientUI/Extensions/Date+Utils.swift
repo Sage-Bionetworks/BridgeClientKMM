@@ -65,4 +65,11 @@ extension Date {
             return DateFormatter.localizedString(from: self, dateStyle: .medium, timeStyle: .short)
         }
     }
+    
+}
+
+extension Kotlinx_datetimeInstant {
+    public var dateValue: Date {
+        Date(timeIntervalSince1970: Double(self.toEpochMilliseconds()) * 0.001)
+    }
 }

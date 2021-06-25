@@ -11,12 +11,15 @@ import org.koin.core.component.inject
 import org.sagebionetworks.bridge.kmm.shared.cache.*
 import org.sagebionetworks.bridge.kmm.shared.models.AdherenceRecord
 import org.sagebionetworks.bridge.kmm.shared.models.AssessmentInfo
+import org.sagebionetworks.bridge.kmm.shared.models.NotificationMessage
 import org.sagebionetworks.bridge.kmm.shared.models.SessionInfo
 import org.sagebionetworks.bridge.kmm.shared.repo.*
 import platform.Foundation.*
+import platform.darwin.NSInteger
 
 class NativeTimelineManager(
-    val studyId: String,
+    private val studyId: String,
+    private val includeNotifications: Boolean,
     private val viewUpdate: (List<NativeScheduledSessionWindow>) -> Unit
 ) : KoinComponent {
 
@@ -27,7 +30,7 @@ class NativeTimelineManager(
 
     fun observeTodaySchedule() {
         scope.launch {
-            repo.getSessionsForToday(studyId).collect { timelineResource ->
+            repo.getSessionsForToday(studyId, includeNotifications).collect { timelineResource ->
                 (timelineResource as? ResourceResult.Success)?.data?.let { list ->
                     viewUpdate( list.map { it.toNative() } )
                 }
@@ -69,6 +72,7 @@ internal fun ScheduledSessionWindow.toNative() : NativeScheduledSessionWindow =
         hasEndTimeOfDay = hasEndTimeOfDay,
         assessments = assessments.map { it.toNative() },
         sessionInfo = sessionInfo,
+        notifications = notifications?.map { it.toNative() },
     )
 
 internal fun ScheduledAssessmentReference.toNative() : NativeScheduledAssessment =
@@ -90,6 +94,20 @@ internal fun AdherenceRecord.toNative() : NativeAdherenceRecord =
         clientData = clientData,
     )
 
+internal fun ScheduledNotification.toNative() : NativeScheduledNotification =
+    NativeScheduledNotification(
+        scheduleOn = scheduleOn.toNSDateComponents(),
+        repeatInterval = repeatInterval?.let { period ->
+            val components = NSDateComponents()
+            components.hour = period.hours.toLong()
+            components.minute = period.minutes.toLong()
+            components.day = period.days.toLong()
+            components.month = period.months.toLong()
+            components },
+        allowSnooze = allowSnooze,
+        message = message,
+    )
+
 data class NativeScheduledSessionWindow(
     val instanceGuid: String,
     val eventTimestamp: String,
@@ -99,7 +117,8 @@ data class NativeScheduledSessionWindow(
     val hasStartTimeOfDay: Boolean,
     val hasEndTimeOfDay: Boolean,
     val assessments: List<NativeScheduledAssessment>,
-    val sessionInfo: SessionInfo
+    val sessionInfo: SessionInfo,
+    val notifications: List<NativeScheduledNotification>?,
 )
 
 data class NativeScheduledAssessment(
@@ -117,5 +136,12 @@ data class NativeAdherenceRecord(
     val finishedOn: NSDate?,
     val declined: Boolean?,
     val clientData: JsonElement?,
+)
+
+data class NativeScheduledNotification(
+    val scheduleOn: NSDateComponents,
+    val repeatInterval: NSDateComponents?,
+    val allowSnooze: Boolean,
+    val message: NotificationMessage?,
 )
 

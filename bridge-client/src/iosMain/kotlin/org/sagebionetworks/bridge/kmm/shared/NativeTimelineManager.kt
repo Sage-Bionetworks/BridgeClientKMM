@@ -15,12 +15,12 @@ import org.sagebionetworks.bridge.kmm.shared.models.NotificationMessage
 import org.sagebionetworks.bridge.kmm.shared.models.SessionInfo
 import org.sagebionetworks.bridge.kmm.shared.repo.*
 import platform.Foundation.*
-import platform.darwin.NSInteger
 
 class NativeTimelineManager(
     private val studyId: String,
-    private val includeNotifications: Boolean,
-    private val viewUpdate: (List<NativeScheduledSessionWindow>) -> Unit
+    private val includeAllNotifications: Boolean,
+    private val alwaysIncludeNextDay: Boolean,
+    private val viewUpdate: (NativeScheduledSessionTimelineSlice) -> Unit
 ) : KoinComponent {
 
     private val repo : ScheduleTimelineRepo by inject(mode = LazyThreadSafetyMode.NONE)
@@ -30,9 +30,9 @@ class NativeTimelineManager(
 
     fun observeTodaySchedule() {
         scope.launch {
-            repo.getSessionsForToday(studyId, includeNotifications).collect { timelineResource ->
-                (timelineResource as? ResourceResult.Success)?.data?.let { list ->
-                    viewUpdate( list.map { it.toNative() } )
+            repo.getSessionsForToday(studyId, includeAllNotifications, alwaysIncludeNextDay).collect { timelineResource ->
+                (timelineResource as? ResourceResult.Success)?.data?.let { timelineSlice ->
+                    viewUpdate(timelineSlice.toNaive())
                 }
             }
         }
@@ -61,7 +61,15 @@ class NativeTimelineManager(
     }
 }
 
-internal fun ScheduledSessionWindow.toNative() : NativeScheduledSessionWindow =
+internal fun ScheduledSessionTimelineSlice.toNaive() =
+    NativeScheduledSessionTimelineSlice(
+        instantInDay = instantInDay.toNSDate(),
+        timezone = timezone.toNSTimeZone(),
+        scheduledSessionWindows = scheduledSessionWindows.map { it.toNative() },
+        notifications = notifications.map { it.toNative() }
+    )
+
+internal fun ScheduledSessionWindow.toNative() =
     NativeScheduledSessionWindow(
         instanceGuid = instanceGuid,
         eventTimestamp = eventTimeStamp.toString(),
@@ -72,10 +80,9 @@ internal fun ScheduledSessionWindow.toNative() : NativeScheduledSessionWindow =
         hasEndTimeOfDay = hasEndTimeOfDay,
         assessments = assessments.map { it.toNative() },
         sessionInfo = sessionInfo,
-        notifications = notifications?.map { it.toNative() },
     )
 
-internal fun ScheduledAssessmentReference.toNative() : NativeScheduledAssessment =
+internal fun ScheduledAssessmentReference.toNative()  =
     NativeScheduledAssessment(
         instanceGuid = instanceGuid,
         assessmentInfo = assessmentInfo,
@@ -84,7 +91,7 @@ internal fun ScheduledAssessmentReference.toNative() : NativeScheduledAssessment
         adherenceRecords = this.adherenceRecordList?.map { it.toNative() },
     )
 
-internal fun AdherenceRecord.toNative() : NativeAdherenceRecord =
+internal fun AdherenceRecord.toNative()  =
     NativeAdherenceRecord(
         instanceGuid = instanceGuid,
         eventTimestamp = eventTimestamp,
@@ -94,8 +101,9 @@ internal fun AdherenceRecord.toNative() : NativeAdherenceRecord =
         clientData = clientData,
     )
 
-internal fun ScheduledNotification.toNative() : NativeScheduledNotification =
+internal fun ScheduledNotification.toNative()  =
     NativeScheduledNotification(
+        instanceGuid = instanceGuid,
         scheduleOn = scheduleOn.toNSDateComponents(),
         repeatInterval = repeatInterval?.let { period ->
             val components = NSDateComponents()
@@ -108,6 +116,13 @@ internal fun ScheduledNotification.toNative() : NativeScheduledNotification =
         message = message,
     )
 
+data class NativeScheduledSessionTimelineSlice (
+    val instantInDay: NSDate,
+    val timezone: NSTimeZone,
+    val scheduledSessionWindows: List<NativeScheduledSessionWindow>,
+    val notifications: List<NativeScheduledNotification>,
+)
+
 data class NativeScheduledSessionWindow(
     val instanceGuid: String,
     val eventTimestamp: String,
@@ -118,7 +133,6 @@ data class NativeScheduledSessionWindow(
     val hasEndTimeOfDay: Boolean,
     val assessments: List<NativeScheduledAssessment>,
     val sessionInfo: SessionInfo,
-    val notifications: List<NativeScheduledNotification>?,
 )
 
 data class NativeScheduledAssessment(
@@ -139,6 +153,7 @@ data class NativeAdherenceRecord(
 )
 
 data class NativeScheduledNotification(
+    val instanceGuid: String,
     val scheduleOn: NSDateComponents,
     val repeatInterval: NSDateComponents?,
     val allowSnooze: Boolean,

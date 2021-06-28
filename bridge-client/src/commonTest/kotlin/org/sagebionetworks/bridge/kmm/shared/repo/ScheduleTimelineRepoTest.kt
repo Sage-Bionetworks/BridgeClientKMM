@@ -402,7 +402,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val resourceResult = repo.getSessionsForDay("sage-assessment-test", getTodayInstant()).firstOrNull { it is ResourceResult.Success }
 
             assertTrue(resourceResult is ResourceResult.Success)
-            val sessionList = resourceResult.data
+            val sessionList = resourceResult.data.scheduledSessionWindows
             assertNotNull(sessionList)
             assertEquals(3, sessionList.size)
 
@@ -434,13 +434,13 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val resourceResult = repo.getSessionsForDay(
                 "sage-assessment-test",
                 getTodayInstant(),
-                ScheduleTimelineRepo.WindowFilterType.TodayAndNotifications
+                true
             ).firstOrNull { it is ResourceResult.Success }
 
             assertTrue(resourceResult is ResourceResult.Success)
-            val sessionList = resourceResult.data
+            val sessionList = resourceResult.data.scheduledSessionWindows
             assertNotNull(sessionList)
-            assertEquals(9, sessionList.size)
+            assertEquals(3, sessionList.size)
 
             //First session should be the 3 day session that started yesterday
             val session1 = sessionList[0]
@@ -456,7 +456,61 @@ class ScheduleTimelineRepoTest: BaseTest() {
             assertEquals("Daily Sessions", session3.sessionInfo.label)
             assertEquals("-B_yTKp8eTGK7NY_qJ0UTA", session3.instanceGuid)
 
+            val notifications = resourceResult.data.notifications
+            assertNotNull(notifications)
+            assertEquals(9, notifications.size)
+        }
+    }
 
+    @Test
+    fun testScheduledSessionsDay1TodayAndTomorrow() {
+        runTest {
+            val eventTimeStamp = Clock.System.now().minus(DateTimeUnit.DAY, TimeZone.currentSystemDefault())
+            val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
+
+            val resourceResult = repo.getSessionsForDay(
+                "sage-assessment-test",
+                getTodayInstant(),
+                includeAllNotifications = true,
+                alwaysIncludeNextDay = true
+            ).firstOrNull { it is ResourceResult.Success }
+
+            assertTrue(resourceResult is ResourceResult.Success)
+            val sessionList = resourceResult.data.scheduledSessionWindows
+            assertNotNull(sessionList)
+            assertEquals(6, sessionList.size)
+
+            //First session should be the 3 day session that started yesterday
+            val session1 = sessionList[0]
+            assertEquals("One time 3 day session", session1.sessionInfo.label)
+
+            //Second session should have started in current hour
+            val session2 = sessionList[1]
+            assertEquals("Daily Sessions", session2.sessionInfo.label)
+            assertEquals("XlZ3SrLpmEQ2E8PuUUcs7g", session2.instanceGuid)
+
+            //Third session will be starting next hour
+            val session3 = sessionList[2]
+            assertEquals("Daily Sessions", session3.sessionInfo.label)
+            assertEquals("-B_yTKp8eTGK7NY_qJ0UTA", session3.instanceGuid)
+
+            // Next day is shown b/c it was explicitly asked to be included
+
+            val session4 = sessionList[3]
+            assertEquals("Daily Sessions", session4.sessionInfo.label)
+            assertEquals("6YyBNuEPir0Vkd3a-crQbA", session4.instanceGuid)
+
+            val session5 = sessionList[4]
+            assertEquals("Daily Sessions", session5.sessionInfo.label)
+            assertEquals("CDWlxjraDB_yn_jUl0YagA", session5.instanceGuid)
+
+            val session6 = sessionList[5]
+            assertEquals("Daily Sessions", session6.sessionInfo.label)
+            assertEquals("wSFtq35JbCog5s4TXXMNRw", session6.instanceGuid)
+
+            val notifications = resourceResult.data.notifications
+            assertNotNull(notifications)
+            assertEquals(9, notifications.size)
         }
     }
 
@@ -470,7 +524,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val resourceResult = repo.getSessionsForDay("sage-assessment-test", todayInstant).firstOrNull { it is ResourceResult.Success }
 
             assertTrue(resourceResult is ResourceResult.Success)
-            val sessionList = resourceResult.data
+            val sessionList = resourceResult.data.scheduledSessionWindows
             assertNotNull(sessionList)
             assertEquals(5, sessionList.size)
 
@@ -512,7 +566,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val todayInstant = getTodayInstant().plus(90, DateTimeUnit.MINUTE, TimeZone.currentSystemDefault())
             val resourceResult = repo.getSessionsForDay(studyId, todayInstant).firstOrNull { it is ResourceResult.Success }
             assertTrue(resourceResult is ResourceResult.Success)
-            val sessionList = resourceResult.data
+            val sessionList = resourceResult.data.scheduledSessionWindows
             assertNotNull(sessionList)
             assertEquals(6, sessionList.size)
 
@@ -560,7 +614,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val resourceResult = repo.getSessionsForDay("sage-assessment-test", getTodayInstant()).firstOrNull { it is ResourceResult.Success }
 
             assertTrue(resourceResult is ResourceResult.Success)
-            val sessionList = resourceResult.data
+            val sessionList = resourceResult.data.scheduledSessionWindows
             assertNotNull(sessionList)
             assertEquals(2, sessionList.size)
 
@@ -587,7 +641,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
             repo.adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)
             val resourceResult = repo.getSessionsForDay(studyId, getTodayInstant()).firstOrNull { it is ResourceResult.Success }
             assertTrue(resourceResult is ResourceResult.Success)
-            val sessionList = resourceResult.data
+            val sessionList = resourceResult.data.scheduledSessionWindows
             assertNotNull(sessionList)
             assertEquals(2, sessionList.size)
 
@@ -613,7 +667,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val resourceResult = repo.getSessionsForDay("sage-assessment-test", getTodayInstant()).firstOrNull { it is ResourceResult.Success }
 
             assertTrue(resourceResult is ResourceResult.Success)
-            val sessionList = resourceResult.data
+            val sessionList = resourceResult.data.scheduledSessionWindows
             assertNotNull(sessionList)
             assertTrue(sessionList.isEmpty())
         }

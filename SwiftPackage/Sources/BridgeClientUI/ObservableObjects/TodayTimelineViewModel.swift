@@ -40,7 +40,7 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
     
     @Published open var today: Date = Date()
     @Published open var studyId: String?
-    @Published open var sessions: [TimelineSession] = []
+    @Published open var sessions: [TimelineSession] = [] 
     
     /// A flag that can be used to set whether or not a view is presenting the assessment. How the assessment is
     /// presented is up to the views built specifically for a given application.
@@ -59,7 +59,7 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
         
     private var schedules: [NativeScheduledSessionWindow] = [] {
         didSet {
-            let newSessions: [TimelineSession] = schedules.map { schedule in
+            let newSessions: [TimelineSession] = schedules.compactMap { schedule in
                 guard let existingSession = self.sessions.first(where: { $0.instanceGuid == schedule.instanceGuid })
                 else {
                     return TimelineSession(schedule)
@@ -112,9 +112,11 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
         self.bridgeManager = bridgeManager
         self.studyId = bridgeManager.studyId ?? "preview"
         if !bridgeManager.isPreview {
-            self.timelineManager = NativeTimelineManager(studyId: studyId!) { schedules in
+            self.timelineManager = NativeTimelineManager(studyId: studyId!, includeAllNotifications: true, alwaysIncludeNextDay: true) { timelineSlice in
                 DispatchQueue.main.async {
-                    self.schedules = schedules
+                    self.today = timelineSlice.instantInDay
+                    self.schedules = timelineSlice.scheduledSessionWindows
+                    // TODO: syoung 06/28/2021 Set up notifications
                 }
             }
             self.timelineManager.observeTodaySchedule()

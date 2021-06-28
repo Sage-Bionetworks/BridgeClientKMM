@@ -50,13 +50,7 @@ extension Date {
     
     public func localizeDate(hasTimeOfDay: Bool) -> String {
         if !hasTimeOfDay {
-            if self.isTomorrow {
-                return NSLocalizedString("tomorrow", comment: "")
-            }
-            else {
-                return String.localizedStringWithFormat(NSLocalizedString("on %@", comment: ""),
-                                                        DateFormatter.localizedString(from: self, dateStyle: .medium, timeStyle: .none))
-            }
+            return DateFormatter.localizedString(from: self, dateStyle: .medium, timeStyle: .none)
         }
         else if self.isToday {
             return String.localizedStringWithFormat(NSLocalizedString("today at %@", comment: ""),

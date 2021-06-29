@@ -43,6 +43,8 @@ open class DataArchive : NSObject {
     
     public final internal(set) var isCompleted: Bool = false
     
+    public final private(set) var encryptedURL: URL?
+    
     public var files: [FileEntry] {
         archiver.files
     }
@@ -66,8 +68,10 @@ open class DataArchive : NSObject {
         try archiver.addFile(data: data, filepath: filepath, createdOn: createdOn, contentType: contentType)
     }
     
+    @discardableResult
     public final func encryptArchive(using pemFile: String) throws -> URL {
-        try archiver.encryptArchive(using: pemFile)
+        self.encryptedURL = try archiver.encryptArchive(using: pemFile)
+        return self.encryptedURL!
     }
     
     #if DEBUG

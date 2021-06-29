@@ -142,10 +142,25 @@ public final class BridgeClientAppManager : ObservableObject {
     }
     
     public func encryptAndUpload(_ archives: [DataArchive]) {
-        DispatchQueue.main.async {
-            self.isUploadingResults = true
-            // TODO: syoung 06/17/2021 Figure out what needs to happen to allow uploading files to S3.
-            // Note: This will have to dispatch to the main queue before accessing the Kotlin framework.
+        DispatchQueue.global().async {
+
+            // Encrypt the files.
+            if let path = Bundle.main.path(forResource: self.platformConfig.appId, ofType: "pem"),
+               let pemFile = try? String(contentsOfFile: path, encoding: .utf8) {
+                archives.forEach { archive in
+                    do {
+                        try archive.encryptArchive(using: pemFile)
+                    } catch let err {
+                        print("Failed to encrypt archive. \(err)")
+                    }
+                }
+            }
+
+            DispatchQueue.main.async {
+                self.isUploadingResults = true
+                // TODO: syoung 06/17/2021 Figure out what needs to happen to allow uploading files to S3.
+                // Note: This will have to dispatch to the main queue before accessing the Kotlin framework.
+            }
         }
     }
 }

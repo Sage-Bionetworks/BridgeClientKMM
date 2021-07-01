@@ -62,8 +62,11 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
     ): Flow<ResourceResult<List<ScheduledSessionWindow>>> {
         return combine(
             getTimeline(studyId),
-            activityEventsRepo.getActivityEvents(studyId)
-        ) { timeLineResource, eventsResource ->
+            activityEventsRepo.getActivityEvents(studyId),
+            //Need to include call to get AdherenceRecords as part of the combine.
+            //This will trigger the flow to emit a new value anytime the AdherenceRecords change.
+            adherenceRecordRepo.getAllCachedAdherenceRecords(studyId)
+        ) { timeLineResource, eventsResource, adherenceRecords ->
             extractSessionsForDay(
                 timeLineResource,
                 eventsResource,

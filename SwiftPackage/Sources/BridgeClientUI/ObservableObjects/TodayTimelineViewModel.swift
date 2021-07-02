@@ -54,9 +54,7 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
     /// task view controller delegate and the SwiftUI requirement that views and view builders are structs.
     ///
     public var selectedAssessment: AssessmentScheduleInfo?
-    
-    internal func now() -> Date { Date() }
-        
+            
     private var schedules: [NativeScheduledSessionWindow] = [] {
         didSet {
             let newSessions: [TimelineSession] = schedules.map { schedule in
@@ -92,7 +90,12 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
     public override init() {
         super.init()
         NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: .main) { _ in
-            self.refreshSchedules()
+            let now = Date()
+            self.sessions.forEach { $0.updateState(now) }
+            if !self.today.isToday {
+                self.today = now
+                self.refreshSchedules()
+            }
         }
     }
     
@@ -112,13 +115,14 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
         self.bridgeManager = bridgeManager
         self.studyId = bridgeManager.studyId ?? "preview"
         if !bridgeManager.isPreview {
-            self.timelineManager = NativeTimelineManager(studyId: studyId!) { schedules in
+            self.timelineManager = NativeTimelineManager(studyId: studyId!, includeAllNotifications: true, alwaysIncludeNextDay: true) { timelineSlice in
                 DispatchQueue.main.async {
-                    self.schedules = schedules
+                    self.today = timelineSlice.instantInDay
+                    self.schedules = timelineSlice.scheduledSessionWindows
+                    // TODO: syoung 06/28/2021 Set up notifications
                 }
             }
             self.timelineManager.observeTodaySchedule()
-            // TODO: syoung 06/11/2021 Setup background process to trigger at start of "tomorrow" (and figure out when "tomorrow" starts)
         }
         else {
             self.schedules = previewSchedules
@@ -252,4 +256,3 @@ extension TodayTimelineViewModel : RSDTaskViewControllerDelegate {
         }
     }
 }
-

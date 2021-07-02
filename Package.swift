@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "BridgeClient",
     platforms: [
-        .iOS(.v13)
+        .iOS(.v14)
     ],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
@@ -22,13 +22,18 @@ let package = Package(
         // .package(url: /* package url */, from: "1.0.0"),
         .package(name: "SharedMobileUI",
                  url: "https://github.com/Sage-Bionetworks/SharedMobileUI-AppleOS.git",
-                 from: "0.1.0"),
+                 from: "0.5.0"),
         .package(name: "BridgeArchiver",
                  url: "https://github.com/Sage-Bionetworks/BridgeArchiver-Swift.git",
-                 from: "0.1.0"),
+                 from: "0.3.0"),
+        .package(name: "SageResearch",
+                 url: "https://github.com/Sage-Bionetworks/SageResearch.git",
+                 from: "4.1.5"),
+        .package(name: "JsonModel",
+                 url: "https://github.com/Sage-Bionetworks/JsonModel-Swift.git",
+                 from: "1.2.0"),
         // TODO: syoung 04/13/2021 Add AssessmentModel-KotlinNative once that repo is set up
         // to build the xcframework when the version is updated.
-        // TODO: syoung 06/08/2021 Add SageResearch once MobileToolbox is set up to use SwiftPM
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -40,6 +45,8 @@ let package = Package(
                     "BridgeClient",
                     "SharedMobileUI",
                     "BridgeArchiver",
+                    "JsonModel",
+                    .product(name: "Research", package: "SageResearch"),
                 ],
                 path: "SwiftPackage/Sources/BridgeClientUI")
     ]

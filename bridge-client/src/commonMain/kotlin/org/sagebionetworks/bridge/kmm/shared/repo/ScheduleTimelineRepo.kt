@@ -159,6 +159,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
             instantInDay,
             studyId,
             if (includeAllNotifications) WindowFilterType.TodayAndNotifications else WindowFilterType.Today,
+            alwaysIncludeNextDay,
             timezone
         ).sortedBy { it.startDateTime }
 
@@ -210,6 +211,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         instantInDay: Instant,
         studyId: String,
         filterType: WindowFilterType,
+        alwaysIncludeNextDay: Boolean,
         timezone: TimeZone,
     ): List<ScheduledSessionWindow> {
 
@@ -240,6 +242,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
                     createScheduledSessionWindow(
                         scheduledSession,
                         filterType,
+                        alwaysIncludeNextDay,
                         day,
                         instantInDay,
                         daysSince,
@@ -256,7 +259,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
     }
 
     // Work-around for Kotlin not having inout variables. syoung 06/25/2021
-    private class FoundWindowState(var found: Boolean = false)
+    private class FoundWindowState(var foundToday: Boolean = false, var nextDay: LocalDate? = null)
 
     internal enum class WindowFilterType {
         Future, Past, Today, Notifications, TodayAndNotifications;
@@ -276,6 +279,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
     private fun createScheduledSessionWindow(
         scheduledSession: ScheduledSession,
         filterType: WindowFilterType,
+        alwaysIncludeNextDay: Boolean,
         day: LocalDate,
         instantInDay: Instant,
         daysSince: Int,
@@ -291,9 +295,11 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
             scheduledSession.startDay >= daysSince && !session.notifications.isNullOrEmpty()
         fun rulesForAvailableToday() =
             (daysSince in scheduledSession.startDay..scheduledSession.endDay)
-        fun rulesForToday() =
-            if (foundState.found) rulesForAvailableToday() else { scheduledSession.endDay >= daysSince }
-
+        fun rulesForToday(startDate: LocalDate? = null) = when {
+            foundState.foundToday && !alwaysIncludeNextDay -> rulesForAvailableToday()
+            startDate != null && foundState.nextDay != null -> startDate <= foundState.nextDay!!
+            else -> scheduledSession.endDay >= daysSince
+        }
         // Exit early if this schedule is not in the range that we are looking for
         if (!when (filterType) {
             WindowFilterType.Notifications -> rulesForNotifications()
@@ -335,9 +341,12 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         }
 
         // If we are filtering for today schedules and one was found that is available today
-        // but *not* available NOW then track that and do not include future dates.
+        // but *not* available NOW then track that.
         if (rulesForAvailableToday() && startInstant > instantInDay) {
-            foundState.found = true
+            foundState.foundToday = true
+        } else if (alwaysIncludeNextDay && startDate > day &&
+            (foundState.nextDay == null || foundState.nextDay!! > startDate)) {
+            foundState.nextDay = startDate
         }
 
         // Convert notifications
@@ -347,7 +356,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         // Exit early if this is only getting future notifications and there aren't any.
         if (notifications.isNullOrEmpty() &&
             filterType.isNotifications() &&
-            (!filterType.isToday() || !rulesForToday())) {
+            (!filterType.isToday() || !rulesForToday(startDate))) {
             return null
         }
 

@@ -40,7 +40,7 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
     
     @Published open var today: Date = Date()
     @Published open var studyId: String?
-    @Published open var sessions: [TimelineSession] = [] 
+    @Published open var sessions: [TimelineSession] = []
     
     /// A flag that can be used to set whether or not a view is presenting the assessment. How the assessment is
     /// presented is up to the views built specifically for a given application.
@@ -254,4 +254,3 @@ extension TodayTimelineViewModel : RSDTaskViewControllerDelegate {
         }
     }
 }
-

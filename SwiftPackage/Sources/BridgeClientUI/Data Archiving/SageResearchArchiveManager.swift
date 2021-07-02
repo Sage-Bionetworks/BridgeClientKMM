@@ -246,7 +246,7 @@ open class SageResearchResultArchive : AbstractResultArchive, RSDDataArchive {
         true
     }
     
-    open func archivableData(for result: RSDResult, sectionIdentifier: String?, stepPath: String?) -> RSDArchivable? {
+    open func archivableData(for result: ResultData, sectionIdentifier: String?, stepPath: String?) -> RSDArchivable? {
         result as? RSDArchivable
     }
     

@@ -47,6 +47,7 @@ let package = Package(
                     "BridgeArchiver",
                     "JsonModel",
                     .product(name: "Research", package: "SageResearch"),
+                    .product(name: "ResearchUI", package: "SageResearch"),
                 ],
                 path: "SwiftPackage/Sources/BridgeClientUI")
     ]

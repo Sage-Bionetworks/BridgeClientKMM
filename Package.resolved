@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/Sage-Bionetworks/BridgeArchiver-Swift.git",
         "state": {
           "branch": null,
-          "revision": "5dc7b0d00d568fbdb4a32993bc18bd55c82a9de4",
-          "version": "0.1.0"
+          "revision": "f1f0c4a9f177b13315bae618db186c12ecbc5bdb",
+          "version": "0.3.0"
         }
       },
       {
@@ -20,12 +20,39 @@
         }
       },
       {
+        "package": "JsonModel",
+        "repositoryURL": "https://github.com/Sage-Bionetworks/JsonModel-Swift.git",
+        "state": {
+          "branch": null,
+          "revision": "531fbb91179d9272d4fbb389a5c6516ead9d8fd7",
+          "version": "1.2.2"
+        }
+      },
+      {
+        "package": "MobilePassiveData",
+        "repositoryURL": "https://github.com/Sage-Bionetworks/MobilePassiveData-SDK.git",
+        "state": {
+          "branch": null,
+          "revision": "57ba7124b3e27db895410f237b1ced4d51e71a10",
+          "version": "1.1.1"
+        }
+      },
+      {
+        "package": "SageResearch",
+        "repositoryURL": "https://github.com/Sage-Bionetworks/SageResearch.git",
+        "state": {
+          "branch": null,
+          "revision": "877baa4d304bb8400bfc60fb05068ef830d266aa",
+          "version": "4.1.5"
+        }
+      },
+      {
         "package": "SharedMobileUI",
         "repositoryURL": "https://github.com/Sage-Bionetworks/SharedMobileUI-AppleOS.git",
         "state": {
           "branch": null,
-          "revision": "0fefce5ae5237be1718f4b00f7257df847584b2a",
-          "version": "0.1.0"
+          "revision": "ceecf49b32f3d1f33eb4f17aef66ffc2ea987201",
+          "version": "0.5.0"
         }
       },
       {

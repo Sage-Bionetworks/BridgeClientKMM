@@ -62,10 +62,7 @@ public final class TimelineSession : ObservableObject, Identifiable {
     
     /// The assessments included in this session.
     @Published public var assessments: [TimelineAssessment]
-    
-    /// Whether or not the entire session is completed.
-    @Published public var isCompleted: Bool = false
-    
+
     /// The ``state`` is used allow SwiftUI to respond in a performant way to what is essentially a
     /// cascading if statement about the state of the session.
     @Published public var state: SessionState = .upNext
@@ -81,20 +78,25 @@ public final class TimelineSession : ObservableObject, Identifiable {
     ///         to the ``state`` of the session window.
     public var dateString: String = ""
     
+    /// A timer that is fired when this session is going to change state based on the current time.
+    private var updateTimer: Timer?
+    
     public init(_ window: NativeScheduledSessionWindow) {
         self.window = window
         self.assessments = window.assessments.map { TimelineAssessment($0) }
         self.updateState()
     }
     
-    /// Update the session ``state``, completion status, and the status of each assessment.
+    /// Update the session ``state``.
     public func updateState(_ now: Date = Date()) {
+        
+        // Determine availability.
         let availableNow = window.availableNow(now)
         let isExpired = window.isExpired(now)
         let performInOrder = window.performInOrder
         var found = false
         var finishedOn: Date?
-        self.isCompleted = self.assessments.reduce(true) { (initial, assessment) in
+        let isCompleted = self.assessments.reduce(true) { (initial, assessment) in
             let isNext = !found && !assessment.isCompleted
             assessment.isEnabled = availableNow && (!performInOrder || isNext)
             if isNext { found = true }
@@ -104,6 +106,13 @@ public final class TimelineSession : ObservableObject, Identifiable {
             }
             return initial && assessment.isCompleted
         }
+        
+        // Set up the session state and timer.
+        setupSessionState(availableNow: availableNow, isExpired: isExpired, isCompleted: isCompleted, finishedOn: finishedOn)
+        setupTimer(now)
+    }
+    
+    private func setupSessionState(availableNow: Bool, isExpired: Bool, isCompleted: Bool, finishedOn: Date?) {
         if window.persistent && availableNow {
             self.dateString = window.dueDateString
             self.state = .availableNow
@@ -125,4 +134,28 @@ public final class TimelineSession : ObservableObject, Identifiable {
             self.state = .availableNow
         }
     }
+    
+    /// The timer is used to update the session state when it's going to change due to a date-time trigger.
+    private func setupTimer(_ now: Date) {
+        // Set up a timer to update the
+        updateTimer?.invalidate()
+        if self.state == .availableNow, window.endDateTime != .distantFuture {
+            let timeInterval = window.endDateTime.timeIntervalSince(now) + 1
+            updateTimer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: false) { [weak self] _ in
+                self?.state = .expired
+            }
+        }
+        else if self.state == .upNext {
+            let timeInterval = window.startDateTime.timeIntervalSince(now) + 1
+            updateTimer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: false) { [weak self] _ in
+                guard let strongSelf = self else { return }
+                strongSelf.dateString = strongSelf.window.dueDateString
+                strongSelf.state = .availableNow
+            }
+        }
+        else {
+            updateTimer = nil
+        }
+    }
 }
+

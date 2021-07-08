@@ -112,6 +112,7 @@ internal fun ScheduledNotification.toNative()  =
             components.day = period.days.toLong()
             components.month = period.months.toLong()
             components },
+        repeatUntil = repeatUntil?.toNSDateComponents(),
         allowSnooze = allowSnooze,
         message = message,
     )
@@ -156,6 +157,7 @@ data class NativeScheduledNotification(
     val instanceGuid: String,
     val scheduleOn: NSDateComponents,
     val repeatInterval: NSDateComponents?,
+    val repeatUntil: NSDateComponents?,
     val allowSnooze: Boolean,
     val message: NotificationMessage?,
 )

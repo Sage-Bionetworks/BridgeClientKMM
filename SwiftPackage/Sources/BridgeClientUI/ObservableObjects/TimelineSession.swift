@@ -33,6 +33,8 @@
 import SwiftUI
 import BridgeClient
 
+/// The `TimelineSession` is an `ObservableObject` that wraps a Kotlin Native
+/// ``NativeScheduledSessionWindow``.
 public final class TimelineSession : ObservableObject, Identifiable {
     public final var id: String {
         self.window.instanceGuid
@@ -42,6 +44,7 @@ public final class TimelineSession : ObservableObject, Identifiable {
         self.window.instanceGuid
     }
     
+    /// The Kotlin Native session window information that backs this object.
     public var window: NativeScheduledSessionWindow {
         didSet {
             let newAssessments: [TimelineAssessment] = window.assessments.map { nativeAssessment in
@@ -57,15 +60,26 @@ public final class TimelineSession : ObservableObject, Identifiable {
         }
     }
     
+    /// The assessments included in this session.
     @Published public var assessments: [TimelineAssessment]
+    
+    /// Whether or not the entire session is completed.
     @Published public var isCompleted: Bool = false
+    
+    /// The ``state`` is used allow SwiftUI to respond in a performant way to what is essentially a
+    /// cascading if statement about the state of the session.
     @Published public var state: SessionState = .upNext
     
-    public var dateString: String = ""
-    
+    /// A simple, `Identifiable` enum for describing the session state.
     public enum SessionState : Int, CaseIterable {
         case completed, expired, availableNow, upNext
     }
+    
+    /// The current text to display for the section header based on the ``state``.
+    ///
+    /// - Note: This is *not* published b/c this should only ever change in association with a change
+    ///         to the ``state`` of the session window.
+    public var dateString: String = ""
     
     public init(_ window: NativeScheduledSessionWindow) {
         self.window = window
@@ -73,6 +87,7 @@ public final class TimelineSession : ObservableObject, Identifiable {
         self.updateState()
     }
     
+    /// Update the session ``state``, completion status, and the status of each assessment.
     public func updateState(_ now: Date = Date()) {
         let availableNow = window.availableNow(now)
         let isExpired = window.isExpired(now)

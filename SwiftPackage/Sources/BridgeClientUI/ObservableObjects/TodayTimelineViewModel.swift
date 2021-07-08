@@ -33,8 +33,6 @@
 import SwiftUI
 import BridgeClient
 import JsonModel
-import Research
-import ResearchUI
 
 open class TodayTimelineViewModel : NSObject, ObservableObject {
     
@@ -90,17 +88,34 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
     public override init() {
         super.init()
         NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: .main) { _ in
-            let now = Date()
-            self.sessions.forEach { $0.updateState(now) }
-            if !self.today.isToday {
-                self.today = now
-                self.refreshSchedules()
-            }
+            self.updateSessionState()
         }
     }
     
     deinit {
         timelineManager?.onCleared()
+        updateTimer?.invalidate()
+    }
+    
+    /// Filter the ``sessions`` and return only those sessions that should be shown for a given ``state``.
+    open func filterSchedules(for state: TimelineSession.SessionState) -> [TimelineSession] {
+        var todayFound: Bool = false
+        return sessions.filter {
+            guard $0.state == state else { return false }
+            switch $0.state {
+            case .availableNow:
+                return true
+            case .upNext:
+                if $0.window.startDateTime.isToday {
+                    todayFound = true
+                    return true
+                } else {
+                    return !todayFound
+                }
+            default:
+                return false
+            }
+        }
     }
     
     /// Called by the view that owns this view model so that it can set up the view on appearance.
@@ -109,7 +124,7 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
     /// initialization.
     /// 
     /// - Parameter bridgeManager: The bridge manager for this app.
-    public final func onAppear(bridgeManager: BridgeClientAppManager, previewSchedules: [NativeScheduledSessionWindow] = []) {
+    open func onAppear(bridgeManager: BridgeClientAppManager, previewSchedules: [NativeScheduledSessionWindow] = []) {
         guard self.bridgeManager == nil else { return }
         
         self.bridgeManager = bridgeManager
@@ -119,7 +134,11 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
                 DispatchQueue.main.async {
                     self.today = timelineSlice.instantInDay
                     self.schedules = timelineSlice.scheduledSessionWindows
-                    // TODO: syoung 06/28/2021 Set up notifications
+                    // syoung 07/08/2021 Ideally, we will get to a point where the database does work to parse
+                    // the timeline and allow using a separate manager for getting the notifications. For now,
+                    // since this is a somewhat expensive operation, return the notifications with the "today"
+                    // schedules.
+                    self.bridgeManager.localNotificationManager.setupNotifications(timelineSlice.notifications)
                 }
             }
             self.timelineManager.observeTodaySchedule()
@@ -128,6 +147,22 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
             self.schedules = previewSchedules
         }
     }
+    
+    private func updateSessionState() {
+        let now = Date()
+        self.sessions.forEach { $0.updateState(now) }
+        if !self.today.isToday {
+            self.today = now
+            self.refreshSchedules()
+        }
+    }
+    
+    private func scheduleNextUpdate() {
+        updateTimer?.invalidate()
+
+    }
+    
+    private var updateTimer: Timer?
     
     /// Force a refresh of the schedules.
     open func refreshSchedules() {
@@ -188,71 +223,3 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
     }
 }
 
-
-extension TodayTimelineViewModel : RSDTaskViewControllerDelegate {
-    
-    open func taskController(_ taskController: RSDTaskController, didFinishWith reason: RSDTaskFinishReason, error: Error?) {
-        
-        // Dismiss the view
-        self.isPresentingAssessment = false
-        
-        if reason != .completed {
-            // If the task finished with an error or discarded results, then delete the output directory.
-            taskController.taskViewModel.deleteOutputDirectory(error: error)
-            if let err = error {
-                debugPrint("WARNING! Task failed: \(err)")
-            }
-        }
-
-        // Update the adherence record
-        guard let schedule = findAssessmentScheduleInfo(taskController.taskViewModel)
-        else {
-            print("WARNING! Could not find a schedule to update.")
-            return
-        }
-        
-        let taskResult = taskController.taskViewModel.taskResult
-        let clientData = (taskController.task as? RSDTrackingTask)?.taskData(for: taskResult)?.json
-        let endedOn = (reason == .completed) ? taskResult.endDate : nil
-        let declined = (reason == .earlyExit)
-        
-        self.updateAdherenceRecord(scheduleInfo: schedule,
-                                   startedOn: taskResult.startDate,
-                                   endedOn: endedOn,
-                                   declined: declined,
-                                   clientData: clientData)
-    }
-    
-    open func taskController(_ taskController: RSDTaskController, readyToSave taskViewModel: RSDTaskViewModel) {
-        let schedule = findAssessmentScheduleInfo(taskController.taskViewModel)
-        sageResearchArchiveManager.archiveAndUpload(taskController.taskViewModel, schedule: schedule)
-    }
-    
-    public func scheduleIdentifier(for schedule: AssessmentScheduleInfo) -> String {
-        "\(schedule.session.instanceGuid)|\(schedule.instanceGuid)"
-    }
-    
-    fileprivate func findAssessmentScheduleInfo(_ taskViewModel: RSDTaskViewModel) -> AssessmentScheduleInfo? {
-        if let scheduleId = taskViewModel.scheduleIdentifier {
-            let parts = scheduleId.split(separator: "|")
-            guard parts.count == 2, let sessionGuid = parts.first, let assessmentGuid = parts.last
-            else {
-                return self.selectedAssessment
-            }
-            if let selected = self.selectedAssessment,
-               selected.instanceGuid == assessmentGuid,
-               selected.session.instanceGuid == sessionGuid {
-                return selected
-            }
-            else if let (session, assessment) = self.findTimelineModel(sessionGuid: String(sessionGuid), assessmentGuid: String(assessmentGuid)) {
-                return .init(session: session.window, assessment: assessment.assessment)
-            }
-            else {
-                return self.selectedAssessment
-            }
-        }
-        else {
-            return self.selectedAssessment
-        }
-    }
-}

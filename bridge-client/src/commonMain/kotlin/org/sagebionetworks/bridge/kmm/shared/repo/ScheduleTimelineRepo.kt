@@ -369,7 +369,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
             event = event,
             startDateTime = startDateTime,
             endDateTime = endDateTime,
-            notifications = if (notifications.isNullOrEmpty()) null else notifications
+            notifications = if (notifications.isNullOrEmpty()) null else notifications!!.sortedBy { it.scheduleOn }
         )
     }
 
@@ -405,10 +405,11 @@ internal fun NotificationInfo.scheduleAt(instanceGuid: String,
     // Get the first notification trigger
     val timeZone = TimeZone.currentSystemDefault()
     val period = this.offset?.let { DateTimePeriod.parse(it) } ?: DateTimePeriod()
+    val lastInstant = endDateTime.toInstant(timeZone)
     var firstInstant = if (notifyAt == NotificationType.AFTER_WINDOW_START) {
         startDateTime.toInstant(timeZone).plus(period, timeZone)
     } else {
-        endDateTime.toInstant(timeZone).minus(period, timeZone)
+        lastInstant.minus(period, timeZone)
     }
 
     // If there is an interval, move the firstInstant forward to after the current time
@@ -426,6 +427,7 @@ internal fun NotificationInfo.scheduleAt(instanceGuid: String,
         instanceGuid,
         firstInstant.toLocalDateTime(timeZone),
         intervalPeriod,
+        if (intervalPeriod ==null) null else lastInstant.toLocalDateTime(timeZone),
         allowSnooze ?: false,
         message
     )
@@ -487,6 +489,7 @@ data class ScheduledNotification(
     val instanceGuid: String,
     val scheduleOn: LocalDateTime,
     val repeatInterval: DateTimePeriod?,
+    val repeatUntil: LocalDateTime?,
     val allowSnooze: Boolean,
     val message: NotificationMessage?,
 )

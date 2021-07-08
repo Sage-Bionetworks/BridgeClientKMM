@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
@@ -19,24 +20,21 @@ sqldelight {
     }
 }
 
+val iosFrameworkName = "BridgeClient"
+
 kotlin {
     android {
         publishAllLibraryVariants()
     }
-    // Block from https://github.com/cashapp/sqldelight/issues/2044#issuecomment-721299517.
-    val iOSTargetName  = System.getenv("SDK_NAME") ?: project.findProperty("XCODE_SDK_NAME") as? String ?: "iphonesimulator"
-    val iOSTarget: (String, KotlinNativeTarget.() -> Unit) -> KotlinNativeTarget =
-        if (iOSTargetName.startsWith("iphoneos"))
-            ::iosArm64
-        else
-            ::iosX64
-    iOSTarget("ios") {
+
+    ios {
         binaries {
             framework {
-                baseName = "BridgeClient"
+                baseName = iosFrameworkName
             }
         }
     }
+
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -136,16 +134,46 @@ publishing {
     }
 }
 
-val packForXcode by tasks.creating(Sync::class) {
+//region XcFramework tasks
+val xcFrameworkPath = "build/xcframework/$iosFrameworkName.xcframework"
+val swiftPMPath = "${project.rootDir}/SwiftPackage/Binaries/$iosFrameworkName.xcframework"
+
+tasks.create<Delete>("deleteSwiftPMFramework") { delete = setOf(swiftPMPath) }
+tasks.create<Delete>("deleteXcFramework") { delete = setOf(xcFrameworkPath) }
+
+val buildXcFramework by tasks.registering {
+    val isSwiftPM = (project.findProperty("SWIFT_PM") == "true")
+    if (isSwiftPM) {
+        dependsOn("deleteSwiftPMFramework")
+    } else {
+        dependsOn("deleteXcFramework")
+    }
     group = "build"
-    val mode = System.getenv("CONFIGURATION") ?: project.findProperty("XCODE_CONFIGURATION") as? String ?: "DEBUG"
-    val sdkName = System.getenv("SDK_NAME") ?: project.findProperty("XCODE_SDK_NAME") as? String ?: "iphonesimulator"
-    val targetName = "ios"// + if (sdkName.startsWith("iphoneos")) "Arm64" else "X64"
-    val framework = kotlin.targets.getByName<KotlinNativeTarget>(targetName).binaries.getFramework(mode)
+    val defaultMode = if (isSwiftPM) "RELEASE" else "DEBUG"
+    val mode = System.getenv("CONFIGURATION") ?: project.findProperty("XCODE_CONFIGURATION") as? String ?: defaultMode
+    val frameworks = arrayOf("iosArm64", "iosX64")
+        .map { kotlin.targets.getByName<KotlinNativeTarget>(it).binaries.getFramework(mode) }
     inputs.property("mode", mode)
-    dependsOn(framework.linkTask)
-    val targetDir = File(buildDir, "xcode-frameworks")
-    from({ framework.outputDirectory })
-    into(targetDir)
+    dependsOn(frameworks.map { it.linkTask })
+    doLast { buildXcFramework(frameworks, isSwiftPM) }
 }
-tasks.getByName("build").dependsOn(packForXcode)
+
+fun buildXcFramework(frameworks: List<Framework>, isSwiftPM: Boolean) {
+    val buildArgs: () -> List<String> = {
+        val arguments = mutableListOf("-create-xcframework")
+        frameworks.forEach {
+            arguments += "-framework"
+            arguments += "${it.outputDirectory}/${it.baseName}.framework"
+            arguments += "-debug-symbols"
+            arguments += "${it.outputDirectory}/${it.baseName}.framework.dSYM"
+        }
+        arguments += "-output"
+        arguments += if (isSwiftPM) swiftPMPath else xcFrameworkPath
+        arguments
+    }
+    exec {
+        executable = "xcodebuild"
+        args = buildArgs()
+    }
+}
+//endregion

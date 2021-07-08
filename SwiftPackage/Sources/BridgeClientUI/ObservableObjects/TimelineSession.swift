@@ -74,8 +74,8 @@ public final class TimelineSession : ObservableObject, Identifiable {
     }
     
     public func updateState(_ now: Date = Date()) {
-        let availableNow = window.availableNow()
-        let isExpired = window.isExpired()
+        let availableNow = window.availableNow(now)
+        let isExpired = window.isExpired(now)
         let performInOrder = window.performInOrder
         var found = false
         var finishedOn: Date?

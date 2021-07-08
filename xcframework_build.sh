@@ -4,5 +4,4 @@
 #  iosApp
 # 
 
-./gradlew :bridge-client:buildXcFramework -PSWIFT_PM="true"
-
+./gradlew :bridge-client:buildXcFramework -PXCFRAMEWORK="true" -PSWIFT_PM="true" 

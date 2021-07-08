@@ -417,11 +417,17 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val session2 = sessionList[1]
             assertEquals("Daily Sessions", session2.sessionInfo.label)
             assertEquals("XlZ3SrLpmEQ2E8PuUUcs7g", session2.instanceGuid)
+            assertFalse(session2.isInPast(getTodayInstant()))
+            assertTrue(session2.isAvailableNow(getTodayInstant()))
+            assertFalse(session2.isInFuture(getTodayInstant()))
 
             //Third session will be starting next hour
             val session3 = sessionList[2]
             assertEquals("Daily Sessions", session3.sessionInfo.label)
             assertEquals("-B_yTKp8eTGK7NY_qJ0UTA", session3.instanceGuid)
+            assertFalse(session3.isInPast(getTodayInstant()))
+            assertFalse(session3.isAvailableNow(getTodayInstant()))
+            assertTrue(session3.isInFuture(getTodayInstant()))
         }
     }
 

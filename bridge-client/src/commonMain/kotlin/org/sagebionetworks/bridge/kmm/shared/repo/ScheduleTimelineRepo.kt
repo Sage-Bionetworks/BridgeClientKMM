@@ -365,8 +365,6 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
             sessionInfo = session,
             assessments = assessments,
             event = event,
-            isExpired = isExpired,
-            isCompleted = isCompleted,
             startDateTime = startDateTime,
             endDateTime = endDateTime,
             notifications = if (notifications.isNullOrEmpty()) null else notifications
@@ -447,8 +445,6 @@ data class ScheduledSessionWindow (
     val event: StudyActivityEvent,
     val startDateTime: LocalDateTime,
     val endDateTime: LocalDateTime,
-    val isExpired: Boolean,
-    val isCompleted: Boolean,
     val assessments: List<ScheduledAssessmentReference>,
     val sessionInfo: SessionInfo,
     val notifications: List<ScheduledNotification>?,
@@ -458,6 +454,22 @@ data class ScheduledSessionWindow (
     val hasStartTimeOfDay = startDateTime.hour == 0 && startDateTime.minute == 0
     val hasEndTimeOfDay = scheduledSession.expiration.let { it.hours > 0 || it.minutes > 0 }
     val persistent = scheduledSession.persistent
+    val isCompleted = assessments.all { it.isCompleted }
+
+    fun isAvailableNow(now: Instant = Clock.System.now()): Boolean {
+        val timeZone = TimeZone.currentSystemDefault()
+        return startDateTime.toInstant(timeZone) <= now && now < endDateTime.toInstant(timeZone)
+    }
+
+    fun isInFuture(now: Instant = Clock.System.now()): Boolean {
+        val timeZone = TimeZone.currentSystemDefault()
+        return startDateTime.toInstant(timeZone) > now
+    }
+
+    fun isInPast(now: Instant = Clock.System.now()): Boolean {
+        val timeZone = TimeZone.currentSystemDefault()
+        return endDateTime.toInstant(timeZone) < now
+    }
 }
 
 data class ScheduledAssessmentReference (

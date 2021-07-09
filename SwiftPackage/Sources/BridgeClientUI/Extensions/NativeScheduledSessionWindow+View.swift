@@ -53,7 +53,7 @@ extension NativeScheduledSessionWindow {
     }
     
     public var dueDateString: String {
-        endDateTime.localizeDate(hasTimeOfDay: hasEndTimeOfDay)
+        endDateTime == .distantFuture ? "" : endDateTime.localizeDate(hasTimeOfDay: hasEndTimeOfDay)
     }
 }
 

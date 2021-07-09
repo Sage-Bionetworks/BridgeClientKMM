@@ -33,6 +33,8 @@
 import SwiftUI
 import BridgeClient
 
+/// The `TimelineAssessment` is an `ObservableObject` that wraps a Kotlin Native
+/// ``NativeScheduledAssessment``.
 public final class TimelineAssessment : ObservableObject, Identifiable {
     public var id: String {
         self.assessment.instanceGuid
@@ -42,6 +44,7 @@ public final class TimelineAssessment : ObservableObject, Identifiable {
         self.assessment.instanceGuid
     }
     
+    /// The Kotlin Native assessment information that backs this object.
     public var assessment: NativeScheduledAssessment {
         didSet {
             self.isCompleted = assessment.isCompleted

@@ -94,7 +94,6 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
     
     deinit {
         timelineManager?.onCleared()
-        updateTimer?.invalidate()
     }
     
     /// Filter the ``sessions`` and return only those sessions that should be shown for a given ``state``.
@@ -156,13 +155,6 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
             self.refreshSchedules()
         }
     }
-    
-    private func scheduleNextUpdate() {
-        updateTimer?.invalidate()
-
-    }
-    
-    private var updateTimer: Timer?
     
     /// Force a refresh of the schedules.
     open func refreshSchedules() {

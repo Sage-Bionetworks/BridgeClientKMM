@@ -455,7 +455,7 @@ data class ScheduledSessionWindow (
 ) {
     val instanceGuid = scheduledSession.instanceGuid
     val eventTimeStamp = event.timestamp
-    val hasStartTimeOfDay = startDateTime.hour == 0 && startDateTime.minute == 0
+    val hasStartTimeOfDay = startDateTime.let { it.hour > 0 || it.minute > 0 }
     val hasEndTimeOfDay = scheduledSession.expiration.let { it.hours > 0 || it.minutes > 0 }
     val persistent = scheduledSession.persistent
     val isCompleted = assessments.all { it.isCompleted }

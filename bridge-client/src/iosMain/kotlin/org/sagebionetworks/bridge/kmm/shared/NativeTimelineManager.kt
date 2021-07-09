@@ -73,8 +73,8 @@ internal fun ScheduledSessionWindow.toNative() =
     NativeScheduledSessionWindow(
         instanceGuid = instanceGuid,
         eventTimestamp = eventTimeStamp.toString(),
-        startDateTime = startDateTime.toNSDateComponents().date ?: NSDate.distantPast(),
-        endDateTime = endDateTime.toNSDateComponents().date ?: NSDate.distantFuture(),
+        startDateTime = startDateTime.toInstant(TimeZone.currentSystemDefault()).toNSDate(),
+        endDateTime = endDateTime.toInstant(TimeZone.currentSystemDefault()).toNSDate(),
         persistent = persistent,
         hasStartTimeOfDay = hasStartTimeOfDay,
         hasEndTimeOfDay = hasEndTimeOfDay,

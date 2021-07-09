@@ -2068,31 +2068,46 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val session1 = sessionList[0]
             assertEquals(getLocalDateTime(now, 0), session1.startDateTime)
             assertEquals(getLocalDateTime(now, 0, 1), session1.endDateTime)
+            assertEquals(0, session1.startDateTime.hour)
+            assertEquals(0, session1.startDateTime.minute)
+            assertFalse(session1.hasStartTimeOfDay)
+            assertFalse(session1.hasEndTimeOfDay)
 
             // Second session should be the first day session that is available at 8:00 until end of study
             val session2 = sessionList[1]
             assertEquals(getLocalDateTime(now, 8), session2.startDateTime)
             assertEquals(getLocalDateTime(now, 8, 14), session2.endDateTime)
+            assertTrue(session2.hasStartTimeOfDay)
+            assertFalse(session1.hasEndTimeOfDay)
 
             // Third session should be available tomorrow at 8:00AM for 1 hour
             val session3 = sessionList[2]
             assertEquals(getLocalDateTime(now, 8, 1), session3.startDateTime)
             assertEquals(getLocalDateTime(now, 9, 1), session3.endDateTime)
+            assertTrue(session3.hasStartTimeOfDay)
+            assertTrue(session3.hasEndTimeOfDay)
 
             // Fourth session should be available tomorrow at 12:00PM for 1 hour
             val session4 = sessionList[3]
             assertEquals(getLocalDateTime(now, 12, 1), session4.startDateTime)
             assertEquals(getLocalDateTime(now, 13, 1), session4.endDateTime)
+            assertTrue(session4.hasStartTimeOfDay)
+            assertTrue(session4.hasEndTimeOfDay)
 
             // Fifth session should be available tomorrow at 4:00PM for 1 hour
             val session5 = sessionList[4]
             assertEquals(getLocalDateTime(now, 16, 1), session5.startDateTime)
             assertEquals(getLocalDateTime(now, 17, 1), session5.endDateTime)
+            assertTrue(session5.hasStartTimeOfDay)
+            assertTrue(session5.hasEndTimeOfDay)
 
             // Sixth session should be available tomorrow at 8:00PM for 1 hour
             val session6 = sessionList[5]
             assertEquals(getLocalDateTime(now, 20, 1), session6.startDateTime)
             assertEquals(getLocalDateTime(now, 21, 1), session6.endDateTime)
+            assertTrue(session6.hasStartTimeOfDay)
+            assertTrue(session6.hasEndTimeOfDay)
+
         }
     }
 

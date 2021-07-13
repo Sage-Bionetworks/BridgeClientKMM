@@ -11,6 +11,7 @@ import kotlinx.serialization.json.Json
 import org.sagebionetworks.bridge.kmm.shared.apis.SchedulesV2Api
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
+import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
 import org.sagebionetworks.bridge.kmm.shared.models.*
 import kotlin.time.ExperimentalTime
@@ -61,6 +62,83 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
     }
 
     /**
+     * Get all sessions with a start time in the past.
+     */
+    fun getPastSessions(studyId: String, now: Instant = Clock.System.now()): Flow<ResourceResult<ScheduledSessionTimelineSlice>> {
+        return combine(
+            getTimeline(studyId),
+            activityEventsRepo.getActivityEvents(studyId),
+            //Need to include call to get AdherenceRecords as part of the combine.
+            //This will trigger the flow to emit a new value anytime the AdherenceRecords change.
+            adherenceRecordRepo.getAllCachedAdherenceRecords(studyId)
+        ) { timeLineResource, eventsResource, _ ->
+            extractPastSessionsFromResults(
+                timeLineResource,
+                eventsResource,
+                studyId,
+                now,
+            )
+        }
+    }
+
+    private fun extractPastSessionsFromResults(
+        timelineResult: ResourceResult<Timeline>,
+        eventsResult: ResourceResult<StudyActivityEventList>,
+        studyId: String,
+        instantInDay: Instant,
+    ): ResourceResult<ScheduledSessionTimelineSlice> {
+        if (eventsResult is ResourceResult.Success && timelineResult is ResourceResult.Success) {
+            return ResourceResult.Success(extractPastSessions(
+                eventList = eventsResult.data,
+                timeline = timelineResult.data,
+                studyId = studyId,
+                instantInDay = instantInDay
+            ), ResourceStatus.SUCCESS)
+        } else if (eventsResult is ResourceResult.Failed || timelineResult is ResourceResult.Failed) {
+            return ResourceResult.Failed(ResourceStatus.FAILED)
+        } else {
+            return ResourceResult.InProgress
+        }
+    }
+
+    private fun extractPastSessions(
+        eventList: StudyActivityEventList,
+        timeline: Timeline,
+        studyId: String,
+        instantInDay: Instant,
+        timezone: TimeZone = TimeZone.currentSystemDefault(),
+    ): ScheduledSessionTimelineSlice {
+
+        // Extract sessions
+        val windows = extractSessionWindows(
+            eventList,
+            timeline,
+            instantInDay,
+            studyId,
+            WindowFilterType.Past,
+            false,
+            timezone
+        ).sortedBy { it.startDateTime }
+
+        // Build the timeline slice
+        val today = instantInDay.toLocalDateTime(timezone)
+        val schedules = mutableListOf<ScheduledSessionWindow>()
+
+        windows.forEach { window ->
+             if (window.startDateTime <= today) {
+                 schedules.add(window)
+             }
+        }
+
+        return ScheduledSessionTimelineSlice(
+            instantInDay = instantInDay,
+            timezone = timezone,
+            scheduledSessionWindows = schedules,
+            notifications = emptyList()
+        )
+    }
+
+    /**
      * Used for testing so that we can specify a consistent point in time.
      */
     internal fun getSessionsForDay(
@@ -76,7 +154,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
             //This will trigger the flow to emit a new value anytime the AdherenceRecords change.
             adherenceRecordRepo.getAllCachedAdherenceRecords(studyId)
         ) { timeLineResource, eventsResource, _ ->
-            extractSessionsForDay(
+            extractSessionsForDayFromResults(
                 timeLineResource,
                 eventsResource,
                 studyId,
@@ -87,7 +165,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         }
     }
 
-    private fun extractSessionsForDay(
+    private fun extractSessionsForDayFromResults(
         timelineResult: ResourceResult<Timeline>,
         eventsResult: ResourceResult<StudyActivityEventList>,
         studyId: String,
@@ -95,47 +173,21 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         includeAllNotifications: Boolean,
         alwaysIncludeNextDay: Boolean,
     ): ResourceResult<ScheduledSessionTimelineSlice> {
-        return when (eventsResult) {
-            is ResourceResult.Success -> {
-                return extractSessions(
-                    eventsResult.data,
-                    timelineResult,
-                    instantInDay,
-                    studyId,
-                    includeAllNotifications,
-                    alwaysIncludeNextDay,
-                )
-            }
-            is ResourceResult.InProgress -> eventsResult
-            is ResourceResult.Failed -> eventsResult
+        if (eventsResult is ResourceResult.Success && timelineResult is ResourceResult.Success) {
+            return ResourceResult.Success(extractSessionsForDay(
+                eventsResult.data,
+                timelineResult.data,
+                instantInDay,
+                studyId,
+                includeAllNotifications,
+                alwaysIncludeNextDay,
+            ), ResourceStatus.SUCCESS)
+        } else if (eventsResult is ResourceResult.Failed || timelineResult is ResourceResult.Failed) {
+            return ResourceResult.Failed(ResourceStatus.FAILED)
+        } else {
+            return ResourceResult.InProgress
         }
-    }
 
-    private fun extractSessions(
-        eventList: StudyActivityEventList,
-        resource: ResourceResult<Timeline>,
-        instantInDay: Instant,
-        studyId: String,
-        includeAllNotifications: Boolean,
-        alwaysIncludeNextDay: Boolean,
-    ): ResourceResult<ScheduledSessionTimelineSlice> {
-        return when (resource) {
-            is ResourceResult.Success -> {
-                val timeline = resource.data
-                ResourceResult.Success(
-                    extractSessionsForDay(
-                        eventList,
-                        timeline,
-                        instantInDay,
-                        studyId,
-                        includeAllNotifications,
-                        alwaysIncludeNextDay,
-                    ), resource.status
-                )
-            }
-            is ResourceResult.InProgress -> resource
-            is ResourceResult.Failed -> resource
-        }
     }
 
     /**

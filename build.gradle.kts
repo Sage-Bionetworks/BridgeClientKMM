@@ -20,7 +20,7 @@ plugins {
 
 allprojects {
     group = "org.sagebionetworks.bridge.kmm"
-    version = "0.2.18"
+    version = "0.2.19"
     repositories {
         google()
         mavenCentral()

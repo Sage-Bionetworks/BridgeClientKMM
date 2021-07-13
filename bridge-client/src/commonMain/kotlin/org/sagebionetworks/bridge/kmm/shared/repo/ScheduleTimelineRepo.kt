@@ -421,7 +421,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
             event = event,
             startDateTime = startDateTime,
             endDateTime = endDateTime,
-            notifications = if (notifications.isNullOrEmpty()) null else notifications
+            notifications = if (notifications.isNullOrEmpty()) null else notifications!!.sortedBy { it.scheduleOn }
         )
     }
 
@@ -457,10 +457,11 @@ internal fun NotificationInfo.scheduleAt(instanceGuid: String,
     // Get the first notification trigger
     val timeZone = TimeZone.currentSystemDefault()
     val period = this.offset?.let { DateTimePeriod.parse(it) } ?: DateTimePeriod()
+    val lastInstant = endDateTime.toInstant(timeZone)
     var firstInstant = if (notifyAt == NotificationType.AFTER_WINDOW_START) {
         startDateTime.toInstant(timeZone).plus(period, timeZone)
     } else {
-        endDateTime.toInstant(timeZone).minus(period, timeZone)
+        lastInstant.minus(period, timeZone)
     }
 
     // If there is an interval, move the firstInstant forward to after the current time
@@ -478,6 +479,7 @@ internal fun NotificationInfo.scheduleAt(instanceGuid: String,
         instanceGuid,
         firstInstant.toLocalDateTime(timeZone),
         intervalPeriod,
+        if (intervalPeriod ==null) null else lastInstant.toLocalDateTime(timeZone),
         allowSnooze ?: false,
         message
     )
@@ -505,7 +507,7 @@ data class ScheduledSessionWindow (
 ) {
     val instanceGuid = scheduledSession.instanceGuid
     val eventTimeStamp = event.timestamp
-    val hasStartTimeOfDay = startDateTime.hour == 0 && startDateTime.minute == 0
+    val hasStartTimeOfDay = startDateTime.let { it.hour > 0 || it.minute > 0 }
     val hasEndTimeOfDay = scheduledSession.expiration.let { it.hours > 0 || it.minutes > 0 }
     val persistent = scheduledSession.persistent
     val isCompleted = assessments.all { it.isCompleted }
@@ -539,6 +541,7 @@ data class ScheduledNotification(
     val instanceGuid: String,
     val scheduleOn: LocalDateTime,
     val repeatInterval: DateTimePeriod?,
+    val repeatUntil: LocalDateTime?,
     val allowSnooze: Boolean,
     val message: NotificationMessage?,
 )

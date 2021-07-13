@@ -127,7 +127,7 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
         guard self.bridgeManager == nil else { return }
         
         self.bridgeManager = bridgeManager
-        self.studyId = bridgeManager.studyId ?? "preview"
+        self.studyId = bridgeManager.studyId ?? kPreviewStudyId
         if !bridgeManager.isPreview {
             self.timelineManager = NativeTimelineManager(studyId: studyId!, includeAllNotifications: true, alwaysIncludeNextDay: true) { timelineSlice in
                 DispatchQueue.main.async {

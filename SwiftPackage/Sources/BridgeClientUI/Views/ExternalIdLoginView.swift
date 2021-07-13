@@ -98,10 +98,10 @@ struct ExternalIdLoginView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             ExternalIdLoginView()
-                .environmentObject(BridgeClientAppManager(appId: "preview"))
+                .environmentObject(BridgeClientAppManager(appId: kPreviewStudyId))
             ExternalIdLoginView()
                 .preferredColorScheme(.dark)
-                .environmentObject(BridgeClientAppManager(appId: "preview"))
+                .environmentObject(BridgeClientAppManager(appId: kPreviewStudyId))
         }
     }
 }

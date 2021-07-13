@@ -15,3 +15,13 @@ class JsonElementDecoder(private val jsonString: String) {
     }
 }
 
+@Throws(Throwable::class)
+fun JsonElement.encodeObject(): String {
+    val jsonCoder: Json = Json {}
+    try {
+        return jsonCoder.encodeToString(JsonElement.serializer(), this)
+    } catch (err: Exception) {
+        throw Throwable(err.message)
+    }
+}
+

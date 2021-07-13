@@ -40,8 +40,21 @@ extension JsonModel.JsonSerializable {
         do {
             let data = try JSONSerialization.data(withJSONObject: self, options: .fragmentsAllowed)
             guard let string = String(data: data, encoding: .utf8) else { return nil }
-            let decoder = JsonElementDecoder(jsonString: string)
+            let decoder = BridgeClient.JsonElementDecoder(jsonString: string)
             return try decoder.decodeObject()
+        } catch {
+            return nil
+        }
+    }
+}
+
+extension BridgeClient.Kotlinx_serialization_jsonJsonElement {
+    public func toJsonElement() -> JsonModel.JsonElement? {
+        do {
+            let jsonString = try self.encodeObject()
+            guard let data = jsonString.data(using: .utf8) else { return nil }
+            let decoder = JSONDecoder()
+            return try decoder.decode(JsonElement.self, from: data)
         } catch {
             return nil
         }

@@ -733,6 +733,54 @@ class ScheduleTimelineRepoTest: BaseTest() {
         }
     }
 
+    @Test
+    fun testPastSessionsDay0() {
+        runTest {
+            val eventTimeStamp = Clock.System.now()
+            //         Clock.System.now().minus(DateTimeUnit.DAY, TimeZone.currentSystemDefault())
+            val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
+            val resourceResult = repo.getPastSessions("sage-assessment-test", getTodayInstant())
+                .firstOrNull { it is ResourceResult.Success }
+
+            assertTrue(resourceResult is ResourceResult.Success)
+            val sessionList = resourceResult.data.scheduledSessionWindows
+            assertNotNull(sessionList)
+            assertEquals(3, sessionList.size)
+        }
+    }
+
+    @Test
+    fun testPastSessionsDay1() {
+        runTest {
+            val eventTimeStamp =
+                Clock.System.now().minus(1, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
+            val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
+            val resourceResult = repo.getPastSessions("sage-assessment-test", getTodayInstant())
+                .firstOrNull { it is ResourceResult.Success }
+
+            assertTrue(resourceResult is ResourceResult.Success)
+            val sessionList = resourceResult.data.scheduledSessionWindows
+            assertNotNull(sessionList)
+            assertEquals(6, sessionList.size)
+        }
+    }
+
+    @Test
+    fun testPastSessionsDay4() {
+        runTest {
+            val eventTimeStamp =
+                Clock.System.now().minus(4, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
+            val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
+            val resourceResult = repo.getPastSessions("sage-assessment-test", getTodayInstant())
+                .firstOrNull { it is ResourceResult.Success }
+
+            assertTrue(resourceResult is ResourceResult.Success)
+            val sessionList = resourceResult.data.scheduledSessionWindows
+            assertNotNull(sessionList)
+            assertEquals(13, sessionList.size)
+        }
+    }
+
     val anotherTimelineJson = """
         {
           "duration": "P14D",

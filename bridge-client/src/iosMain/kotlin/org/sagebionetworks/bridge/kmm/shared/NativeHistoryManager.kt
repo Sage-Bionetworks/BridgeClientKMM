@@ -4,17 +4,10 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import kotlinx.datetime.*
-import kotlinx.serialization.json.JsonElement
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.sagebionetworks.bridge.kmm.shared.cache.*
-import org.sagebionetworks.bridge.kmm.shared.models.AdherenceRecord
-import org.sagebionetworks.bridge.kmm.shared.models.AssessmentInfo
-import org.sagebionetworks.bridge.kmm.shared.models.NotificationMessage
-import org.sagebionetworks.bridge.kmm.shared.models.SessionInfo
 import org.sagebionetworks.bridge.kmm.shared.repo.*
-import platform.Foundation.*
 
 class NativeHistoryManager(
     private val studyId: String,

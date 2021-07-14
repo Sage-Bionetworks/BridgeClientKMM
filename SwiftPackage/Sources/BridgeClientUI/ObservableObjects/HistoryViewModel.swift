@@ -98,6 +98,7 @@ extension NativeScheduledAssessment {
                                      instanceGuid: self.instanceGuid,
                                      startedOn: startedOn,
                                      finishedOn: finishedOn,
+                                     timeZone: record.timezoneIdentifier.map { TimeZone(identifier: $0) ?? .current },
                                      clientData: record.clientData?.toJsonElement())
         } ?? []
     }
@@ -112,15 +113,17 @@ public struct AssessmentRecord : Identifiable {
     public let instanceGuid: String
     public let startedOn: Date
     public let finishedOn: Date
+    public let timeZone: TimeZone
     public let clientData: JsonElement?
     public let minutes: Int
     
-    public init(assessmentInfo: AssessmentInfo, instanceGuid: String, startedOn: Date, finishedOn: Date, clientData: JsonElement?) {
+    public init(assessmentInfo: AssessmentInfo, instanceGuid: String, startedOn: Date, finishedOn: Date, timeZone: TimeZone? = nil, clientData: JsonElement? = nil) {
         self.id = "\(instanceGuid)|\(finishedOn)"
         self.info = assessmentInfo
         self.instanceGuid = instanceGuid
         self.startedOn = startedOn
         self.finishedOn = finishedOn
+        self.timeZone = timeZone ?? TimeZone.current
         self.clientData = clientData
         self.minutes = Calendar.current.dateComponents([.minute], from: startedOn, to: finishedOn).minute ?? 1
     }

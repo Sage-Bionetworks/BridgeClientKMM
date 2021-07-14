@@ -172,6 +172,7 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
     open func updateAdherenceRecord(scheduleInfo: AssessmentScheduleInfo, startedOn: Date?, endedOn: Date?, declined: Bool, clientData: JsonSerializable?) {
         let record = NativeAdherenceRecord(instanceGuid: scheduleInfo.instanceGuid,
                                            eventTimestamp: scheduleInfo.session.eventTimestamp,
+                                           timezoneIdentifier: TimeZone.current.identifier,
                                            startedOn: startedOn,
                                            finishedOn: endedOn,
                                            declined: .init(value: declined),

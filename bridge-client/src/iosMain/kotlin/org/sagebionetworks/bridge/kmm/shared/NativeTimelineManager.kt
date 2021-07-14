@@ -95,6 +95,7 @@ internal fun AdherenceRecord.toNative()  =
     NativeAdherenceRecord(
         instanceGuid = instanceGuid,
         eventTimestamp = eventTimestamp,
+        timezoneIdentifier = clientTimeZone,
         startedOn = startedOn?.toNSDate(),
         finishedOn = finishedOn?.toNSDate(),
         declined = declined,
@@ -147,6 +148,7 @@ data class NativeScheduledAssessment(
 data class NativeAdherenceRecord(
     val instanceGuid: String,
     val eventTimestamp: String,
+    val timezoneIdentifier: String?,
     val startedOn: NSDate?,
     val finishedOn: NSDate?,
     val declined: Boolean?,

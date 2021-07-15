@@ -131,6 +131,13 @@ public final class BridgeClientAppManager : ObservableObject {
         }
     }
     
+    public func signOut() {
+        userSessionInfo = nil
+        isOnboardingFinished = false
+        authManager.signOut()
+        updateAppState()
+    }
+    
     private func updateAppState() {
         if appConfig == nil {
             appState = .launching

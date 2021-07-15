@@ -35,6 +35,8 @@ import BridgeClient
 
 fileprivate let kOnboardingStateKey = "isOnboardingFinished"
 
+public let kPreviewStudyId = "preview"
+
 public final class BridgeClientAppManager : ObservableObject {
     
     public enum AppState : String {
@@ -86,8 +88,8 @@ public final class BridgeClientAppManager : ObservableObject {
     public init(platformConfig: PlatformConfig) {
         self.platformConfig = platformConfig
         self.title = self.platformConfig.localizedAppName
-        self.isPreview = (platformConfig.appId == "preview")
-        self.studyId = self.isPreview ? "preview" : nil
+        self.isPreview = (platformConfig.appId == kPreviewStudyId)
+        self.studyId = self.isPreview ? kPreviewStudyId : nil
         if !self.isPreview {
             IOSBridgeConfig().initialize(platformConfig: self.platformConfig)
         }

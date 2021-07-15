@@ -127,7 +127,7 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
         guard self.bridgeManager == nil else { return }
         
         self.bridgeManager = bridgeManager
-        self.studyId = bridgeManager.studyId ?? "preview"
+        self.studyId = bridgeManager.studyId ?? kPreviewStudyId
         if !bridgeManager.isPreview {
             self.timelineManager = NativeTimelineManager(studyId: studyId!, includeAllNotifications: true, alwaysIncludeNextDay: true) { timelineSlice in
                 DispatchQueue.main.async {
@@ -172,6 +172,7 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
     open func updateAdherenceRecord(scheduleInfo: AssessmentScheduleInfo, startedOn: Date?, endedOn: Date?, declined: Bool, clientData: JsonSerializable?) {
         let record = NativeAdherenceRecord(instanceGuid: scheduleInfo.instanceGuid,
                                            eventTimestamp: scheduleInfo.session.eventTimestamp,
+                                           timezoneIdentifier: TimeZone.current.identifier,
                                            startedOn: startedOn,
                                            finishedOn: endedOn,
                                            declined: .init(value: declined),

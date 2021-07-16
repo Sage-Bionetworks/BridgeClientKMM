@@ -14,7 +14,7 @@ import org.sagebionetworks.bridge.kmm.shared.cache.loadResource
 import org.sagebionetworks.bridge.kmm.shared.models.StudyActivityEventList
 
 class ActivityEventsRepo(httpClient: HttpClient, databaseHelper: ResourceDatabaseHelper, backgroundScope: CoroutineScope) :
-    AbstractResourceRepo(databaseHelper, resourceType = ResourceType.ACTIVITY_EVENTS_LIST, backgroundScope) {
+    AbstractResourceRepo(databaseHelper, backgroundScope) {
 
     companion object {
         const val ACTIVITY_EVENTS_LIST_ID = "ActivityEventsListId"
@@ -36,7 +36,7 @@ class ActivityEventsRepo(httpClient: HttpClient, databaseHelper: ResourceDatabas
      * @return StudyActivityEventList
      */
     fun getActivityEvents(studyId: String): Flow<ResourceResult<StudyActivityEventList>> {
-        return getResourceById(ACTIVITY_EVENTS_LIST_ID+studyId, remoteLoad =  { loadRemoteEvents(studyId) }, studyId = studyId)
+        return getResourceById(ACTIVITY_EVENTS_LIST_ID+studyId, resourceType = ResourceType.ACTIVITY_EVENTS_LIST, remoteLoad =  { loadRemoteEvents(studyId) }, studyId = studyId)
     }
 
     private suspend fun loadRemoteEvents(studyId: String) : String {

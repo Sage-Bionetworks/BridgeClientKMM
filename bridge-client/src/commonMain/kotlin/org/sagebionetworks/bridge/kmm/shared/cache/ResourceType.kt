@@ -14,6 +14,8 @@ enum class ResourceType() {
     TIMELINE,
     ACTIVITY_EVENTS_LIST,
     ADHERENCE_RECORD,
+    STUDY,
+    STUDY_INFO
 }
 
 enum class ResourceStatus {

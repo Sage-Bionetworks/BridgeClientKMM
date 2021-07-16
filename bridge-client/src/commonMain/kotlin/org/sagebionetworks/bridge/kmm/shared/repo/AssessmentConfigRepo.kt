@@ -14,7 +14,7 @@ import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
 import org.sagebionetworks.bridge.kmm.shared.models.AssessmentConfig
 
 class AssessmentConfigRepo(httpClient: HttpClient, databaseHelper: ResourceDatabaseHelper, backgroundScope: CoroutineScope) :
-    AbstractResourceRepo(databaseHelper, resourceType = ResourceType.ASSESSMENT_CONFIG, backgroundScope) {
+    AbstractResourceRepo(databaseHelper, backgroundScope) {
 
     init {
         ensureNeverFrozen()
@@ -26,7 +26,10 @@ class AssessmentConfigRepo(httpClient: HttpClient, databaseHelper: ResourceDatab
     )
 
     fun getAssessmentById(identifier: String): Flow<ResourceResult<AssessmentConfig>> {
-        return getResourceById(identifier, remoteLoad =  { loadRemoteAssessmentConfig(identifier) },
+        return getResourceById(
+            identifier,
+            resourceType = ResourceType.ASSESSMENT_CONFIG,
+            remoteLoad = { loadRemoteAssessmentConfig(identifier) },
             studyId = APP_WIDE_STUDY_ID
         )
     }

@@ -41,6 +41,16 @@ open class SageResearchTaskDelegate : NSObject, RSDTaskViewControllerDelegate {
     public let assessmentManager: TodayTimelineViewModel
     public let scheduledAssessment: AssessmentScheduleInfo!
     
+    /// The archive manager to use for archiving Sage Research assessments.
+    open var sageResearchArchiveManager: SageResearchArchiveManager {
+        _sageResearchArchiveManager
+    }
+    lazy private var _sageResearchArchiveManager: SageResearchArchiveManager = {
+        let manager = SageResearchArchiveManager()
+        manager.load(bridgeManager: assessmentManager.bridgeManager)
+        return manager
+    }()
+    
     public var scheduleIdentifier: String {
         "\(scheduledAssessment.session.instanceGuid)|\(scheduledAssessment.instanceGuid)"
     }
@@ -76,6 +86,6 @@ open class SageResearchTaskDelegate : NSObject, RSDTaskViewControllerDelegate {
     }
     
     open func taskController(_ taskController: RSDTaskController, readyToSave taskViewModel: RSDTaskViewModel) {
-        assessmentManager.sageResearchArchiveManager.archiveAndUpload(taskController.taskViewModel, schedule: scheduledAssessment)
+       sageResearchArchiveManager.archiveAndUpload(taskController.taskViewModel, schedule: scheduledAssessment)
     }
 }

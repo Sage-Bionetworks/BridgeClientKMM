@@ -50,12 +50,12 @@ open class HistoryViewModel : NSObject, ObservableObject {
         
     private var historyManager: NativeHistoryManager! {
         willSet {
-            historyManager?.onCleared()
+            try? historyManager?.onCleared()
         }
     }
     
     deinit {
-        historyManager?.onCleared()
+        try? historyManager?.onCleared()
     }
     
     /// Called by the view that owns this view model so that it can set up the view on appearance.

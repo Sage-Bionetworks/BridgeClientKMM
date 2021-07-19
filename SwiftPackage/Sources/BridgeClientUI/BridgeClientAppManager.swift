@@ -61,12 +61,23 @@ public final class BridgeClientAppManager : ObservableObject {
     
     @Published public var userSessionInfo: UserSessionInfo? {
         didSet {
-            if studyId == nil {
+            // Look to see if the studyId needs to change to reflect the new user session info.
+            if studyId == nil || userSessionInfo == nil || !userSessionInfo!.studyIds.contains(self.studyId!)  {
                 self.studyId = userSessionInfo?.studyIds.first
+            }
+            // Set up to get refreshed study object.
+            try? studyManager?.onCleared()
+            if let studyId = self.studyId, userSessionInfo != nil {
+                studyManager?.observeStudy(studyId: studyId)
+            }
+            else {
+                self.study = nil
             }
             updateAppState()
         }
     }
+    
+    @Published public var study: Study?
     
     @Published public var isOnboardingFinished: Bool = UserDefaults.standard.bool(forKey: kOnboardingStateKey) {
         didSet {
@@ -75,6 +86,7 @@ public final class BridgeClientAppManager : ObservableObject {
         }
     }
     
+    private var studyManager: NativeStudyManager!
     private var appConfigManager: NativeAppConfigManager!
     public private(set) var authManager: NativeAuthenticationManager!
     
@@ -110,6 +122,12 @@ public final class BridgeClientAppManager : ObservableObject {
             self.appConfig = appConfig ?? self.appConfig
         }
         self.appConfigManager.observeAppConfig()
+        
+        // Hook up study config
+        self.studyManager = NativeStudyManager() { study in
+            guard self.studyId == study.identifier else { return }
+            self.study = study
+        }
         
         // Hook up user session info
         self.authManager = NativeAuthenticationManager() { userSessionInfo in
@@ -175,5 +193,5 @@ public final class BridgeClientAppManager : ObservableObject {
             }
         }
     }
-
 }
+

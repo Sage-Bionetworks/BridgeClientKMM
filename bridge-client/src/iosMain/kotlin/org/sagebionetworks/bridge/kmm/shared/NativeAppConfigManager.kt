@@ -32,8 +32,13 @@ class NativeAppConfigManager(
         }
     }
 
+    @Throws(Throwable::class)
     fun onCleared() {
-        scope.cancel()
+        try {
+            scope.cancel()
+        } catch (err: Exception) {
+            throw Throwable(err.message)
+        }
     }
 }
 

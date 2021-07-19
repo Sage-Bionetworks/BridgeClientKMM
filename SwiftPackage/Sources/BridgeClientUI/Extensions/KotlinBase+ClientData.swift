@@ -35,27 +35,40 @@ import Foundation
 import BridgeClient
 import JsonModel
 
-extension AppConfig {
+public protocol BridgeConfigModel : AnyObject {
+    var clientData: BridgeClient.Kotlinx_serialization_jsonJsonElement? { get }
+}
+
+extension BridgeConfigModel {
+    
+    public func clientDataJsonElement() -> JsonModel.JsonElement? {
+        clientData?.toJsonElement()
+    }
     
     public func clientDataDictionary() -> [String : JsonSerializable]? {
-        guard let clientDataString = self.clientDataJson(),
-              let data = clientDataString.data(using: .utf8)
+        guard let jsonElement = self.clientDataJsonElement(),
+              case let .object(dictionary) = jsonElement
+        else { return nil }
+        return dictionary
+    }
+        
+    public func decodeClientData<T : Decodable>(_ type: T.Type, using factory: SerializationFactory = .init()) throws -> T? {
+        guard let jsonElement = self.clientDataJsonElement()
         else {
             return nil
         }
-        do {
-            let decoder = JSONDecoder()
-            let element = try decoder.decode(JsonElement.self, from: data)
-            switch element {
-            case .object(let dictionary):
-                return dictionary
-            default:
-                return nil
-            }
-        }
-        catch let err {
-            assertionFailure("Failed to decode recorder config: \(err)")
-            return nil
-        }
+        let data = try jsonElement.jsonEncodedData()
+        let decoder = factory.createJSONDecoder()
+        return try decoder.decode(type, from: data)
     }
 }
+
+extension AppConfig : BridgeConfigModel {
+}
+
+extension Study : BridgeConfigModel {
+}
+
+extension UserSessionInfo : BridgeConfigModel {
+}
+

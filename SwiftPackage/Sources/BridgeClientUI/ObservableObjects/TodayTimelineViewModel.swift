@@ -71,7 +71,7 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
     
     private var timelineManager: NativeTimelineManager! {
         willSet {
-            timelineManager?.onCleared()
+            try? timelineManager?.onCleared()
         }
     }
     
@@ -83,7 +83,7 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
     }
     
     deinit {
-        timelineManager?.onCleared()
+        try? timelineManager?.onCleared()
     }
     
     /// Filter the ``sessions`` and return only those sessions that should be shown for a given ``state``.

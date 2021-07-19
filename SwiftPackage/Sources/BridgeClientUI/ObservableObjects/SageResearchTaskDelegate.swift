@@ -51,6 +51,8 @@ open class SageResearchTaskDelegate : NSObject, RSDTaskViewControllerDelegate {
         return manager
     }()
     
+    public private(set) var didCallReadyToSave: Bool = false
+    
     public var scheduleIdentifier: String {
         "\(scheduledAssessment.session.instanceGuid)|\(scheduledAssessment.instanceGuid)"
     }
@@ -65,7 +67,7 @@ open class SageResearchTaskDelegate : NSObject, RSDTaskViewControllerDelegate {
         // Dismiss the view
         assessmentManager.isPresentingAssessment = false
         
-        if reason != .completed {
+        if reason != .completed && !self.didCallReadyToSave {
             // If the task finished with an error or discarded results, then delete the output directory.
             taskController.taskViewModel.deleteOutputDirectory(error: error)
             if let err = error {
@@ -86,6 +88,8 @@ open class SageResearchTaskDelegate : NSObject, RSDTaskViewControllerDelegate {
     }
     
     open func taskController(_ taskController: RSDTaskController, readyToSave taskViewModel: RSDTaskViewModel) {
-       sageResearchArchiveManager.archiveAndUpload(taskController.taskViewModel, schedule: scheduledAssessment)
+        self.didCallReadyToSave = true
+        sageResearchArchiveManager.archiveAndUpload(taskController.taskViewModel, schedule: scheduledAssessment)
     }
 }
+

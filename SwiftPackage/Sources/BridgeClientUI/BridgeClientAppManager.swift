@@ -35,7 +35,7 @@ import BridgeClient
 
 fileprivate let kOnboardingStateKey = "isOnboardingFinished"
 
-public let kPreviewStudyId = "preview"
+public let kPreviewStudyId = "xcode_preview"
 
 public final class BridgeClientAppManager : ObservableObject {
     

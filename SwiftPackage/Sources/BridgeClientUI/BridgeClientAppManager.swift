@@ -43,8 +43,8 @@ public final class BridgeClientAppManager : ObservableObject {
         case launching, login, onboarding, main
     }
     
-    public let platformConfig: PlatformConfig
     public let isPreview: Bool
+    public let platformConfig: PlatformConfig
         
     @Published public var title: String
     @Published public var studyId: String?
@@ -129,6 +129,13 @@ public final class BridgeClientAppManager : ObservableObject {
             self.userSessionInfo = userSessionInfo
             completion(status)
         }
+    }
+    
+    public func signOut() {
+        userSessionInfo = nil
+        isOnboardingFinished = false
+        authManager.signOut()
+        updateAppState()
     }
     
     private func updateAppState() {

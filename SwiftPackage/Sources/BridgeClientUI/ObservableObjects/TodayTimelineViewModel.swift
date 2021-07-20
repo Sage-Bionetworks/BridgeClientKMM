@@ -69,16 +69,6 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
     
     public private(set) var bridgeManager: BridgeClientAppManager!
     
-    /// The archive manager to use for archiving Sage Research assessments.
-    open var sageResearchArchiveManager: SageResearchArchiveManager {
-        _sageResearchArchiveManager
-    }
-    lazy private var _sageResearchArchiveManager: SageResearchArchiveManager = {
-        let manager = SageResearchArchiveManager()
-        manager.load(bridgeManager: bridgeManager)
-        return manager
-    }()
-    
     private var timelineManager: NativeTimelineManager! {
         willSet {
             timelineManager?.onCleared()
@@ -124,8 +114,6 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
     /// 
     /// - Parameter bridgeManager: The bridge manager for this app.
     open func onAppear(bridgeManager: BridgeClientAppManager, previewSchedules: [NativeScheduledSessionWindow] = []) {
-        guard self.bridgeManager == nil else { return }
-        
         self.bridgeManager = bridgeManager
         self.studyId = bridgeManager.studyId ?? kPreviewStudyId
         if !bridgeManager.isPreview {

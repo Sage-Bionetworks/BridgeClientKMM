@@ -53,6 +53,12 @@ class NativeAuthenticationManager(
         }
     }
 
+    fun signOut() {
+        scope.launch {
+            authManager.signOut()
+        }
+    }
+
     fun onCleared() {
         scope.cancel()
     }

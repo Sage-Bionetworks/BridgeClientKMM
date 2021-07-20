@@ -12,6 +12,7 @@ import org.sagebionetworks.bridge.kmm.shared.apis.StudyApi
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper.Companion.APP_WIDE_STUDY_ID
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
+import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
 import org.sagebionetworks.bridge.kmm.shared.models.AssessmentConfig
 import org.sagebionetworks.bridge.kmm.shared.models.Study
@@ -36,10 +37,14 @@ class StudyRepo(internal val bridgeConfig: BridgeConfig, httpClient: HttpClient,
      * @param studyId Study identifier
      * @return StudyInfo
      */
-    fun getStudyInfo(studyId: String): Flow<ResourceResult<StudyInfo>> {
-        return getResourceById(studyId, resourceType = ResourceType.STUDY_INFO, remoteLoad =  { loadRemoteStudyInfo(studyId) },
-            studyId = studyId
-        )
+    suspend fun getStudyInfo(studyId: String): ResourceResult<StudyInfo> {
+        return try {
+            val studyInfo = studyApi.getStudyInfo(bridgeConfig.appId, studyId)
+            ResourceResult.Success(studyInfo, ResourceStatus.SUCCESS)
+        } catch (err: Throwable) {
+            println(err)
+            ResourceResult.Failed(ResourceStatus.FAILED)
+        }
     }
 
     /**

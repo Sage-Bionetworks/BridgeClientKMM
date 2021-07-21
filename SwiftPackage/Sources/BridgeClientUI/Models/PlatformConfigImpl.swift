@@ -74,10 +74,16 @@ public class PlatformConfigImpl : PlatformConfig {
 
 extension PlatformConfig {
     
+    public var localizedAppName : String {
+        Bundle.localizedAppName
+    }
+}
+
+extension Bundle {
     /// The localized name of this application.
     /// This method looks at the plist for the main bundle and returns the most
     /// appropriate display name.
-    public var localizedAppName : String {
+    static public var localizedAppName : String {
         let mainBundle = Bundle.main
         if let bundleInfo = mainBundle.localizedInfoDictionary ?? mainBundle.infoDictionary {
             if let name = bundleInfo["CFBundleDisplayName"] as? String {

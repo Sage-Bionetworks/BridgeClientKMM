@@ -34,11 +34,10 @@ import SwiftUI
 import BridgeClient
 
 fileprivate let kOnboardingStateKey = "isOnboardingFinished"
-fileprivate let kStudyIdKey = "studyId"
 
 public let kPreviewStudyId = "xcode_preview"
 
-public final class BridgeClientAppManager : ObservableObject {
+open class BridgeClientAppManager : ObservableObject {
     
     public enum AppState : String {
         case launching, login, onboarding, main
@@ -49,15 +48,7 @@ public final class BridgeClientAppManager : ObservableObject {
         
     @Published public var title: String
     @Published public var appState: AppState = .launching
-    
     @Published public var isUploadingResults: Bool = false
-    @Published public var isStudyComplete: Bool = false
-    
-    @Published public var studyId: String? {
-        didSet {
-            UserDefaults.standard.set(studyId, forKey: kStudyIdKey)
-        }
-    }
     
     @Published public var appConfig: AppConfig? {
         didSet {
@@ -67,12 +58,14 @@ public final class BridgeClientAppManager : ObservableObject {
     
     @Published public var userSessionInfo: UserSessionInfo? {
         didSet {
-            updateStudy()
+            didSetUserSessionInfo(oldValue: oldValue)
             updateAppState()
         }
     }
     
-    @Published public var study: Study?
+    open func didSetUserSessionInfo(oldValue: UserSessionInfo?) {
+        // Do nothing. Allows subclass override of `userSessionInfo.didSet`.
+    }
     
     @Published public var isOnboardingFinished: Bool = UserDefaults.standard.bool(forKey: kOnboardingStateKey) {
         didSet {
@@ -81,7 +74,6 @@ public final class BridgeClientAppManager : ObservableObject {
         }
     }
     
-    private var studyManager: NativeStudyManager!
     private var appConfigManager: NativeAppConfigManager!
     public private(set) var authManager: NativeAuthenticationManager!
     
@@ -90,14 +82,12 @@ public final class BridgeClientAppManager : ObservableObject {
     
     public convenience init(appId: String) {
         self.init(platformConfig: PlatformConfigImpl(appId: appId))
-        self.studyId = UserDefaults.standard.string(forKey: kStudyIdKey)
     }
     
     public init(platformConfig: PlatformConfig) {
         self.platformConfig = platformConfig
         self.title = self.platformConfig.localizedAppName
         self.isPreview = (platformConfig.appId == kPreviewStudyId)
-        self.studyId = self.isPreview ? kPreviewStudyId : nil
         if !self.isPreview {
             IOSBridgeConfig().initialize(platformConfig: self.platformConfig)
         }
@@ -131,8 +121,8 @@ public final class BridgeClientAppManager : ObservableObject {
         updateAppState()
     }
     
-    public func loginWithExternalId(_ externalId: String, completion: @escaping ((BridgeClient.ResourceStatus) -> Void)) {
-        self.authManager.signInExternalId(externalId: externalId, password: externalId) { (userSessionInfo, status) in
+    public func loginWithExternalId(_ externalId: String, password: String, completion: @escaping ((BridgeClient.ResourceStatus) -> Void)) {
+        self.authManager.signInExternalId(externalId: externalId, password: password) { (userSessionInfo, status) in
             guard status == ResourceStatus.success || status == ResourceStatus.failed else { return }
             self.userSessionInfo = userSessionInfo
             completion(status)
@@ -142,30 +132,7 @@ public final class BridgeClientAppManager : ObservableObject {
     public func signOut() {
         userSessionInfo = nil
         isOnboardingFinished = false
-        try? studyManager?.onCleared()
-        studyManager = nil
-        study = nil
         authManager.signOut()
-    }
-    
-    private func updateStudy() {
-        guard (authManager?.isAuthenticated() ?? false),
-              let studyIds = userSessionInfo?.studyIds, studyIds.count > 0
-        else {
-            return
-        }
-        let previousStudyId = studyId
-        if studyId == nil || !studyIds.contains(studyId!) {
-            studyId = studyIds.first
-            print("Setting studyId=\(studyId!)")
-        }
-        if studyManager == nil || studyId != previousStudyId {
-            try? studyManager?.onCleared()
-            self.studyManager = NativeStudyManager(studyId: studyId!) { [weak self] study in
-                self?.study = study
-            }
-            self.studyManager.observeStudy()
-        }
     }
     
     private func updateAppState() {

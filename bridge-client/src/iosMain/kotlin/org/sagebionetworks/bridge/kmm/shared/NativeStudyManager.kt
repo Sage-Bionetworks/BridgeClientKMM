@@ -3,6 +3,7 @@ package kotlin.org.sagebionetworks.bridge.kmm.shared
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
 import org.koin.core.component.KoinComponent
@@ -13,6 +14,7 @@ import org.sagebionetworks.bridge.kmm.shared.models.Study
 import org.sagebionetworks.bridge.kmm.shared.repo.*
 
 class NativeStudyManager(
+    val studyId: String,
     private val viewUpdate: (Study) -> Unit
 ) : KoinComponent {
 
@@ -20,7 +22,7 @@ class NativeStudyManager(
 
     private val scope = MainScope()
 
-    fun observeStudy(studyId: String) {
+    fun observeStudy() {
         scope.launch {
             repo.getStudy(studyId).collect { resource ->
                 (resource as? ResourceResult.Success)?.data?.let { result ->
@@ -32,6 +34,7 @@ class NativeStudyManager(
 
     @Throws(Throwable::class)
     fun onCleared() {
+        if (!scope.isActive) return
         try {
             scope.cancel()
         } catch (err: Exception) {

@@ -34,6 +34,7 @@ import SwiftUI
 import BridgeClient
 
 fileprivate let kOnboardingStateKey = "isOnboardingFinished"
+fileprivate let kStudyIdKey = "studyId"
 
 public let kPreviewStudyId = "xcode_preview"
 
@@ -47,11 +48,16 @@ public final class BridgeClientAppManager : ObservableObject {
     public let platformConfig: PlatformConfig
         
     @Published public var title: String
-    @Published public var studyId: String?
     @Published public var appState: AppState = .launching
     
     @Published public var isUploadingResults: Bool = false
     @Published public var isStudyComplete: Bool = false
+    
+    @Published public var studyId: String? {
+        didSet {
+            UserDefaults.standard.set(studyId, forKey: kStudyIdKey)
+        }
+    }
     
     @Published public var appConfig: AppConfig? {
         didSet {
@@ -61,18 +67,7 @@ public final class BridgeClientAppManager : ObservableObject {
     
     @Published public var userSessionInfo: UserSessionInfo? {
         didSet {
-            // Look to see if the studyId needs to change to reflect the new user session info.
-            if studyId == nil || userSessionInfo == nil || !userSessionInfo!.studyIds.contains(self.studyId!)  {
-                self.studyId = userSessionInfo?.studyIds.first
-            }
-            // Set up to get refreshed study object.
-            try? studyManager?.onCleared()
-            if let studyId = self.studyId, userSessionInfo != nil {
-                studyManager?.observeStudy(studyId: studyId)
-            }
-            else {
-                self.study = nil
-            }
+            updateStudy()
             updateAppState()
         }
     }
@@ -95,6 +90,7 @@ public final class BridgeClientAppManager : ObservableObject {
     
     public convenience init(appId: String) {
         self.init(platformConfig: PlatformConfigImpl(appId: appId))
+        self.studyId = UserDefaults.standard.string(forKey: kStudyIdKey)
     }
     
     public init(platformConfig: PlatformConfig) {
@@ -123,12 +119,6 @@ public final class BridgeClientAppManager : ObservableObject {
         }
         self.appConfigManager.observeAppConfig()
         
-        // Hook up study config
-        self.studyManager = NativeStudyManager() { study in
-            guard self.studyId == study.identifier else { return }
-            self.study = study
-        }
-        
         // Hook up user session info
         self.authManager = NativeAuthenticationManager() { userSessionInfo in
             guard userSessionInfo == nil || !userSessionInfo!.isEqual(userSessionInfo) else { return }
@@ -152,8 +142,30 @@ public final class BridgeClientAppManager : ObservableObject {
     public func signOut() {
         userSessionInfo = nil
         isOnboardingFinished = false
+        try? studyManager?.onCleared()
+        studyManager = nil
+        study = nil
         authManager.signOut()
-        updateAppState()
+    }
+    
+    private func updateStudy() {
+        guard (authManager?.isAuthenticated() ?? false),
+              let studyIds = userSessionInfo?.studyIds, studyIds.count > 0
+        else {
+            return
+        }
+        let previousStudyId = studyId
+        if studyId == nil || !studyIds.contains(studyId!) {
+            studyId = studyIds.first
+            print("Setting studyId=\(studyId!)")
+        }
+        if studyManager == nil || studyId != previousStudyId {
+            try? studyManager?.onCleared()
+            self.studyManager = NativeStudyManager(studyId: studyId!) { [weak self] study in
+                self?.study = study
+            }
+            self.studyManager.observeStudy()
+        }
     }
     
     private func updateAppState() {

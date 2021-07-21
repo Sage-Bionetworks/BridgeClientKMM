@@ -79,7 +79,7 @@ public struct AssessmentInfoMap {
             return color
         }
         else {
-            return mappings[info.assessmentId]?.color ?? .appBlue
+            return mappings[info.assessmentId]?.color ?? Color.accentColor
         }
     }
     

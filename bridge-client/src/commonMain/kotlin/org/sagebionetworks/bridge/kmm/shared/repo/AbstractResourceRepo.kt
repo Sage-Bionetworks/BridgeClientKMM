@@ -12,10 +12,11 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import org.sagebionetworks.bridge.kmm.shared.cache.*
 
-abstract class AbstractResourceRepo(val database: ResourceDatabaseHelper, protected val resourceType: ResourceType, protected val backgroundScope: CoroutineScope) {
+abstract class AbstractResourceRepo(val database: ResourceDatabaseHelper, protected val backgroundScope: CoroutineScope) {
 
     internal inline fun <reified T: Any> getResourceById(identifier: String,
                                                          studyId: String,
+                                                         resourceType: ResourceType,
                                                          noinline remoteLoad: suspend () -> String,
                                                          noinline shouldUpdate: (Resource) -> Boolean = {false}): Flow<ResourceResult<T>> {
         return database.getResourceAsFlow(identifier, resourceType, studyId).filter { curResource ->

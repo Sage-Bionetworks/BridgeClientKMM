@@ -21,7 +21,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
                            httpClient: HttpClient,
                            databaseHelper: ResourceDatabaseHelper,
                            backgroundScope: CoroutineScope) :
-    AbstractResourceRepo(databaseHelper, resourceType = ResourceType.TIMELINE, backgroundScope) {
+    AbstractResourceRepo(databaseHelper, backgroundScope) {
 
     companion object {
         const val SCHEDULE_TIMELINE_ID = "ScheduleTimelineId"
@@ -38,6 +38,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
     private fun getTimeline(studyId: String): Flow<ResourceResult<Timeline>> {
         return getResourceById(
             SCHEDULE_TIMELINE_ID + studyId,
+            resourceType = ResourceType.TIMELINE,
             remoteLoad = { loadRemoteTimeline(studyId) },
             studyId = studyId
         )

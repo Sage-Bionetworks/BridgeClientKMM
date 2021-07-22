@@ -17,7 +17,7 @@ class AppConfigRepo(httpClient: HttpClient,
                     databaseHelper: ResourceDatabaseHelper,
                     backgroundScope: CoroutineScope,
                     val bridgeConfig: BridgeConfig ) :
-    AbstractResourceRepo(databaseHelper, resourceType = ResourceType.APP_CONFIG, backgroundScope) {
+    AbstractResourceRepo(databaseHelper, backgroundScope) {
 
     init {
         ensureNeverFrozen()
@@ -31,6 +31,7 @@ class AppConfigRepo(httpClient: HttpClient,
     fun getAppConfig(): Flow<ResourceResult<AppConfig>> {
         return getResourceById(
             identifier = bridgeConfig.appId,
+            resourceType = ResourceType.APP_CONFIG,
             remoteLoad = { loadRemoteAppConfig() },
             studyId =  ResourceDatabaseHelper.APP_WIDE_STUDY_ID)
     }

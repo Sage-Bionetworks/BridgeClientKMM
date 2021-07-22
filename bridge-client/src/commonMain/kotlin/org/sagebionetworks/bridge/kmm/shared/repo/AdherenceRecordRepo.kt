@@ -20,7 +20,7 @@ import org.sagebionetworks.bridge.kmm.shared.models.AdherenceRecordsSearch
 import org.sagebionetworks.bridge.kmm.shared.models.SortOrder
 
 class AdherenceRecordRepo(httpClient: HttpClient, databaseHelper: ResourceDatabaseHelper, backgroundScope: CoroutineScope) :
-        AbstractResourceRepo(databaseHelper, resourceType = ResourceType.ADHERENCE_RECORD, backgroundScope) {
+        AbstractResourceRepo(databaseHelper, backgroundScope) {
 
     init {
         ensureNeverFrozen()
@@ -35,14 +35,14 @@ class AdherenceRecordRepo(httpClient: HttpClient, databaseHelper: ResourceDataba
      * Get all of the locally cached [AdherenceRecord]s.
      */
     fun getAllCachedAdherenceRecords(studyId: String) : Flow<Map<String, List<AdherenceRecord>>> {
-        return database.getResourcesAsFlow(resourceType, studyId).mapNotNull { it.mapNotNull { resource -> resource.loadResource<AdherenceRecord>() }.groupBy { adherenceRecord -> adherenceRecord.instanceGuid } }
+        return database.getResourcesAsFlow(ResourceType.ADHERENCE_RECORD, studyId).mapNotNull { it.mapNotNull { resource -> resource.loadResource<AdherenceRecord>() }.groupBy { adherenceRecord -> adherenceRecord.instanceGuid } }
     }
 
     /**
      * Get the locally cached [AdherenceRecord]s for the specified [instanceIds].
      */
     fun getCachedAdherenceRecords(instanceIds: List<String>, studyId: String) : Map<String, List<AdherenceRecord>> {
-        val list: List<AdherenceRecord> = database.getResourcesByIds(instanceIds, resourceType, studyId).mapNotNull { it.loadResource() }
+        val list: List<AdherenceRecord> = database.getResourcesByIds(instanceIds, ResourceType.ADHERENCE_RECORD, studyId).mapNotNull { it.loadResource() }
         return list.groupBy { it.instanceGuid }
     }
 
@@ -81,7 +81,7 @@ class AdherenceRecordRepo(httpClient: HttpClient, databaseHelper: ResourceDataba
         val resource = Resource(
             identifier = adherenceRecord.instanceGuid,
             secondaryId = adherenceRecord.startedOn.toString(),
-            type = resourceType,
+            type = ResourceType.ADHERENCE_RECORD,
             studyId = studyId,
             json = json,
             lastUpdate = Clock.System.now().toEpochMilliseconds(),
@@ -107,7 +107,7 @@ class AdherenceRecordRepo(httpClient: HttpClient, databaseHelper: ResourceDataba
      * Any failures will remain in a needSave state and be tried again the next time.
      */
     private suspend fun processUpdates(studyId: String) {
-        val resourcesToUpload = database.getResourcesNeedSave(resourceType, studyId)
+        val resourcesToUpload = database.getResourcesNeedSave(ResourceType.ADHERENCE_RECORD, studyId)
         val records: List<AdherenceRecord> = resourcesToUpload.mapNotNull { it.loadResource() }
         if (records.isEmpty()) return
         var status = ResourceStatus.FAILED

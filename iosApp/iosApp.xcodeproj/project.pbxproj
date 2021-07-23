@@ -15,8 +15,7 @@
 		7555FF8B242A565B00829871 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7555FF89242A565B00829871 /* LaunchScreen.storyboard */; };
 		7555FF96242A565B00829871 /* iosAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF95242A565B00829871 /* iosAppTests.swift */; };
 		7555FFA1242A565B00829871 /* iosAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FFA0242A565B00829871 /* iosAppUITests.swift */; };
-		FF12D01E2695011200520C4D /* BridgeClient.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF12D01D2695011200520C4D /* BridgeClient.xcframework */; };
-		FF12D01F2695011200520C4D /* BridgeClient.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FF12D01D2695011200520C4D /* BridgeClient.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		FF4E0E1C26AB7BE100BA652C /* BridgeClient in Frameworks */ = {isa = PBXBuildFile; productRef = FF4E0E1B26AB7BE100BA652C /* BridgeClient */; };
 		FF7ED30226A89739001F9E8B /* ExternalIdLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF7ED30126A89738001F9E8B /* ExternalIdLoginView.swift */; };
 /* End PBXBuildFile section */
 
@@ -37,20 +36,6 @@
 		};
 /* End PBXContainerItemProxy section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		FF12D0202695011200520C4D /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				FF12D01F2695011200520C4D /* BridgeClient.xcframework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXFileReference section */
 		7555FF7B242A565900829871 /* iosApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iosApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FF7E242A565900829871 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -69,6 +54,7 @@
 		E9B7695625D73E8D0031D67E /* bridge_client.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = bridge_client.framework; path = "../bridge-client/build/xcode-frameworks/bridge_client.framework"; sourceTree = "<group>"; };
 		FF12D019269500E300520C4D /* BridgeClient.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BridgeClient.framework; path = "../bridge-client/build/xcode-frameworks/BridgeClient.framework"; sourceTree = "<group>"; };
 		FF12D01D2695011200520C4D /* BridgeClient.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = BridgeClient.xcframework; path = "../bridge-client/build/xcframework/BridgeClient.xcframework"; sourceTree = "<group>"; };
+		FF4E0E1A26AB7B8800BA652C /* BridgeClientKMM */ = {isa = PBXFileReference; lastKnownFileType = folder; name = BridgeClientKMM; path = ..; sourceTree = "<group>"; };
 		FF7ED30126A89738001F9E8B /* ExternalIdLoginView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExternalIdLoginView.swift; sourceTree = "<group>"; };
 		FF8F8D1E261F858900366307 /* BridgeClient.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BridgeClient.framework; path = "../bridge-client/build/bin/ios/debugFramework/BridgeClient.framework"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -78,7 +64,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FF12D01E2695011200520C4D /* BridgeClient.xcframework in Frameworks */,
+				FF4E0E1C26AB7BE100BA652C /* BridgeClient in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -102,6 +88,7 @@
 		7555FF72242A565900829871 = {
 			isa = PBXGroup;
 			children = (
+				FF4E0E1A26AB7B8800BA652C /* BridgeClientKMM */,
 				7555FF7D242A565900829871 /* iosApp */,
 				7555FF94242A565B00829871 /* iosAppTests */,
 				7555FF9F242A565B00829871 /* iosAppUITests */,
@@ -182,7 +169,6 @@
 				7555FF77242A565900829871 /* Sources */,
 				7555FF78242A565900829871 /* Frameworks */,
 				7555FF79242A565900829871 /* Resources */,
-				FF12D0202695011200520C4D /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -190,6 +176,7 @@
 			);
 			name = iosApp;
 			packageProductDependencies = (
+				FF4E0E1B26AB7BE100BA652C /* BridgeClient */,
 			);
 			productName = iosApp;
 			productReference = 7555FF7B242A565900829871 /* iosApp.app */;
@@ -634,6 +621,13 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		FF4E0E1B26AB7BE100BA652C /* BridgeClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = BridgeClient;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 7555FF73242A565900829871 /* Project object */;
 }

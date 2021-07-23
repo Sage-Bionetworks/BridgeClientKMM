@@ -9,28 +9,15 @@ import kotlinx.serialization.json.JsonElement
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.sagebionetworks.bridge.kmm.shared.cache.*
-import org.sagebionetworks.bridge.kmm.shared.encodeObject
 import org.sagebionetworks.bridge.kmm.shared.models.Study
 import org.sagebionetworks.bridge.kmm.shared.models.StudyInfo
 import org.sagebionetworks.bridge.kmm.shared.repo.*
 
-class NativeStudyManager(
-    private val viewUpdate: (Study) -> Unit
-) : KoinComponent {
+class NativeStudyInfoManager() : KoinComponent {
 
     private val repo : StudyRepo by inject(mode = LazyThreadSafetyMode.NONE)
 
     private val scope = MainScope()
-
-    fun observeStudy(studyId: String) {
-        scope.launch {
-            repo.getStudy(studyId).collect { resource ->
-                (resource as? ResourceResult.Success)?.data?.let { result ->
-                    viewUpdate(result)
-                }
-            }
-        }
-    }
 
     fun fetchStudyInfo(studyId: String, callBack: (StudyInfo?, ResourceStatus) -> Unit) {
         scope.launch {
@@ -40,10 +27,29 @@ class NativeStudyManager(
             }
         }
     }
+}
+
+class NativeStudyManager(
+    private val studyId: String,
+    private val viewUpdate: (Study) -> Unit
+) : KoinComponent {
+
+    private val repo : StudyRepo by inject(mode = LazyThreadSafetyMode.NONE)
+
+    private val scope = MainScope()
+
+    fun observeStudy() {
+        scope.launch {
+            repo.getStudy(studyId).collect { resource ->
+                (resource as? ResourceResult.Success)?.data?.let { result ->
+                    viewUpdate(result)
+                }
+            }
+        }
+    }
 
     @Throws(Throwable::class)
     fun onCleared() {
-        if (!scope.isActive) return
         try {
             scope.cancel()
         } catch (err: Exception) {

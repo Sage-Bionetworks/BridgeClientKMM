@@ -130,9 +130,9 @@ open class BridgeClientAppManager : ObservableObject {
     }
     
     public func signOut() {
-        userSessionInfo = nil
-        isOnboardingFinished = false
         authManager.signOut()
+        isOnboardingFinished = false
+        userSessionInfo = nil
     }
     
     private func updateAppState() {

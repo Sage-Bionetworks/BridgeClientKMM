@@ -232,8 +232,16 @@ open class SageResearchArchiveManager : NSObject, RSDDataArchiveManager {
 extension AppConfig {
     
     func taskToSchemaMapping() -> [String : String]? {
-        guard let dictionary = clientDataDictionary() else { return nil }
-        return dictionary["taskToSchemaIdentifierMap"] as? [String : String]
+        do {
+            guard let dictionary = try self.clientDataDictionary()
+            else {
+                return nil
+            }
+            return dictionary["taskToSchemaIdentifierMap"] as? [String : String]
+        } catch let err {
+            print("WARNING! Failed to decode client data to a dictionary. \(err)")
+            return nil
+        }
     }
 }
 

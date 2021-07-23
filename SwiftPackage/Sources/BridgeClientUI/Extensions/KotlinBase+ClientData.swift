@@ -1,5 +1,5 @@
 //
-//  AppConfig+Utils.swift
+//  KotlinBase+ClientData.swift
 //
 //
 //  Copyright © 2021 Sage Bionetworks. All rights reserved.
@@ -35,40 +35,42 @@ import Foundation
 import BridgeClient
 import JsonModel
 
-public protocol BridgeConfigModel : AnyObject {
-    var clientData: BridgeClient.Kotlinx_serialization_jsonJsonElement? { get }
+public protocol KotlinBase_ClientData : AnyObject {
+    func clientDataJson() -> Data?
 }
 
-extension BridgeConfigModel {
+extension KotlinBase_ClientData {
     
-    public func clientDataJsonElement() -> JsonModel.JsonElement? {
-        clientData?.toJsonElement()
-    }
-    
-    public func clientDataDictionary() -> [String : JsonSerializable]? {
-        guard let jsonElement = self.clientDataJsonElement(),
-              case let .object(dictionary) = jsonElement
-        else { return nil }
-        return dictionary
-    }
-        
-    public func decodeClientData<T : Decodable>(_ type: T.Type, using factory: SerializationFactory = .init()) throws -> T? {
-        guard let jsonElement = self.clientDataJsonElement()
+    public func clientDataDictionary() throws -> [String : JsonSerializable]? {
+        guard let data = self.clientDataJson()
         else {
             return nil
         }
-        let data = try jsonElement.jsonEncodedData()
+        return try JSONSerialization.jsonObject(with: data, options: []) as? [String : JsonSerializable]
+    }
+    
+    public func decodeClientData<T : Decodable>(_ type: T.Type, using factory: SerializationFactory = .init()) throws -> T? {
+        guard let data = self.clientDataJson()
+        else {
+            return nil
+        }
         let decoder = factory.createJSONDecoder()
         return try decoder.decode(type, from: data)
     }
 }
 
-extension AppConfig : BridgeConfigModel {
+extension AppConfig : KotlinBase_ClientData {
 }
 
-extension Study : BridgeConfigModel {
+extension Study : KotlinBase_ClientData {
 }
 
-extension UserSessionInfo : BridgeConfigModel {
+extension UserSessionInfo : KotlinBase_ClientData {
+}
+
+extension AdherenceRecord : KotlinBase_ClientData {
+}
+
+extension NativeAdherenceRecord : KotlinBase_ClientData {
 }
 

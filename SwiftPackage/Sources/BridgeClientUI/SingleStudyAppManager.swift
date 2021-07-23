@@ -51,8 +51,8 @@ public final class SingleStudyAppManager : BridgeClientAppManager {
     @Published public var study: Study?
     @Published public var isStudyComplete: Bool = false
     
-    private var studyManager: NativeStudyManager!
-    
+    private var studyManager: NativeStudyManager?
+
     public override init(platformConfig: PlatformConfig) {
         super.init(platformConfig: platformConfig)
         self.studyId = self.isPreview ? kPreviewStudyId : UserDefaults.standard.string(forKey: kStudyIdKey)
@@ -60,9 +60,6 @@ public final class SingleStudyAppManager : BridgeClientAppManager {
     
     public override func appWillFinishLaunching(_ launchOptions: [UIApplication.LaunchOptionsKey : Any]?) {
         super.appWillFinishLaunching(launchOptions)
-        self.studyManager = NativeStudyManager() { [weak self] study in
-            self?.study = study
-        }
         updateStudy()
     }
     
@@ -73,20 +70,15 @@ public final class SingleStudyAppManager : BridgeClientAppManager {
         super.signOut()
     }
     
-    public func fetchStudyInfo(_ studyId: String, completion: @escaping ((StudyInfo?, BridgeClient.ResourceStatus) -> Void)) {
-        self.studyId = studyId
-        self.studyManager.fetchStudyInfo(studyId: studyId, callBack: completion)
-    }
-    
     private var observedStudyId: String?
     
     private func updateStudy() {
         guard (authManager?.isAuthenticated() ?? false),
-              let studyIds = userSessionInfo?.studyIds, studyIds.count > 0,
-              let studyManager = self.studyManager
+              let studyIds = userSessionInfo?.studyIds, studyIds.count > 0
         else {
             return
         }
+        
         let previousStudyId = observedStudyId
         if studyId == nil || !studyIds.contains(studyId!) {
             studyId = studyIds.first
@@ -97,9 +89,13 @@ public final class SingleStudyAppManager : BridgeClientAppManager {
             return
         }
 
-        try? studyManager.onCleared()
+        try? studyManager?.onCleared()
         self.observedStudyId = studyId
-        studyManager.observeStudy(studyId: studyId)
+        print("observe study=\(studyId)")
+        self.studyManager = .init(studyId: studyId) { [weak self] study in
+            self?.study = study
+        }
+        self.studyManager!.observeStudy()
     }
 }
 

@@ -67,11 +67,11 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
         }
     }
     
-    public private(set) var bridgeManager: BridgeClientAppManager!
+    public private(set) var bridgeManager: SingleStudyAppManager!
     
     private var timelineManager: NativeTimelineManager! {
         willSet {
-            timelineManager?.onCleared()
+            try? timelineManager?.onCleared()
         }
     }
     
@@ -83,7 +83,7 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
     }
     
     deinit {
-        timelineManager?.onCleared()
+        try? timelineManager?.onCleared()
     }
     
     /// Filter the ``sessions`` and return only those sessions that should be shown for a given ``state``.
@@ -109,11 +109,11 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
     
     /// Called by the view that owns this view model so that it can set up the view on appearance.
     ///
-    /// This allows the `View` that uses this model to pass the `BridgeClientAppManager` after
+    /// This allows the `View` that uses this model to pass the `SingleStudyAppManager` after
     /// initialization.
     /// 
     /// - Parameter bridgeManager: The bridge manager for this app.
-    open func onAppear(bridgeManager: BridgeClientAppManager, previewSchedules: [NativeScheduledSessionWindow] = []) {
+    open func onAppear(bridgeManager: SingleStudyAppManager, previewSchedules: [NativeScheduledSessionWindow] = []) {
         self.bridgeManager = bridgeManager
         self.studyId = bridgeManager.studyId ?? kPreviewStudyId
         if !bridgeManager.isPreview {

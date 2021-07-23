@@ -35,9 +35,9 @@ import BridgeClient
 
 fileprivate let kOnboardingStateKey = "isOnboardingFinished"
 
-public let kPreviewStudyId = "preview"
+public let kPreviewStudyId = "xcode_preview"
 
-public final class BridgeClientAppManager : ObservableObject {
+open class BridgeClientAppManager : ObservableObject {
     
     public enum AppState : String {
         case launching, login, onboarding, main
@@ -47,11 +47,8 @@ public final class BridgeClientAppManager : ObservableObject {
     public let platformConfig: PlatformConfig
         
     @Published public var title: String
-    @Published public var studyId: String?
     @Published public var appState: AppState = .launching
-    
     @Published public var isUploadingResults: Bool = false
-    @Published public var isStudyComplete: Bool = false
     
     @Published public var appConfig: AppConfig? {
         didSet {
@@ -61,11 +58,13 @@ public final class BridgeClientAppManager : ObservableObject {
     
     @Published public var userSessionInfo: UserSessionInfo? {
         didSet {
-            if studyId == nil {
-                self.studyId = userSessionInfo?.studyIds.first
-            }
+            didSetUserSessionInfo(oldValue: oldValue)
             updateAppState()
         }
+    }
+    
+    open func didSetUserSessionInfo(oldValue: UserSessionInfo?) {
+        // Do nothing. Allows subclass override of `userSessionInfo.didSet`.
     }
     
     @Published public var isOnboardingFinished: Bool = UserDefaults.standard.bool(forKey: kOnboardingStateKey) {
@@ -89,7 +88,6 @@ public final class BridgeClientAppManager : ObservableObject {
         self.platformConfig = platformConfig
         self.title = self.platformConfig.localizedAppName
         self.isPreview = (platformConfig.appId == kPreviewStudyId)
-        self.studyId = self.isPreview ? kPreviewStudyId : nil
         if !self.isPreview {
             IOSBridgeConfig().initialize(platformConfig: self.platformConfig)
         }
@@ -123,8 +121,8 @@ public final class BridgeClientAppManager : ObservableObject {
         updateAppState()
     }
     
-    public func loginWithExternalId(_ externalId: String, completion: @escaping ((BridgeClient.ResourceStatus) -> Void)) {
-        self.authManager.signInExternalId(externalId: externalId, password: externalId) { (userSessionInfo, status) in
+    public func loginWithExternalId(_ externalId: String, password: String, completion: @escaping ((BridgeClient.ResourceStatus) -> Void)) {
+        self.authManager.signInExternalId(externalId: externalId, password: password) { (userSessionInfo, status) in
             guard status == ResourceStatus.success || status == ResourceStatus.failed else { return }
             self.userSessionInfo = userSessionInfo
             completion(status)
@@ -132,10 +130,9 @@ public final class BridgeClientAppManager : ObservableObject {
     }
     
     public func signOut() {
-        userSessionInfo = nil
-        isOnboardingFinished = false
         authManager.signOut()
-        updateAppState()
+        isOnboardingFinished = false
+        userSessionInfo = nil
     }
     
     private func updateAppState() {
@@ -175,5 +172,5 @@ public final class BridgeClientAppManager : ObservableObject {
             }
         }
     }
-
 }
+

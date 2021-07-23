@@ -1,5 +1,5 @@
 //
-//  AppConfig+Utils.swift
+//  KotlinBase+ClientData.swift
 //
 //
 //  Copyright © 2021 Sage Bionetworks. All rights reserved.
@@ -35,27 +35,42 @@ import Foundation
 import BridgeClient
 import JsonModel
 
-extension AppConfig {
+public protocol KotlinBase_ClientData : AnyObject {
+    func clientDataJson() -> Data?
+}
+
+extension KotlinBase_ClientData {
     
-    public func clientDataDictionary() -> [String : JsonSerializable]? {
-        guard let clientDataString = self.clientDataJson(),
-              let data = clientDataString.data(using: .utf8)
+    public func clientDataDictionary() throws -> [String : JsonSerializable]? {
+        guard let data = self.clientDataJson()
         else {
             return nil
         }
-        do {
-            let decoder = JSONDecoder()
-            let element = try decoder.decode(JsonElement.self, from: data)
-            switch element {
-            case .object(let dictionary):
-                return dictionary
-            default:
-                return nil
-            }
-        }
-        catch let err {
-            assertionFailure("Failed to decode recorder config: \(err)")
+        return try JSONSerialization.jsonObject(with: data, options: []) as? [String : JsonSerializable]
+    }
+    
+    public func decodeClientData<T : Decodable>(_ type: T.Type, using factory: SerializationFactory = .init()) throws -> T? {
+        guard let data = self.clientDataJson()
+        else {
             return nil
         }
+        let decoder = factory.createJSONDecoder()
+        return try decoder.decode(type, from: data)
     }
 }
+
+extension AppConfig : KotlinBase_ClientData {
+}
+
+extension Study : KotlinBase_ClientData {
+}
+
+extension UserSessionInfo : KotlinBase_ClientData {
+}
+
+extension AdherenceRecord : KotlinBase_ClientData {
+}
+
+extension NativeAdherenceRecord : KotlinBase_ClientData {
+}
+

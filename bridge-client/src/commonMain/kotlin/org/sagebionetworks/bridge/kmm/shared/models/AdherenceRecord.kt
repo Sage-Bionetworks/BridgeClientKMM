@@ -50,7 +50,7 @@ data class AdherenceRecord (
     val uploadedOn: kotlin.String? = null,
     /* If the participant explicitly decides to skip a session or an assessment, this can be indicated by the mobile app by setting this flag to true. This can then used when considering adherence to the protocol. */
     @SerialName("declined")
-    val declined: kotlin.Boolean? = null,
+    val declined: kotlin.Boolean = false,
     /* An arbitrary JSON structure that the client can use to record information about this schedule item (maximum size 65k). */
     @SerialName("clientData")
     val clientData: kotlinx.serialization.json.JsonElement? = null,

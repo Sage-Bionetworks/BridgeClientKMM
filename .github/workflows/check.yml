@@ -19,3 +19,6 @@ jobs:
       env:
         testExternalId01: ${{ secrets.TEST_EXTERNAL_ID_01 }}
       run: ./gradlew check
+    - name: Android Test Report
+      uses: asadmansr/android-test-report-action@v1.2.0
+      if: ${{ always() }} # IMPORTANT: run Android Test Report regardless

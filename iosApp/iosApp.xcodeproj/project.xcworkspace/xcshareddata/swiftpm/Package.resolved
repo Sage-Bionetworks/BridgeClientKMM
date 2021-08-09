@@ -5,9 +5,9 @@
         "package": "BridgeArchiver",
         "repositoryURL": "https://github.com/Sage-Bionetworks/BridgeArchiver-Swift.git",
         "state": {
-          "branch": "main",
+          "branch": null,
           "revision": "f1f0c4a9f177b13315bae618db186c12ecbc5bdb",
-          "version": null
+          "version": "0.3.0"
         }
       },
       {
@@ -42,17 +42,17 @@
         "repositoryURL": "https://github.com/Sage-Bionetworks/SageResearch.git",
         "state": {
           "branch": null,
-          "revision": "9a639da0b74d3fb81c20d107fd5b5dbfb1dd2fdd",
-          "version": "4.1.4"
+          "revision": "1209e1a36257c6179e1ca41e622286db69fea9cd",
+          "version": "4.1.6"
         }
       },
       {
         "package": "SharedMobileUI",
         "repositoryURL": "https://github.com/Sage-Bionetworks/SharedMobileUI-AppleOS.git",
         "state": {
-          "branch": "main",
-          "revision": "ceecf49b32f3d1f33eb4f17aef66ffc2ea987201",
-          "version": null
+          "branch": null,
+          "revision": "df3b13bc20fb3d1cd7dc99edbdd48bdc07aed90a",
+          "version": "0.6.0"
         }
       },
       {

@@ -15,29 +15,8 @@
 		7555FF8B242A565B00829871 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7555FF89242A565B00829871 /* LaunchScreen.storyboard */; };
 		7555FF96242A565B00829871 /* iosAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF95242A565B00829871 /* iosAppTests.swift */; };
 		7555FFA1242A565B00829871 /* iosAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FFA0242A565B00829871 /* iosAppUITests.swift */; };
-		FF12D01E2695011200520C4D /* BridgeClient.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF12D01D2695011200520C4D /* BridgeClient.xcframework */; };
-		FF12D01F2695011200520C4D /* BridgeClient.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FF12D01D2695011200520C4D /* BridgeClient.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		FF12D0302695019800520C4D /* TimelineAssessment.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF12D0222695019800520C4D /* TimelineAssessment.swift */; };
-		FF12D0312695019800520C4D /* TimelineSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF12D0232695019800520C4D /* TimelineSession.swift */; };
-		FF12D0322695019800520C4D /* TodayTimelineViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF12D0242695019800520C4D /* TodayTimelineViewModel.swift */; };
-		FF12D0332695019800520C4D /* AssessmentScheduleInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF12D0262695019800520C4D /* AssessmentScheduleInfo.swift */; };
-		FF12D0342695019800520C4D /* NativeScheduledSessionWindow+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF12D0282695019800520C4D /* NativeScheduledSessionWindow+View.swift */; };
-		FF12D0372695019800520C4D /* Date+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF12D02B2695019800520C4D /* Date+Utils.swift */; };
-		FF12D0382695019800520C4D /* SageResearchArchiveManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF12D02D2695019800520C4D /* SageResearchArchiveManager.swift */; };
-		FF12D0392695019800520C4D /* AbstractResultArchive.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF12D02E2695019800520C4D /* AbstractResultArchive.swift */; };
-		FF12D03A2695019800520C4D /* DataArchive.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF12D02F2695019800520C4D /* DataArchive.swift */; };
-		FF5657BF266F12C7008671B5 /* PlatformConfigImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF5657BB266F12C7008671B5 /* PlatformConfigImpl.swift */; };
+		FF4E0E1C26AB7BE100BA652C /* BridgeClient in Frameworks */ = {isa = PBXBuildFile; productRef = FF4E0E1B26AB7BE100BA652C /* BridgeClient */; };
 		FF7ED30226A89739001F9E8B /* ExternalIdLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF7ED30126A89738001F9E8B /* ExternalIdLoginView.swift */; };
-		FF7ED30526A8975B001F9E8B /* SageResearchTaskDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF7ED30326A8975B001F9E8B /* SageResearchTaskDelegate.swift */; };
-		FF7ED30626A8975B001F9E8B /* HistoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF7ED30426A8975B001F9E8B /* HistoryViewModel.swift */; };
-		FF7ED30826A8976B001F9E8B /* AssessmentInfoMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF7ED30726A8976B001F9E8B /* AssessmentInfoMap.swift */; };
-		FF7ED30B26A8977F001F9E8B /* KotlinBase+ClientData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF7ED30926A8977F001F9E8B /* KotlinBase+ClientData.swift */; };
-		FF7ED30C26A8977F001F9E8B /* JsonElement+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF7ED30A26A8977F001F9E8B /* JsonElement+Utils.swift */; };
-		FF8D1F7E26276F3100C44DE9 /* Research in Frameworks */ = {isa = PBXBuildFile; productRef = FF8D1F7D26276F3100C44DE9 /* Research */; };
-		FF8D1F8026276F3100C44DE9 /* ResearchUI in Frameworks */ = {isa = PBXBuildFile; productRef = FF8D1F7F26276F3100C44DE9 /* ResearchUI */; };
-		FF8D1F8526276F5700C44DE9 /* BridgeArchiver in Frameworks */ = {isa = PBXBuildFile; productRef = FF8D1F8426276F5700C44DE9 /* BridgeArchiver */; };
-		FFACECFF26727E1500F764E5 /* BridgeClientAppManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFACECFE26727E1500F764E5 /* BridgeClientAppManager.swift */; };
-		FFACED0426727F2800F764E5 /* SharedMobileUI in Frameworks */ = {isa = PBXBuildFile; productRef = FFACED0326727F2800F764E5 /* SharedMobileUI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,20 +36,6 @@
 		};
 /* End PBXContainerItemProxy section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		FF12D0202695011200520C4D /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				FF12D01F2695011200520C4D /* BridgeClient.xcframework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXFileReference section */
 		7555FF7B242A565900829871 /* iosApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iosApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FF7E242A565900829871 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -86,27 +51,8 @@
 		7555FF9C242A565B00829871 /* iosAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iosAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FFA0242A565B00829871 /* iosAppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iosAppUITests.swift; sourceTree = "<group>"; };
 		7555FFA2242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		E9B7695625D73E8D0031D67E /* bridge_client.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = bridge_client.framework; path = "../bridge-client/build/xcode-frameworks/bridge_client.framework"; sourceTree = "<group>"; };
-		FF12D019269500E300520C4D /* BridgeClient.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BridgeClient.framework; path = "../bridge-client/build/xcode-frameworks/BridgeClient.framework"; sourceTree = "<group>"; };
-		FF12D01D2695011200520C4D /* BridgeClient.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = BridgeClient.xcframework; path = "../bridge-client/build/xcframework/BridgeClient.xcframework"; sourceTree = "<group>"; };
-		FF12D0222695019800520C4D /* TimelineAssessment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimelineAssessment.swift; sourceTree = "<group>"; };
-		FF12D0232695019800520C4D /* TimelineSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimelineSession.swift; sourceTree = "<group>"; };
-		FF12D0242695019800520C4D /* TodayTimelineViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TodayTimelineViewModel.swift; sourceTree = "<group>"; };
-		FF12D0262695019800520C4D /* AssessmentScheduleInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssessmentScheduleInfo.swift; sourceTree = "<group>"; };
-		FF12D0282695019800520C4D /* NativeScheduledSessionWindow+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NativeScheduledSessionWindow+View.swift"; sourceTree = "<group>"; };
-		FF12D02B2695019800520C4D /* Date+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Date+Utils.swift"; sourceTree = "<group>"; };
-		FF12D02D2695019800520C4D /* SageResearchArchiveManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SageResearchArchiveManager.swift; sourceTree = "<group>"; };
-		FF12D02E2695019800520C4D /* AbstractResultArchive.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AbstractResultArchive.swift; sourceTree = "<group>"; };
-		FF12D02F2695019800520C4D /* DataArchive.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataArchive.swift; sourceTree = "<group>"; };
-		FF5657BB266F12C7008671B5 /* PlatformConfigImpl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlatformConfigImpl.swift; sourceTree = "<group>"; };
+		FF4E0E1A26AB7B8800BA652C /* BridgeClientKMM */ = {isa = PBXFileReference; lastKnownFileType = folder; name = BridgeClientKMM; path = ..; sourceTree = "<group>"; };
 		FF7ED30126A89738001F9E8B /* ExternalIdLoginView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExternalIdLoginView.swift; sourceTree = "<group>"; };
-		FF7ED30326A8975B001F9E8B /* SageResearchTaskDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SageResearchTaskDelegate.swift; sourceTree = "<group>"; };
-		FF7ED30426A8975B001F9E8B /* HistoryViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistoryViewModel.swift; sourceTree = "<group>"; };
-		FF7ED30726A8976B001F9E8B /* AssessmentInfoMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssessmentInfoMap.swift; sourceTree = "<group>"; };
-		FF7ED30926A8977F001F9E8B /* KotlinBase+ClientData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "KotlinBase+ClientData.swift"; sourceTree = "<group>"; };
-		FF7ED30A26A8977F001F9E8B /* JsonElement+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "JsonElement+Utils.swift"; sourceTree = "<group>"; };
-		FF8F8D1E261F858900366307 /* BridgeClient.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BridgeClient.framework; path = "../bridge-client/build/bin/ios/debugFramework/BridgeClient.framework"; sourceTree = "<group>"; };
-		FFACECFE26727E1500F764E5 /* BridgeClientAppManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BridgeClientAppManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -114,11 +60,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FF12D01E2695011200520C4D /* BridgeClient.xcframework in Frameworks */,
-				FF8D1F7E26276F3100C44DE9 /* Research in Frameworks */,
-				FF8D1F8026276F3100C44DE9 /* ResearchUI in Frameworks */,
-				FF8D1F8526276F5700C44DE9 /* BridgeArchiver in Frameworks */,
-				FFACED0426727F2800F764E5 /* SharedMobileUI in Frameworks */,
+				FF4E0E1C26AB7BE100BA652C /* BridgeClient in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -142,6 +84,7 @@
 		7555FF72242A565900829871 = {
 			isa = PBXGroup;
 			children = (
+				FF4E0E1A26AB7B8800BA652C /* BridgeClientKMM */,
 				7555FF7D242A565900829871 /* iosApp */,
 				7555FF94242A565B00829871 /* iosAppTests */,
 				7555FF9F242A565B00829871 /* iosAppUITests */,
@@ -163,7 +106,6 @@
 		7555FF7D242A565900829871 /* iosApp */ = {
 			isa = PBXGroup;
 			children = (
-				FF8D1F7326276A5800C44DE9 /* BridgeClientUI */,
 				7555FF7E242A565900829871 /* AppDelegate.swift */,
 				FF7ED30126A89738001F9E8B /* ExternalIdLoginView.swift */,
 				7555FF80242A565900829871 /* SceneDelegate.swift */,
@@ -205,68 +147,8 @@
 		7555FFB0242A642200829871 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				FF12D01D2695011200520C4D /* BridgeClient.xcframework */,
-				FF8F8D1E261F858900366307 /* BridgeClient.framework */,
-				FF12D019269500E300520C4D /* BridgeClient.framework */,
-				E9B7695625D73E8D0031D67E /* bridge_client.framework */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		FF12D0212695019800520C4D /* ObservableObjects */ = {
-			isa = PBXGroup;
-			children = (
-				FF7ED30426A8975B001F9E8B /* HistoryViewModel.swift */,
-				FF7ED30326A8975B001F9E8B /* SageResearchTaskDelegate.swift */,
-				FF12D0222695019800520C4D /* TimelineAssessment.swift */,
-				FF12D0232695019800520C4D /* TimelineSession.swift */,
-				FF12D0242695019800520C4D /* TodayTimelineViewModel.swift */,
-			);
-			path = ObservableObjects;
-			sourceTree = "<group>";
-		};
-		FF12D0252695019800520C4D /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				FF7ED30726A8976B001F9E8B /* AssessmentInfoMap.swift */,
-				FF12D0262695019800520C4D /* AssessmentScheduleInfo.swift */,
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
-		FF12D0272695019800520C4D /* Extensions */ = {
-			isa = PBXGroup;
-			children = (
-				FF7ED30A26A8977F001F9E8B /* JsonElement+Utils.swift */,
-				FF7ED30926A8977F001F9E8B /* KotlinBase+ClientData.swift */,
-				FF12D0282695019800520C4D /* NativeScheduledSessionWindow+View.swift */,
-				FF12D02B2695019800520C4D /* Date+Utils.swift */,
-			);
-			path = Extensions;
-			sourceTree = "<group>";
-		};
-		FF12D02C2695019800520C4D /* Data Archiving */ = {
-			isa = PBXGroup;
-			children = (
-				FF12D02D2695019800520C4D /* SageResearchArchiveManager.swift */,
-				FF12D02E2695019800520C4D /* AbstractResultArchive.swift */,
-				FF12D02F2695019800520C4D /* DataArchive.swift */,
-			);
-			path = "Data Archiving";
-			sourceTree = "<group>";
-		};
-		FF8D1F7326276A5800C44DE9 /* BridgeClientUI */ = {
-			isa = PBXGroup;
-			children = (
-				FF12D02C2695019800520C4D /* Data Archiving */,
-				FF12D0272695019800520C4D /* Extensions */,
-				FF12D0252695019800520C4D /* Models */,
-				FF12D0212695019800520C4D /* ObservableObjects */,
-				FFACECFE26727E1500F764E5 /* BridgeClientAppManager.swift */,
-				FF5657BB266F12C7008671B5 /* PlatformConfigImpl.swift */,
-			);
-			name = BridgeClientUI;
-			path = ../../SwiftPackage/Sources/BridgeClientUI;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -279,7 +161,6 @@
 				7555FF77242A565900829871 /* Sources */,
 				7555FF78242A565900829871 /* Frameworks */,
 				7555FF79242A565900829871 /* Resources */,
-				FF12D0202695011200520C4D /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -287,10 +168,7 @@
 			);
 			name = iosApp;
 			packageProductDependencies = (
-				FF8D1F7D26276F3100C44DE9 /* Research */,
-				FF8D1F7F26276F3100C44DE9 /* ResearchUI */,
-				FF8D1F8426276F5700C44DE9 /* BridgeArchiver */,
-				FFACED0326727F2800F764E5 /* SharedMobileUI */,
+				FF4E0E1B26AB7BE100BA652C /* BridgeClient */,
 			);
 			productName = iosApp;
 			productReference = 7555FF7B242A565900829871 /* iosApp.app */;
@@ -365,9 +243,6 @@
 			);
 			mainGroup = 7555FF72242A565900829871;
 			packageReferences = (
-				FF8D1F7C26276F3100C44DE9 /* XCRemoteSwiftPackageReference "SageResearch" */,
-				FF8D1F8326276F5700C44DE9 /* XCRemoteSwiftPackageReference "BridgeArchiver-Swift" */,
-				FFACED0226727F2800F764E5 /* XCRemoteSwiftPackageReference "SharedMobileUI-AppleOS" */,
 			);
 			productRefGroup = 7555FF7C242A565900829871 /* Products */;
 			projectDirPath = "";
@@ -412,26 +287,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FF12D0382695019800520C4D /* SageResearchArchiveManager.swift in Sources */,
 				7555FF7F242A565900829871 /* AppDelegate.swift in Sources */,
 				7555FF81242A565900829871 /* SceneDelegate.swift in Sources */,
-				FF12D03A2695019800520C4D /* DataArchive.swift in Sources */,
-				FF12D0342695019800520C4D /* NativeScheduledSessionWindow+View.swift in Sources */,
-				FF7ED30B26A8977F001F9E8B /* KotlinBase+ClientData.swift in Sources */,
-				FF7ED30626A8975B001F9E8B /* HistoryViewModel.swift in Sources */,
-				FF7ED30526A8975B001F9E8B /* SageResearchTaskDelegate.swift in Sources */,
-				FF12D0372695019800520C4D /* Date+Utils.swift in Sources */,
-				FF12D0312695019800520C4D /* TimelineSession.swift in Sources */,
-				FF12D0332695019800520C4D /* AssessmentScheduleInfo.swift in Sources */,
-				FFACECFF26727E1500F764E5 /* BridgeClientAppManager.swift in Sources */,
-				FF12D0322695019800520C4D /* TodayTimelineViewModel.swift in Sources */,
-				FF12D0392695019800520C4D /* AbstractResultArchive.swift in Sources */,
 				FF7ED30226A89739001F9E8B /* ExternalIdLoginView.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
-				FF12D0302695019800520C4D /* TimelineAssessment.swift in Sources */,
-				FF7ED30826A8976B001F9E8B /* AssessmentInfoMap.swift in Sources */,
-				FF7ED30C26A8977F001F9E8B /* JsonElement+Utils.swift in Sources */,
-				FF5657BF266F12C7008671B5 /* PlatformConfigImpl.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -755,53 +614,10 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		FF8D1F7C26276F3100C44DE9 /* XCRemoteSwiftPackageReference "SageResearch" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Sage-Bionetworks/SageResearch.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 4.1.4;
-			};
-		};
-		FF8D1F8326276F5700C44DE9 /* XCRemoteSwiftPackageReference "BridgeArchiver-Swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Sage-Bionetworks/BridgeArchiver-Swift.git";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
-		};
-		FFACED0226727F2800F764E5 /* XCRemoteSwiftPackageReference "SharedMobileUI-AppleOS" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Sage-Bionetworks/SharedMobileUI-AppleOS.git";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
 /* Begin XCSwiftPackageProductDependency section */
-		FF8D1F7D26276F3100C44DE9 /* Research */ = {
+		FF4E0E1B26AB7BE100BA652C /* BridgeClient */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = FF8D1F7C26276F3100C44DE9 /* XCRemoteSwiftPackageReference "SageResearch" */;
-			productName = Research;
-		};
-		FF8D1F7F26276F3100C44DE9 /* ResearchUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = FF8D1F7C26276F3100C44DE9 /* XCRemoteSwiftPackageReference "SageResearch" */;
-			productName = ResearchUI;
-		};
-		FF8D1F8426276F5700C44DE9 /* BridgeArchiver */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = FF8D1F8326276F5700C44DE9 /* XCRemoteSwiftPackageReference "BridgeArchiver-Swift" */;
-			productName = BridgeArchiver;
-		};
-		FFACED0326727F2800F764E5 /* SharedMobileUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = FFACED0226727F2800F764E5 /* XCRemoteSwiftPackageReference "SharedMobileUI-AppleOS" */;
-			productName = SharedMobileUI;
+			productName = BridgeClient;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

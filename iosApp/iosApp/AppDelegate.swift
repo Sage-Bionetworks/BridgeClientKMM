@@ -1,7 +1,8 @@
 import UIKit
 import BridgeClient
+import BridgeClientUI
 
-let bridgeManager = BridgeClientAppManager(appId: "sage-assessment-test")
+let bridgeManager = SingleStudyAppManager(appId: "sage-assessment-test")
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {

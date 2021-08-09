@@ -766,6 +766,38 @@ class ScheduleTimelineRepoTest: BaseTest() {
     }
 
     @Test
+    fun testPastSessionsDay2WithCompletion() {
+        runTest {
+            val studyId = "sage-assessment-test"
+            val eventTimeStamp =
+                Clock.System.now().minus(2, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
+            val repo =
+                getTestScheduleTimelineRepo(adherenceRecordDay2json, timeStamp = eventTimeStamp)
+            repo.adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)
+
+            val todayInstant =
+                getTodayInstant().plus(90, DateTimeUnit.MINUTE, TimeZone.currentSystemDefault())
+            val resourceResult = repo.getPastSessions(studyId, todayInstant)
+                .firstOrNull { it is ResourceResult.Success }
+            assertTrue(resourceResult is ResourceResult.Success)
+            val sessionList = resourceResult.data.scheduledSessionWindows
+            assertNotNull(sessionList)
+            assertEquals(10, sessionList.size)
+            val historyRecordsList = sessionList.flatMap {
+                it.assessments.flatMap { assessment -> assessment.history() }
+            }.sortedBy { it.finishedOn }
+
+            assertEquals(2, historyRecordsList.size)
+
+            val record1 = historyRecordsList[0]
+            assertEquals("Assessment Test 1", record1.assessmentInfo.label)
+
+            val record2 = historyRecordsList[1]
+            assertEquals("Shape-Color Sorting", record2.assessmentInfo.label)
+        }
+    }
+
+    @Test
     fun testPastSessionsDay4() {
         runTest {
             val eventTimeStamp =

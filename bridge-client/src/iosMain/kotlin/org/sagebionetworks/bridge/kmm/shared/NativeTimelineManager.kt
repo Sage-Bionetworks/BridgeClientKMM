@@ -156,7 +156,7 @@ data class NativeAdherenceRecord(
     val timezoneIdentifier: String?,
     val startedOn: NSDate?,
     val finishedOn: NSDate?,
-    val declined: Boolean?,
+    val declined: Boolean,
     val clientData: JsonElement?,
 )
 

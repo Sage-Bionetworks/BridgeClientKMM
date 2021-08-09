@@ -14,6 +14,7 @@ import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
 import org.sagebionetworks.bridge.kmm.shared.models.*
+import kotlin.math.roundToInt
 import kotlin.time.ExperimentalTime
 
 class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo,
@@ -442,7 +443,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
             ScheduledAssessmentReference(
                 instanceGuid = assessment.instanceGuid,
                 assessmentInfo = assessmentInfoMap[assessment.refKey]!!,
-                adherenceRecordList = recordsList
+                adherenceRecordList = recordsList ?: emptyList()
             )
         }
     }
@@ -532,10 +533,20 @@ data class ScheduledSessionWindow (
 data class ScheduledAssessmentReference (
     val instanceGuid: String,
     val assessmentInfo: AssessmentInfo,
-    val adherenceRecordList: List<AdherenceRecord>?,
+    val adherenceRecordList: List<AdherenceRecord>,
 ) {
-    val isCompleted = adherenceRecordList?.any { it.finishedOn != null } ?: false
-    val isDeclined = !isCompleted && adherenceRecordList?.any { it.declined == true } ?: false
+    val isCompleted = adherenceRecordList.any { it.finishedOn != null }
+    val isDeclined = !isCompleted && adherenceRecordList.any { it.declined == true }
+
+    fun history(): List<AssessmentHistoryRecord> {
+        return adherenceRecordList.mapNotNull { record ->
+            if (record.startedOn != null && record.finishedOn != null && !record.declined)  {
+                AssessmentHistoryRecord(instanceGuid, assessmentInfo, record.startedOn, record.finishedOn, record.clientTimeZone, record.clientData)
+            } else {
+                null
+            }
+        }
+    }
 }
 
 data class ScheduledNotification(
@@ -546,3 +557,17 @@ data class ScheduledNotification(
     val allowSnooze: Boolean,
     val message: NotificationMessage?,
 )
+
+data class AssessmentHistoryRecord (
+    val instanceGuid: String,
+    val assessmentInfo: AssessmentInfo,
+    val startedOn: Instant,
+    val finishedOn: Instant,
+    val clientTimeZone: String? = null,
+    val clientData: kotlinx.serialization.json.JsonElement? = null) {
+
+    //TODO: Switch to using Instant math once we migrate to Kotlin 1.5 -nbrown 07/27/21
+    val minutes: Int = ((finishedOn.epochSeconds - startedOn.epochSeconds) / 60).toInt()
+//    @OptIn(ExperimentalTime::class)
+//    val minutes = finishedOn.minus(startedOn).inMinutes.roundToInt()
+}

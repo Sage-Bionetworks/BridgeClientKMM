@@ -22,7 +22,7 @@ let package = Package(
         // .package(url: /* package url */, from: "1.0.0"),
         .package(name: "SharedMobileUI",
                  url: "https://github.com/Sage-Bionetworks/SharedMobileUI-AppleOS.git",
-                 from: "0.5.0"),
+                 from: "0.9.0"),
         .package(name: "BridgeArchiver",
                  url: "https://github.com/Sage-Bionetworks/BridgeArchiver-Swift.git",
                  from: "0.3.0"),

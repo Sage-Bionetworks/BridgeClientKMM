@@ -163,7 +163,7 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
                                            timezoneIdentifier: TimeZone.current.identifier,
                                            startedOn: startedOn,
                                            finishedOn: endedOn,
-                                           declined: .init(declined),
+                                           declined: .init(booleanLiteral: declined),
                                            clientData: clientData?.toBridgeClientJsonElement())
         self.timelineManager.updateAdherenceRecord(record: record)
         

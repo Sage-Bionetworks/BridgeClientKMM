@@ -49,6 +49,8 @@ let package = Package(
                     .product(name: "Research", package: "SageResearch"),
                     .product(name: "ResearchUI", package: "SageResearch"),
                 ],
-                path: "SwiftPackage/Sources/BridgeClientUI")
+                path: "SwiftPackage/Sources/BridgeClientUI",
+                resources: [.process("Resources")]
+                )
     ]
 )

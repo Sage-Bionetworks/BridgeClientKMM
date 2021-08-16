@@ -45,6 +45,7 @@ struct PreviewTodayView: View {
     
     var body: some View {
         TodayView(previewSchedules)
+            .assessmentInfoMap(.init(extensions: MTBIdentifier.allCases))
             .environmentObject(bridgeManager)
             .environmentObject(viewModel)
             .fullScreenCover(isPresented: $viewModel.isPresentingAssessment) {
@@ -195,7 +196,7 @@ extension NativeScheduledAssessment {
 }
 
 extension AssessmentInfo {
-    convenience init(identifier: String) {
+    fileprivate convenience init(identifier: String) {
         self.init(key: identifier, guid: UUID().uuidString, appId: kPreviewStudyId, identifier: identifier, revision: nil, label: identifier, minutesToComplete: 3, colorScheme: assessmentColors[identifier], type: "AssessmentInfo")
     }
 }

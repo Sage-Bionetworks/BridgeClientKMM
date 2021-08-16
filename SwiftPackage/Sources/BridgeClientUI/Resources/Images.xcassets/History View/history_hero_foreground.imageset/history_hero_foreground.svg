@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="116" height="70" viewBox="0 0 116 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <ellipse rx="0.600005" ry="3.00002" transform="matrix(-1 0 0 1 43.9996 67)" fill="#93CCF0"/>
+  <ellipse rx="0.600005" ry="3.00002" transform="matrix(4.37114e-08 1 1 -4.37114e-08 44 66.9984)" fill="#93CCF0"/>
+  <ellipse rx="0.400003" ry="2.00002" transform="matrix(-1 0 0 1 33.0004 45.002)" fill="#93CCF0"/>
+  <ellipse rx="0.400003" ry="2.00002" transform="matrix(4.37114e-08 1 1 -4.37114e-08 33 45.0035)" fill="#93CCF0"/>
+  <ellipse rx="0.200002" ry="1.00001" transform="matrix(-1 0 0 1 85.0012 33)" fill="#93CCF0"/>
+  <ellipse rx="0.200002" ry="1.00001" transform="matrix(4.37114e-08 1 1 -4.37114e-08 85.002 33.0008)" fill="#93CCF0"/>
+  <ellipse rx="0.275312" ry="1.10125" transform="matrix(-1 0 0 1 57.1563 30.1012)" fill="#93CCF0"/>
+  <ellipse rx="0.275312" ry="1.15631" transform="matrix(4.37114e-08 1 1 -4.37114e-08 57.1563 30.1542)" fill="#93CCF0"/>
+  <ellipse rx="0.400003" ry="2.00002" transform="matrix(-1 0 0 1 76.0004 64.0039)" fill="#93CCF0"/>
+  <ellipse rx="0.400003" ry="2.00002" transform="matrix(4.37114e-08 1 1 -4.37114e-08 76 64.0055)" fill="#93CCF0"/>
+  <path fill-rule="evenodd" clip-rule="evenodd" d="M67.1614 47.6929L63.9311 38.002L72.3439 38.002L77.9093 46.7583L67.1614 47.6929ZM66.6492 47.7374L63.4041 38.002L55.4431 38.002L52.341 47.7513H66.4897L66.6492 47.7374ZM52.377 48.2513H66.5005H66.5114L66.5222 48.2504L66.6457 48.2396L59.9847 66.3196L52.377 48.2513ZM51.8221 47.7332L54.9184 38.002L47.6567 38.002L42.0625 46.8037L51.8221 47.7332ZM42.3944 47.3376L51.828 48.236L59.3362 66.068L42.3944 47.3376ZM67.1962 48.1917L77.6563 47.2822L60.573 66.169L67.1962 48.1917ZM77.9927 46.9103L78.0005 46.9017L77.9906 46.8862L77.9927 46.9103Z" fill="#95CFF4"/>
+  <text style="font-size: 36; font-family: Roboto; white-space: pre;" transform="matrix(1, 0, 0, 1, -10.031247, 52.095754)">#95CFF4</text>
+</svg>

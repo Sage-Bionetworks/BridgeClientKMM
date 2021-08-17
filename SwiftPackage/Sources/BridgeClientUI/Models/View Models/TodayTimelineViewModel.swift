@@ -240,7 +240,7 @@ public final class TodayTimelineSession : ObservableObject, Identifiable {
     /// The assessments included in this session.
     @Published public var assessments: [TodayTimelineAssessment]
 
-    /// The ``state`` is used allow SwiftUI to respond in a performant way to what is essentially a
+    /// The ``state`` is used to allow SwiftUI to respond in a performant way to what is essentially a
     /// cascading if statement about the state of the session.
     @Published public var state: SessionState = .upNext
     

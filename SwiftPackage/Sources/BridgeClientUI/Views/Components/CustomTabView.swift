@@ -43,7 +43,7 @@ public protocol TabItem : Identifiable, Hashable {
     /// The icon to show when it is selected. By default, this will be tinted using the ``Color.accentColor``.
     func selectedIcon() -> Image
     
-    /// If `true`, then this is a underlay-style icon and image so when selected, *both* the ``icon()``
+    /// If `true`, then this is an underlay-style icon and image so when selected, *both* the ``icon()``
     /// and ``selectedIcon()`` are shown. If `false`, then the ``icon()`` is hidden when selected.
     var isUnderlay: Bool { get }
 }

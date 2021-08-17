@@ -72,7 +72,7 @@ open class StudyInfoViewModel : ObservableObject {
         }
         self.study = study
         self.participantPhone = bridgeManager.userSessionInfo?.phone
-        self.participantId = bridgeManager.userSessionInfo?.externalId ?? (bridgeManager.isPreview ? "123456" : nil)
+        self.participantId = bridgeManager.userSessionInfo?.participantId(for: study.identifier) ?? (bridgeManager.isPreview ? "123456" : nil)
         updateInfo()
     }
     

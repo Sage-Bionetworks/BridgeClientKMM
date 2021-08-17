@@ -65,10 +65,7 @@ public struct PrivacyNoticeView: View {
                         }
                     }
                     Button(action: privacyPolicyShareView.share) {
-                        Label(
-                            title: { Text("Full Notice", bundle: .module) },
-                            icon: { Image(systemName: "square.and.arrow.up") }
-                        )
+                        Label("Full Notice", systemImage: "square.and.arrow.up", bundle: .module)
                     }
                     .buttonStyle(RoundedButtonStyle())
                     privacyPolicyShareView

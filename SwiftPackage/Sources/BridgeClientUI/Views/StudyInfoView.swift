@@ -155,10 +155,7 @@ public struct AboutStudyView: View {
     @ViewBuilder
     private func privacyPolicyButton() -> some View {
         Button(action: showPrivacyNotice) {
-            Label(
-                title: { Text("Review Privacy Notice", bundle: .module) },
-                icon: { Image("privacy.notice.icon", bundle: .module) }
-            )
+            Label("Review Privacy Notice", image: "privacy.notice.icon", bundle: .module)
         }
         .buttonStyle(RoundedButtonStyle(horizontalPadding: 16))
         .padding(.top, 4)
@@ -167,13 +164,10 @@ public struct AboutStudyView: View {
         .fullScreenCover(isPresented: $isPresentingPrivacyNotice) {
             VStack(alignment: .leading, spacing: 0) {
                 Button(action: hidePrivacyNotice) {
-                    Label(
-                        title: { Text("Back", bundle: .module) },
-                        icon: { Image(systemName: "arrow.left") }
-                    )
-                    .font(.latoFont(14, relativeTo: .title2, weight: .regular))
-                    .foregroundColor(.textForeground)
-                    .padding(.horizontal, 16)
+                    Label("Back", systemImage: "arrow.left", bundle: .module)
+                        .font(.latoFont(14, relativeTo: .title2, weight: .regular))
+                        .foregroundColor(.textForeground)
+                        .padding(.horizontal, 16)
                 }
                 PrivacyNoticeView(selectedTab: $privacyNoticeTab)
             }
@@ -278,9 +272,8 @@ public struct ContactAndSupportView: View {
                     .font(.latoFont(12, relativeTo: .title3, weight: .regular))
             },
             icon: {
-                Image("\(imageName).foreground", bundle: .module, label: label)
-                    .background(Image(decorative: "\(imageName).background", bundle: .module)
-                                    .foregroundColor(.accentColor))
+                CompositeTintedImage("\(imageName).foreground", background: "\(imageName).background", bundle: .module)
+                    .accessibility(label: label)
             })
         }
     }

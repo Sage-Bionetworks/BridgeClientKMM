@@ -1,5 +1,5 @@
 //
-//  EndOfStudyView.swift
+//  CompositeTintedImage.swift
 //
 //  Copyright © 2021 Sage Bionetworks. All rights reserved.
 //
@@ -31,74 +31,57 @@
 //
 
 import SwiftUI
-import SharedMobileUI
 
-public struct EndOfStudyView: View {
-    @EnvironmentObject var bridgeManager: SingleStudyAppManager
+public struct CompositeTintedImage: View {
+    private let isBehind: Bool
+    private let defaultImage: Image
+    private let tintedImage: Image
+    private let color: Color
     
-    private let waitMessage = EndOfStudyStatusView(
-        image: "Uploading",
-        isBehind: true,
-        offset: 55.0,
-        title: LocalizedStringKey("Hang tight..."),
-        detail: LocalizedStringKey("Please don't close the app quite yet. We're uploading your contributions to the cloud."))
-    private let allDoneMessage = EndOfStudyStatusView(
-        image:"End of Study",
-        isBehind: false,
-        offset: 120.0,
-        title: LocalizedStringKey("Well done!"),
-        detail: LocalizedStringKey("You've completed the study.\n\nThank you for your contributions."))
+    public init(_ tinted: String, background: String, bundle: Bundle? = nil, color: Color = .accentColor) {
+        self.isBehind = false
+        self.tintedImage = Image(decorative: tinted, bundle: bundle).renderingMode(.template)
+        self.defaultImage = Image(background, bundle: bundle).renderingMode(.original)
+        self.color = color
+    }
     
-    public init() {}
+    public init(_ tinted: String, foreground: String, bundle: Bundle? = nil, color: Color = .accentColor) {
+        self.isBehind = true
+        self.tintedImage = Image(decorative: tinted, bundle: bundle).renderingMode(.template)
+        self.defaultImage = Image(foreground, bundle: bundle).renderingMode(.original)
+        self.color = color
+    }
     
+    init(_ tinted: String, defaultImage: String, isBehind: Bool, bundle: Bundle? = nil, color: Color = .accentColor) {
+        self.isBehind = isBehind
+        self.tintedImage = Image(decorative: tinted, bundle: bundle).renderingMode(.template)
+        self.defaultImage = Image(defaultImage, bundle: bundle).renderingMode(.original)
+        self.color = color
+    }
+
     public var body: some View {
-        ScreenBackground(content: message)
+        ZStack {
+            if isBehind {
+                tinted()
+            }
+            defaultImage
+            if !isBehind {
+                tinted()
+            }
+        }
     }
     
     @ViewBuilder
-    private func message() -> some View {
-        if bridgeManager.isUploadingResults {
-            waitMessage
-        }
-        else {
-            allDoneMessage
-        }
-    }
-}
-
-fileprivate struct EndOfStudyStatusView: View {
-    let image: String
-    let isBehind: Bool
-    let offset: CGFloat
-    let title: LocalizedStringKey
-    let detail: LocalizedStringKey
-    
-    var body: some View {
-        VStack {
-            CompositeTintedImage("\(image).tinted", defaultImage: image, isBehind: isBehind, bundle: .module)
-                .padding(.bottom, 30)
-            Text(title, bundle: .module)
-                .font(.latoFont(24))
-                .padding(.bottom, 16)
-            Text(detail, bundle: .module)
-                .font(.latoFont(18))
-                .padding(.horizontal, 30)
-                .padding(.bottom, 30)
-        }
-        .background(
-            Color.sageWhite
-                .shadow(color: .init(.sRGB, white: 0.0, opacity: 0.25), radius: 4, x: 4.0, y: 4.0)
-                .padding(.top, offset)
-        )
-        .frame(width: 271)
+    func tinted() -> some View {
+        tintedImage
+            .foregroundColor(color)
     }
 }
 
 // syoung 08/16/2021 SwiftUI fails to build complex UI in a shared framework. Therefore, the preview
 // for this element is in iosApp.
-struct EndOfStudyView_Previews: PreviewProvider {
+struct CompositeTintedImage_Previews: PreviewProvider {
     static var previews: some View {
         Text("Hello, World!")
     }
 }
-

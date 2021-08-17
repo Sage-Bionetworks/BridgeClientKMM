@@ -68,12 +68,8 @@ public struct HistoryView: View {
     private func header() -> some View {
         VStack(spacing: 10) {
             ZStack(alignment: .top) {
-                ZStack {
-                    Image(decorative: "history_hero_background", bundle: .module)
-                    Image(decorative: "history_hero_foreground", bundle: .module)
-                        .foregroundColor(.accentColor)
-                }
-                .padding(.top, 12)
+                CompositeTintedImage("History.tinted", background: "History", bundle: .module)
+                    .padding(.top, 12)
                 VStack(spacing: -6) {
                     Text("\(viewModel.minutes)")
                         .font(.poppinsFont(21))

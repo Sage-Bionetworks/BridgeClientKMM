@@ -272,7 +272,7 @@ public struct ContactAndSupportView: View {
                     .font(.latoFont(12, relativeTo: .title3, weight: .regular))
             },
             icon: {
-                CompositeTintedImage("\(imageName).foreground", background: "\(imageName).background", bundle: .module)
+                CompositeTintedImage("\(imageName).background", foreground: "\(imageName).foreground", bundle: .module)
                     .accessibility(label: label)
             })
         }

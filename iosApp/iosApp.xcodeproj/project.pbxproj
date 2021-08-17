@@ -19,6 +19,7 @@
 		FF4E0E1C26AB7BE100BA652C /* BridgeClient in Frameworks */ = {isa = PBXBuildFile; productRef = FF4E0E1B26AB7BE100BA652C /* BridgeClient */; };
 		FF7ED30226A89739001F9E8B /* ExternalIdLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF7ED30126A89738001F9E8B /* ExternalIdLoginView.swift */; };
 		FF8C11EE26CB364B00A9AE72 /* PreviewEndOfStudyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF8C11ED26CB364B00A9AE72 /* PreviewEndOfStudyView.swift */; };
+		FF8C11F026CB3BC300A9AE72 /* PreviewPrivacyNoticeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF8C11EF26CB3BC300A9AE72 /* PreviewPrivacyNoticeView.swift */; };
 		FFE2DF6926CACD3C00DD1E7B /* PreviewCustomTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFE2DF6826CACD3C00DD1E7B /* PreviewCustomTabView.swift */; };
 		FFFE875F26CAF9B000274002 /* PreviewHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFE875E26CAF9B000274002 /* PreviewHistoryView.swift */; };
 /* End PBXBuildFile section */
@@ -59,6 +60,7 @@
 		FF4E0E1A26AB7B8800BA652C /* BridgeClientKMM */ = {isa = PBXFileReference; lastKnownFileType = folder; name = BridgeClientKMM; path = ..; sourceTree = "<group>"; };
 		FF7ED30126A89738001F9E8B /* ExternalIdLoginView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExternalIdLoginView.swift; sourceTree = "<group>"; };
 		FF8C11ED26CB364B00A9AE72 /* PreviewEndOfStudyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewEndOfStudyView.swift; sourceTree = "<group>"; };
+		FF8C11EF26CB3BC300A9AE72 /* PreviewPrivacyNoticeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewPrivacyNoticeView.swift; sourceTree = "<group>"; };
 		FFE2DF6826CACD3C00DD1E7B /* PreviewCustomTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewCustomTabView.swift; sourceTree = "<group>"; };
 		FFFE875E26CAF9B000274002 /* PreviewHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewHistoryView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -134,6 +136,7 @@
 				FF41658E26CAEA0300606A6B /* PreviewTodayView.swift */,
 				FFFE875E26CAF9B000274002 /* PreviewHistoryView.swift */,
 				FF8C11ED26CB364B00A9AE72 /* PreviewEndOfStudyView.swift */,
+				FF8C11EF26CB3BC300A9AE72 /* PreviewPrivacyNoticeView.swift */,
 			);
 			path = "Preview Content";
 			sourceTree = "<group>";
@@ -299,6 +302,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FF8C11F026CB3BC300A9AE72 /* PreviewPrivacyNoticeView.swift in Sources */,
 				FF8C11EE26CB364B00A9AE72 /* PreviewEndOfStudyView.swift in Sources */,
 				7555FF7F242A565900829871 /* AppDelegate.swift in Sources */,
 				7555FF81242A565900829871 /* SceneDelegate.swift in Sources */,

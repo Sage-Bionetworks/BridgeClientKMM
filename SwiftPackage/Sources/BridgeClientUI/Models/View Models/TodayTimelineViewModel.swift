@@ -366,7 +366,7 @@ public final class TodayTimelineAssessment : ObservableObject, Identifiable {
         }
     }
     
-    // Has the assessment been declined (participant asked *not* to finish).
+    /// Has the assessment been declined (participant asked *not* to finish)?
     @Published public var isDeclined: Bool
             
     /// When was it finished?

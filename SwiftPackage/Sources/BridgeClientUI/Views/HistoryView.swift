@@ -49,7 +49,7 @@ public struct HistoryView: View {
         ScreenBackground {
             VStack(spacing: 21) {
                 header()
-                ScrollView {
+                CustomScrollView {
                     LazyVStack(spacing: 16) {
                         ForEach(viewModel.records) { record in
                             card(record)

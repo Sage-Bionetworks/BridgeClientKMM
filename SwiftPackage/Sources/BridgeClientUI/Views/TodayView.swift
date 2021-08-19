@@ -47,7 +47,7 @@ public struct TodayView: View {
         ScreenBackground {
             VStack {
                 dateHeader()
-                ScrollView {
+                CustomScrollView {
                     LazyVStack(spacing: 16) {
                         ForEach(TodayTimelineSession.SessionState.allCases, id: \.rawValue) { state in
                             let sessions = viewModel.filterSchedules(for: state)

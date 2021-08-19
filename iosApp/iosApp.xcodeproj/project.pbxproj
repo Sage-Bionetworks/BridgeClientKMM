@@ -22,6 +22,7 @@
 		FF8C11EE26CB364B00A9AE72 /* PreviewEndOfStudyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF8C11ED26CB364B00A9AE72 /* PreviewEndOfStudyView.swift */; };
 		FF8C11F026CB3BC300A9AE72 /* PreviewPrivacyNoticeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF8C11EF26CB3BC300A9AE72 /* PreviewPrivacyNoticeView.swift */; };
 		FFE2DF6926CACD3C00DD1E7B /* PreviewCustomTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFE2DF6826CACD3C00DD1E7B /* PreviewCustomTabView.swift */; };
+		FFE3F34426CC860A009614D5 /* PreviewCustomScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFE3F34326CC860A009614D5 /* PreviewCustomScrollView.swift */; };
 		FFFE875F26CAF9B000274002 /* PreviewHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFE875E26CAF9B000274002 /* PreviewHistoryView.swift */; };
 /* End PBXBuildFile section */
 
@@ -64,6 +65,7 @@
 		FF8C11ED26CB364B00A9AE72 /* PreviewEndOfStudyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewEndOfStudyView.swift; sourceTree = "<group>"; };
 		FF8C11EF26CB3BC300A9AE72 /* PreviewPrivacyNoticeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewPrivacyNoticeView.swift; sourceTree = "<group>"; };
 		FFE2DF6826CACD3C00DD1E7B /* PreviewCustomTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewCustomTabView.swift; sourceTree = "<group>"; };
+		FFE3F34326CC860A009614D5 /* PreviewCustomScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewCustomScrollView.swift; sourceTree = "<group>"; };
 		FFFE875E26CAF9B000274002 /* PreviewHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewHistoryView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -140,6 +142,7 @@
 				FF8C11ED26CB364B00A9AE72 /* PreviewEndOfStudyView.swift */,
 				FF8C11EF26CB3BC300A9AE72 /* PreviewPrivacyNoticeView.swift */,
 				FF0B930026CC3DAE0041A486 /* PreviewStudyInfoView.swift */,
+				FFE3F34326CC860A009614D5 /* PreviewCustomScrollView.swift */,
 			);
 			path = "Preview Content";
 			sourceTree = "<group>";
@@ -311,6 +314,7 @@
 				7555FF7F242A565900829871 /* AppDelegate.swift in Sources */,
 				7555FF81242A565900829871 /* SceneDelegate.swift in Sources */,
 				FF7ED30226A89739001F9E8B /* ExternalIdLoginView.swift in Sources */,
+				FFE3F34426CC860A009614D5 /* PreviewCustomScrollView.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
 				FFFE875F26CAF9B000274002 /* PreviewHistoryView.swift in Sources */,
 				FFE2DF6926CACD3C00DD1E7B /* PreviewCustomTabView.swift in Sources */,

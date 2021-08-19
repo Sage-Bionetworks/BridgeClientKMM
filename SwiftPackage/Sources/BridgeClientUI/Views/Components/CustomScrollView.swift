@@ -160,8 +160,8 @@ public struct CustomScrollView<Content : View>: View {
             // Figure out how many pages are needed.
             let pageCount = Int(ceil(scrollHeight/viewHeight))
             if pages.count > 0 {
-                // Lop off the end. If there are more pages that there are currently
-                // then doing do will refresh the last page with a new height by
+                // Lop off the end. If there are more pages than there are currently
+                // then doing so will refresh the last page with a new height by
                 // replacing the UUID that is used as the identifier.
                 pages = Array(pages[0..<(min(pageCount, pages.count) - 1)])
             }

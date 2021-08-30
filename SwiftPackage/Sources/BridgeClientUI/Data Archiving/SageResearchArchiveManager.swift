@@ -40,10 +40,12 @@ open class SageResearchArchiveManager : NSObject, RSDDataArchiveManager {
     public var bridgeManager: BridgeClientAppManager!
     
     private var _defaultTaskToSchemaMapping: [String : String]?
+    private var _appConfigTaskToSchemaMapping: [String : String]?
     
     open func load(bridgeManager: BridgeClientAppManager, taskToSchemaMapping: [String : String]? = nil) {
         self.bridgeManager = bridgeManager
         self._defaultTaskToSchemaMapping = taskToSchemaMapping
+        self._appConfigTaskToSchemaMapping = bridgeManager.appConfig?.taskToSchemaMapping()
     }
     
     open func schemaReference(for taskResult: RSDTaskResult) -> RSDSchemaInfo? {
@@ -54,9 +56,9 @@ open class SageResearchArchiveManager : NSObject, RSDDataArchiveManager {
         var ret: RSDSchemaInfo? = nil
         DispatchQueue.main.sync {
             let schemaIdentifier =
-                (taskResult as? AssessmentResult)?.schemaIdentifier ??
-                self.bridgeManager.appConfig?.taskToSchemaMapping()?[taskResult.identifier] ??
+                self._appConfigTaskToSchemaMapping?[taskResult.identifier] ??
                 self._defaultTaskToSchemaMapping?[taskResult.identifier] ??
+                (taskResult as? AssessmentResult)?.schemaIdentifier ??
                 taskResult.identifier
             
             if let ref = bridgeManager.appConfig?.schemaReferences?.first(where: { $0.id == schemaIdentifier }) {

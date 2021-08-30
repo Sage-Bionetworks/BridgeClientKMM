@@ -41,12 +41,12 @@ public protocol KotlinBase_ClientData : AnyObject {
 
 extension KotlinBase_ClientData {
     
-    public func clientDataDictionary() throws -> [String : JsonSerializable]? {
+    public func clientDataDictionary() throws -> [String : Any]? {
         guard let data = self.clientDataJson()
         else {
             return nil
         }
-        return try JSONSerialization.jsonObject(with: data, options: []) as? [String : JsonSerializable]
+        return try JSONSerialization.jsonObject(with: data, options: []) as? [String : Any]
     }
     
     public func decodeClientData<T : Decodable>(_ type: T.Type, using factory: SerializationFactory = .init()) throws -> T? {

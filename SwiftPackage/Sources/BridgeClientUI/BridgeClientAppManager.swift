@@ -154,11 +154,10 @@ open class BridgeClientAppManager : ObservableObject {
         DispatchQueue.global().async {
 
             // Encrypt the files.
-            if let path = Bundle.main.path(forResource: self.platformConfig.appId, ofType: "pem"),
-               let pemFile = try? String(contentsOfFile: path, encoding: .utf8) {
+            if let path = Bundle.main.path(forResource: self.platformConfig.appId, ofType: "pem") {
                 archives.forEach { archive in
                     do {
-                        try archive.encryptArchive(using: pemFile)
+                        try archive.encryptArchive(using: path)
                     } catch let err {
                         print("Failed to encrypt archive. \(err)")
                     }

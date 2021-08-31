@@ -45,6 +45,7 @@ open class BridgeClientAppManager : ObservableObject {
     
     public let isPreview: Bool
     public let platformConfig: PlatformConfig
+    public let pemPath: String?
         
     @Published public var title: String
     @Published public var appState: AppState = .launching
@@ -80,11 +81,12 @@ open class BridgeClientAppManager : ObservableObject {
     /// The local notification manager is a singleton that can be set up as the notification delegate (to handle snoozing)
     lazy public var localNotificationManager : LocalNotificationManager = LocalNotificationManager()
     
-    public convenience init(appId: String) {
-        self.init(platformConfig: PlatformConfigImpl(appId: appId))
+    public convenience init(appId: String, pemPath: String? = nil) {
+        self.init(platformConfig: PlatformConfigImpl(appId: appId), pemPath: pemPath)
     }
     
-    public init(platformConfig: PlatformConfig) {
+    public init(platformConfig: PlatformConfig, pemPath: String? = nil) {
+        self.pemPath = pemPath ?? Bundle.main.path(forResource: platformConfig.appId, ofType: "pem")
         self.platformConfig = platformConfig
         self.title = self.platformConfig.localizedAppName
         self.isPreview = (platformConfig.appId == kPreviewStudyId)
@@ -154,7 +156,7 @@ open class BridgeClientAppManager : ObservableObject {
         DispatchQueue.global().async {
 
             // Encrypt the files.
-            if let path = Bundle.main.path(forResource: self.platformConfig.appId, ofType: "pem") {
+            if let path = self.pemPath {
                 archives.forEach { archive in
                     do {
                         try archive.encryptArchive(using: path)

@@ -22,8 +22,8 @@ abstract class AbstractBaseIntegrationTest: BaseTest(), KoinTest {
 
 
     val testModule = module {
-        single (override=true) { ResourceDatabaseHelper(testDatabaseDriver()) }
-        single<BridgeConfig>(override=true) { TestBridgeConfig() }
+        single () { ResourceDatabaseHelper(testDatabaseDriver()) }
+        single<BridgeConfig>() { TestBridgeConfig() }
 
     }
 

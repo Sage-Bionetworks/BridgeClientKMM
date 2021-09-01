@@ -4,14 +4,14 @@ object Versions {
     const val compile_sdk = 29
 
     //Kotlin
-    const val kotlin = "1.4.32"
-    const val kotlinCoroutines = "1.4.3-native-mt"
-    const val ktor = "1.5.3"
-    const val kotlinxSerialization = "1.1.0"
-    const val kotlinxDateTime = "0.2.0"
+    const val kotlin = "1.5.30"
+    const val kotlinCoroutines = "1.5.1-native-mt"
+    const val ktor = "1.6.1"
+    const val kotlinxSerialization = "1.2.2"
+    const val kotlinxDateTime = "0.2.1"
     const val multiplatformSettings = "0.7.1"
-    const val koin = "3.0.1"
-    const val sqlDelight = "1.5.0"
+    const val koin = "3.1.1"
+    const val sqlDelight = "1.5.1"
     const val okio = "3.0.0-alpha.4"
     const val stately = "1.1.1"
 

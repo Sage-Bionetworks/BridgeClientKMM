@@ -60,13 +60,13 @@ public struct AssessmentScheduleInfo {
     /// A thread-safe struct with information required to load and save the results from an assessment.
     public struct Info : Hashable, Codable {
         /// The ``BridgeClient.AssessmentInfo/identifier``.
-        let identifier: String
+        public let identifier: String
         /// The ``BridgeClient.AssessmentInfo/key``.
-        let key: String?
+        public let key: String?
         /// The ``BridgeClient.AssessmentInfo/guid``.
-        let guid: String?
+        public let guid: String?
         /// The ``BridgeClient.AssessmentInfo/label``.
-        let label: String?
+        public let label: String?
     }
     
     /// A thread-safe struct with information needed to find and update the Kotlin ``BridgeClient.NativeScheduledSessionWindow``

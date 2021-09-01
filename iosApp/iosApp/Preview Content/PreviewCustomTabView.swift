@@ -1,5 +1,5 @@
 //
-//  TimelineAssessment.swift
+//  PreviewCustomTabView.swift
 //
 //  Copyright © 2021 Sage Bionetworks. All rights reserved.
 //
@@ -31,51 +31,52 @@
 //
 
 import SwiftUI
-import BridgeClient
+import BridgeClientUI
 
-/// The `TimelineAssessment` is an `ObservableObject` that wraps a Kotlin Native
-/// ``NativeScheduledAssessment``.
-public final class TimelineAssessment : ObservableObject, Identifiable {
-    public var id: String {
-        self.assessment.instanceGuid
-    }
+struct PreviewCustomTabView: View {
+    let placement: VerticalAlignment
     
-    public var instanceGuid: String {
-        self.assessment.instanceGuid
-    }
+    @State var selectedTab : Tab = .profile
     
-    /// The Kotlin Native assessment information that backs this object.
-    public var assessment: NativeScheduledAssessment {
-        didSet {
-            self.isCompleted = assessment.isCompleted
-            self.isDeclined = assessment.isDeclined
+    enum Tab : String, CaseIterable, EnumTabItem {
+        case profile, notifications, settings
+        
+        var bundle: Bundle? { nil }
+        
+        func title() -> Text {
+            switch self {
+            case .profile:
+                return Text("PROFILE")
+            case .notifications:
+                return Text("NOTIFICATIONS")
+            case .settings:
+                return Text("SETTINGS")
+            }
         }
     }
     
-    /// Is the assessment enabled?
-    @Published public var isEnabled: Bool
-    
-    /// Is the assessment completed?
-    @Published public var isCompleted: Bool {
-        didSet {
-            self.finishedOn = finishedOn ?? Date()
+    var body: some View {
+        CustomTabView(selectedTab: $selectedTab, tabs: Tab.allCases, placement: placement) { tab in
+            switch tab {
+            case .profile:
+                Text("Showing Profile")
+            case .notifications:
+                Text("Showing Notifications")
+            case .settings:
+                Text("Showing Settings")
+            }
+        }
+        .onAppear {
+            print("whoohoo")
         }
     }
-    
-    // Has the assessment been declined (participant asked *not* to finish).
-    @Published public var isDeclined: Bool
-            
-    /// When was it finished?
-    @Published public var finishedOn: Date?
-    
-    public init(_ assessment: NativeScheduledAssessment, isEnabled: Bool = true) {
-        self.assessment = assessment
-        self.isCompleted = assessment.isCompleted
-        self.isDeclined = assessment.isDeclined
-        self.isEnabled = isEnabled
-        self.finishedOn = assessment.adherenceRecords?
-            .filter({ $0.finishedOn != nil })
-            .sorted(by: { $0.finishedOn! < $1.finishedOn! })
-            .last?.finishedOn
+}
+
+struct PreviewCustomTabView_Previews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            PreviewCustomTabView(placement: .top)
+            PreviewCustomTabView(placement: .bottom)
+        }
     }
 }

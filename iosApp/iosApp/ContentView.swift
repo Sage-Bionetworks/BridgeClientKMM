@@ -1,10 +1,11 @@
 import SwiftUI
 import BridgeClient
+import BridgeClientUI
 
 // TODO: syoung 06/07/2021 Build example app?
 
 struct ContentView: View {
-    @EnvironmentObject var bridgeManager: BridgeClientAppManager
+    @EnvironmentObject var bridgeManager: SingleStudyAppManager
     
     var body: some View {
         switch bridgeManager.appState {
@@ -22,7 +23,7 @@ struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             ContentView()
-                .environmentObject(BridgeClientAppManager(appId: "preview"))
+                .environmentObject(SingleStudyAppManager(appId: kPreviewStudyId))
         }
     }
 }

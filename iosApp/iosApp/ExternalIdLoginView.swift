@@ -33,10 +33,11 @@
 
 import SwiftUI
 import BridgeClient
+import BridgeClientUI
 import SharedMobileUI
 
 public struct ExternalIdLoginView: View {
-    @EnvironmentObject var bridgeManager: BridgeClientAppManager
+    @EnvironmentObject var bridgeManager: SingleStudyAppManager
     @State var externalId: String = ""
     @State var status: ResourceStatus?
     
@@ -88,7 +89,7 @@ public struct ExternalIdLoginView: View {
     func signIn() {
         guard externalId.count > 0 else { return }
         self.status = ResourceStatus.pending
-        bridgeManager.loginWithExternalId(externalId) { status in
+        bridgeManager.loginWithExternalId(externalId, password: externalId) { status in
             self.status = status
         }
     }
@@ -98,10 +99,10 @@ struct ExternalIdLoginView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             ExternalIdLoginView()
-                .environmentObject(BridgeClientAppManager(appId: kPreviewStudyId))
+                .environmentObject(SingleStudyAppManager(appId: kPreviewStudyId))
             ExternalIdLoginView()
                 .preferredColorScheme(.dark)
-                .environmentObject(BridgeClientAppManager(appId: kPreviewStudyId))
+                .environmentObject(SingleStudyAppManager(appId: kPreviewStudyId))
         }
     }
 }

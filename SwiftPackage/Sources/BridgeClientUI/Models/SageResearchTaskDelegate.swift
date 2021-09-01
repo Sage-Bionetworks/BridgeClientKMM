@@ -57,7 +57,7 @@ open class SageResearchTaskDelegate : NSObject, RSDTaskViewControllerDelegate {
         "\(scheduledAssessment.session.instanceGuid)|\(scheduledAssessment.instanceGuid)"
     }
     
-    init(_ assessmentManager: TodayTimelineViewModel) {
+    public init(_ assessmentManager: TodayTimelineViewModel) {
         self.assessmentManager = assessmentManager
         self.scheduledAssessment = assessmentManager.selectedAssessment
     }

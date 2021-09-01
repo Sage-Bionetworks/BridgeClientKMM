@@ -10,7 +10,7 @@ object Versions {
     const val kotlinxSerialization = "1.1.0"
     const val kotlinxDateTime = "0.2.0"
     const val multiplatformSettings = "0.7.1"
-    const val koin = "3.0.1"
+    const val koin = "3.1.1"
     const val sqlDelight = "1.5.0"
     const val okio = "3.0.0-alpha.4"
     const val stately = "1.1.1"

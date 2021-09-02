@@ -50,7 +50,13 @@ let package = Package(
                     .product(name: "ResearchUI", package: "SageResearch"),
                 ],
                 path: "SwiftPackage/Sources/BridgeClientUI",
-                resources: [.process("Resources")]
-                )
+                resources: [.process("Resources")]),
+        
+        .testTarget(name: "BridgeClientUITests",
+                    dependencies: [
+                        "BridgeClient",
+                        "BridgeClientUI",
+                    ],
+                    path: "SwiftPackage/Tests/BridgeClientUITests")
     ]
 )

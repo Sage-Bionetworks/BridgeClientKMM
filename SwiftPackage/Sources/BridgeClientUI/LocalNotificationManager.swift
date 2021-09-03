@@ -80,12 +80,15 @@ open class LocalNotificationManager : NSObject, UNUserNotificationCenterDelegate
     }
     
     open func createRequests() -> [UNNotificationRequest] {
+        createBuilders().map { $0.buildNotificationRequest()}
+    }
+    
+    func createBuilders() -> [RequestBuilder] {
         let builders = notifications[..<maxTotalScheduledSessionRequests]
             .map { buildRequests(for: $0) }
             .flatMap { $0 }
             .sorted()
-        return builders[..<min(maxRequests, builders.count)]
-            .map { $0.buildNotificationRequest()}
+        return Array(builders[..<min(maxRequests, builders.count)])
     }
     
     open func buildContent(for notification: NativeScheduledNotification) -> UNNotificationContent {
@@ -103,7 +106,7 @@ open class LocalNotificationManager : NSObject, UNUserNotificationCenterDelegate
         return content
     }
     
-    private func buildRequests(for notification: NativeScheduledNotification) -> [RequestBuilder] {
+    func buildRequests(for notification: NativeScheduledNotification) -> [RequestBuilder] {
         let content = buildContent(for: notification)
         let calendar = Calendar.current
         
@@ -144,7 +147,7 @@ open class LocalNotificationManager : NSObject, UNUserNotificationCenterDelegate
                                            instanceGuid: notification.instanceGuid,
                                            repeats: false))
             scheduleInstant = calendar.date(byAdding: repeatInterval, to: scheduleInstant) ?? .distantFuture
-        } while scheduleInstant < endInstant && requests.count < maxCount
+        } while scheduleInstant < endInstant && requests.count < maxRequests
         
         return requests
     }
@@ -160,7 +163,7 @@ open class LocalNotificationManager : NSObject, UNUserNotificationCenterDelegate
         }
     }
     
-    private class RequestBuilder : Comparable {
+    class RequestBuilder : Comparable {
 
         let content: UNNotificationContent
         let trigger: UNCalendarNotificationTrigger

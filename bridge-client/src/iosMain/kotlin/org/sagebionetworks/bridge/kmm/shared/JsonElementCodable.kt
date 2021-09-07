@@ -1,32 +1,57 @@
 package org.sagebionetworks.bridge.kmm.shared
 
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import platform.Foundation.*
-import org.sagebionetworks.bridge.kmm.shared.models.AdherenceRecord
-import org.sagebionetworks.bridge.kmm.shared.models.Study
-import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
+import org.sagebionetworks.bridge.kmm.shared.models.*
 import org.sagebionetworks.bridge.mpp.network.generated.models.AppConfig
 
 class JsonElementDecoder(private val jsonData: NSData) {
-    private val jsonCoder: Json = Json {}
     @Throws(Throwable::class)
     fun decodeObject(): JsonElement {
         try {
             val jsonString = jsonData.toUTF8String()
-            return jsonCoder.parseToJsonElement(jsonString!!)
+            return Json.parseToJsonElement(jsonString!!)
         } catch (err: Exception) {
             throw Throwable(err.message)
         }
     }
 }
 
+class JsonDecoder(private val jsonData: NSData) {
+    @Throws(Throwable::class)
+    private inline fun <reified T> decodeObject(): T {
+        try {
+            val jsonString = jsonData.toUTF8String()
+            return Json.decodeFromString(jsonString!!)
+        } catch (err: Exception) {
+            throw Throwable(err.message)
+        }
+    }
+
+    @Throws(Throwable::class)
+    fun decodeAppConfig(): AppConfig = decodeObject()
+
+    @Throws(Throwable::class)
+    fun decodeStudy(): Study = decodeObject()
+
+    @Throws(Throwable::class)
+    fun decodeUserSessionInfo(): UserSessionInfo = decodeObject()
+
+    @Throws(Throwable::class)
+    fun decodeAdherenceRecord(): AdherenceRecord = decodeObject()
+
+    @Throws(Throwable::class)
+    fun decodeJsonElement(): JsonElement = decodeObject()
+}
+
 // syoung 07/23/2021 from https://github.com/JetBrains/kotlin-native/issues/2146
 
-fun String.toNSData(): NSData? =
+internal fun String.toNSData(): NSData? =
     NSString.create(string = this).dataUsingEncoding(NSUTF8StringEncoding)
 
-fun NSData.toUTF8String(): String? =
+internal fun NSData.toUTF8String(): String? =
     NSString.create(data = this, encoding = NSUTF8StringEncoding)?.toString()
 
 // syoung 07/23/2021 There is a bug in the Kotlin KMM serialization where the

@@ -33,6 +33,10 @@ kotlin {
             binaries {
                 framework {
                     baseName = iosFrameworkName
+                    // Include DSYM in the release build
+                    freeCompilerArgs += "-Xg0"
+                    // Include Generics in the module header.
+                    freeCompilerArgs += "-Xobjc-generics"
                 }
             }
         }

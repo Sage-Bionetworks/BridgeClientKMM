@@ -7,6 +7,7 @@ import platform.Foundation.*
 import org.sagebionetworks.bridge.kmm.shared.models.*
 import org.sagebionetworks.bridge.mpp.network.generated.models.AppConfig
 
+// TODO: syoung 09/08/2021 Deprecate this class and use Generic JsonDecoder below
 class JsonElementDecoder(private val jsonData: NSData) {
     @Throws(Throwable::class)
     fun decodeObject(): JsonElement {

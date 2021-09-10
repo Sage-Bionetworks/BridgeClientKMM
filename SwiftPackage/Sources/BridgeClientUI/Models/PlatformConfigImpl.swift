@@ -33,13 +33,15 @@
 import Foundation
 import BridgeClient
 
-public class PlatformConfigImpl : PlatformConfig {
-
+public class PlatformConfigImpl : IOSPlatformConfig {
+        
+    public let appGroupIdentifier: String?
     public let appId: String
     public let appName: String
     public let appVersionName: String
     public let appVersion: Int32
     public let deviceName: String
+    public let bridgeEnv: PlatformConfigBridgeEnv
     public let osName: String
     public let osVersion: String
     
@@ -47,12 +49,14 @@ public class PlatformConfigImpl : PlatformConfig {
         "\(deviceName); \(osName)/\(osVersion)"
     }
     
-    init(appId: String? = nil) {
+    init(appId: String? = nil, appGroupIdentifier: String? = nil, bridgeEnv: PlatformConfigBridgeEnv = .production) {
         
         self.appId = appId ?? Bundle.main.bridgeAppId
+        self.appGroupIdentifier = appGroupIdentifier
         self.appName = Bundle.main.executableName
         self.appVersionName = Bundle.main.fullVersion
         self.appVersion = Int32(Bundle.main.buildNumber)
+        self.bridgeEnv = bridgeEnv
         
         #if os(watchOS)
         let device = WKInterfaceDevice.current()

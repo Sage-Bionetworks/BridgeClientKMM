@@ -11,6 +11,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         bridgeManager.appWillFinishLaunching(launchOptions)
         return true
     }
+    
+    // MARK: Background URLSession Lifecycle
+    
+    func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String,
+            completionHandler: @escaping () -> Void) {
+        bridgeManager.handleEvents(for: identifier, completionHandler: completionHandler)
+    }
 
     // MARK: UISceneSession Lifecycle
 

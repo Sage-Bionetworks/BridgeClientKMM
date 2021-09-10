@@ -3,15 +3,19 @@ package org.sagebionetworks.bridge.kmm.shared
 import kotlin.native.concurrent.AtomicReference
 import kotlin.native.concurrent.freeze
 
+interface IOSPlatformConfig : PlatformConfig {
+    val appGroupIdentifier: String?
+}
+
 object IOSBridgeConfig  : BridgeConfig {
 
-    private val atomicRef: AtomicReference<PlatformConfig?> = AtomicReference(null)
+    private val atomicRef: AtomicReference<IOSPlatformConfig?> = AtomicReference(null)
 
-    fun initialize(platformConfig : PlatformConfig) {
+    fun initialize(platformConfig : IOSPlatformConfig) {
         atomicRef.compareAndSet(null, platformConfig.freeze())
     }
 
-    private val platformConfig: PlatformConfig
+    private val platformConfig: IOSPlatformConfig
         get() {
             return atomicRef.value ?: defaultPlatformConfig
         }
@@ -22,6 +26,8 @@ object IOSBridgeConfig  : BridgeConfig {
 
     // Wrapped values
 
+    val appGroupIdentifier: String?
+        get() = platformConfig.appGroupIdentifier
     override val appId: String
         get() = platformConfig.appId
     override val appName: String
@@ -30,6 +36,8 @@ object IOSBridgeConfig  : BridgeConfig {
         get() = platformConfig.appVersion
     override val appVersionName: String
         get() = platformConfig.appVersionName
+    override val bridgeEnv: PlatformConfig.BridgeEnv
+        get() = platformConfig.bridgeEnv
     override val osName: String
         get() = platformConfig.osName
     override val osVersion: String
@@ -39,11 +47,13 @@ object IOSBridgeConfig  : BridgeConfig {
 }
 
 internal data class PlatformConfigImpl(
+    override val appGroupIdentifier: String? = null,
     override val appId: String = "sage-assessment-test",
     override val appName: String = "Sage Assessment Test",
     override val appVersion: Int = 99,
     override val appVersionName: String = "Unknown",
+    override val bridgeEnv: PlatformConfig.BridgeEnv = PlatformConfig.BridgeEnv.production,
     override val osVersion: String = "Unknown",
     override val deviceName: String = "Unknown",
-    override val osName: String = "iOS") : PlatformConfig
+    override val osName: String = "iOS") : IOSPlatformConfig
 

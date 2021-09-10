@@ -32,8 +32,7 @@
 //
 
 import XCTest
-import BridgeClient
-@testable import Psorcast
+@testable import BridgeClient
 
 class ParticipantFileUploadManagerTests: XCTestCase {
     

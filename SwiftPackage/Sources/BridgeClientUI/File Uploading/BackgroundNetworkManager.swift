@@ -32,6 +32,7 @@
 //
 
 import Foundation
+import UIKit
 import BridgeClient
 
 protocol URLSessionBackgroundDelegate: URLSessionDataDelegate, URLSessionDownloadDelegate {
@@ -69,20 +70,21 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
 
     /// A singleton instance of the manager.
     public static let shared = BackgroundNetworkManager()
-    
+
     /// The identifier (base) for the background URLSession. App extensions will append a unique string to this to distinguish
     /// their background sessions.
     // TODO: Allow users of this singleton to specify their own individually unique identifiers.
     public static let backgroundSessionIdentifier = "org.sagebase.backgroundnetworkmanager.session"
     
+    /// BackgroundNetworkManager needs access to app configuration and user session info. The app manager should create the singleton
+    /// instance and immediately set this value to itself.
+    var appManager: BridgeClientAppManager!
+
     /// We use this custom HTTP request header as a hack to keep track of how many times we've retried a request.
     let retryCountHeader = "X-SageBridge-Retry"
     
     /// This sets the maximum number of times we will retry a request before giving up.
     let maxRetries = 5
-    
-    /// If set, this object's delegate methods will be called to present UI around critical errors (app update required, etc.).
-    public var bridgeErrorUIDelegate: SBBBridgeErrorUIDelegate?
     
     /// If set, URLSession(Data/Download)Delegate method calls received by the BackgroundNetworkManager
     /// will be passed through to this object for further handling.
@@ -163,7 +165,7 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
     // internal-use-only method, must always be called on the session delegate queue
     fileprivate func createBackgroundSession(with sessionIdentifier: String) {
         let config = URLSessionConfiguration.background(withIdentifier: sessionIdentifier)
-        if let appGroupIdentifier = BridgeSDK.bridgeInfo.appGroupIdentifier, !appGroupIdentifier.isEmpty {
+        if let appGroupIdentifier = IOSBridgeConfig().appGroupIdentifier, !appGroupIdentifier.isEmpty {
             config.sharedContainerIdentifier = appGroupIdentifier
         }
         
@@ -171,22 +173,9 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
     }
     
     func bridgeBaseURL() -> URL {
-        let domainPrefix = "webservices"
-        let domainSuffixForEnv = [
-            "",
-            "-staging",
-            "-develop",
-            "-custom"
-        ]
-        
-        let bridgeEnv = BridgeSDK.bridgeInfo.environment.rawValue
-        guard bridgeEnv < domainSuffixForEnv.count else {
-            fatalError("Environment property in BridgeInfo must be an integer in the range 0..\(domainSuffixForEnv.count).")
-        }
-        
-        let bridgeHost = "\(domainPrefix)\(domainSuffixForEnv[bridgeEnv]).sagebridge.org"
-        guard let baseUrl = URL(string: "https://\(bridgeHost)") else {
-            fatalError("Unable to create URL object from string 'https://\(bridgeHost)'")
+        let basePath = IOSBridgeConfig().bridgeEnv.basePath()
+        guard let baseUrl = URL(string: basePath) else {
+            fatalError("Unable to create URL object from string '\(basePath)'")
         }
         
         return baseUrl
@@ -229,12 +218,6 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
     }
     
     func addBasicHeaders(to request: inout URLRequest) {
-        let bundle = Bundle.main
-        let device = UIDevice.current
-        let name = bundle.appName()
-        let version = bundle.appVersion()
-        let info = device.deviceInfo()
-        
         let userAgentHeader = IOSBridgeConfig().userAgent
         request.setValue(userAgentHeader, forHTTPHeaderField: "User-Agent")
         
@@ -244,7 +227,23 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
         request.setValue("no-cache", forHTTPHeaderField: "cache-control")
     }
     
-    func request<T>(method: String, URLString: String, headers: [String : String]?, parameters: T?) -> URLRequest where T: Encodable {
+    func request(method: String, URLString: String, headers: [String : String]?) -> URLRequest {
+        var request = URLRequest(url: bridgeURL(for: URLString))
+        request.httpMethod = method
+        request.httpShouldHandleCookies = false
+        addBasicHeaders(to: &request)
+        
+        if let headers = headers {
+            for (header, value) in headers {
+                request.addValue(value, forHTTPHeaderField: header)
+            }
+        }
+        
+        debugPrint("Prepared request--URL:\n\(String(describing: request.url?.absoluteString))\nHeaders:\n\(String(describing: request.allHTTPHeaderFields))")
+        return request
+    }
+    
+    func request<T>(method: String, URLString: String, headers: [String : String]?, parameters: T) -> URLRequest where T: Encodable {
         var URLString = URLString
         let isGet = (method.uppercased() == "GET")
         
@@ -260,20 +259,11 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
             }
         }
         
-        var request = URLRequest(url: bridgeURL(for: URLString))
-        request.httpMethod = method
-        request.httpShouldHandleCookies = false
-        addBasicHeaders(to: &request)
-        
-        if let headers = headers {
-            for (header, value) in headers {
-                request.addValue(value, forHTTPHeaderField: header)
-            }
-        }
+        var request = self.request(method: method, URLString: URLString, headers: headers)
         
         // for non-GET requests, the parameters (if any) go in the request body
         let contentTypeHeader = "Content-Type"
-        if let parameters = parameters, !isGet {
+        if !isGet {
             if request.value(forHTTPHeaderField: contentTypeHeader) == nil {
                 let ianaCharset = CFStringConvertEncodingToIANACharSetName(CFStringConvertNSStringEncodingToEncoding(String.Encoding.utf8.rawValue)) as String
                 request.setValue("application/json; charset=\(ianaCharset)", forHTTPHeaderField: contentTypeHeader)
@@ -286,17 +276,22 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
             }
         }
         
-        debugPrint("Prepared request--URL:\n\(String(describing: request.url?.absoluteString))\nHeaders:\n\(String(describing: request.allHTTPHeaderFields))\nBody:\n\(String(describing: String(data: request.httpBody ?? Data(), encoding: .utf8)))")
+        debugPrint("Request body:\n\(String(describing: String(data: request.httpBody ?? Data(), encoding: .utf8)))")
         
         return request
     }
     
-    public func downloadFile<T>(from URLString: String, method: String, httpHeaders: [String : String]?, parameters: T?, taskDescription: String) -> URLSessionDownloadTask where T: Encodable {
-        let request =  self.request(method: method, URLString: URLString, headers: httpHeaders, parameters: parameters)
-        return self.downloadFile(urlRequest: request)
+    public func downloadFile(from URLString: String, method: String, httpHeaders: [String : String]?, taskDescription: String) -> URLSessionDownloadTask {
+        let request = self.request(method: method, URLString: URLString, headers: httpHeaders)
+        return self.downloadFile(with: request, taskDescription: taskDescription)
     }
     
-    public func downloadFile(urlRequest: URLRequest) {
+    public func downloadFile<T>(from URLString: String, method: String, httpHeaders: [String : String]?, parameters: T?, taskDescription: String) -> URLSessionDownloadTask where T: Encodable {
+        let request =  self.request(method: method, URLString: URLString, headers: httpHeaders, parameters: parameters)
+        return self.downloadFile(with: request, taskDescription: taskDescription)
+    }
+    
+    private func downloadFile(with request: URLRequest, taskDescription: String) -> URLSessionDownloadTask {
         let task = self.backgroundSession().downloadTask(with: request)
         task.taskDescription = taskDescription
         task.resume()
@@ -334,7 +329,7 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
         return (errorCode == NSURLErrorTimedOut || errorCode == NSURLErrorCannotFindHost || errorCode == NSURLErrorCannotConnectToHost || errorCode == NSURLErrorNotConnectedToInternet || errorCode == NSURLErrorSecureConnectionFailed)
     }
     
-    func retry(task: URLSessionTask) -> Bool {
+    func retry(task: URLSessionDownloadTask) -> Bool {
         guard var request = task.originalRequest else {
             debugPrint("Unable to retry task, as originalRequest is nil:\n\(task)")
             return false
@@ -344,8 +339,15 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
         var retry = Int(request.value(forHTTPHeaderField: retryCountHeader) ?? "") ?? 0
         guard retry < maxRetries else { return false }
         
+        guard let sessionToken = appManager.authManager!.session()?.sessionToken else {
+            debugPrint("Unable to retry task--not signed in (auth manager's UserSessionInfo is nil)")
+            return false
+        }
+
         retry += 1
         request.setValue("\(retry)", forHTTPHeaderField: retryCountHeader)
+        request.setValue(sessionToken, forHTTPHeaderField: "Bridge-Session")
+
         let newTask = self.backgroundSession().downloadTask(with: request)
         newTask.taskDescription = task.taskDescription
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + pow(2.0, Double(retry))) {
@@ -355,7 +357,7 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
         return true
     }
     
-    func handleError(_ error: NSError, session: URLSession, task: URLSessionTask) -> Bool {
+    func handleError(_ error: NSError, session: URLSession, task: URLSessionDownloadTask) -> Bool {
         if isTemporaryError(errorCode: error.code) {
             // Retry, and let the caller know we're retrying.
             return retry(task: task)
@@ -365,36 +367,24 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
     }
     
     func handleUnsupportedAppVersion() {
-        let bridgeNetworkManager = SBBComponentManager.component(SBBBridgeNetworkManager.self) as! SBBBridgeNetworkManager
-        guard !bridgeNetworkManager.isUnsupportedAppVersion else { return }
-        bridgeNetworkManager.isUnsupportedAppVersion = true
-        if !(bridgeErrorUIDelegate?.handleUnsupportedAppVersionError?(NSError.sbbUnsupportedAppVersionError(), networkManager: bridgeNetworkManager) ?? false) {
-            debugPrint("App Version Not Supported error not handled by error UI delegate")
-        }
+        appManager.authManager.notifyUIOfBridgeError(statusCode: Ktor_httpHttpStatusCode(value: 410, description: "Unsupported app version"))
     }
     
-    func handleServerPreconditionNotMet(task: URLSessionTask, response: HTTPURLResponse) {
-        if !(bridgeErrorUIDelegate?.handleUserNotConsentedError?(NSError.generateSBBError(forStatusCode: 412), sessionInfo: response, networkManager: nil) ?? false) {
-            debugPrint("User Not Consented error not handled by error UI delegate")
-        }
+    func handleServerPreconditionNotMet() {
+        appManager.authManager.notifyUIOfBridgeError(statusCode: Ktor_httpHttpStatusCode(value: 412, description: "User not consented" ))
     }
     
-    func handleHTTPErrorResponse(_ response: HTTPURLResponse, session: URLSession, task: URLSessionTask) -> Bool {
+    func handleHTTPErrorResponse(_ response: HTTPURLResponse, session: URLSession, task: URLSessionDownloadTask) -> Bool {
         switch response.statusCode {
         case 401:
-            let authMan = NativeAuthenticationManager()
-            authMan.reauth { [self] error in
-                if let nsError = error as NSError?,
-                   nsError.code != SBBErrorCode.serverPreconditionNotMet.rawValue {
+            appManager.authManager!.reauth { [self] error in
+                if let error = error {
+                    // Assume BridgeClientKMM will have handled any 410 or 412 error appropriately.
                     debugPrint("Session token auto-refresh failed: \(String(describing: error))")
-                    if (nsError.code == SBBErrorCode.unsupportedAppVersion.rawValue) {
-                        handleUnsupportedAppVersion()
-                    }
                     return
                 }
                 
                 debugPrint("Session token auto-refresh succeeded, retrying original request")
-                task.originalRequest?.setValue(authMan.session().sessionToken, forHTTPHeaderField: "Bridge-Session")
                 let _ = retry(task: task)
             }
             return true
@@ -403,7 +393,7 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
             handleUnsupportedAppVersion()
             
         case 412:
-            handleServerPreconditionNotMet(task: task, response: response)
+            handleServerPreconditionNotMet()
             
         default:
             // Let the backgroundTransferDelegate deal with it
@@ -436,14 +426,14 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
         }
         
         var retrying = false
-        if task.isKind(of: URLSessionDownloadTask.self) {
+        if let downloadTask = task as? URLSessionDownloadTask {
             let httpResponse = task.response as? HTTPURLResponse
             let httpError = (httpResponse?.statusCode ?? 0) >= 400
             if let nsError = error as NSError? {
-                retrying = self.handleError(nsError, session: session, task: task)
+                retrying = self.handleError(nsError, session: session, task: downloadTask)
             }
             else if httpError {
-                retrying = self.handleHTTPErrorResponse(httpResponse!, session: session, task: task)
+                retrying = self.handleHTTPErrorResponse(httpResponse!, session: session, task: downloadTask)
             }
         }
         

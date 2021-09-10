@@ -1,5 +1,6 @@
 package org.sagebionetworks.bridge.kmm.shared
 
+import io.ktor.http.*
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collect
@@ -39,6 +40,10 @@ class NativeAuthenticationManager(
                 false -> completion(Error(message = "reAuth failed"))
             }
         }
+    }
+
+    fun notifyUIOfBridgeError(statusCode: HttpStatusCode) {
+        authManager.notifyUIOfBridgeError(statusCode)
     }
 
     fun session() : UserSessionInfo? {

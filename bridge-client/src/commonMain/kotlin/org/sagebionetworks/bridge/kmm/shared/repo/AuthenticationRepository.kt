@@ -2,6 +2,7 @@ package org.sagebionetworks.bridge.kmm.shared.repo
 
 import io.ktor.client.*
 import io.ktor.client.features.*
+import io.ktor.http.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Clock
@@ -109,6 +110,10 @@ class AuthenticationRepository(httpClient: HttpClient, val bridgeConfig: BridgeC
             }
             success
         } ?: false
+    }
+
+    fun notifyUIOfBridgeError(statusCode: HttpStatusCode) {
+        // TODO: emm 2021-08-17 pass 410 (app version not supported) and 412 (not consented) Bridge errors along to the UI to deal with.
     }
 
     private fun updateCachedSession(oldUserSessionInfo: UserSessionInfo?, newUserSession: UserSessionInfo) {

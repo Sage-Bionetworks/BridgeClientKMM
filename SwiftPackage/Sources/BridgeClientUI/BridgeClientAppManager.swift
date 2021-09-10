@@ -47,7 +47,6 @@ open class BridgeClientAppManager : ObservableObject {
 
     public let isPreview: Bool
     public let platformConfig: IOSPlatformConfig
-    public let platformConfig: PlatformConfig
     public let pemPath: String?
         
     @Published public var title: String
@@ -88,7 +87,7 @@ open class BridgeClientAppManager : ObservableObject {
         self.init(platformConfig: PlatformConfigImpl(appId: appId), pemPath: pemPath)
     }
     
-    public init(platformConfig: PlatformConfig, pemPath: String? = nil) {
+    public init(platformConfig: IOSPlatformConfig, pemPath: String? = nil) {
         self.pemPath = pemPath ?? Bundle.main.path(forResource: platformConfig.appId, ofType: "pem")
         self.platformConfig = platformConfig
         self.title = self.platformConfig.localizedAppName

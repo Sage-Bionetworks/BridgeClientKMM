@@ -441,6 +441,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         return scheduledSession.assessments.map { assessment ->
             val recordsList = adherenceRecords[assessment.instanceGuid]
             ScheduledAssessmentReference(
+                studyId = studyId,
                 instanceGuid = assessment.instanceGuid,
                 assessmentInfo = assessmentInfoMap[assessment.refKey]!!,
                 adherenceRecordList = recordsList ?: emptyList()
@@ -531,6 +532,7 @@ data class ScheduledSessionWindow (
 }
 
 data class ScheduledAssessmentReference (
+    val studyId: String,
     val instanceGuid: String,
     val assessmentInfo: AssessmentInfo,
     val adherenceRecordList: List<AdherenceRecord>,

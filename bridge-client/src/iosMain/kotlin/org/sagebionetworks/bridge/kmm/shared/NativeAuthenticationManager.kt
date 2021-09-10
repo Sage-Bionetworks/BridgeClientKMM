@@ -31,6 +31,16 @@ class NativeAuthenticationManager(
         return authManager.isAuthenticated()
     }
 
+    fun reauth(completion: (Error?) -> Unit) {
+        scope.launch {
+            when(authManager.reAuth()) {
+                true -> completion(null)
+                // TODO: have reAuth return the actual error instead of a bool? ~emm 2021-07-27
+                false -> completion(Error(message = "reAuth failed"))
+            }
+        }
+    }
+
     fun session() : UserSessionInfo? {
         return authManager.session()
     }

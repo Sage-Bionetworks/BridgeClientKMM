@@ -77,7 +77,7 @@ class MockDownloadTask: URLSessionDownloadTask {
             let (fileUrl, error) = session.downloadFileUrlAndError(for: request)
             session.remove(mockTask: self)
             guard let fileUrl = fileUrl else {
-                debugPrint("TEST SETUP ERROR: No download file URL provided for mock download task request.")
+                debugPrint("TEST SETUP ERROR: No download file URL provided for mock download task request: \(self.request.url)")
                 return
             }
             (session.delegate as? URLSessionDownloadDelegate)?.urlSession(self.session, downloadTask: self, didFinishDownloadingTo: fileUrl)
@@ -150,7 +150,7 @@ class MockURLSession: URLSession {
     }
     
     func setJsonFromFile(named fileName: String, responseCode: Int, for endpoint: String, httpMethod: String) {
-        guard let fileUrl = Bundle(for: type(of: self).self).url(forResource: fileName, withExtension: "json") else {
+        guard let fileUrl = Bundle.module.url(forResource: fileName, withExtension: "json") else {
             debugPrint("WARNING: Failed to get .json resource url for file '\(fileName)'")
             return
         }

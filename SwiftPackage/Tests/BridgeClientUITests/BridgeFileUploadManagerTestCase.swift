@@ -50,6 +50,8 @@ protocol BridgeFileUploadManagerTestCase : XCTWaiterDelegate {
     var savedAppManager: BridgeClientAppManager? { get set }
     
     var requestEndpoint: String { get }
+    var uploadRequestSuccessResponseFile: String { get }
+    var uploadRequestExpiredResponseFile: String { get }
     var uploadSucceededNotification: Notification.Name { get }
     var uploadRequestFailedNotification: Notification.Name { get }
     var uploadToS3FailedNotification: Notification.Name { get }
@@ -65,7 +67,11 @@ protocol BridgeFileUploadManagerTestCase : XCTWaiterDelegate {
     func testUploadFileToBridgeHappyPath()
 }
 
-extension BridgeFileUploadManagerTestCase {
+protocol BridgeFileUploadManagerTestCaseTyped: BridgeFileUploadManagerTestCase {
+    associatedtype T : Codable
+}
+
+extension BridgeFileUploadManagerTestCaseTyped {
     func genericSetUp() {
         // Call this in the XCTestCase setUp() func after calling super.setUp()
         let bnm = BackgroundNetworkManager.shared
@@ -136,7 +142,7 @@ extension BridgeFileUploadManagerTestCase {
         let endpoint = requestEndpoint
         let mimeType = "image/jpeg"
         guard let downloadFileUrl = Bundle.module.url(forResource: "failed-upload-request-response", withExtension: "json") else {
-            XCTAssert(false, "Unable to find test response file 'failed-upload-request-response.json' for ParticipantFileUploadManager upload failure tests")
+            XCTAssert(false, "Unable to find test response file 'failed-upload-request-response.json' for upload api \(self.uploadApi.apiString) upload failure tests")
             return
         }
         mockURLSession.set(json: responseJson, responseCode: 412, for: endpoint, httpMethod: "POST")
@@ -148,7 +154,7 @@ extension BridgeFileUploadManagerTestCase {
         // NOTE: If I move this block any further up in the function, it causes a compiler crash. Not
         // a syntax error, an actual crash of the compiler. ¯\_(ツ)_/¯ ~emm 2021-07-08
         guard let uploadFileUrl = Bundle.module.url(forResource: "cat", withExtension: "jpg") else {
-            XCTAssert(false, "Unable to find test image 'cat.jpg' for ParticipantFileUploadManager upload failure tests")
+            XCTAssert(false, "Unable to find test image 'cat.jpg' for upload api \(self.uploadApi.apiString) upload failure tests")
             return
         }
         
@@ -188,12 +194,13 @@ extension BridgeFileUploadManagerTestCase {
                 self.uploadSucceeded503RetriedTests(userInfo: userInfo)
             }
             else {
-                XCTAssert(false, "SBBParticipantFileUploaded notification has no userInfo")
+                XCTAssert(false, "\(self.uploadSucceededNotification) notification has no userInfo")
             }
                 
             XCTAssertNotNil(tempCopyUrl, "Temp file copy URL is nil")
             if let tempCopyUrl = tempCopyUrl {
-                self.check(file: tempCopyUrl, willRetry: false, message: "Should no longer be in retry queue upon successful retry after initial 503 error")
+                let shouldStillExist = self.uploadApi.notifiesBridgeWhenUploaded
+                self.check(file: tempCopyUrl, willRetry: false, stillExists: shouldStillExist, message: "Should no longer be in retry queue upon successful retry after initial 503 error", cleanUpAfter: true)
             }
             
             // make sure we didn't generate any spurious uploads or retries
@@ -204,29 +211,34 @@ extension BridgeFileUploadManagerTestCase {
             let uploadsToS3 = defaults.dictionary(forKey: bfum.uploadingToS3Key)
             let notifyingBridge = defaults.dictionary(forKey: bfum.notifyingBridgeUploadSucceededKey)
             XCTAssert(retryUploads?.count ?? 0 == 0, "Spurious files left in retryUploads map: \(retryUploads!)")
-            XCTAssert(fileUploads?.count ?? 0 == 0, "Spurious files left in participantFileUploads map: \(fileUploads!)")
+            XCTAssert(fileUploads?.count ?? 0 == 0, "Spurious files left in bridgeFileUploads map: \(fileUploads!)")
             XCTAssert(uploadRequests?.count ?? 0 == 0, "Spurious files left in uploadURLsRequested map: \(uploadRequests!)")
             XCTAssert(uploadsToS3?.count ?? 0 == 0, "Spurious files left in uploadingToS3 map: \(uploadsToS3!)")
             XCTAssert(notifyingBridge?.count ?? 0 == 0, "Spurious files left in notifyingBridge map: \(notifyingBridge!)")
 
             // make sure we didn't leave any unreferenced files lying around in the temp upload dir
             let items = try! FileManager.default.contentsOfDirectory(atPath: self.uploadApi.tempUploadDirURL.path)
-            XCTAssert(items.count == 0, "Files left hanging around in temp upload dir:\n\(items)")
-
+            if self.uploadApi.notifiesBridgeWhenUploaded {
+                XCTAssert(items.count == 1, "Expected exactly one file to be in temp upload dir:\n\(items)")
+            }
+            else {
+                XCTAssert(items.count == 0, "Files left hanging around in temp upload dir:\n\(items)")
+            }
+            
             // make sure all the mock response stuff got "used up"
-            for key in self.mockURLSession.jsonForEndpoints.allKeys {
+            for key in self.keysEmptyAfterUpload(for: self.mockURLSession.jsonForEndpoints) {
                 let responses = self.mockURLSession.jsonForEndpoints[key] as? [Any]
                 XCTAssert(responses?.count ?? 0 == 0, "Mock URLSession still has mock json response(s):\n\(self.mockURLSession.jsonForEndpoints)")
             }
-            for key in self.mockURLSession.codesforEndpoints.allKeys {
+            for key in self.keysEmptyAfterUpload(for: self.mockURLSession.codesforEndpoints) {
                 let responses = self.mockURLSession.codesforEndpoints[key] as? [Any]
                 XCTAssert(responses?.count ?? 0 == 0, "Mock URLSession still has mock response code(s):\n\(self.mockURLSession.codesforEndpoints)")
             }
-            for key in self.mockURLSession.URLsForEndpoints.allKeys {
+            for key in self.keysEmptyAfterUpload(for: self.mockURLSession.URLsForEndpoints) {
                 let responses = self.mockURLSession.URLsForEndpoints[key] as? [Any]
                 XCTAssert(responses?.count ?? 0 == 0, "Mock URLSession still has (a) mock downloaded response file URL(s):\n\(self.mockURLSession.URLsForEndpoints)")
             }
-            for key in self.mockURLSession.errorsForEndpoints.allKeys {
+            for key in self.keysEmptyAfterUpload(for: self.mockURLSession.errorsForEndpoints) {
                 let responses = self.mockURLSession.errorsForEndpoints[key] as? [Any]
                 XCTAssert(responses?.count ?? 0 == 0, "Mock URLSession still has (a) mock error code(s):\n\(self.mockURLSession.errorsForEndpoints)")
             }
@@ -258,31 +270,50 @@ extension BridgeFileUploadManagerTestCase {
             self.mockURLSession.delegateQueue.addOperation {
                 guard retryRecoverable else { return }
                 // first, check that the file is indeed in the retry queue as expected
-                self.check(file: tempCopyUrl, willRetry: true, stillExists: true, message: "Should retry after 503 from participant file upload API", cleanUpAfter: false)
+                self.check(file: tempCopyUrl, willRetry: true, stillExists: true, message: "Should retry after 503 from upload api \(self.uploadApi.apiString)", cleanUpAfter: false)
                 
                 // set up the responses for the retry
-                // -- set up the Participant File Upload Request response
                 let s3url = "/not-a-real-pre-signed-S3-url"
-                let participantFile = ParticipantFile(fileId: self.testFileId, mimeType: mimeType, createdOn: nil, downloadUrl: nil, uploadUrl: s3url)
-                var responseJson: Any
-                do {
-                    responseJson = try DictionaryEncoder().encode(participantFile)
-                } catch let error {
-                    print("Error attempting to encode ParticipantFile object \(participantFile) to json dict: \(error)")
+                guard let downloadFileUrl = Bundle.module.url(forResource: self.uploadRequestSuccessResponseFile, withExtension: "json") else {
+                    XCTAssert(false, "Unable to find test response file '\(self.uploadRequestSuccessResponseFile).json' for upload api \(self.uploadApi.apiString) upload failure tests")
                     return
                 }
-                guard let downloadFileUrl = Bundle.module.url(forResource: "upload-request-success", withExtension: "json") else {
-                    XCTAssert(false, "Unable to find test response file 'upload-request-success.json' for ParticipantFileUploadManager upload failure tests")
-                    return
-                }
-                self.mockURLSession.set(json: responseJson, responseCode: 201, for: endpoint, httpMethod: "POST")
+
+                self.mockURLSession.setJsonFromFile(named: self.uploadRequestSuccessResponseFile, responseCode: 201, for: endpoint, httpMethod: "POST")
                 self.mockURLSession.set(downloadFileUrl: downloadFileUrl, error: nil, for: endpoint, httpMethod: "POST")
                 
                 // -- set up the S3 upload success response
                 self.mockURLSession.set(json: [:], responseCode: 200, for: s3url, httpMethod: "PUT")
                 
-                // TODO: When adapting this test for result file uploads, set up the "upload completed"
-                // api call response here too ~emm 2021-07-08
+                // -- set up the "upload completed" api call response
+                if self.uploadApi.notifiesBridgeWhenUploaded {
+                    guard let uploadOnlyMetadata = self.uploadApi.uploadMetadata(for: self.testFileId, fileUrl: uploadFileUrl, mimeType: mimeType, extras: self.uploadExtras) else {
+                        XCTAssert(false, "Failed to create test upload metadata for \(self.uploadApi.apiString) upload failure test retry attempt in order to get the notifyBridgeUrlString")
+                        return
+                    }
+                    var jsonData: Data
+                    do {
+                        jsonData = try Data(contentsOf: downloadFileUrl)
+                    } catch let err {
+                        XCTAssert(false, "Error getting contents of \(downloadFileUrl) as Data: \(err)")
+                        return
+                    }
+                    guard let uploadMetadata = self.uploadApi.update(metadata: uploadOnlyMetadata, with: jsonData) else {
+                        XCTAssert(false, "Failed to update upload metadata with json from mock upload request response")
+                        return
+                    }
+                    guard let emptyDownloadFileUrl = Bundle.module.url(forResource: "empty-response-body", withExtension: "json") else {
+                        XCTAssert(false, "Unable to find empty response file '\(self.uploadRequestSuccessResponseFile).json' for \(self.uploadApi.apiString) upload failure test retry attempt")
+                        return
+                    }
+                    guard let notifyBridgeUrlString = self.uploadApi.notifyBridgeUrlString(for: uploadMetadata) else {
+                        XCTAssert(false, "Unable to build notifyBridgeUrlString from uploadMetadata \(uploadMetadata)")
+                        return
+                    }
+                    let notifyBridgeEndpoint = "/\(notifyBridgeUrlString)"
+                    self.mockURLSession.set(json: [:], responseCode: 200, for: notifyBridgeEndpoint, httpMethod: "POST")
+                    self.mockURLSession.set(downloadFileUrl: emptyDownloadFileUrl, error: nil, for: notifyBridgeEndpoint, httpMethod: "POST")
+                }
                 
                 // -- do the retry
                 bfum.retryUploadsAfterDelay()
@@ -307,33 +338,24 @@ extension BridgeFileUploadManagerTestCase {
     func testUploadFileToBridgeWhenS3Responds(status: Int) {
         let s3url = "/not-a-real-pre-signed-S3-url"
         let mimeType = "image/jpeg"
-        let endpoint = "/v3/participants/self/files/\(testFileId)"
+        let endpoint = requestEndpoint
         guard let uploadFileUrl = Bundle.module.url(forResource: "cat", withExtension: "jpg") else {
-            XCTAssert(false, "Unable to find test image 'cat.jpg' for ParticipantFileUploadManager S3 error response tests")
+            XCTAssert(false, "Unable to find test image 'cat.jpg' for upload api \(self.uploadApi.apiString) S3 error response tests")
             return
         }
 
         // -- set up the mock UploadRequest response
-        let createdOn = Date().addingTimeInterval(-172800)
-        let expiresOn = Date().addingTimeInterval(-86400)
-        let participantFile = ParticipantFile(fileId: self.testFileId, mimeType: mimeType, createdOn: createdOn, downloadUrl: nil, uploadUrl: s3url, expiresOn: expiresOn)
-        var responseJson: Any
-        do {
-            responseJson = try DictionaryEncoder().encode(participantFile)
-        } catch let error {
-            XCTAssert(false, "Error attempting to encode ParticipantFile object \(participantFile) to json dict: \(error)")
-            return
-        }
-        let downloadFileName = (status == 403) ? "upload-request-expired" : "upload-request-success"
+        let downloadFileName = (status == 403) ? self.uploadRequestExpiredResponseFile : self.uploadRequestSuccessResponseFile
         guard let downloadFileUrl = Bundle.module.url(forResource: downloadFileName, withExtension: "json") else {
-            XCTAssert(false, "Unable to find test response file '\(downloadFileName).json' for ParticipantFileUploadManager S3 error response tests")
+            XCTAssert(false, "Unable to find test response file '\(downloadFileName).json' for upload api \(self.uploadApi.apiString) S3 error response tests")
             return
         }
-        self.mockURLSession.set(json: responseJson, responseCode: 201, for: endpoint, httpMethod: "POST")
+
+        self.mockURLSession.setJsonFromFile(named: downloadFileName, responseCode: 201, for: endpoint, httpMethod: "POST")
         self.mockURLSession.set(downloadFileUrl: downloadFileUrl, error: nil, for: endpoint, httpMethod: "POST")
 
         // -- set up the mock S3 upload failed response
-        responseJson = ["Arbitrary S3 response" : "We should be ignoring this"]
+        let responseJson = ["Arbitrary S3 response" : "We should be ignoring this"]
         self.mockURLSession.set(json: responseJson, responseCode: status, for: s3url, httpMethod: "PUT")
         
         // -- try it
@@ -353,7 +375,7 @@ extension BridgeFileUploadManagerTestCase {
         }
 
         tempCopyUrl = uploadApi.uploadInternal(fileId: testFileId, fileUrl: uploadFileUrl, contentType: mimeType, extras: uploadExtras)
-        XCTAssertNotNil(tempCopyUrl, "Temp file url is nil when testing participant file upload request with retryable S3 error response")
+        XCTAssertNotNil(tempCopyUrl, "Temp file url is nil when testing upload api \(self.uploadApi.apiString) upload request with retryable S3 error response")
         guard let tempCopyUrl = tempCopyUrl else { return }
 
         // queue up a couple of times to make sure the above stuff has actually completed before we check the retry queue
@@ -382,46 +404,66 @@ extension BridgeFileUploadManagerTestCase {
     func tryUploadFileToBridgeHappyPath() {
         let s3url = "/not-a-real-pre-signed-S3-url"
         let mimeType = "image/jpeg"
-        let endpoint = "/v3/participants/self/files/\(testFileId)"
+        let endpoint = requestEndpoint
         guard let uploadFileUrl = Bundle.module.url(forResource: "cat", withExtension: "jpg") else {
-            XCTAssert(false, "Unable to find test image 'cat.jpg' for ParticipantFileUploadManager happy path test")
+            XCTAssert(false, "Unable to find test image 'cat.jpg' for upload api \(self.uploadApi.apiString) happy path test")
             return
         }
 
         // -- set up the mock UploadRequest response
-        let createdOn = Date()
-        let expiresOn = createdOn.addingTimeInterval(86400)
-        let participantFile = ParticipantFile(fileId: self.testFileId, mimeType: mimeType, createdOn: createdOn, downloadUrl: nil, uploadUrl: s3url, expiresOn: expiresOn)
-        var responseJson: Any
-        do {
-            responseJson = try DictionaryEncoder().encode(participantFile)
-        } catch let error {
-            XCTAssert(false, "Error attempting to encode ParticipantFile object \(participantFile) to json dict: \(error)")
+        guard let downloadFileUrl = Bundle.module.url(forResource: self.uploadRequestSuccessResponseFile, withExtension: "json") else {
+            XCTAssert(false, "Unable to find test response file '\(self.uploadRequestSuccessResponseFile).json' for \(uploadApi.apiString) happy path test")
             return
         }
-        guard let downloadFileUrl = Bundle.module.url(forResource: "upload-request-success", withExtension: "json") else {
-            XCTAssert(false, "Unable to find test response file 'upload-request-success.json' for \(uploadApi.apiString) happy path test")
-            return
-        }
-        self.mockURLSession.set(json: responseJson, responseCode: 201, for: endpoint, httpMethod: "POST")
+        
+        self.mockURLSession.setJsonFromFile(named: self.uploadRequestSuccessResponseFile, responseCode: 201, for: endpoint, httpMethod: "POST")
         self.mockURLSession.set(downloadFileUrl: downloadFileUrl, error: nil, for: endpoint, httpMethod: "POST")
 
         // -- set up the mock S3 upload succeeded response
-        responseJson = ["Arbitrary S3 response" : "We should be ignoring this"]
+        let responseJson = ["Arbitrary S3 response" : "We should be ignoring this"]
         self.mockURLSession.set(json: responseJson, responseCode: 200, for: s3url, httpMethod: "PUT")
         
-        // TODO: When adapting for result file upload API, here's where to set up the mock upload completed response
-        
+        // -- set up the mock upload completed response
+        if uploadApi.notifiesBridgeWhenUploaded {
+            guard let uploadOnlyMetadata = self.uploadApi.uploadMetadata(for: testFileId, fileUrl: uploadFileUrl, mimeType: mimeType, extras: self.uploadExtras) else {
+                XCTAssert(false, "Failed to create test upload metadata for \(uploadApi.apiString) happy path test in order to get the notifyBridgeUrlString")
+                return
+            }
+            var jsonData: Data
+            do {
+                jsonData = try Data(contentsOf: downloadFileUrl)
+            } catch let err {
+                XCTAssert(false, "Error getting contents of \(downloadFileUrl) as Data: \(err)")
+                return
+            }
+            guard let uploadMetadata = self.uploadApi.update(metadata: uploadOnlyMetadata, with: jsonData) else {
+                XCTAssert(false, "Failed to update upload metadata with json from mock upload request response")
+                return
+            }
+            guard let emptyDownloadFileUrl = Bundle.module.url(forResource: "empty-response-body", withExtension: "json") else {
+                XCTAssert(false, "Unable to find empty response file '\(self.uploadRequestSuccessResponseFile).json' for \(uploadApi.apiString) happy path test")
+                return
+            }
+            guard let notifyBridgeUrlString = self.uploadApi.notifyBridgeUrlString(for: uploadMetadata) else {
+                XCTAssert(false, "Unable to create notifyBridgeUrlString from uploadMetadata: \(uploadMetadata)")
+                return
+            }
+            let notifyBridgeEndpoint = "/\(notifyBridgeUrlString)"
+            self.mockURLSession.set(json: [:], responseCode: 200, for: notifyBridgeEndpoint, httpMethod: "POST")
+            self.mockURLSession.set(downloadFileUrl: emptyDownloadFileUrl, error: nil, for: notifyBridgeEndpoint, httpMethod: "POST")
+        }
+
         // -- try it
         let bfum = BridgeFileUploadManager.shared
         let expectUploaded = XCTestExpectation(description: "Should have successfully uploaded")
         var tempCopyUrl: URL?
         var succeeded = false
-        let succeededObserver = NotificationCenter.default.addObserver(forName: .SBBParticipantFileUploaded, object: nil, queue: nil) { notification in
+        let succeededObserver = NotificationCenter.default.addObserver(forName: self.uploadSucceededNotification, object: nil, queue: nil) { notification in
             succeeded = true
             XCTAssertNotNil(tempCopyUrl, "Temp copy URL is nil in upload succeeded notification observer")
             if let tempCopyUrl = tempCopyUrl {
-                self.check(file: tempCopyUrl, willRetry: false, message: "Should not be in retry queue after successful upload")
+                let shouldStillExist = self.uploadApi.notifiesBridgeWhenUploaded
+                self.check(file: tempCopyUrl, willRetry: false, stillExists: shouldStillExist, message: "Should not be in retry queue after successful upload", cleanUpAfter: true)
             }
             
             // make sure we didn't generate any spurious uploads or retries
@@ -432,29 +474,34 @@ extension BridgeFileUploadManagerTestCase {
             let uploadsToS3 = defaults.dictionary(forKey: bfum.uploadingToS3Key)
             let notifyingBridge = defaults.dictionary(forKey: bfum.notifyingBridgeUploadSucceededKey)
             XCTAssert(retryUploads?.count ?? 0 == 0, "Spurious files left in retryUploads map: \(retryUploads!)")
-            XCTAssert(fileUploads?.count ?? 0 == 0, "Spurious files left in participantFileUploads map: \(fileUploads!)")
+            XCTAssert(fileUploads?.count ?? 0 == 0, "Spurious files left in bridgeFileUploads map: \(fileUploads!)")
             XCTAssert(uploadRequests?.count ?? 0 == 0, "Spurious files left in uploadURLsRequested map: \(uploadRequests!)")
             XCTAssert(uploadsToS3?.count ?? 0 == 0, "Spurious files left in uploadingToS3 map: \(uploadsToS3!)")
             XCTAssert(notifyingBridge?.count ?? 0 == 0, "Spurious files left in notifyingBridge map: \(notifyingBridge!)")
 
             // make sure we didn't leave any unreferenced files lying around in the temp upload dir
             let items = try! FileManager.default.contentsOfDirectory(atPath: self.uploadApi.tempUploadDirURL.path)
-            XCTAssert(items.count == 0, "Files left hanging around in temp upload dir:\n\(items)")
+            if self.uploadApi.notifiesBridgeWhenUploaded {
+                XCTAssert(items.count == 1, "Expected exactly one file to be in temp upload dir:\n\(items)")
+            }
+            else {
+                XCTAssert(items.count == 0, "Files left hanging around in temp upload dir:\n\(items)")
+            }
 
             // make sure all the mock response stuff got "used up"
-            for key in self.mockURLSession.jsonForEndpoints.allKeys {
+            for key in self.keysEmptyAfterUpload(for: self.mockURLSession.jsonForEndpoints) {
                 let responses = self.mockURLSession.jsonForEndpoints[key] as? [Any]
                 XCTAssert(responses?.count ?? 0 == 0, "Mock URLSession still has mock json response(s):\n\(self.mockURLSession.jsonForEndpoints)")
             }
-            for key in self.mockURLSession.codesforEndpoints.allKeys {
+            for key in self.keysEmptyAfterUpload(for: self.mockURLSession.codesforEndpoints) {
                 let responses = self.mockURLSession.codesforEndpoints[key] as? [Any]
                 XCTAssert(responses?.count ?? 0 == 0, "Mock URLSession still has mock response code(s):\n\(self.mockURLSession.codesforEndpoints)")
             }
-            for key in self.mockURLSession.URLsForEndpoints.allKeys {
+            for key in self.keysEmptyAfterUpload(for: self.mockURLSession.URLsForEndpoints) {
                 let responses = self.mockURLSession.URLsForEndpoints[key] as? [Any]
                 XCTAssert(responses?.count ?? 0 == 0, "Mock URLSession still has (a) mock downloaded response file URL(s):\n\(self.mockURLSession.URLsForEndpoints)")
             }
-            for key in self.mockURLSession.errorsForEndpoints.allKeys {
+            for key in self.keysEmptyAfterUpload(for: self.mockURLSession.errorsForEndpoints) {
                 let responses = self.mockURLSession.errorsForEndpoints[key] as? [Any]
                 XCTAssert(responses?.count ?? 0 == 0, "Mock URLSession still has (a) mock error code(s):\n\(self.mockURLSession.errorsForEndpoints)")
             }
@@ -480,5 +527,15 @@ extension BridgeFileUploadManagerTestCase {
         NotificationCenter.default.removeObserver(succeededObserver)
         
         XCTAssert(succeeded, "\(uploadApi.apiString) File Upload happy path test did not post successful upload notification")
+    }
+    
+    // Uploaded notification gets sent while notifying Bridge of success is
+    // still in process, so we don't want to fail the test if there are still
+    // mock responses etc. set for that step.
+    func keysEmptyAfterUpload(for mockURLSessionList: NSMutableDictionary) -> [String] {
+        var allKeys = mockURLSessionList.allKeys as! [String]
+        return allKeys.remove { key in
+            key == BridgeFileUploadManager.shared.notifyingBridgeUploadSucceededKey
+        }
     }
 }

@@ -59,7 +59,9 @@ extension Notification.Name {
 }
 
 class ParticipantFileUploadAPI: BridgeFileUploadAPITyped {
-    typealias T = ParticipantFile
+    typealias TrackingType = ParticipantFile
+    typealias UploadRequestType = ParticipantFile
+    typealias UploadRequestResponseType = ParticipantFile
     
     /// A singleton instance of the API.
     public static let shared = ParticipantFileUploadAPI()
@@ -118,19 +120,19 @@ class ParticipantFileUploadAPI: BridgeFileUploadAPITyped {
             "Content-Type": participantFile.mimeType,
         ]
         
-        return BridgeFileUploadMetadata(bridgeUploadObject: participantFile, s3Headers: headers)
+        return BridgeFileUploadMetadata(bridgeUploadTrackingObject: participantFile, s3Headers: headers)
     }
     
     func uploadRequestObject(for uploadMetadata: BridgeFileUploadMetadataBlob) -> Codable {
-        return (uploadMetadata as! BridgeFileUploadMetadata<T>).bridgeUploadObject
+        return (uploadMetadata as! BridgeFileUploadMetadata<TrackingType>).bridgeUploadTrackingObject
     }
     
     func fileId(for uploadMetadata: BridgeFileUploadMetadataBlob) -> String {
-        return (uploadMetadata as! BridgeFileUploadMetadata<T>).bridgeUploadObject.fileId
+        return (uploadMetadata as! BridgeFileUploadMetadata<TrackingType>).bridgeUploadTrackingObject.fileId
     }
     
     func mimeType(for uploadMetadata: BridgeFileUploadMetadataBlob) -> String {
-        return (uploadMetadata as! BridgeFileUploadMetadata<T>).bridgeUploadObject.mimeType
+        return (uploadMetadata as! BridgeFileUploadMetadata<TrackingType>).bridgeUploadTrackingObject.mimeType
     }
     
     func uploadRequestUrlString(for uploadMetadata: BridgeFileUploadMetadataBlob) -> String {
@@ -138,12 +140,12 @@ class ParticipantFileUploadAPI: BridgeFileUploadAPITyped {
     }
     
     func s3UploadUrlString(for uploadMetadata: BridgeFileUploadMetadataBlob) -> String? {
-        return (uploadMetadata as! BridgeFileUploadMetadata<T>).bridgeUploadObject.uploadUrl
+        return (uploadMetadata as! BridgeFileUploadMetadata<TrackingType>).bridgeUploadTrackingObject.uploadUrl
     }
     
     func s3UploadHeaders(for uploadMetadata: BridgeFileUploadMetadataBlob) -> [String : String] {
-        let metadata = uploadMetadata as! BridgeFileUploadMetadata<T>
-        let participantFile = metadata.bridgeUploadObject
+        let metadata = uploadMetadata as! BridgeFileUploadMetadata<TrackingType>
+        let participantFile = metadata.bridgeUploadTrackingObject
         let uploadUrl = participantFile.uploadUrl
         var s3Headers = metadata.s3Headers
         
@@ -170,12 +172,12 @@ class ParticipantFileUploadAPI: BridgeFileUploadAPITyped {
     }
     
     func fileUploadedNotification(for uploadMetadata: BridgeFileUploadMetadataBlob) -> Notification {
-        let metadata = uploadMetadata as! BridgeFileUploadMetadata<T>
+        let metadata = uploadMetadata as! BridgeFileUploadMetadata<TrackingType>
         let uploadRequestPath = uploadRequestUrlString(for: metadata)
         let requestUrl = self.uploadManager.netManager.bridgeURL(for: uploadRequestPath)
         let userInfo: [AnyHashable : Any] = [
-            self.fileIdKey: metadata.bridgeUploadObject.fileId,
-            self.participantFileKey: metadata.bridgeUploadObject,
+            self.fileIdKey: metadata.bridgeUploadTrackingObject.fileId,
+            self.participantFileKey: metadata.bridgeUploadTrackingObject,
             self.requestUrlKey: requestUrl
         ]
         let uploadedNotification = Notification(name: .SBBParticipantFileUploaded, object: nil, userInfo: userInfo)
@@ -187,20 +189,20 @@ class ParticipantFileUploadAPI: BridgeFileUploadAPITyped {
     }
     
     func uploadToS3FailedNotification(for uploadMetadata: BridgeFileUploadMetadataBlob) -> Notification {
-        let metadata = uploadMetadata as! BridgeFileUploadMetadata<T>
+        let metadata = uploadMetadata as! BridgeFileUploadMetadata<TrackingType>
         let userInfo: [AnyHashable : Any] = [
-            self.fileIdKey: metadata.bridgeUploadObject.fileId,
-            self.participantFileKey: metadata.bridgeUploadObject
+            self.fileIdKey: metadata.bridgeUploadTrackingObject.fileId,
+            self.participantFileKey: metadata.bridgeUploadTrackingObject
         ]
         let uploadFailedNotification = Notification(name: .SBBParticipantFileUploadToS3Failed, object: nil, userInfo: userInfo)
         return uploadFailedNotification
     }
     
     func uploadRequestFailedNotification(for uploadMetadata: BridgeFileUploadMetadataBlob, statusCode: Int, responseBody: String?) -> Notification {
-        let metadata = uploadMetadata as! BridgeFileUploadMetadata<T>
+        let metadata = uploadMetadata as! BridgeFileUploadMetadata<TrackingType>
         var userInfo: [AnyHashable : Any] = [
-            self.fileIdKey: metadata.bridgeUploadObject.fileId,
-            self.participantFileKey: metadata.bridgeUploadObject,
+            self.fileIdKey: metadata.bridgeUploadTrackingObject.fileId,
+            self.participantFileKey: metadata.bridgeUploadTrackingObject,
             self.httpStatusKey: statusCode
         ]
         
@@ -214,9 +216,25 @@ class ParticipantFileUploadAPI: BridgeFileUploadAPITyped {
     }
     
     func isUploadSessionExpired(for uploadMetadata: BridgeFileUploadMetadataBlob) -> Bool {
-        return ((uploadMetadata as! BridgeFileUploadMetadata<T>).bridgeUploadObject.expiresOn?.timeIntervalSinceNow ?? 0.0) <= 0.0
+        return ((uploadMetadata as! BridgeFileUploadMetadata<TrackingType>).bridgeUploadTrackingObject.expiresOn?.timeIntervalSinceNow ?? 0.0) <= 0.0
     }
     
+    func update(metadata: BridgeFileUploadMetadataBlob, with jsonData: Data) -> BridgeFileUploadMetadataBlob? {
+        // deserialize the bridgeUploadObject from the downloaded JSON data and
+        // update the upload metadata with it
+        guard var uploadMetadata = metadata as? BridgeFileUploadMetadata<TrackingType> else {
+            debugPrint("Metadata blob was not of the expected type BridgeFileUploadMetadata<\(TrackingType.self)>: \(metadata)")
+            return nil
+        }
+        do {
+            uploadMetadata.bridgeUploadTrackingObject = try self.uploadManager.netManager.jsonDecoder.decode(UploadRequestResponseType.self, from: jsonData)
+        } catch let err {
+            debugPrint("Unexpected: Could not parse contents of downloaded file as a \(UploadRequestResponseType.self) object: \"\(String(describing: String(data: jsonData, encoding: .utf8)))\"\n\terror:\(err)")
+            return nil
+        }
+        return uploadMetadata
+    }
     
+
 }
 

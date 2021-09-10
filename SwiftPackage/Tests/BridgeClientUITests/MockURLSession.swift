@@ -34,11 +34,11 @@
 import Foundation
 
 // MARK: MockHTTPURLResponse
-class MockHTTPURLResponse: HTTPURLResponse {
+class MockHTTPURLResponse : HTTPURLResponse {
 }
 
 // MARK: MockUploadTask
-class MockUploadTask: URLSessionUploadTask {
+class MockUploadTask : URLSessionUploadTask {
     var session: MockURLSession
     var request: URLRequest
     var mockResponse: MockHTTPURLResponse?

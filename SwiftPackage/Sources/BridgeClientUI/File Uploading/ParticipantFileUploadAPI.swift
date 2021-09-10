@@ -73,12 +73,6 @@ class ParticipantFileUploadAPI: BridgeFileUploadAPITyped {
     /// The Notification.userInfo key for the Bridge API URL at which one can (with appropriate authentication headers)
     /// DELETE the uploaded file, or GET it back (via redirect).
     let requestUrlKey = "RequestUrl"
-    
-    /// The Notification.userInfo key for a failed upload/download HTTP status.
-    let httpStatusKey = "HttpStatus"
-    
-    /// The Notification.userInfo key for a failed download HTTPResponse body.
-    let responseBodyKey = "ResponseBody"
 
     public private(set) var apiString: String = "v3/participants/self/files/"
     

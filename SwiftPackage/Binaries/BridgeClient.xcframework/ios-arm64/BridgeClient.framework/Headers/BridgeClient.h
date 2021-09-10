@@ -429,7 +429,6 @@ __attribute__((swift_name("NativeAppConfigManager")))
 - (BOOL)onClearedAndReturnError:(NSError * _Nullable * _Nullable)error __attribute__((swift_name("onCleared()")));
 @end;
 
-__attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("NativeAuthenticationManager")))
 @interface BridgeClientNativeAuthenticationManager : BridgeClientBase <BridgeClientKoin_coreKoinComponent>
 - (instancetype)initWithViewUpdate:(void (^)(BridgeClientUserSessionInfo * _Nullable))viewUpdate __attribute__((swift_name("init(viewUpdate:)"))) __attribute__((objc_designated_initializer));

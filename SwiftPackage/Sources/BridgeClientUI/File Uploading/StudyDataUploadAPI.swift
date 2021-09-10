@@ -104,12 +104,6 @@ class StudyDataUploadAPI: BridgeFileUploadAPITyped {
     /// The Notification.userInfo key for the uploaded file's fileId.
     let fileNameKey = "FileName"
     
-    /// The Notification.userInfo key for a failed upload/download HTTP status.
-    let httpStatusKey = "HttpStatus"
-    
-    /// The Notification.userInfo key for a failed download HTTPResponse body.
-    let responseBodyKey = "ResponseBody"
-        
     public private(set) var apiString: String = "v3/uploads"
     
     public private(set) var tempUploadDirURL: URL

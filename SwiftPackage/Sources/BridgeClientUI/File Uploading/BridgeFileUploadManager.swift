@@ -166,6 +166,12 @@ protocol BridgeFileUploadAPI {
     /// A partial URL path that uniquely and completely identifies the particular Bridge upload API.
     var apiString: String { get }
     
+    /// The Notification.userInfo key for a failed upload/download HTTP status.
+    var httpStatusKey: String { get }
+    
+    /// The Notification.userInfo key for a failed download HTTPResponse body.
+    var responseBodyKey: String { get }
+
     /// Where to keep temporary copies of files being uploaded via this upload API.
     /// Typically this would be a subdirectory of the Application Support Directory.
     var tempUploadDirURL: URL { get }
@@ -260,6 +266,10 @@ protocol BridgeFileUploadAPI {
     
     /// This method is the public face of the Bridge upload APIs.
     func upload(fileId: String, fileUrl: URL, contentType: String?, extras: Any?)
+    
+    /// Behaves identically to `upload(fileId:fileUrl:contentType:extras:)` but
+    /// returns the temp file copy. For internal use in unit testing only.
+    func uploadInternal(fileId: String, fileUrl: URL, contentType: String?, extras: Any?) -> URL?
 }
 
 /// BridgeFileUploadAPITyped extends BridgeFileUploadAPI with an associated type, which is
@@ -273,6 +283,17 @@ protocol BridgeFileUploadAPITyped : BridgeFileUploadAPI {
 /// Implementations of functions that require compile-time knowledge of the associated type, but are
 /// otherwise the same for all upload APIs.
 extension BridgeFileUploadAPITyped {
+    
+    /// The Notification.userInfo key for a failed upload/download HTTP status.
+    var httpStatusKey: String {
+        "HttpStatus"
+    }
+    
+    /// The Notification.userInfo key for a failed download HTTPResponse body.
+    var responseBodyKey: String {
+        "ResponseBody"
+    }
+
     func markUploadRequested(for relativePath: String, uploadMetadata: BridgeFileUploadMetadataBlob) {
         self.uploadManager.persistMapping(from: relativePath, to: uploadMetadata as! BridgeFileUploadMetadata<T>, defaultsKey: self.uploadManager.uploadURLsRequestedKey)
     }
@@ -372,6 +393,10 @@ extension BridgeFileUploadAPITyped {
     public func upload(fileId: String, fileUrl: URL, contentType: String? = nil, extras: Any? = nil) {
         self.uploadManager.upload(T.self, uploadApi: self, fileId: fileId, fileUrl: fileUrl, contentType: contentType, extras: extras)
     }
+
+    public func uploadInternal(fileId: String, fileUrl: URL, contentType: String? = nil, extras: Any? = nil) -> URL? {
+        return self.uploadManager.uploadInternal(T.self, uploadApi: self, fileId: fileId, fileUrl: fileUrl, contentType: contentType, extras: extras)
+    }
 }
 
 /// The BridgeFileUploadManager handles uploading files to Bridge using an iOS URLSession
@@ -415,22 +440,6 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
     /// The key under which we store retryInfo for retrying failed file uploads.
     /// The key refers to a mapping of temp file -> BridgeFileRetryInfo.
     let retryUploadsKey = "RetryUploadsKey"
-    
-    /// The Notification.userInfo key for the uploaded file's upload object from Bridge.
-    let bridgeUploadObjectKey = "BridgeUploadObject"
-    
-    /// The Notification.userInfo key for the uploaded file's original (on-device) path.
-    let filePathKey = "FilePath"
-    
-    /// The Notification.userInfo key for a failed upload/download HTTP status.
-    let httpStatusKey = "HttpStatus"
-    
-    /// The Notification.userInfo key for a failed download HTTPResponse body.
-    let responseBodyKey = "ResponseBody"
-    
-    /// The Notification.userInfo key for the Bridge API URL at which one can (with appropriate authentication headers)
-    /// DELETE the uploaded file, or GET it back (via redirect).
-    let requestUrlKey = "RequestUrl"
     
     /// A mapping for implementation-specific details for each registered Bridge upload API.
     var bridgeFileUploadApis = [String : BridgeFileUploadAPI]()

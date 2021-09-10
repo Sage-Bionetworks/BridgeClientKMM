@@ -12,7 +12,7 @@ import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus
 import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
 import org.sagebionetworks.bridge.kmm.shared.repo.AuthenticationRepository
 
-class NativeAuthenticationManager(
+open class NativeAuthenticationManager(
     private val viewUpdate: (UserSessionInfo?) -> Unit
 ) : KoinComponent {
 

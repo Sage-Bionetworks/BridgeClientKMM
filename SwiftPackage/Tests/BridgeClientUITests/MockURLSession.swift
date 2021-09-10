@@ -55,6 +55,10 @@ class MockUploadTask : URLSessionUploadTask {
         return mockResponse
     }
     
+    override var originalRequest: URLRequest? {
+        return self.request
+    }
+    
     init(session: MockURLSession, request: URLRequest) {
         self.session = session
         self.request = request
@@ -83,6 +87,10 @@ class MockDownloadTask: URLSessionDownloadTask {
     
     override var response: URLResponse? {
         return mockResponse
+    }
+    
+    override var originalRequest: URLRequest? {
+        return self.request
     }
     
     init(session: MockURLSession, request: URLRequest) {

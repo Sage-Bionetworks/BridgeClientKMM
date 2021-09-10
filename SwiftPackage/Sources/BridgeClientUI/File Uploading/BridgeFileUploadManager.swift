@@ -777,15 +777,19 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         
         // Request an uploadUrl for the bridgeUploadObject
         let requestString = uploadApi.uploadRequestUrlString(for: uploadMetadata)
-        guard let sessionToken = self.appManager.userSessionInfo?.sessionToken else {
-            debugPrint("Unable to request an upload URL from Bridge--not logged in to an account.")
-            return nil
-        }
-        let headers = [
-            "Bridge-Session" : sessionToken
-        ]
 
-        let _ = self.netManager.downloadFile(from: requestString, method: "POST", httpHeaders: headers, parameters: bridgeUploadObject, taskDescription: invariantFilePath)
+        // throw this over to the main queue so we can access Kotlin stuff
+        OperationQueue.main.addOperation {
+            guard let sessionToken = self.appManager.userSessionInfo?.sessionToken else {
+                debugPrint("Unable to request an upload URL from Bridge--not logged in to an account.")
+                return
+            }
+            let headers = [
+                "Bridge-Session" : sessionToken
+            ]
+
+            let _ = self.netManager.downloadFile(from: requestString, method: "POST", httpHeaders: headers, parameters: bridgeUploadObject, taskDescription: invariantFilePath)
+        }
         
         return fileCopy
     }
@@ -1000,18 +1004,18 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
     /// Task delegate method.
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         
-        // get which API this task is using
-        guard let uploadApi = self.uploadApi(for: task.originalRequest?.url) else  {
-            debugPrint("Unexpected: No uploadApi registered for task \(task) (url: \(String(describing: task.originalRequest?.url)))")
-            return
-        }
-        
         // get the sandbox-relative path to the temp copy of the participant file
         guard let invariantFilePath = task.taskDescription else {
             debugPrint("Unexpected: Finished a background session task with no taskDescription set")
             return
         }
         
+        // get which API this task is using from the temp copy's xattrs
+        guard let uploadApi = self.apiFromXAttrs(for: invariantFilePath) else  {
+            debugPrint("Unexpected: No uploadApi marked for temp file \(invariantFilePath)")
+            return
+        }
+
         if let downloadTask = task as? URLSessionDownloadTask {
             // If an HTTP error response from Bridge gets through to here, we need to handle it.
             // Otherwise, we're done here.
@@ -1216,7 +1220,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         // simulator and device have the app uuid in a different location in the path,
         // and it might change in the future, so:
         let rangeOfLastUUID = sandboxPath.range(of: UUIDRegexPattern, options: [.regularExpression, .backwards])
-        let beforeUUID = sandboxPath[...(rangeOfLastUUID?.lowerBound ?? sandboxPath.startIndex)]
+        let beforeUUID = sandboxPath[..<(rangeOfLastUUID?.lowerBound ?? sandboxPath.startIndex)]
         let afterUUID = sandboxPath[(rangeOfLastUUID?.upperBound ?? sandboxPath.startIndex)...]
         var regex = "^"
         if beforeUUID.count > 0 {

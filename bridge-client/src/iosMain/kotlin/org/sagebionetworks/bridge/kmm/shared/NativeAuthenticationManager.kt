@@ -32,7 +32,7 @@ open class NativeAuthenticationManager(
         return authManager.isAuthenticated()
     }
 
-    fun reauth(completion: (Error?) -> Unit) {
+    open fun reauth(completion: (Error?) -> Unit) {
         scope.launch {
             when(authManager.reAuth()) {
                 true -> completion(null)
@@ -42,11 +42,11 @@ open class NativeAuthenticationManager(
         }
     }
 
-    fun notifyUIOfBridgeError(statusCode: HttpStatusCode) {
+    open fun notifyUIOfBridgeError(statusCode: HttpStatusCode) {
         authManager.notifyUIOfBridgeError(statusCode)
     }
 
-    fun session() : UserSessionInfo? {
+    open fun session() : UserSessionInfo? {
         return authManager.session()
     }
 

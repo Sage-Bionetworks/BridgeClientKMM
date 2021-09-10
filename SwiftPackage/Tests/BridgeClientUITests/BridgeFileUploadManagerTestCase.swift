@@ -135,7 +135,7 @@ extension BridgeFileUploadManagerTestCase {
         let responseJson = ["message": "try again later"]
         let endpoint = requestEndpoint
         let mimeType = "image/jpeg"
-        guard let downloadFileUrl = Bundle(for: type(of: self)).url(forResource: "failed-upload-request-response", withExtension: "json") else {
+        guard let downloadFileUrl = Bundle.module.url(forResource: "failed-upload-request-response", withExtension: "json") else {
             XCTAssert(false, "Unable to find test response file 'failed-upload-request-response.json' for ParticipantFileUploadManager upload failure tests")
             return
         }
@@ -147,7 +147,7 @@ extension BridgeFileUploadManagerTestCase {
         
         // NOTE: If I move this block any further up in the function, it causes a compiler crash. Not
         // a syntax error, an actual crash of the compiler. ¯\_(ツ)_/¯ ~emm 2021-07-08
-        guard let uploadFileUrl = Bundle(for: type(of: self)).url(forResource: "cat", withExtension: "jpg") else {
+        guard let uploadFileUrl = Bundle.module.url(forResource: "cat", withExtension: "jpg") else {
             XCTAssert(false, "Unable to find test image 'cat.jpg' for ParticipantFileUploadManager upload failure tests")
             return
         }
@@ -254,37 +254,39 @@ extension BridgeFileUploadManagerTestCase {
 
         // -- now set up the responses for the retry attempt and then initiate it.
         //    (queue up so this happens after the above has completed)
-        self.mockURLSession.delegateQueue.addOperation {
-            guard retryRecoverable else { return }
-            // first, check that the file is indeed in the retry queue as expected
-            self.check(file: tempCopyUrl, willRetry: true, stillExists: true, message: "Should retry after 503 from participant file upload API", cleanUpAfter: false)
-            
-            // set up the responses for the retry
-            // -- set up the Participant File Upload Request response
-            let s3url = "/not-a-real-pre-signed-S3-url"
-            let participantFile = ParticipantFile(fileId: self.testFileId, mimeType: mimeType, createdOn: nil, downloadUrl: nil, uploadUrl: s3url)
-            var responseJson: Any
-            do {
-                responseJson = try DictionaryEncoder().encode(participantFile)
-            } catch let error {
-                print("Error attempting to encode ParticipantFile object \(participantFile) to json dict: \(error)")
-                return
+        OperationQueue.main.addOperation {
+            self.mockURLSession.delegateQueue.addOperation {
+                guard retryRecoverable else { return }
+                // first, check that the file is indeed in the retry queue as expected
+                self.check(file: tempCopyUrl, willRetry: true, stillExists: true, message: "Should retry after 503 from participant file upload API", cleanUpAfter: false)
+                
+                // set up the responses for the retry
+                // -- set up the Participant File Upload Request response
+                let s3url = "/not-a-real-pre-signed-S3-url"
+                let participantFile = ParticipantFile(fileId: self.testFileId, mimeType: mimeType, createdOn: nil, downloadUrl: nil, uploadUrl: s3url)
+                var responseJson: Any
+                do {
+                    responseJson = try DictionaryEncoder().encode(participantFile)
+                } catch let error {
+                    print("Error attempting to encode ParticipantFile object \(participantFile) to json dict: \(error)")
+                    return
+                }
+                guard let downloadFileUrl = Bundle.module.url(forResource: "upload-request-success", withExtension: "json") else {
+                    XCTAssert(false, "Unable to find test response file 'upload-request-success.json' for ParticipantFileUploadManager upload failure tests")
+                    return
+                }
+                self.mockURLSession.set(json: responseJson, responseCode: 201, for: endpoint, httpMethod: "POST")
+                self.mockURLSession.set(downloadFileUrl: downloadFileUrl, error: nil, for: endpoint, httpMethod: "POST")
+                
+                // -- set up the S3 upload success response
+                self.mockURLSession.set(json: [:], responseCode: 200, for: s3url, httpMethod: "PUT")
+                
+                // TODO: When adapting this test for result file uploads, set up the "upload completed"
+                // api call response here too ~emm 2021-07-08
+                
+                // -- do the retry
+                bfum.retryUploadsAfterDelay()
             }
-            guard let downloadFileUrl = Bundle(for: type(of: self)).url(forResource: "upload-request-success", withExtension: "json") else {
-                XCTAssert(false, "Unable to find test response file 'upload-request-success.json' for ParticipantFileUploadManager upload failure tests")
-                return
-            }
-            self.mockURLSession.set(json: responseJson, responseCode: 201, for: endpoint, httpMethod: "POST")
-            self.mockURLSession.set(downloadFileUrl: downloadFileUrl, error: nil, for: endpoint, httpMethod: "POST")
-            
-            // -- set up the S3 upload success response
-            self.mockURLSession.set(json: [:], responseCode: 200, for: s3url, httpMethod: "PUT")
-            
-            // TODO: When adapting this test for result file uploads, set up the "upload completed"
-            // api call response here too ~emm 2021-07-08
-            
-            // -- do the retry
-            bfum.retryUploadsAfterDelay()
         }
         
         // -- wait here until everything above has worked its way through.
@@ -306,7 +308,7 @@ extension BridgeFileUploadManagerTestCase {
         let s3url = "/not-a-real-pre-signed-S3-url"
         let mimeType = "image/jpeg"
         let endpoint = "/v3/participants/self/files/\(testFileId)"
-        guard let uploadFileUrl = Bundle(for: type(of: self)).url(forResource: "cat", withExtension: "jpg") else {
+        guard let uploadFileUrl = Bundle.module.url(forResource: "cat", withExtension: "jpg") else {
             XCTAssert(false, "Unable to find test image 'cat.jpg' for ParticipantFileUploadManager S3 error response tests")
             return
         }
@@ -323,7 +325,7 @@ extension BridgeFileUploadManagerTestCase {
             return
         }
         let downloadFileName = (status == 403) ? "upload-request-expired" : "upload-request-success"
-        guard let downloadFileUrl = Bundle(for: type(of: self)).url(forResource: downloadFileName, withExtension: "json") else {
+        guard let downloadFileUrl = Bundle.module.url(forResource: downloadFileName, withExtension: "json") else {
             XCTAssert(false, "Unable to find test response file '\(downloadFileName).json' for ParticipantFileUploadManager S3 error response tests")
             return
         }
@@ -357,11 +359,15 @@ extension BridgeFileUploadManagerTestCase {
         // queue up a couple of times to make sure the above stuff has actually completed before we check the retry queue
         self.mockURLSession.delegateQueue.addOperation {
             print("testUploadFileToBridgeWhenS3Responds \(status): once through delegate queue")
-            self.mockURLSession.delegateQueue.addOperation {
-                print("testUploadFileToBridgeWhenS3Responds \(status): twice through delegate queue")
+            OperationQueue.main.addOperation {
                 self.mockURLSession.delegateQueue.addOperation {
-                    print("testUploadFileToBridgeWhenS3Responds \(status): thrice through delegate queue")
-                    expectStatus.fulfill()
+                    print("testUploadFileToBridgeWhenS3Responds \(status): twice through delegate queue")
+                    OperationQueue.main.addOperation {
+                        self.mockURLSession.delegateQueue.addOperation {
+                            print("testUploadFileToBridgeWhenS3Responds \(status): thrice through delegate queue")
+                            expectStatus.fulfill()
+                        }
+                    }
                 }
             }
         }
@@ -377,7 +383,7 @@ extension BridgeFileUploadManagerTestCase {
         let s3url = "/not-a-real-pre-signed-S3-url"
         let mimeType = "image/jpeg"
         let endpoint = "/v3/participants/self/files/\(testFileId)"
-        guard let uploadFileUrl = Bundle(for: type(of: self)).url(forResource: "cat", withExtension: "jpg") else {
+        guard let uploadFileUrl = Bundle.module.url(forResource: "cat", withExtension: "jpg") else {
             XCTAssert(false, "Unable to find test image 'cat.jpg' for ParticipantFileUploadManager happy path test")
             return
         }
@@ -393,7 +399,7 @@ extension BridgeFileUploadManagerTestCase {
             XCTAssert(false, "Error attempting to encode ParticipantFile object \(participantFile) to json dict: \(error)")
             return
         }
-        guard let downloadFileUrl = Bundle(for: type(of: self)).url(forResource: "upload-request-success", withExtension: "json") else {
+        guard let downloadFileUrl = Bundle.module.url(forResource: "upload-request-success", withExtension: "json") else {
             XCTAssert(false, "Unable to find test response file 'upload-request-success.json' for \(uploadApi.apiString) happy path test")
             return
         }

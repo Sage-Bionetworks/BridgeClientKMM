@@ -469,7 +469,7 @@ internal fun NotificationInfo.scheduleAt(instanceGuid: String,
 
     // If there is an interval, move the firstInstant forward to after the current time
     val intervalPeriod = this.interval?.let { DateTimePeriod.parse(it) }
-    if (intervalPeriod != null && intervalPeriod.days > 0) {
+    if (intervalPeriod != null) {
         val endInstant = endDateTime.toInstant(timeZone)
         while(firstInstant < instantInDay && firstInstant < endInstant) {
             firstInstant = firstInstant.plus(intervalPeriod, timeZone)

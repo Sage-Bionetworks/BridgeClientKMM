@@ -442,7 +442,7 @@ extension BridgeFileUploadAPITyped {
             ]
 
             let _ = uploadManager.netManager.downloadFile(from: notifyUrl, method: "POST", httpHeaders: headers, taskDescription: relativePath)
-            }
+        }
     }
 }
 

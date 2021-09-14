@@ -62,7 +62,12 @@ public struct CustomScrollView<Content : View>: View {
                     .coordinateSpace(name: "scroll")
                     .frame(maxWidth: .infinity)
                     .onPreferenceChange(ScrollFramePreferenceKey.self) { value in
-                        viewModel.scrollOffset = abs(floor(value.minY))
+                        // syoung 09/09/2021 So... it turns out that this isn't always called
+                        // on the main thread so it was getting updated multiple times per
+                        // frame.
+                        DispatchQueue.main.async {
+                            viewModel.scrollOffset = abs(floor(value.minY))
+                        }
                     }
                     
                     makeButtons(scrollView: scrollView)
@@ -192,8 +197,10 @@ public struct CustomScrollView<Content : View>: View {
                                 value: proxy.size.height)
             })
             .onPreferenceChange(ViewHeightPreferenceKey.self) { value in
-                guard contentHeight != floor(value) else { return }
-                contentHeight = floor(value)
+                DispatchQueue.main.async {
+                    guard contentHeight != floor(value) else { return }
+                    contentHeight = floor(value)
+                }
             }
         }
     }

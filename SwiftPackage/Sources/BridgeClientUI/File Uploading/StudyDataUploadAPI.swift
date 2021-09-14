@@ -94,7 +94,7 @@ extension Notification.Name {
     public static let SBBStudyFileUploadBridgeNotificationFailed = Notification.Name(rawValue: "SBBStudyFileUploadBridgeNotificationFailed")
 }
 
-class StudyDataUploadAPI: BridgeFileUploadAPITyped {
+public class StudyDataUploadAPI: BridgeFileUploadAPITyped {
     typealias TrackingType = StudyDataUploadObject
     typealias UploadRequestType = UploadRequest
     typealias UploadRequestResponseType = UploadSession

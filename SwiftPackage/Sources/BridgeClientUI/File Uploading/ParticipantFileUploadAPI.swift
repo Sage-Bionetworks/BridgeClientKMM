@@ -36,10 +36,10 @@ import UniformTypeIdentifiers
 import CoreServices
 import BridgeClient
 
-public struct ParticipantFile: Codable {
-    var fileId : String
-    var mimeType: String
-    var createdOn: Date?
+struct ParticipantFile: Codable {
+    let fileId : String
+    let mimeType: String
+    let createdOn: Date?
     var downloadUrl: String?
     var uploadUrl: String?
     var expiresOn: Date?

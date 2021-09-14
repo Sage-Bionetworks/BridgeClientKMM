@@ -377,15 +377,14 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
     }
     
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        if let nsError = error as NSError? {
+        if let nsError = error as NSError?,
+           let downloadTask = task as? URLSessionDownloadTask,
+           let resumeData = nsError.userInfo[NSURLSessionDownloadTaskResumeData] as? Data {
             // if there's resume data from a download task, use it to retry
-            if let downloadTask = task as? URLSessionDownloadTask,
-               let resumeData = nsError.userInfo[NSURLSessionDownloadTaskResumeData] as? Data {
-                self.retryFailedDownload(downloadTask, for: session, resumeData: resumeData)
-                return
-            }
+            self.retryFailedDownload(downloadTask, for: session, resumeData: resumeData)
+            return
         }
-        
+
         var retrying = false
         if let downloadTask = task as? URLSessionDownloadTask {
             let httpResponse = task.response as? HTTPURLResponse

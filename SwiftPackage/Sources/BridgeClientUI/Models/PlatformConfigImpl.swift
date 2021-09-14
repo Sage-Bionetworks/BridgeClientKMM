@@ -41,7 +41,7 @@ public class PlatformConfigImpl : IOSPlatformConfig {
     public let appVersionName: String
     public let appVersion: Int32
     public let deviceName: String
-    public let bridgeEnv: PlatformConfigBridgeEnv
+    public let bridgeEnvironment: PlatformConfigBridgeEnvironment
     public let osName: String
     public let osVersion: String
     
@@ -49,14 +49,14 @@ public class PlatformConfigImpl : IOSPlatformConfig {
         "\(deviceName); \(osName)/\(osVersion)"
     }
     
-    init(appId: String? = nil, appGroupIdentifier: String? = nil, bridgeEnv: PlatformConfigBridgeEnv = .production) {
+    init(appId: String? = nil, appGroupIdentifier: String? = nil, bridgeEnvironment: PlatformConfigBridgeEnvironment = .production) {
         
         self.appId = appId ?? Bundle.main.bridgeAppId
         self.appGroupIdentifier = appGroupIdentifier
         self.appName = Bundle.main.executableName
         self.appVersionName = Bundle.main.fullVersion
         self.appVersion = Int32(Bundle.main.buildNumber)
-        self.bridgeEnv = bridgeEnv
+        self.bridgeEnvironment = bridgeEnvironment
         
         #if os(watchOS)
         let device = WKInterfaceDevice.current()

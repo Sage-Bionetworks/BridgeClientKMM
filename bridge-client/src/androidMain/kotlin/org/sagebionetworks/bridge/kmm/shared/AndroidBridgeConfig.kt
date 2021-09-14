@@ -45,7 +45,7 @@ class AndroidBridgeConfig(context: Context) : BridgeConfig {
         }
 
     // TODO: emm 2021-08-18 Where should this value come from?
-    override val bridgeEnv: PlatformConfig.BridgeEnv = PlatformConfig.BridgeEnv.production
+    override val bridgeEnvironment: PlatformConfig.BridgeEnvironment = PlatformConfig.BridgeEnvironment.production
 
     override val osName: String = "Android"
 

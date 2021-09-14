@@ -3,7 +3,7 @@ package org.sagebionetworks.bridge.kmm.shared
 import org.sagebionetworks.bridge.kmm.shared.models.ClientInfo
 
 interface PlatformConfig {
-    enum class BridgeEnv {
+    enum class BridgeEnvironment {
         production {
             override fun domainSuffix() = ""
         },
@@ -32,7 +32,7 @@ interface PlatformConfig {
 
     val appVersionName: String
 
-    val bridgeEnv: BridgeEnv
+    val bridgeEnvironment: BridgeEnvironment
 
     val osVersion: String
 

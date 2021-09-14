@@ -36,8 +36,8 @@ object IOSBridgeConfig  : BridgeConfig {
         get() = platformConfig.appVersion
     override val appVersionName: String
         get() = platformConfig.appVersionName
-    override val bridgeEnv: PlatformConfig.BridgeEnv
-        get() = platformConfig.bridgeEnv
+    override val bridgeEnvironment: PlatformConfig.BridgeEnvironment
+        get() = platformConfig.bridgeEnvironment
     override val osName: String
         get() = platformConfig.osName
     override val osVersion: String
@@ -52,7 +52,7 @@ internal data class PlatformConfigImpl(
     override val appName: String = "Sage Assessment Test",
     override val appVersion: Int = 99,
     override val appVersionName: String = "Unknown",
-    override val bridgeEnv: PlatformConfig.BridgeEnv = PlatformConfig.BridgeEnv.production,
+    override val bridgeEnvironment: PlatformConfig.BridgeEnvironment = PlatformConfig.BridgeEnvironment.production,
     override val osVersion: String = "Unknown",
     override val deviceName: String = "Unknown",
     override val osName: String = "iOS") : IOSPlatformConfig

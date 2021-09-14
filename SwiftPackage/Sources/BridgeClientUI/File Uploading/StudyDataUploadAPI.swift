@@ -32,7 +32,6 @@
 //
 
 //import Foundation
-import UIKit
 import UniformTypeIdentifiers
 import CoreServices
 import BridgeClient

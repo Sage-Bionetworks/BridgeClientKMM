@@ -104,11 +104,11 @@ extension BridgeFileUploadManagerTestCaseTyped {
     
     func removeMappings(for relativeFilePath: String) {
         let bfum = BridgeFileUploadManager.shared
-        let _ = bfum.removeMapping(String.self, from: relativeFilePath, defaultsKey: bfum.bridgeFileUploadsKey)
+        bfum.removeMapping(String.self, from: relativeFilePath, defaultsKey: bfum.bridgeFileUploadsKey)
         let _ = uploadApi.fetchUploadRequested(for: relativeFilePath)
         let _ = uploadApi.fetchUploadingToS3(for: relativeFilePath)
         let _ = uploadApi.fetchNotifyingBridge(for: relativeFilePath)
-        let _ = bfum.removeMapping(String.self, from: relativeFilePath, defaultsKey: bfum.downloadErrorResponseBodyKey)
+        bfum.removeMapping(String.self, from: relativeFilePath, defaultsKey: bfum.downloadErrorResponseBodyKey)
     }
     
     func check(file: URL, willRetry: Bool, stillExists: Bool, message: String, cleanUpAfter: Bool) {

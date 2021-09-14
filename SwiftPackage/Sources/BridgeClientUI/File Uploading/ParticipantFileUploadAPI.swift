@@ -32,7 +32,6 @@
 //
 
 //import Foundation
-import UIKit
 import UniformTypeIdentifiers
 import CoreServices
 import BridgeClient
@@ -58,7 +57,7 @@ extension Notification.Name {
     public static let SBBParticipantFileUploadToS3Failed = Notification.Name(rawValue: "SBBParticipantFileUploadToS3Failed")
 }
 
-class ParticipantFileUploadAPI: BridgeFileUploadAPITyped {
+public class ParticipantFileUploadAPI: BridgeFileUploadAPITyped {
     typealias TrackingType = ParticipantFile
     typealias UploadRequestType = ParticipantFile
     typealias UploadRequestResponseType = ParticipantFile

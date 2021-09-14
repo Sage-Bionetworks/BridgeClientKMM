@@ -166,26 +166,29 @@ open class BridgeClientAppManager : ObservableObject {
         DispatchQueue.global().async {
 
             // Encrypt the files.
-            var encryptedArchives = [String : URL]()
             if let path = self.pemPath {
                 archives.forEach { archive in
                     do {
-                        let encryptedArchive = try archive.encryptArchive(using: path)
-                        encryptedArchives[archive.identifier] = encryptedArchive
+                        try archive.encryptArchive(using: path)
                     } catch let err {
-                        print("Failed to encrypt archive. \(err)")
+                        print("ERROR: Failed to encrypt \(archive.identifier). \(err)")
                     }
                 }
             }
 
             DispatchQueue.main.async {
                 self.isUploadingResults = true
-                encryptedArchives.forEach { (id, url) in
+                archives.forEach { archive in
                     // TODO: emm 2021-08-19 Find out what metadata scientists want us to mark uploads with for
                     // exporter v3, and figure out how to get it here--maybe by putting it on the DataArchive?
                     // In any case, it needs to consist of Json key-value pairs.
                     let exporterV3Metadata: JsonElement? = nil
                     let extras = StudyDataUploadExtras(encrypted: true, metadata: exporterV3Metadata, zipped: true)
+                    let id = archive.identifier
+                    guard let url = archive.encryptedURL else {
+                        print("WARNING! Cannot upload \(id)")
+                        return
+                    }
                     StudyDataUploadAPI.shared.upload(fileId: id, fileUrl: url, contentType: "application/zip", extras: extras)
                     do {
                         try FileManager.default.removeItem(at: url)

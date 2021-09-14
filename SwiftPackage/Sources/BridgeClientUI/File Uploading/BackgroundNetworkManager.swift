@@ -32,49 +32,40 @@
 //
 
 import Foundation
-import UIKit
 import BridgeClient
+import JsonModel
 
 protocol URLSessionBackgroundDelegate: URLSessionDataDelegate, URLSessionDownloadDelegate {
 }
 
-class BridgeJsonParser {
-    /// The .iso8601 date encoding/decoding strategy for JSONEncoder/Decoder uses ISO8601DateFormatter,
-    /// which (a) is not a subclass of DateFormatter and (b) only supports the RFC 3339 profile, which does not include
-    /// fractional seconds. Bridge always includes fractional seconds in dates.
-    
-    static let iso8601FormatterWithFractionalSeconds: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.calendar = Calendar(identifier: .iso8601)
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSXXXXX"
-        return formatter
-    } ()
-    
-    /// For encoding objects to be passed to Bridge.
-    static let jsonEncoder: JSONEncoder = {
-        let encoder = JSONEncoder()
-        encoder.dateEncodingStrategy = .formatted(BridgeJsonParser.iso8601FormatterWithFractionalSeconds)
-        return encoder
-    }()
-    
-    /// For decoding objects received from Bridge.
-    static let jsonDecoder: JSONDecoder = {
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .formatted(BridgeJsonParser.iso8601FormatterWithFractionalSeconds)
-        return decoder
-    }()
+extension URLRequest {
+    mutating fileprivate func addHeaders(_ headers: [String : String]?) {
+        let userAgentHeader = IOSBridgeConfig().userAgent
+        self.setValue(userAgentHeader, forHTTPHeaderField: "User-Agent")
+
+        let acceptLanguageHeader = Locale.preferredLanguages.joined(separator: ", ")
+        self.setValue(acceptLanguageHeader, forHTTPHeaderField: "Accept-Language")
+
+        self.setValue("no-cache", forHTTPHeaderField: "cache-control")
+        
+        headers?.forEach {
+            self.addValue($0.key, forHTTPHeaderField: $0.value)
+        }
+    }
+}
+
+enum HTTPMethod : String {
+    case GET, POST, PUT, DELETE
 }
 
 class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
 
     /// A singleton instance of the manager.
-    public static let shared = BackgroundNetworkManager()
+    static let shared = BackgroundNetworkManager()
 
     /// The identifier (base) for the background URLSession. App extensions will append a unique string to this to distinguish
     /// their background sessions.
-    // TODO: Allow users of this singleton to specify their own individually unique identifiers.
-    public static let backgroundSessionIdentifier = "org.sagebase.backgroundnetworkmanager.session"
+    static let backgroundSessionIdentifier = "org.sagebase.backgroundnetworkmanager.session"
     
     /// BackgroundNetworkManager needs access to app configuration and user session info. The app manager should create the singleton
     /// instance and immediately set this value to itself.
@@ -88,26 +79,24 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
     
     /// If set, URLSession(Data/Download)Delegate method calls received by the BackgroundNetworkManager
     /// will be passed through to this object for further handling.
-    // TODO: Allow multiple delegates, one for each unique background session identifier.
-    public var backgroundTransferDelegate: URLSessionBackgroundDelegate?
+    var backgroundTransferDelegate: URLSessionBackgroundDelegate?
     
     /// The queue used for calling background session delegate methods.
     ///  Also used for creating the singleton background session itself in a thread-safe way.
     ///  Created lazily.
-    // TODO: When supporting multiple sessions (below), does it make sense to share one delegate queue among all of them?
-    public static let sessionDelegateQueue: OperationQueue = {
+    static let sessionDelegateQueue: OperationQueue = {
         let delegateQueue = OperationQueue()
         delegateQueue.maxConcurrentOperationCount = 1
         return delegateQueue
     }()
             
     /// The singleton background URLSession.
-    public static var _backgroundSession: URLSession? = nil
+    static var _backgroundSession: URLSession? = nil
     
     /// A singleton map of pending background URLSession completion handlers that have been passed in from the app delegate and not yet called.
-    public static var backgroundSessionCompletionHandlers = [String : () -> Void]()
+    var backgroundSessionCompletionHandlers = [String : () -> Void]()
     
-    private static func isRunningInAppExtension() -> Bool {
+    private func isRunningInAppExtension() -> Bool {
         // "An app extension target’s Info.plist file identifies the extension point and may specify some details
         // about your extension. At a minimum, the file includes the NSExtension key and a dictionary of keys and
         // values that the extension point specifies."
@@ -126,14 +115,13 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
     }
     
     /// For encoding objects to be passed to Bridge.
-    let jsonEncoder = BridgeJsonParser.jsonEncoder
+    let jsonEncoder = SerializationFactory.defaultFactory.createJSONEncoder()
     
     /// For decoding objects received from Bridge.
-    let jsonDecoder = BridgeJsonParser.jsonDecoder
+    let jsonDecoder = SerializationFactory.defaultFactory.createJSONDecoder()
     
     /// Access (and if necessary, create) the singleton background URLSession used by the singleton BackgroundNetworkManager.
     /// Make sure it only gets created once, regardless of threading.
-    // TODO: Support creating multiple sessions each with a unique identifer, creating each exactly once.
     func backgroundSession() -> URLSession {
         if BackgroundNetworkManager._backgroundSession == nil {
             // If it doesn't yet exist, queue up a block of code to create it.
@@ -144,7 +132,7 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
                 
                 // OK, create it.
                 var sessionIdentifier = BackgroundNetworkManager.backgroundSessionIdentifier
-                if BackgroundNetworkManager.isRunningInAppExtension() {
+                if self.isRunningInAppExtension() {
                     // Uniquify it from the containing app's BridgeClient background session and those of any other
                     // app extensions or instances thereof with the same containing app that use BridgeClient. Note
                     // that if the extension is gone when the background upload/download finishes, the containing
@@ -173,7 +161,7 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
     }
     
     func bridgeBaseURL() -> URL {
-        let basePath = IOSBridgeConfig().bridgeEnv.basePath()
+        let basePath = IOSBridgeConfig().bridgeEnvironment.basePath()
         guard let baseUrl = URL(string: basePath) else {
             fatalError("Unable to create URL object from string '\(basePath)'")
         }
@@ -195,70 +183,41 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
         return bridgeUrl
     }
     
-    func queryString(from parameters: Encodable?) -> String? {
-        guard let paramDict = parameters as? [String : String] else { return nil }
-        
-        let allowedChars = CharacterSet.urlQueryAllowed
-        var queryParams = Array<String>()
-        for (param, value) in paramDict {
-            // if either the param name or the value fail to encode to a url %-encoded string, skip this parameter
-            var encodedValue: Data
-            do {
-                encodedValue = try jsonEncoder.encode(value)
-            } catch let error {
-                debugPrint("Error trying to jsonEncode value:\n\(value)\n\(error)")
-                continue
+    func queryString(from parameters: [String : String]?) -> String? {
+        parameters?.compactMap { (param, value) in
+            guard let encodedParam = param.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed),
+                  let encodedValueString = "\"\(value)\"".addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)
+            else {
+                return nil
             }
-            guard let encodedValueString = String(data: encodedValue, encoding: .utf8)?.addingPercentEncoding(withAllowedCharacters: allowedChars) else { continue }
-            guard let encodedParam = param.addingPercentEncoding(withAllowedCharacters: allowedChars) else { continue }
-            
-            queryParams.append("\(encodedParam)=\(encodedValueString)")
-        }
-        return queryParams.joined(separator: "&")
+            return "\(encodedParam)=\(encodedValueString)"
+        }.joined(separator: "&")
     }
     
-    func addBasicHeaders(to request: inout URLRequest) {
-        let userAgentHeader = IOSBridgeConfig().userAgent
-        request.setValue(userAgentHeader, forHTTPHeaderField: "User-Agent")
-        
-        let acceptLanguageHeader = Locale.preferredLanguages.joined(separator: ", ")
-        request.setValue(acceptLanguageHeader, forHTTPHeaderField: "Accept-Language")
-        
-        request.setValue("no-cache", forHTTPHeaderField: "cache-control")
-    }
-    
-    func request(method: String, URLString: String, headers: [String : String]?) -> URLRequest {
+    func request(method: HTTPMethod, URLString: String, headers: [String : String]?) -> URLRequest {
         var request = URLRequest(url: bridgeURL(for: URLString))
-        request.httpMethod = method
+        request.httpMethod = method.rawValue
         request.httpShouldHandleCookies = false
-        addBasicHeaders(to: &request)
-        
-        if let headers = headers {
-            for (header, value) in headers {
-                request.addValue(value, forHTTPHeaderField: header)
-            }
-        }
+        request.addHeaders(headers)
         
         debugPrint("Prepared request--URL:\n\(String(describing: request.url?.absoluteString))\nHeaders:\n\(String(describing: request.allHTTPHeaderFields))")
         return request
     }
     
-    func request<T>(method: String, URLString: String, headers: [String : String]?, parameters: T) -> URLRequest where T: Encodable {
+    func request<T>(method: HTTPMethod, URLString: String, headers: [String : String]?, parameters: T) -> URLRequest where T: Encodable {
         var URLString = URLString
-        let isGet = (method.uppercased() == "GET")
+        let isGet = (method == .GET)
         
         // for GET requests, the parameters go in the query part of the URL
-        if isGet {
-            if let queryString = queryString(from: parameters), !queryString.isEmpty {
-                if URLString.contains("?") {
-                    URLString.append("&\(queryString)")
-                }
-                else {
-                    URLString.append("?\(queryString)")
-                }
+        if isGet, let queryString = queryString(from: parameters as? [String : String]), !queryString.isEmpty {
+            if URLString.contains("?") {
+                URLString.append("&\(queryString)")
+            }
+            else {
+                URLString.append("?\(queryString)")
             }
         }
-        
+
         var request = self.request(method: method, URLString: URLString, headers: headers)
         
         // for non-GET requests, the parameters (if any) go in the request body
@@ -281,12 +240,14 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
         return request
     }
     
-    public func downloadFile(from URLString: String, method: String, httpHeaders: [String : String]?, taskDescription: String) -> URLSessionDownloadTask {
+    @discardableResult
+    func downloadFile(from URLString: String, method: HTTPMethod, httpHeaders: [String : String]?, taskDescription: String) -> URLSessionDownloadTask {
         let request = self.request(method: method, URLString: URLString, headers: httpHeaders)
         return self.downloadFile(with: request, taskDescription: taskDescription)
     }
     
-    public func downloadFile<T>(from URLString: String, method: String, httpHeaders: [String : String]?, parameters: T?, taskDescription: String) -> URLSessionDownloadTask where T: Encodable {
+    @discardableResult
+    func downloadFile<T>(from URLString: String, method: HTTPMethod, httpHeaders: [String : String]?, parameters: T?, taskDescription: String) -> URLSessionDownloadTask where T: Encodable {
         let request =  self.request(method: method, URLString: URLString, headers: httpHeaders, parameters: parameters)
         return self.downloadFile(with: request, taskDescription: taskDescription)
     }
@@ -298,28 +259,27 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
         return task
     }
     
-    public func uploadFile(_ fileURL: URL, httpHeaders: [String : String]?, to urlString: String, taskDescription: String) -> URLSessionUploadTask? {
+    @discardableResult
+    func uploadFile(_ fileURL: URL, httpHeaders: [String : String]?, to urlString: String, taskDescription: String) -> URLSessionUploadTask? {
         guard let url = URL(string: urlString) else {
             debugPrint("Could not create URL from string '\(urlString)")
             return nil
         }
         var request = URLRequest(url: url)
         request.allHTTPHeaderFields = httpHeaders
-        request.httpMethod = "PUT"
+        request.httpMethod = HTTPMethod.PUT.rawValue
         let task = backgroundSession().uploadTask(with: request, fromFile: fileURL)
         task.taskDescription = taskDescription
         task.resume()
         return task
     }
     
-    public func restore(backgroundSession: String, completionHandler: @escaping () -> Void) {
-        if backgroundSession.starts(with: BackgroundNetworkManager.backgroundSessionIdentifier) {
-            BackgroundNetworkManager.backgroundSessionCompletionHandlers[backgroundSession] = completionHandler
-            BackgroundNetworkManager.sessionDelegateQueue.addOperation {
-                // TODO: Update this when support is added for multiple named background sessions.
-                if BackgroundNetworkManager._backgroundSession == nil {
-                    self.createBackgroundSession(with: backgroundSession)
-                }
+    func restore(backgroundSession: String, completionHandler: @escaping () -> Void) {
+        guard backgroundSession.starts(with: BackgroundNetworkManager.backgroundSessionIdentifier) else { return }
+        self.backgroundSessionCompletionHandlers[backgroundSession] = completionHandler
+        BackgroundNetworkManager.sessionDelegateQueue.addOperation {
+            if BackgroundNetworkManager._backgroundSession == nil {
+                self.createBackgroundSession(with: backgroundSession)
             }
         }
     }
@@ -329,6 +289,7 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
         return (errorCode == NSURLErrorTimedOut || errorCode == NSURLErrorCannotFindHost || errorCode == NSURLErrorCannotConnectToHost || errorCode == NSURLErrorNotConnectedToInternet || errorCode == NSURLErrorSecureConnectionFailed)
     }
     
+    @discardableResult
     func retry(task: URLSessionDownloadTask) -> Bool {
         guard var request = task.originalRequest else {
             debugPrint("Unable to retry task, as originalRequest is nil:\n\(task)")
@@ -385,7 +346,7 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
                 }
                 
                 debugPrint("Session token auto-refresh succeeded, retrying original request")
-                let _ = retry(task: task)
+                retry(task: task)
             }
             return true
             
@@ -445,11 +406,11 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
     // MARK: URLSessionDelegate
     func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
         if let identifier = session.configuration.identifier,
-            let completion = BackgroundNetworkManager.backgroundSessionCompletionHandlers[identifier] {
+            let completion = self.backgroundSessionCompletionHandlers[identifier] {
             OperationQueue.main.addOperation {
                 completion()
             }
-            BackgroundNetworkManager.backgroundSessionCompletionHandlers.removeValue(forKey: identifier)
+            self.backgroundSessionCompletionHandlers.removeValue(forKey: identifier)
         }
         self.backgroundTransferDelegate?.urlSessionDidFinishEvents?(forBackgroundURLSession: session)
     }

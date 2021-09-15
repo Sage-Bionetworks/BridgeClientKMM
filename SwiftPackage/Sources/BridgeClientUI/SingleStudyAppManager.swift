@@ -72,6 +72,8 @@ public final class SingleStudyAppManager : BridgeClientAppManager {
         try? studyManager?.onCleared()
         studyManager = nil
         study = nil
+        studyId = nil
+        observedStudyId = nil
         super.signOut()
     }
     

@@ -137,7 +137,7 @@ open class BridgeClientAppManager : ObservableObject {
         userSessionInfo = nil
     }
     
-    private func updateAppState() {
+    func updateAppState() {
         if appConfig == nil {
             appState = .launching
         }

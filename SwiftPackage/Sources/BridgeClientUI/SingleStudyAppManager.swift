@@ -48,7 +48,12 @@ public final class SingleStudyAppManager : BridgeClientAppManager {
         updateStudy()
     }
     
-    @Published public var study: Study?
+    @Published public var study: Study? {
+        didSet {
+            updateAppState()
+        }
+    }
+    
     @Published public var isStudyComplete: Bool = false
     
     private var studyManager: NativeStudyManager?
@@ -82,7 +87,6 @@ public final class SingleStudyAppManager : BridgeClientAppManager {
         let previousStudyId = observedStudyId
         if studyId == nil || !studyIds.contains(studyId!) {
             studyId = studyIds.first
-            print("Setting studyId=\(studyId!)")
         }
         guard let studyId = self.studyId, studyId != previousStudyId
         else {
@@ -91,11 +95,34 @@ public final class SingleStudyAppManager : BridgeClientAppManager {
 
         try? studyManager?.onCleared()
         self.observedStudyId = studyId
-        print("observe study=\(studyId)")
-        self.studyManager = .init(studyId: studyId) { [weak self] study in
-            self?.study = study
+        self.studyManager = .init(studyId: studyId) { study in
+            self.study = study
         }
         self.studyManager!.observeStudy()
     }
+    
+    override func updateAppState() {
+        if appConfig == nil {
+            appState = .launching
+        }
+        else if userSessionInfo == nil {
+            appState = .login
+        }
+        else if study == nil {
+            // syoung 09/14/2021 On iOS 14.4, SwiftUI is not recognizing and updating on
+            // changes to the study object and is hanging on the launch screen. Instead,
+            // use the `appState` published property to manage the state of the root view.
+            appState = .launching
+        }
+        else if !isOnboardingFinished {
+            appState = .onboarding
+        }
+        else {
+            appState = .main
+        }
+    }
 }
 
+extension Study : Identifiable {
+    public var id: String { identifier }
+}

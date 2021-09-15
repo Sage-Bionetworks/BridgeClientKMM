@@ -53,7 +53,7 @@ public final class SingleStudyAppManager : BridgeClientAppManager {
     
     private var studyManager: NativeStudyManager?
 
-    public override init(platformConfig: PlatformConfig, pemPath: String? = nil) {
+    public override init(platformConfig: IOSPlatformConfig, pemPath: String? = nil) {
         super.init(platformConfig: platformConfig, pemPath: pemPath)
         self.studyId = self.isPreview ? kPreviewStudyId : UserDefaults.standard.string(forKey: kStudyIdKey)
     }

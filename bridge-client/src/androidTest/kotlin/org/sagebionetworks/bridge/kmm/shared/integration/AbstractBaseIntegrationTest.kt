@@ -5,6 +5,7 @@ import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.sagebionetworks.bridge.kmm.shared.BaseTest
 import org.sagebionetworks.bridge.kmm.shared.BridgeConfig
+import org.sagebionetworks.bridge.kmm.shared.PlatformConfig
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
 import org.sagebionetworks.bridge.kmm.shared.di.bridgeClientkoinModules
 import org.sagebionetworks.bridge.kmm.shared.testDatabaseDriver
@@ -38,6 +39,8 @@ abstract class AbstractBaseIntegrationTest: BaseTest(), KoinTest {
             get() = 1
         override val appVersionName: String
             get() = "Android Integration Test"
+        override val bridgeEnvironment: PlatformConfig.BridgeEnvironment
+            get() = PlatformConfig.BridgeEnvironment.production
         override val osName: String
             get() = "Android Integration Test"
         override val osVersion: String

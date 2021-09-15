@@ -1,5 +1,6 @@
 package org.sagebionetworks.bridge.kmm.shared
 
+import io.ktor.http.*
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collect
@@ -11,7 +12,7 @@ import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus
 import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
 import org.sagebionetworks.bridge.kmm.shared.repo.AuthenticationRepository
 
-class NativeAuthenticationManager(
+open class NativeAuthenticationManager(
     private val viewUpdate: (UserSessionInfo?) -> Unit
 ) : KoinComponent {
 
@@ -31,7 +32,21 @@ class NativeAuthenticationManager(
         return authManager.isAuthenticated()
     }
 
-    fun session() : UserSessionInfo? {
+    open fun reauth(completion: (Error?) -> Unit) {
+        scope.launch {
+            when(authManager.reAuth()) {
+                true -> completion(null)
+                // TODO: have reAuth return the actual error instead of a bool? ~emm 2021-07-27
+                false -> completion(Error(message = "reAuth failed"))
+            }
+        }
+    }
+
+    open fun notifyUIOfBridgeError(statusCode: HttpStatusCode) {
+        authManager.notifyUIOfBridgeError(statusCode)
+    }
+
+    open fun session() : UserSessionInfo? {
         return authManager.session()
     }
 

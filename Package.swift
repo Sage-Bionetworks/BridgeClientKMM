@@ -51,12 +51,12 @@ let package = Package(
                 ],
                 path: "SwiftPackage/Sources/BridgeClientUI",
                 resources: [.process("Resources")]),
-        
         .testTarget(name: "BridgeClientUITests",
                     dependencies: [
                         "BridgeClient",
                         "BridgeClientUI",
                     ],
-                    path: "SwiftPackage/Tests/BridgeClientUITests")
+                    path: "SwiftPackage/Tests/BridgeClientUITests",
+                    resources: [.process("Resources")]),
     ]
 )

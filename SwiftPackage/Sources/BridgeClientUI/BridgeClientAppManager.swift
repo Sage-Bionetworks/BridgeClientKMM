@@ -32,6 +32,8 @@
 
 import SwiftUI
 import BridgeClient
+import JsonModel
+
 
 fileprivate let kOnboardingStateKey = "isOnboardingFinished"
 
@@ -42,9 +44,9 @@ open class BridgeClientAppManager : ObservableObject {
     public enum AppState : String {
         case launching, login, onboarding, main
     }
-    
+
     public let isPreview: Bool
-    public let platformConfig: PlatformConfig
+    public let platformConfig: IOSPlatformConfig
     public let pemPath: String?
         
     @Published public var title: String
@@ -85,7 +87,7 @@ open class BridgeClientAppManager : ObservableObject {
         self.init(platformConfig: PlatformConfigImpl(appId: appId), pemPath: pemPath)
     }
     
-    public init(platformConfig: PlatformConfig, pemPath: String? = nil) {
+    public init(platformConfig: IOSPlatformConfig, pemPath: String? = nil) {
         self.pemPath = pemPath ?? Bundle.main.path(forResource: platformConfig.appId, ofType: "pem")
         self.platformConfig = platformConfig
         self.title = self.platformConfig.localizedAppName
@@ -93,7 +95,11 @@ open class BridgeClientAppManager : ObservableObject {
         if !self.isPreview {
             IOSBridgeConfig().initialize(platformConfig: self.platformConfig)
         }
-    }
+
+        // Set up the background network manager singleton and make us its app manager
+        let bnm = BackgroundNetworkManager.shared
+        bnm.appManager = self
+}
     
     public func appWillFinishLaunching(_ launchOptions: [UIApplication.LaunchOptionsKey : Any]? ) {
 
@@ -121,6 +127,10 @@ open class BridgeClientAppManager : ObservableObject {
         
         // Update the app state
         updateAppState()
+    }
+    
+    public func handleEvents(for backgroundSession: String, completionHandler: @escaping () -> Void) {
+        BackgroundNetworkManager.shared.restore(backgroundSession: backgroundSession, completionHandler: completionHandler)
     }
     
     public func loginWithExternalId(_ externalId: String, password: String, completion: @escaping ((BridgeClient.ResourceStatus) -> Void)) {
@@ -161,15 +171,31 @@ open class BridgeClientAppManager : ObservableObject {
                     do {
                         try archive.encryptArchive(using: path)
                     } catch let err {
-                        print("Failed to encrypt archive. \(err)")
+                        print("ERROR: Failed to encrypt \(archive.identifier). \(err)")
                     }
                 }
             }
 
             DispatchQueue.main.async {
                 self.isUploadingResults = true
-                // TODO: syoung 06/17/2021 Figure out what needs to happen to allow uploading files to S3.
-                // Note: This will have to dispatch to the main queue before accessing the Kotlin framework.
+                archives.forEach { archive in
+                    // TODO: emm 2021-08-19 Find out what metadata scientists want us to mark uploads with for
+                    // exporter v3, and figure out how to get it here--maybe by putting it on the DataArchive?
+                    // In any case, it needs to consist of Json key-value pairs.
+                    let exporterV3Metadata: JsonElement? = nil
+                    let extras = StudyDataUploadExtras(encrypted: true, metadata: exporterV3Metadata, zipped: true)
+                    let id = archive.identifier
+                    guard let url = archive.encryptedURL else {
+                        print("WARNING! Cannot upload \(id)")
+                        return
+                    }
+                    StudyDataUploadAPI.shared.upload(fileId: id, fileUrl: url, contentType: "application/zip", extras: extras)
+                    do {
+                        try FileManager.default.removeItem(at: url)
+                    } catch let err {
+                        print("Failed to delete encrypted archive \(id) at \(url). \(err)")
+                    }
+                }
             }
         }
     }

@@ -1,13 +1,15 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
+import org.gradle.internal.classpath.Instrumented.systemProperty
 
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
     kotlin("plugin.serialization")
     id("com.squareup.sqldelight")
-    id ("maven-publish")
+    id("maven-publish")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
@@ -26,6 +28,14 @@ val iosFrameworkName = "BridgeClient"
 kotlin {
     android {
         publishAllLibraryVariants()
+        tasks.withType<Test> {
+            systemProperty(
+                "testExternalId01",
+                gradleLocalProperties(rootProject.rootDir)
+                    .getProperty("testExternalId01")
+                    ?: System.getenv("TEST_EXTERNAL_ID_01")
+            )
+        }
     }
 
     // syoung 09/13/2021 If this is building for XCFramework, then build both
@@ -102,7 +112,7 @@ kotlin {
         }
         val iosMain by getting {
             dependencies {
-                implementation (Deps.SqlDelight.nativeDriver)
+                implementation(Deps.SqlDelight.nativeDriver)
                 implementation(Deps.Ktor.clientIos)
             }
         }

@@ -174,15 +174,16 @@ struct DocumentPreview: UIViewControllerRepresentable {
         }
     }
 
-    func makeCoordinator() -> Coordintor {
-        return Coordintor(owner: self)
+    func makeCoordinator() -> Coordinator {
+        return Coordinator(owner: self)
     }
 
-    final class Coordintor: NSObject, UIDocumentInteractionControllerDelegate { // works as delegate
+    final class Coordinator: NSObject, UIDocumentInteractionControllerDelegate { // works as delegate
         let owner: DocumentPreview
         init(owner: DocumentPreview) {
             self.owner = owner
         }
+        
         func documentInteractionControllerViewControllerForPreview(_ controller: UIDocumentInteractionController) -> UIViewController {
             return owner.viewController
         }

@@ -1,0 +1,6 @@
+{
+    "fileId":"TestFileId",
+    "mimeType": "image/jpeg",
+    "uploadUrl":"/not-a-real-pre-signed-S3-url",
+    "type":"ParticipantFile"
+}

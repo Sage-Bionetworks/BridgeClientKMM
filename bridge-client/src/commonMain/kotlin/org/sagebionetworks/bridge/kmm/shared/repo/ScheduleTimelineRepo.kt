@@ -6,6 +6,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.datetime.*
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.sagebionetworks.bridge.kmm.shared.apis.SchedulesV2Api
@@ -469,7 +470,7 @@ internal fun NotificationInfo.scheduleAt(instanceGuid: String,
 
     // If there is an interval, move the firstInstant forward to after the current time
     val intervalPeriod = this.interval?.let { DateTimePeriod.parse(it) }
-    if (intervalPeriod != null && intervalPeriod.days > 0) {
+    if (intervalPeriod != null) {
         val endInstant = endDateTime.toInstant(timeZone)
         while(firstInstant < instantInDay && firstInstant < endInstant) {
             firstInstant = firstInstant.plus(intervalPeriod, timeZone)
@@ -551,6 +552,7 @@ data class ScheduledAssessmentReference (
     }
 }
 
+@Serializable
 data class ScheduledNotification(
     val instanceGuid: String,
     val scheduleOn: LocalDateTime,

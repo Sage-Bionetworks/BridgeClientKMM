@@ -1,0 +1,7 @@
+{
+    "fileId": "TestFileId",
+    "mimeType": "image/jpeg",
+    "uploadUrl": "/not-a-real-pre-signed-S3-url",
+    "expiresOn": "2020-08-28T14:28:13.386Z",
+    "type": "ParticipantFile"
+}

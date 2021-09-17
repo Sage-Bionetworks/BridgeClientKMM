@@ -3,6 +3,27 @@ package org.sagebionetworks.bridge.kmm.shared
 import org.sagebionetworks.bridge.kmm.shared.models.ClientInfo
 
 interface PlatformConfig {
+    enum class BridgeEnvironment {
+        production {
+            override fun domainSuffix() = ""
+        },
+        staging {
+            override fun domainSuffix() = "-staging"
+        },
+        development {
+            override fun domainSuffix() = "-develop"
+        },
+        custom {
+            override fun domainSuffix() = "-custom"
+        };
+
+        abstract fun domainSuffix() : String
+
+        fun basePath(): String {
+            return "https://webservices${domainSuffix()}.sagebridge.org"
+        }
+    }
+
     val appId: String
 
     val appName: String
@@ -10,6 +31,8 @@ interface PlatformConfig {
     val appVersion: Int
 
     val appVersionName: String
+
+    val bridgeEnvironment: BridgeEnvironment
 
     val osVersion: String
 

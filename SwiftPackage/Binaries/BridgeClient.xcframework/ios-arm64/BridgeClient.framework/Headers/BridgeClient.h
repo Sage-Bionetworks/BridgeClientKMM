@@ -6,9 +6,9 @@
 #import <Foundation/NSString.h>
 #import <Foundation/NSValue.h>
 
-@class BridgeClientCriteria, BridgeClientKotlinx_serialization_jsonJsonElement, BridgeClientSurveyReference, BridgeClientSchemaReference, BridgeClientConfigReference, BridgeClientFileReference, BridgeClientAppConfigCompanion, BridgeClientAppConfig, BridgeClientConfigReferenceCompanion, BridgeClientFileReferenceCompanion, BridgeClientSchemaReferenceCompanion, BridgeClientSurveyReferenceCompanion, BridgeClientClientInfo, BridgeClientIOSBridgeConfig, NSData, BridgeClientAdherenceRecord, BridgeClientStudy, BridgeClientUserSessionInfo, NSDate, BridgeClientNativeAdherenceRecord, BridgeClientKoin_coreKoin, BridgeClientResourceStatus, BridgeClientNativeScheduledSessionTimelineSlice, BridgeClientAssessmentInfo, BridgeClientNativeScheduledAssessment, NSDateComponents, BridgeClientNotificationMessage, BridgeClientNativeScheduledNotification, NSTimeZone, BridgeClientNativeScheduledSessionWindow, BridgeClientSessionInfo, BridgeClientKotlinEnumCompanion, BridgeClientKotlinEnum<E>, BridgeClientAccountStatusCompanion, BridgeClientAccountStatus, BridgeClientKotlinArray<T>, BridgeClientAddressCompanion, BridgeClientAddress, BridgeClientKotlinx_datetimeInstant, BridgeClientAdherenceRecordCompanion, BridgeClientAdherenceRecordTypeCompanion, BridgeClientAdherenceRecordType, BridgeClientAdherenceRecordUpdatesCompanion, BridgeClientAdherenceRecordUpdates, BridgeClientSortOrder, BridgeClientAdherenceRecordsSearchCompanion, BridgeClientAdherenceRecordsSearch, BridgeClientAssessmentConfigCompanion, BridgeClientAssessmentConfig, BridgeClientColorScheme, BridgeClientAssessmentInfoCompanion, BridgeClientClientInfoCompanion, BridgeClientColorSchemeCompanion, BridgeClientConsentStatusCompanion, BridgeClientConsentStatus, BridgeClientContactRole, BridgeClientPhone, BridgeClientContactCompanion, BridgeClientContact, BridgeClientContactRoleCompanion, BridgeClientCriteriaCompanion, BridgeClientEnvironmentCompanion, BridgeClientEnvironment, BridgeClientIrbDecisionTypeCompanion, BridgeClientIrbDecisionType, BridgeClientNotificationType, BridgeClientNotificationInfoCompanion, BridgeClientNotificationInfo, BridgeClientNotificationMessageCompanion, BridgeClientNotificationTypeCompanion, BridgeClientPerformanceOrderCompanion, BridgeClientPerformanceOrder, BridgeClientPhoneCompanion, BridgeClientReminderTypeCompanion, BridgeClientReminderType, BridgeClientRoleCompanion, BridgeClientRole, BridgeClientScheduledAssessmentCompanion, BridgeClientScheduledAssessment, BridgeClientKotlinx_datetimeDateTimePeriod, BridgeClientScheduledSessionCompanion, BridgeClientScheduledSession, BridgeClientSessionInfoCompanion, BridgeClientSharingScopeCompanion, BridgeClientSharingScope, BridgeClientSignInTypeCompanion, BridgeClientSignInType, BridgeClientSortOrderCompanion, BridgeClientStudyPhase, BridgeClientStudyCompanion, BridgeClientStudyActivityEventCompanion, BridgeClientStudyActivityEvent, BridgeClientStudyActivityEventListCompanion, BridgeClientStudyActivityEventList, BridgeClientStudyInfoCompanion, BridgeClientStudyInfo, BridgeClientStudyPhaseCompanion, BridgeClientTimelineCompanion, BridgeClientTimeline, BridgeClientUserSessionInfoCompanion, BridgeClientKtor_client_coreHttpClient, BridgeClientAbstractApiCompanion, BridgeClientRefreshTokenFeatureFeature, BridgeClientRefreshTokenFeature, BridgeClientKtor_utilsAttributeKey<T>, BridgeClientRefreshTokenFeatureConfig, BridgeClientSessionTokenFeatureFeature, BridgeClientSessionTokenFeature, BridgeClientSessionTokenFeatureConfig, BridgeClientBridgeResourceDatabaseCompanion, BridgeClientResourceAdapter, BridgeClientResourceType, BridgeClientResource, BridgeClientRuntimeQuery<__covariant RowType>, BridgeClientResourceDatabaseHelperCompanion, BridgeClientResourceResult<__covariant T>, BridgeClientResourceResultFailed, BridgeClientKotlinNothing, BridgeClientResourceResultInProgress, BridgeClientResourceResultSuccess<__covariant T>, BridgeClientResourceDatabaseHelper, BridgeClientAbstractResourceRepoCompanion, BridgeClientAbstractResourceRepo, BridgeClientActivityEventsRepoCompanion, BridgeClientAssessmentHistoryRecord, BridgeClientAuthenticationRepositoryCompanion, BridgeClientKotlinUnit, BridgeClientAdherenceRecordRepo, BridgeClientActivityEventsRepo, BridgeClientScheduleTimelineRepoCompanion, BridgeClientScheduledAssessmentReference, BridgeClientKotlinx_datetimeLocalDateTime, BridgeClientScheduledNotification, BridgeClientKotlinx_datetimeTimeZone, BridgeClientScheduledSessionWindow, BridgeClientScheduledSessionTimelineSlice, BridgeClientKoin_coreModule, BridgeClientKoin_coreKoinApplication, BridgeClientKotlinx_serialization_jsonJsonElementCompanion, BridgeClientKotlinThrowable, BridgeClientKoin_coreScope, BridgeClientKoin_coreParametersHolder, BridgeClientKotlinLazyThreadSafetyMode, BridgeClientKoin_coreLogger, BridgeClientKoin_coreInstanceRegistry, BridgeClientKoin_corePropertyRegistry, BridgeClientKoin_coreScopeRegistry, BridgeClientKotlinx_datetimeInstantCompanion, BridgeClientKotlinx_datetimeDateTimePeriodCompanion, BridgeClientKtor_client_coreHttpClientEngineConfig, BridgeClientKtor_client_coreHttpClientConfig<T>, BridgeClientKtor_client_coreHttpRequestBuilder, BridgeClientKtor_client_coreHttpClientCall, BridgeClientKotlinx_coroutines_coreCoroutineDispatcher, BridgeClientKtor_client_coreHttpReceivePipeline, BridgeClientKtor_client_coreHttpRequestPipeline, BridgeClientKtor_client_coreHttpResponsePipeline, BridgeClientKtor_client_coreHttpSendPipeline, BridgeClientKotlinException, BridgeClientKotlinRuntimeException, BridgeClientKotlinIllegalStateException, BridgeClientKtor_httpOutgoingContent, BridgeClientKtor_httpHttpMethod, BridgeClientKtor_httpUrl, BridgeClientRuntimeTransacterTransaction, BridgeClientKotlinx_datetimeMonth, BridgeClientKotlinx_datetimeLocalDateTimeCompanion, BridgeClientKotlinx_datetimeLocalDate, BridgeClientKotlinx_datetimeDayOfWeek, BridgeClientKotlinx_datetimeTimeZoneCompanion, BridgeClientKoin_coreInstanceFactory<T>, BridgeClientKotlinPair<__covariant A, __covariant B>, BridgeClientKoin_coreScopeDSL, BridgeClientKoin_coreSingleInstanceFactory<T>, BridgeClientKoin_coreKoinApplicationCompanion, BridgeClientKoin_coreLevel, BridgeClientKotlinx_serialization_coreSerializersModule, BridgeClientKotlinx_serialization_coreSerialKind, BridgeClientKoin_coreParametersHolderCompanion, BridgeClientKoin_coreScopeRegistryCompanion, BridgeClientKtor_client_coreHttpRequestData, BridgeClientKtor_client_coreHttpResponseData, BridgeClientKtor_client_coreProxyConfig, BridgeClientKtor_httpHeadersBuilder, BridgeClientKtor_client_coreHttpRequestBuilderCompanion, BridgeClientKtor_httpURLBuilder, BridgeClientKtor_client_coreHttpClientCallCompanion, BridgeClientKtor_client_coreTypeInfo, BridgeClientKtor_client_coreHttpResponse, BridgeClientKotlinAbstractCoroutineContextElement, BridgeClientKotlinx_coroutines_coreCoroutineDispatcherKey, BridgeClientKtor_utilsPipelinePhase, BridgeClientKtor_utilsPipeline<TSubject, TContext>, BridgeClientKtor_client_coreHttpReceivePipelinePhases, BridgeClientKtor_client_coreHttpRequestPipelinePhases, BridgeClientKtor_client_coreHttpResponsePipelinePhases, BridgeClientKtor_client_coreHttpResponseContainer, BridgeClientKtor_client_coreHttpSendPipelinePhases, BridgeClientKtor_httpContentType, BridgeClientKtor_httpHttpStatusCode, BridgeClientKtor_httpHttpMethodCompanion, BridgeClientKtor_httpURLProtocol, BridgeClientKtor_httpUrlCompanion, BridgeClientKotlinByteArray, BridgeClientKotlinx_datetimeLocalDateCompanion, BridgeClientKoin_coreBeanDefinition<T>, BridgeClientKoin_coreInstanceFactoryCompanion, BridgeClientKoin_coreInstanceContext, BridgeClientKtor_utilsGMTDate, BridgeClientKtor_httpHttpProtocolVersion, BridgeClientKtor_utilsStringValuesBuilder, BridgeClientKtor_httpParametersBuilder, BridgeClientKtor_httpURLBuilderCompanion, BridgeClientKotlinCancellationException, BridgeClientKtor_ioMemory, BridgeClientKtor_ioIoBuffer, BridgeClientKtor_ioByteReadPacket, BridgeClientKtor_ioByteOrder, BridgeClientKotlinAbstractCoroutineContextKey<B, E>, BridgeClientKtor_httpHeaderValueParam, BridgeClientKtor_httpHeaderValueWithParametersCompanion, BridgeClientKtor_httpHeaderValueWithParameters, BridgeClientKtor_httpContentTypeCompanion, BridgeClientKtor_httpHttpStatusCodeCompanion, BridgeClientKtor_httpURLProtocolCompanion, BridgeClientKtor_httpUrlEncodingOption, BridgeClientKotlinByteIterator, BridgeClientKoin_coreKind, BridgeClientKoin_coreCallbacks<T>, BridgeClientKtor_utilsGMTDateCompanion, BridgeClientKtor_utilsWeekDay, BridgeClientKtor_utilsMonth, BridgeClientKtor_httpHttpProtocolVersionCompanion, BridgeClientKtor_ioMemoryCompanion, BridgeClientKtor_ioBufferCompanion, BridgeClientKtor_ioBuffer, BridgeClientKtor_ioChunkBuffer, BridgeClientKtor_ioChunkBufferCompanion, BridgeClientKotlinCharArray, BridgeClientKtor_ioIoBufferCompanion, BridgeClientKtor_ioAbstractInputCompanion, BridgeClientKtor_ioAbstractInput, BridgeClientKtor_ioByteReadPacketBaseCompanion, BridgeClientKtor_ioByteReadPacketBase, BridgeClientKtor_ioByteReadPacketPlatformBase, BridgeClientKtor_ioByteReadPacketCompanion, BridgeClientKtor_ioByteOrderCompanion, BridgeClientKotlinKTypeProjection, BridgeClientKtor_utilsWeekDayCompanion, BridgeClientKtor_utilsMonthCompanion, BridgeClientKotlinx_coroutines_coreAtomicDesc, BridgeClientKotlinx_coroutines_coreLockFreeLinkedListNodePrepareOp, BridgeClientKotlinCharIterator, BridgeClientKotlinKVariance, BridgeClientKotlinKTypeProjectionCompanion, BridgeClientKotlinx_coroutines_coreAtomicOp<__contravariant T>, BridgeClientKotlinx_coroutines_coreOpDescriptor, BridgeClientKotlinx_coroutines_coreLockFreeLinkedListNode, BridgeClientKotlinx_coroutines_coreLockFreeLinkedListNodeAbstractAtomicDesc, BridgeClientKotlinx_coroutines_coreLockFreeLinkedListNodeAddLastDesc<T>, BridgeClientKotlinx_coroutines_coreLockFreeLinkedListNodeRemoveFirstDesc<T>;
+@class BridgeClientCriteria, BridgeClientKotlinx_serialization_jsonJsonElement, BridgeClientSurveyReference, BridgeClientSchemaReference, BridgeClientConfigReference, BridgeClientFileReference, BridgeClientAppConfigCompanion, BridgeClientAppConfig, BridgeClientConfigReferenceCompanion, BridgeClientFileReferenceCompanion, BridgeClientSchemaReferenceCompanion, BridgeClientSurveyReferenceCompanion, BridgeClientClientInfo, BridgeClientPlatformConfigBridgeEnvironment, BridgeClientIOSBridgeConfig, NSData, BridgeClientAdherenceRecord, BridgeClientStudy, BridgeClientUserSessionInfo, NSDate, BridgeClientNativeAdherenceRecord, BridgeClientKoin_coreKoin, BridgeClientResourceStatus, BridgeClientKtor_httpHttpStatusCode, BridgeClientKotlinError, BridgeClientNativeScheduledSessionTimelineSlice, BridgeClientAssessmentInfo, BridgeClientNativeScheduledAssessment, NSDateComponents, BridgeClientNotificationMessage, BridgeClientNativeScheduledNotification, NSTimeZone, BridgeClientNativeScheduledSessionWindow, BridgeClientSessionInfo, BridgeClientKotlinEnumCompanion, BridgeClientKotlinEnum<E>, BridgeClientKotlinArray<T>, BridgeClientAccountStatusCompanion, BridgeClientAccountStatus, BridgeClientAddressCompanion, BridgeClientAddress, BridgeClientKotlinx_datetimeInstant, BridgeClientAdherenceRecordCompanion, BridgeClientAdherenceRecordTypeCompanion, BridgeClientAdherenceRecordType, BridgeClientAdherenceRecordUpdatesCompanion, BridgeClientAdherenceRecordUpdates, BridgeClientSortOrder, BridgeClientAdherenceRecordsSearchCompanion, BridgeClientAdherenceRecordsSearch, BridgeClientAssessmentConfigCompanion, BridgeClientAssessmentConfig, BridgeClientColorScheme, BridgeClientAssessmentInfoCompanion, BridgeClientClientInfoCompanion, BridgeClientColorSchemeCompanion, BridgeClientConsentStatusCompanion, BridgeClientConsentStatus, BridgeClientContactRole, BridgeClientPhone, BridgeClientContactCompanion, BridgeClientContact, BridgeClientContactRoleCompanion, BridgeClientCriteriaCompanion, BridgeClientEnvironmentCompanion, BridgeClientEnvironment, BridgeClientIrbDecisionTypeCompanion, BridgeClientIrbDecisionType, BridgeClientNotificationType, BridgeClientNotificationInfoCompanion, BridgeClientNotificationInfo, BridgeClientNotificationMessageCompanion, BridgeClientNotificationTypeCompanion, BridgeClientPerformanceOrderCompanion, BridgeClientPerformanceOrder, BridgeClientPhoneCompanion, BridgeClientReminderTypeCompanion, BridgeClientReminderType, BridgeClientRoleCompanion, BridgeClientRole, BridgeClientScheduledAssessmentCompanion, BridgeClientScheduledAssessment, BridgeClientKotlinx_datetimeDateTimePeriod, BridgeClientScheduledSessionCompanion, BridgeClientScheduledSession, BridgeClientSessionInfoCompanion, BridgeClientSharingScopeCompanion, BridgeClientSharingScope, BridgeClientSignInTypeCompanion, BridgeClientSignInType, BridgeClientSortOrderCompanion, BridgeClientStudyPhase, BridgeClientStudyCompanion, BridgeClientStudyActivityEventCompanion, BridgeClientStudyActivityEvent, BridgeClientStudyActivityEventListCompanion, BridgeClientStudyActivityEventList, BridgeClientStudyInfoCompanion, BridgeClientStudyInfo, BridgeClientStudyPhaseCompanion, BridgeClientTimelineCompanion, BridgeClientTimeline, BridgeClientUserSessionInfoCompanion, BridgeClientKtor_client_coreHttpClient, BridgeClientAbstractApiCompanion, BridgeClientRefreshTokenFeatureFeature, BridgeClientRefreshTokenFeature, BridgeClientKtor_utilsAttributeKey<T>, BridgeClientRefreshTokenFeatureConfig, BridgeClientSessionTokenFeatureFeature, BridgeClientSessionTokenFeature, BridgeClientSessionTokenFeatureConfig, BridgeClientBridgeResourceDatabaseCompanion, BridgeClientResourceAdapter, BridgeClientResourceType, BridgeClientResource, BridgeClientRuntimeQuery<__covariant RowType>, BridgeClientResourceDatabaseHelperCompanion, BridgeClientResourceResult<__covariant T>, BridgeClientResourceResultFailed, BridgeClientKotlinNothing, BridgeClientResourceResultInProgress, BridgeClientResourceResultSuccess<__covariant T>, BridgeClientResourceDatabaseHelper, BridgeClientAbstractResourceRepoCompanion, BridgeClientAbstractResourceRepo, BridgeClientActivityEventsRepoCompanion, BridgeClientAssessmentHistoryRecord, BridgeClientAuthenticationRepositoryCompanion, BridgeClientKotlinUnit, BridgeClientAdherenceRecordRepo, BridgeClientActivityEventsRepo, BridgeClientScheduleTimelineRepoCompanion, BridgeClientScheduledAssessmentReference, BridgeClientKotlinx_datetimeLocalDateTime, BridgeClientScheduledNotificationCompanion, BridgeClientScheduledNotification, BridgeClientKotlinx_datetimeTimeZone, BridgeClientScheduledSessionWindow, BridgeClientScheduledSessionTimelineSlice, BridgeClientKoin_coreModule, BridgeClientKoin_coreKoinApplication, BridgeClientKotlinx_serialization_jsonJsonElementCompanion, BridgeClientKotlinThrowable, BridgeClientKoin_coreScope, BridgeClientKoin_coreParametersHolder, BridgeClientKotlinLazyThreadSafetyMode, BridgeClientKoin_coreLogger, BridgeClientKoin_coreInstanceRegistry, BridgeClientKoin_corePropertyRegistry, BridgeClientKoin_coreScopeRegistry, BridgeClientKtor_httpHttpStatusCodeCompanion, BridgeClientKotlinx_datetimeInstantCompanion, BridgeClientKotlinx_datetimeDateTimePeriodCompanion, BridgeClientKtor_client_coreHttpClientEngineConfig, BridgeClientKtor_client_coreHttpClientConfig<T>, BridgeClientKtor_client_coreHttpRequestBuilder, BridgeClientKtor_client_coreHttpClientCall, BridgeClientKotlinx_coroutines_coreCoroutineDispatcher, BridgeClientKtor_client_coreHttpReceivePipeline, BridgeClientKtor_client_coreHttpRequestPipeline, BridgeClientKtor_client_coreHttpResponsePipeline, BridgeClientKtor_client_coreHttpSendPipeline, BridgeClientKotlinException, BridgeClientKotlinRuntimeException, BridgeClientKotlinIllegalStateException, BridgeClientKtor_httpOutgoingContent, BridgeClientKtor_httpHttpMethod, BridgeClientKtor_httpUrl, BridgeClientRuntimeTransacterTransaction, BridgeClientKotlinx_datetimeMonth, BridgeClientKotlinx_datetimeLocalDateTimeCompanion, BridgeClientKotlinx_datetimeLocalDate, BridgeClientKotlinx_datetimeDayOfWeek, BridgeClientKotlinx_datetimeTimeZoneCompanion, BridgeClientKoin_coreInstanceFactory<T>, BridgeClientKotlinPair<__covariant A, __covariant B>, BridgeClientKoin_coreScopeDSL, BridgeClientKoin_coreSingleInstanceFactory<T>, BridgeClientKoin_coreKoinApplicationCompanion, BridgeClientKoin_coreLevel, BridgeClientKotlinx_serialization_coreSerializersModule, BridgeClientKotlinx_serialization_coreSerialKind, BridgeClientKoin_coreParametersHolderCompanion, BridgeClientKoin_coreScopeRegistryCompanion, BridgeClientKtor_client_coreHttpRequestData, BridgeClientKtor_client_coreHttpResponseData, BridgeClientKtor_client_coreProxyConfig, BridgeClientKtor_httpHeadersBuilder, BridgeClientKtor_client_coreHttpRequestBuilderCompanion, BridgeClientKtor_httpURLBuilder, BridgeClientKtor_client_coreHttpClientCallCompanion, BridgeClientKtor_client_coreTypeInfo, BridgeClientKtor_client_coreHttpResponse, BridgeClientKotlinAbstractCoroutineContextElement, BridgeClientKotlinx_coroutines_coreCoroutineDispatcherKey, BridgeClientKtor_utilsPipelinePhase, BridgeClientKtor_utilsPipeline<TSubject, TContext>, BridgeClientKtor_client_coreHttpReceivePipelinePhases, BridgeClientKtor_client_coreHttpRequestPipelinePhases, BridgeClientKtor_client_coreHttpResponsePipelinePhases, BridgeClientKtor_client_coreHttpResponseContainer, BridgeClientKtor_client_coreHttpSendPipelinePhases, BridgeClientKtor_httpContentType, BridgeClientKtor_httpHttpMethodCompanion, BridgeClientKtor_httpURLProtocol, BridgeClientKtor_httpUrlCompanion, BridgeClientKotlinByteArray, BridgeClientKotlinx_datetimeLocalDateCompanion, BridgeClientKoin_coreBeanDefinition<T>, BridgeClientKoin_coreInstanceFactoryCompanion, BridgeClientKoin_coreInstanceContext, BridgeClientKtor_utilsGMTDate, BridgeClientKtor_httpHttpProtocolVersion, BridgeClientKtor_utilsStringValuesBuilder, BridgeClientKtor_httpParametersBuilder, BridgeClientKtor_httpURLBuilderCompanion, BridgeClientKotlinCancellationException, BridgeClientKtor_ioMemory, BridgeClientKtor_ioIoBuffer, BridgeClientKtor_ioByteReadPacket, BridgeClientKtor_ioByteOrder, BridgeClientKotlinAbstractCoroutineContextKey<B, E>, BridgeClientKtor_httpHeaderValueParam, BridgeClientKtor_httpHeaderValueWithParametersCompanion, BridgeClientKtor_httpHeaderValueWithParameters, BridgeClientKtor_httpContentTypeCompanion, BridgeClientKtor_httpURLProtocolCompanion, BridgeClientKtor_httpUrlEncodingOption, BridgeClientKotlinByteIterator, BridgeClientKoin_coreKind, BridgeClientKoin_coreCallbacks<T>, BridgeClientKtor_utilsGMTDateCompanion, BridgeClientKtor_utilsWeekDay, BridgeClientKtor_utilsMonth, BridgeClientKtor_httpHttpProtocolVersionCompanion, BridgeClientKtor_ioMemoryCompanion, BridgeClientKtor_ioBufferCompanion, BridgeClientKtor_ioBuffer, BridgeClientKtor_ioChunkBuffer, BridgeClientKtor_ioChunkBufferCompanion, BridgeClientKotlinCharArray, BridgeClientKtor_ioIoBufferCompanion, BridgeClientKtor_ioAbstractInputCompanion, BridgeClientKtor_ioAbstractInput, BridgeClientKtor_ioByteReadPacketBaseCompanion, BridgeClientKtor_ioByteReadPacketBase, BridgeClientKtor_ioByteReadPacketPlatformBase, BridgeClientKtor_ioByteReadPacketCompanion, BridgeClientKtor_ioByteOrderCompanion, BridgeClientKotlinKTypeProjection, BridgeClientKtor_utilsWeekDayCompanion, BridgeClientKtor_utilsMonthCompanion, BridgeClientKotlinx_coroutines_coreAtomicDesc, BridgeClientKotlinx_coroutines_coreLockFreeLinkedListNodePrepareOp, BridgeClientKotlinCharIterator, BridgeClientKotlinKVariance, BridgeClientKotlinKTypeProjectionCompanion, BridgeClientKotlinx_coroutines_coreAtomicOp<__contravariant T>, BridgeClientKotlinx_coroutines_coreOpDescriptor, BridgeClientKotlinx_coroutines_coreLockFreeLinkedListNode, BridgeClientKotlinx_coroutines_coreLockFreeLinkedListNodeAbstractAtomicDesc, BridgeClientKotlinx_coroutines_coreLockFreeLinkedListNodeAddLastDesc<T>, BridgeClientKotlinx_coroutines_coreLockFreeLinkedListNodeRemoveFirstDesc<T>;
 
-@protocol BridgeClientKotlinx_serialization_coreKSerializer, BridgeClientPlatformConfig, BridgeClientBridgeConfig, BridgeClientKoin_coreKoinComponent, BridgeClientKotlinComparable, BridgeClientKotlinSuspendFunction0, BridgeClientKtor_client_coreHttpRequest, BridgeClientKtor_client_coreHttpClientFeature, BridgeClientSessionTokenFeatureSessionTokenProvider, BridgeClientBridgeResourceDatabaseQueries, BridgeClientRuntimeTransactionWithoutReturn, BridgeClientRuntimeTransactionWithReturn, BridgeClientRuntimeTransacter, BridgeClientBridgeResourceDatabase, BridgeClientRuntimeSqlDriver, BridgeClientRuntimeSqlDriverSchema, BridgeClientDbDriverFactory, BridgeClientRuntimeColumnAdapter, BridgeClientKotlinx_coroutines_coreCoroutineScope, BridgeClientKotlinx_coroutines_coreFlow, BridgeClientKotlinx_serialization_coreEncoder, BridgeClientKotlinx_serialization_coreSerialDescriptor, BridgeClientKotlinx_serialization_coreSerializationStrategy, BridgeClientKotlinx_serialization_coreDecoder, BridgeClientKotlinx_serialization_coreDeserializationStrategy, BridgeClientKoin_coreKoinScopeComponent, BridgeClientKoin_coreQualifier, BridgeClientKotlinKClass, BridgeClientKotlinLazy, BridgeClientKotlinIterator, BridgeClientKotlinCoroutineContext, BridgeClientKtor_ioCloseable, BridgeClientKtor_client_coreHttpClientEngine, BridgeClientKtor_client_coreHttpClientEngineCapability, BridgeClientKtor_utilsAttributes, BridgeClientKotlinFunction, BridgeClientKtor_httpHeaders, BridgeClientKtor_httpHttpMessage, BridgeClientRuntimeTransactionCallbacks, BridgeClientRuntimeSqlPreparedStatement, BridgeClientRuntimeSqlCursor, BridgeClientRuntimeCloseable, BridgeClientRuntimeQueryListener, BridgeClientKotlinx_coroutines_coreFlowCollector, BridgeClientKotlinx_serialization_coreCompositeEncoder, BridgeClientKotlinAnnotation, BridgeClientKotlinx_serialization_coreCompositeDecoder, BridgeClientKoin_coreScopeCallback, BridgeClientKotlinKDeclarationContainer, BridgeClientKotlinKAnnotatedElement, BridgeClientKotlinKClassifier, BridgeClientKotlinCoroutineContextElement, BridgeClientKotlinCoroutineContextKey, BridgeClientKtor_httpHttpMessageBuilder, BridgeClientKotlinx_coroutines_coreJob, BridgeClientKtor_ioByteReadChannel, BridgeClientKtor_utilsTypeInfo, BridgeClientKotlinContinuation, BridgeClientKotlinContinuationInterceptor, BridgeClientKotlinx_coroutines_coreRunnable, BridgeClientKotlinSuspendFunction2, BridgeClientKtor_httpParameters, BridgeClientKotlinMapEntry, BridgeClientKtor_utilsStringValues, BridgeClientKotlinx_serialization_coreSerializersModuleCollector, BridgeClientKotlinx_coroutines_coreChildHandle, BridgeClientKotlinx_coroutines_coreChildJob, BridgeClientKotlinx_coroutines_coreDisposableHandle, BridgeClientKotlinSequence, BridgeClientKotlinx_coroutines_coreSelectClause0, BridgeClientKtor_ioReadSession, BridgeClientKotlinSuspendFunction1, BridgeClientKotlinAppendable, BridgeClientKotlinKType, BridgeClientKotlinx_coroutines_coreParentJob, BridgeClientKotlinx_coroutines_coreSelectInstance, BridgeClientKtor_ioObjectPool, BridgeClientKtor_ioInput, BridgeClientKtor_ioOutput;
+@protocol BridgeClientKotlinx_serialization_coreKSerializer, BridgeClientPlatformConfig, BridgeClientBridgeConfig, BridgeClientIOSPlatformConfig, BridgeClientKoin_coreKoinComponent, BridgeClientKotlinComparable, BridgeClientKotlinSuspendFunction0, BridgeClientKtor_client_coreHttpRequest, BridgeClientKtor_client_coreHttpClientFeature, BridgeClientSessionTokenFeatureSessionTokenProvider, BridgeClientBridgeResourceDatabaseQueries, BridgeClientRuntimeTransactionWithoutReturn, BridgeClientRuntimeTransactionWithReturn, BridgeClientRuntimeTransacter, BridgeClientBridgeResourceDatabase, BridgeClientRuntimeSqlDriver, BridgeClientRuntimeSqlDriverSchema, BridgeClientDbDriverFactory, BridgeClientRuntimeColumnAdapter, BridgeClientKotlinx_coroutines_coreCoroutineScope, BridgeClientKotlinx_coroutines_coreFlow, BridgeClientKotlinx_serialization_coreEncoder, BridgeClientKotlinx_serialization_coreSerialDescriptor, BridgeClientKotlinx_serialization_coreSerializationStrategy, BridgeClientKotlinx_serialization_coreDecoder, BridgeClientKotlinx_serialization_coreDeserializationStrategy, BridgeClientKoin_coreKoinScopeComponent, BridgeClientKoin_coreQualifier, BridgeClientKotlinKClass, BridgeClientKotlinLazy, BridgeClientKotlinIterator, BridgeClientKotlinCoroutineContext, BridgeClientKtor_ioCloseable, BridgeClientKtor_client_coreHttpClientEngine, BridgeClientKtor_client_coreHttpClientEngineCapability, BridgeClientKtor_utilsAttributes, BridgeClientKotlinFunction, BridgeClientKtor_httpHeaders, BridgeClientKtor_httpHttpMessage, BridgeClientRuntimeTransactionCallbacks, BridgeClientRuntimeSqlPreparedStatement, BridgeClientRuntimeSqlCursor, BridgeClientRuntimeCloseable, BridgeClientRuntimeQueryListener, BridgeClientKotlinx_coroutines_coreFlowCollector, BridgeClientKotlinx_serialization_coreCompositeEncoder, BridgeClientKotlinAnnotation, BridgeClientKotlinx_serialization_coreCompositeDecoder, BridgeClientKoin_coreScopeCallback, BridgeClientKotlinKDeclarationContainer, BridgeClientKotlinKAnnotatedElement, BridgeClientKotlinKClassifier, BridgeClientKotlinCoroutineContextElement, BridgeClientKotlinCoroutineContextKey, BridgeClientKtor_httpHttpMessageBuilder, BridgeClientKotlinx_coroutines_coreJob, BridgeClientKtor_ioByteReadChannel, BridgeClientKtor_utilsTypeInfo, BridgeClientKotlinContinuation, BridgeClientKotlinContinuationInterceptor, BridgeClientKotlinx_coroutines_coreRunnable, BridgeClientKotlinSuspendFunction2, BridgeClientKtor_httpParameters, BridgeClientKotlinMapEntry, BridgeClientKtor_utilsStringValues, BridgeClientKotlinx_serialization_coreSerializersModuleCollector, BridgeClientKotlinx_coroutines_coreChildHandle, BridgeClientKotlinx_coroutines_coreChildJob, BridgeClientKotlinx_coroutines_coreDisposableHandle, BridgeClientKotlinSequence, BridgeClientKotlinx_coroutines_coreSelectClause0, BridgeClientKtor_ioReadSession, BridgeClientKotlinSuspendFunction1, BridgeClientKotlinAppendable, BridgeClientKotlinKType, BridgeClientKotlinx_coroutines_coreParentJob, BridgeClientKotlinx_coroutines_coreSelectInstance, BridgeClientKtor_ioObjectPool, BridgeClientKtor_ioInput, BridgeClientKtor_ioOutput;
 
 NS_ASSUME_NONNULL_BEGIN
 #pragma clang diagnostic push
@@ -314,6 +314,7 @@ __attribute__((swift_name("PlatformConfig")))
 @property (readonly) NSString *appName __attribute__((swift_name("appName")));
 @property (readonly) int32_t appVersion __attribute__((swift_name("appVersion")));
 @property (readonly) NSString *appVersionName __attribute__((swift_name("appVersionName")));
+@property (readonly) BridgeClientPlatformConfigBridgeEnvironment *bridgeEnvironment __attribute__((swift_name("bridgeEnvironment")));
 @property (readonly) NSString *deviceName __attribute__((swift_name("deviceName")));
 @property (readonly) NSString *osName __attribute__((swift_name("osName")));
 @property (readonly) NSString *osVersion __attribute__((swift_name("osVersion")));
@@ -334,15 +335,23 @@ __attribute__((swift_name("IOSBridgeConfig")))
 + (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
 + (instancetype)iOSBridgeConfig __attribute__((swift_name("init()")));
 @property (class, readonly, getter=shared) BridgeClientIOSBridgeConfig *shared __attribute__((swift_name("shared")));
-- (void)initializePlatformConfig:(id<BridgeClientPlatformConfig>)platformConfig __attribute__((swift_name("initialize(platformConfig:)")));
+- (void)initializePlatformConfig:(id<BridgeClientIOSPlatformConfig>)platformConfig __attribute__((swift_name("initialize(platformConfig:)")));
+@property (readonly) NSString * _Nullable appGroupIdentifier __attribute__((swift_name("appGroupIdentifier")));
 @property (readonly) NSString *appId __attribute__((swift_name("appId")));
 @property (readonly) NSString *appName __attribute__((swift_name("appName")));
 @property (readonly) int32_t appVersion __attribute__((swift_name("appVersion")));
 @property (readonly) NSString *appVersionName __attribute__((swift_name("appVersionName")));
+@property (readonly) BridgeClientPlatformConfigBridgeEnvironment *bridgeEnvironment __attribute__((swift_name("bridgeEnvironment")));
 @property (readonly) NSString *deviceName __attribute__((swift_name("deviceName")));
 @property (readonly) NSString *osName __attribute__((swift_name("osName")));
 @property (readonly) NSString *osVersion __attribute__((swift_name("osVersion")));
 @property (readonly) int32_t sdkVersion __attribute__((swift_name("sdkVersion")));
+@end;
+
+__attribute__((swift_name("IOSPlatformConfig")))
+@protocol BridgeClientIOSPlatformConfig <BridgeClientPlatformConfig>
+@required
+@property (readonly) NSString * _Nullable appGroupIdentifier __attribute__((swift_name("appGroupIdentifier")));
 @end;
 
 __attribute__((objc_subclassing_restricted))
@@ -429,17 +438,18 @@ __attribute__((swift_name("NativeAppConfigManager")))
 - (BOOL)onClearedAndReturnError:(NSError * _Nullable * _Nullable)error __attribute__((swift_name("onCleared()")));
 @end;
 
-__attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("NativeAuthenticationManager")))
 @interface BridgeClientNativeAuthenticationManager : BridgeClientBase <BridgeClientKoin_coreKoinComponent>
 - (instancetype)initWithViewUpdate:(void (^)(BridgeClientUserSessionInfo * _Nullable))viewUpdate __attribute__((swift_name("init(viewUpdate:)"))) __attribute__((objc_designated_initializer));
 - (BOOL)isAuthenticated __attribute__((swift_name("isAuthenticated()")));
+- (void)notifyUIOfBridgeErrorStatusCode:(BridgeClientKtor_httpHttpStatusCode *)statusCode __attribute__((swift_name("notifyUIOfBridgeError(statusCode:)")));
 - (void)observeUserSessionInfo __attribute__((swift_name("observeUserSessionInfo()")));
 
 /**
  @note This method converts all Kotlin exceptions to errors.
 */
 - (BOOL)onClearedAndReturnError:(NSError * _Nullable * _Nullable)error __attribute__((swift_name("onCleared()")));
+- (void)reauthCompletion:(void (^)(BridgeClientKotlinError * _Nullable))completion __attribute__((swift_name("reauth(completion:)")));
 - (BridgeClientUserSessionInfo * _Nullable)session __attribute__((swift_name("session()")));
 - (void)signInEmailUserName:(NSString *)userName password:(NSString *)password callBack:(void (^)(BridgeClientUserSessionInfo * _Nullable, BridgeClientResourceStatus *))callBack __attribute__((swift_name("signInEmail(userName:password:callBack:)")));
 - (void)signInExternalIdExternalId:(NSString *)externalId password:(NSString * _Nullable)password callBack:(void (^)(BridgeClientUserSessionInfo * _Nullable, BridgeClientResourceStatus *))callBack __attribute__((swift_name("signInExternalId(externalId:password:callBack:)")));
@@ -576,6 +586,21 @@ __attribute__((swift_name("KotlinEnum")))
 - (NSString *)description __attribute__((swift_name("description()")));
 @property (readonly) NSString *name __attribute__((swift_name("name")));
 @property (readonly) int32_t ordinal __attribute__((swift_name("ordinal")));
+@end;
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("PlatformConfigBridgeEnvironment")))
+@interface BridgeClientPlatformConfigBridgeEnvironment : BridgeClientKotlinEnum<BridgeClientPlatformConfigBridgeEnvironment *>
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
+- (instancetype)initWithName:(NSString *)name ordinal:(int32_t)ordinal __attribute__((swift_name("init(name:ordinal:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
+@property (class, readonly) BridgeClientPlatformConfigBridgeEnvironment *production __attribute__((swift_name("production")));
+@property (class, readonly) BridgeClientPlatformConfigBridgeEnvironment *staging __attribute__((swift_name("staging")));
+@property (class, readonly) BridgeClientPlatformConfigBridgeEnvironment *development __attribute__((swift_name("development")));
+@property (class, readonly) BridgeClientPlatformConfigBridgeEnvironment *custom __attribute__((swift_name("custom")));
++ (BridgeClientKotlinArray<BridgeClientPlatformConfigBridgeEnvironment *> *)values __attribute__((swift_name("values()")));
+- (NSString *)basePath __attribute__((swift_name("basePath()")));
+- (NSString *)domainSuffix __attribute__((swift_name("domainSuffix()")));
 @end;
 
 __attribute__((objc_subclassing_restricted))
@@ -2170,6 +2195,7 @@ __attribute__((swift_name("AuthenticationRepository")))
 @property (class, readonly, getter=companion) BridgeClientAuthenticationRepositoryCompanion *companion __attribute__((swift_name("companion")));
 - (NSString * _Nullable)currentStudyId __attribute__((swift_name("currentStudyId()")));
 - (BOOL)isAuthenticated __attribute__((swift_name("isAuthenticated()")));
+- (void)notifyUIOfBridgeErrorStatusCode:(BridgeClientKtor_httpHttpStatusCode *)statusCode __attribute__((swift_name("notifyUIOfBridgeError(statusCode:)")));
 
 /**
  @note This method converts instances of CancellationException to errors.
@@ -2265,6 +2291,7 @@ __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("ScheduledNotification")))
 @interface BridgeClientScheduledNotification : BridgeClientBase
 - (instancetype)initWithInstanceGuid:(NSString *)instanceGuid scheduleOn:(BridgeClientKotlinx_datetimeLocalDateTime *)scheduleOn repeatInterval:(BridgeClientKotlinx_datetimeDateTimePeriod * _Nullable)repeatInterval repeatUntil:(BridgeClientKotlinx_datetimeLocalDateTime * _Nullable)repeatUntil allowSnooze:(BOOL)allowSnooze message:(BridgeClientNotificationMessage * _Nullable)message __attribute__((swift_name("init(instanceGuid:scheduleOn:repeatInterval:repeatUntil:allowSnooze:message:)"))) __attribute__((objc_designated_initializer));
+@property (class, readonly, getter=companion) BridgeClientScheduledNotificationCompanion *companion __attribute__((swift_name("companion")));
 - (NSString *)component1 __attribute__((swift_name("component1()")));
 - (BridgeClientKotlinx_datetimeLocalDateTime *)component2 __attribute__((swift_name("component2()")));
 - (BridgeClientKotlinx_datetimeDateTimePeriod * _Nullable)component3 __attribute__((swift_name("component3()")));
@@ -2281,6 +2308,16 @@ __attribute__((swift_name("ScheduledNotification")))
 @property (readonly) BridgeClientKotlinx_datetimeDateTimePeriod * _Nullable repeatInterval __attribute__((swift_name("repeatInterval")));
 @property (readonly) BridgeClientKotlinx_datetimeLocalDateTime * _Nullable repeatUntil __attribute__((swift_name("repeatUntil")));
 @property (readonly) BridgeClientKotlinx_datetimeLocalDateTime *scheduleOn __attribute__((swift_name("scheduleOn")));
+@end;
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("ScheduledNotification.Companion")))
+@interface BridgeClientScheduledNotificationCompanion : BridgeClientBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) BridgeClientScheduledNotificationCompanion *shared __attribute__((swift_name("shared")));
+- (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end;
 
 __attribute__((objc_subclassing_restricted))
@@ -2489,6 +2526,31 @@ __attribute__((swift_name("Koin_coreKoin")))
 @property (readonly) BridgeClientKoin_coreLogger *logger __attribute__((swift_name("logger")));
 @property (readonly) BridgeClientKoin_corePropertyRegistry *propertyRegistry __attribute__((swift_name("propertyRegistry")));
 @property (readonly) BridgeClientKoin_coreScopeRegistry *scopeRegistry __attribute__((swift_name("scopeRegistry")));
+@end;
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_httpHttpStatusCode")))
+@interface BridgeClientKtor_httpHttpStatusCode : BridgeClientBase
+- (instancetype)initWithValue:(int32_t)value description:(NSString *)description __attribute__((swift_name("init(value:description:)"))) __attribute__((objc_designated_initializer));
+@property (class, readonly, getter=companion) BridgeClientKtor_httpHttpStatusCodeCompanion *companion __attribute__((swift_name("companion")));
+- (int32_t)component1 __attribute__((swift_name("component1()")));
+- (NSString *)component2 __attribute__((swift_name("component2()")));
+- (BridgeClientKtor_httpHttpStatusCode *)doCopyValue:(int32_t)value description:(NSString *)description __attribute__((swift_name("doCopy(value:description:)")));
+- (BridgeClientKtor_httpHttpStatusCode *)descriptionValue:(NSString *)value __attribute__((swift_name("description(value:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString *description_ __attribute__((swift_name("description_")));
+@property (readonly) int32_t value __attribute__((swift_name("value")));
+@end;
+
+__attribute__((swift_name("KotlinError")))
+@interface BridgeClientKotlinError : BridgeClientKotlinThrowable
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+- (instancetype)initWithMessage:(NSString * _Nullable)message __attribute__((swift_name("init(message:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithMessage:(NSString * _Nullable)message cause:(BridgeClientKotlinThrowable * _Nullable)cause __attribute__((swift_name("init(message:cause:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithCause:(BridgeClientKotlinThrowable * _Nullable)cause __attribute__((swift_name("init(cause:)"))) __attribute__((objc_designated_initializer));
 @end;
 
 __attribute__((objc_subclassing_restricted))
@@ -3043,6 +3105,69 @@ __attribute__((swift_name("Koin_coreScopeRegistry")))
 - (void)loadScopesModules:(NSArray<BridgeClientKoin_coreModule *> *)modules __attribute__((swift_name("loadScopes(modules:)")));
 @property (readonly) BridgeClientKoin_coreScope *rootScope __attribute__((swift_name("rootScope")));
 @property (readonly) NSSet<id<BridgeClientKoin_coreQualifier>> *scopeDefinitions __attribute__((swift_name("scopeDefinitions")));
+@end;
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_httpHttpStatusCode.Companion")))
+@interface BridgeClientKtor_httpHttpStatusCodeCompanion : BridgeClientBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) BridgeClientKtor_httpHttpStatusCodeCompanion *shared __attribute__((swift_name("shared")));
+- (BridgeClientKtor_httpHttpStatusCode *)fromValueValue:(int32_t)value __attribute__((swift_name("fromValue(value:)")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *Accepted __attribute__((swift_name("Accepted")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *BadGateway __attribute__((swift_name("BadGateway")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *BadRequest __attribute__((swift_name("BadRequest")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *Conflict __attribute__((swift_name("Conflict")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *Continue __attribute__((swift_name("Continue")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *Created __attribute__((swift_name("Created")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *ExpectationFailed __attribute__((swift_name("ExpectationFailed")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *FailedDependency __attribute__((swift_name("FailedDependency")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *Forbidden __attribute__((swift_name("Forbidden")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *Found __attribute__((swift_name("Found")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *GatewayTimeout __attribute__((swift_name("GatewayTimeout")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *Gone __attribute__((swift_name("Gone")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *InsufficientStorage __attribute__((swift_name("InsufficientStorage")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *InternalServerError __attribute__((swift_name("InternalServerError")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *LengthRequired __attribute__((swift_name("LengthRequired")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *Locked __attribute__((swift_name("Locked")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *MethodNotAllowed __attribute__((swift_name("MethodNotAllowed")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *MovedPermanently __attribute__((swift_name("MovedPermanently")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *MultiStatus __attribute__((swift_name("MultiStatus")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *MultipleChoices __attribute__((swift_name("MultipleChoices")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *NoContent __attribute__((swift_name("NoContent")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *NonAuthoritativeInformation __attribute__((swift_name("NonAuthoritativeInformation")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *NotAcceptable __attribute__((swift_name("NotAcceptable")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *NotFound __attribute__((swift_name("NotFound")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *NotImplemented __attribute__((swift_name("NotImplemented")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *NotModified __attribute__((swift_name("NotModified")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *OK __attribute__((swift_name("OK")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *PartialContent __attribute__((swift_name("PartialContent")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *PayloadTooLarge __attribute__((swift_name("PayloadTooLarge")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *PaymentRequired __attribute__((swift_name("PaymentRequired")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *PermanentRedirect __attribute__((swift_name("PermanentRedirect")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *PreconditionFailed __attribute__((swift_name("PreconditionFailed")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *Processing __attribute__((swift_name("Processing")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *ProxyAuthenticationRequired __attribute__((swift_name("ProxyAuthenticationRequired")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *RequestHeaderFieldTooLarge __attribute__((swift_name("RequestHeaderFieldTooLarge")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *RequestTimeout __attribute__((swift_name("RequestTimeout")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *RequestURITooLong __attribute__((swift_name("RequestURITooLong")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *RequestedRangeNotSatisfiable __attribute__((swift_name("RequestedRangeNotSatisfiable")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *ResetContent __attribute__((swift_name("ResetContent")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *SeeOther __attribute__((swift_name("SeeOther")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *ServiceUnavailable __attribute__((swift_name("ServiceUnavailable")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *SwitchProxy __attribute__((swift_name("SwitchProxy")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *SwitchingProtocols __attribute__((swift_name("SwitchingProtocols")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *TemporaryRedirect __attribute__((swift_name("TemporaryRedirect")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *TooManyRequests __attribute__((swift_name("TooManyRequests")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *Unauthorized __attribute__((swift_name("Unauthorized")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *UnprocessableEntity __attribute__((swift_name("UnprocessableEntity")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *UnsupportedMediaType __attribute__((swift_name("UnsupportedMediaType")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *UpgradeRequired __attribute__((swift_name("UpgradeRequired")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *UseProxy __attribute__((swift_name("UseProxy")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *VariantAlsoNegotiates __attribute__((swift_name("VariantAlsoNegotiates")));
+@property (readonly) BridgeClientKtor_httpHttpStatusCode *VersionNotSupported __attribute__((swift_name("VersionNotSupported")));
+@property (readonly) NSArray<BridgeClientKtor_httpHttpStatusCode *> *allStatusCodes __attribute__((swift_name("allStatusCodes")));
 @end;
 
 __attribute__((swift_name("KotlinIterator")))
@@ -4130,22 +4255,6 @@ __attribute__((swift_name("Ktor_httpContentType")))
 @end;
 
 __attribute__((objc_subclassing_restricted))
-__attribute__((swift_name("Ktor_httpHttpStatusCode")))
-@interface BridgeClientKtor_httpHttpStatusCode : BridgeClientBase
-- (instancetype)initWithValue:(int32_t)value description:(NSString *)description __attribute__((swift_name("init(value:description:)"))) __attribute__((objc_designated_initializer));
-@property (class, readonly, getter=companion) BridgeClientKtor_httpHttpStatusCodeCompanion *companion __attribute__((swift_name("companion")));
-- (int32_t)component1 __attribute__((swift_name("component1()")));
-- (NSString *)component2 __attribute__((swift_name("component2()")));
-- (BridgeClientKtor_httpHttpStatusCode *)doCopyValue:(int32_t)value description:(NSString *)description __attribute__((swift_name("doCopy(value:description:)")));
-- (BridgeClientKtor_httpHttpStatusCode *)descriptionValue:(NSString *)value __attribute__((swift_name("description(value:)")));
-- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
-- (NSUInteger)hash __attribute__((swift_name("hash()")));
-- (NSString *)description __attribute__((swift_name("description()")));
-@property (readonly) NSString *description_ __attribute__((swift_name("description_")));
-@property (readonly) int32_t value __attribute__((swift_name("value")));
-@end;
-
-__attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("Ktor_httpHttpMethod.Companion")))
 @interface BridgeClientKtor_httpHttpMethodCompanion : BridgeClientBase
 + (instancetype)alloc __attribute__((unavailable));
@@ -4621,69 +4730,6 @@ __attribute__((swift_name("Ktor_httpContentType.Companion")))
 @property (class, readonly, getter=shared) BridgeClientKtor_httpContentTypeCompanion *shared __attribute__((swift_name("shared")));
 - (BridgeClientKtor_httpContentType *)parseValue:(NSString *)value __attribute__((swift_name("parse(value:)")));
 @property (readonly) BridgeClientKtor_httpContentType *Any __attribute__((swift_name("Any")));
-@end;
-
-__attribute__((objc_subclassing_restricted))
-__attribute__((swift_name("Ktor_httpHttpStatusCode.Companion")))
-@interface BridgeClientKtor_httpHttpStatusCodeCompanion : BridgeClientBase
-+ (instancetype)alloc __attribute__((unavailable));
-+ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
-+ (instancetype)companion __attribute__((swift_name("init()")));
-@property (class, readonly, getter=shared) BridgeClientKtor_httpHttpStatusCodeCompanion *shared __attribute__((swift_name("shared")));
-- (BridgeClientKtor_httpHttpStatusCode *)fromValueValue:(int32_t)value __attribute__((swift_name("fromValue(value:)")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *Accepted __attribute__((swift_name("Accepted")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *BadGateway __attribute__((swift_name("BadGateway")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *BadRequest __attribute__((swift_name("BadRequest")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *Conflict __attribute__((swift_name("Conflict")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *Continue __attribute__((swift_name("Continue")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *Created __attribute__((swift_name("Created")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *ExpectationFailed __attribute__((swift_name("ExpectationFailed")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *FailedDependency __attribute__((swift_name("FailedDependency")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *Forbidden __attribute__((swift_name("Forbidden")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *Found __attribute__((swift_name("Found")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *GatewayTimeout __attribute__((swift_name("GatewayTimeout")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *Gone __attribute__((swift_name("Gone")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *InsufficientStorage __attribute__((swift_name("InsufficientStorage")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *InternalServerError __attribute__((swift_name("InternalServerError")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *LengthRequired __attribute__((swift_name("LengthRequired")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *Locked __attribute__((swift_name("Locked")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *MethodNotAllowed __attribute__((swift_name("MethodNotAllowed")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *MovedPermanently __attribute__((swift_name("MovedPermanently")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *MultiStatus __attribute__((swift_name("MultiStatus")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *MultipleChoices __attribute__((swift_name("MultipleChoices")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *NoContent __attribute__((swift_name("NoContent")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *NonAuthoritativeInformation __attribute__((swift_name("NonAuthoritativeInformation")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *NotAcceptable __attribute__((swift_name("NotAcceptable")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *NotFound __attribute__((swift_name("NotFound")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *NotImplemented __attribute__((swift_name("NotImplemented")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *NotModified __attribute__((swift_name("NotModified")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *OK __attribute__((swift_name("OK")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *PartialContent __attribute__((swift_name("PartialContent")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *PayloadTooLarge __attribute__((swift_name("PayloadTooLarge")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *PaymentRequired __attribute__((swift_name("PaymentRequired")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *PermanentRedirect __attribute__((swift_name("PermanentRedirect")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *PreconditionFailed __attribute__((swift_name("PreconditionFailed")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *Processing __attribute__((swift_name("Processing")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *ProxyAuthenticationRequired __attribute__((swift_name("ProxyAuthenticationRequired")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *RequestHeaderFieldTooLarge __attribute__((swift_name("RequestHeaderFieldTooLarge")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *RequestTimeout __attribute__((swift_name("RequestTimeout")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *RequestURITooLong __attribute__((swift_name("RequestURITooLong")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *RequestedRangeNotSatisfiable __attribute__((swift_name("RequestedRangeNotSatisfiable")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *ResetContent __attribute__((swift_name("ResetContent")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *SeeOther __attribute__((swift_name("SeeOther")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *ServiceUnavailable __attribute__((swift_name("ServiceUnavailable")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *SwitchProxy __attribute__((swift_name("SwitchProxy")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *SwitchingProtocols __attribute__((swift_name("SwitchingProtocols")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *TemporaryRedirect __attribute__((swift_name("TemporaryRedirect")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *TooManyRequests __attribute__((swift_name("TooManyRequests")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *Unauthorized __attribute__((swift_name("Unauthorized")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *UnprocessableEntity __attribute__((swift_name("UnprocessableEntity")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *UnsupportedMediaType __attribute__((swift_name("UnsupportedMediaType")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *UpgradeRequired __attribute__((swift_name("UpgradeRequired")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *UseProxy __attribute__((swift_name("UseProxy")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *VariantAlsoNegotiates __attribute__((swift_name("VariantAlsoNegotiates")));
-@property (readonly) BridgeClientKtor_httpHttpStatusCode *VersionNotSupported __attribute__((swift_name("VersionNotSupported")));
-@property (readonly) NSArray<BridgeClientKtor_httpHttpStatusCode *> *allStatusCodes __attribute__((swift_name("allStatusCodes")));
 @end;
 
 __attribute__((objc_subclassing_restricted))

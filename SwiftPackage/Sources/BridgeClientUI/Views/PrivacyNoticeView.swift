@@ -38,9 +38,9 @@ public struct PrivacyNoticeView: View {
     @EnvironmentObject private var bridgeManager: SingleStudyAppManager
     @State private var privacyNotice: PrivacyNotice = PrivacyNotice.default
     @Binding private var selectedTab: PrivacyNotice.Category
+    @State private var showFullNotice: Bool = false
     
-    private let privacyPolicyShareView = URLActivityViewRepresentable(
-        Bundle.main.url(forResource: "PrivacyPolicy", withExtension: "pdf"))
+    let fullPolicyURL = Bundle.main.url(forResource: "PrivacyPolicy", withExtension: "pdf")
     
     public init(selectedTab: Binding<PrivacyNotice.Category>) {
         self._selectedTab = selectedTab
@@ -64,11 +64,7 @@ public struct PrivacyNoticeView: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
                     }
-                    Button(action: privacyPolicyShareView.share) {
-                        Label("Full Notice", systemImage: "square.and.arrow.up", bundle: .module)
-                    }
-                    .buttonStyle(RoundedButtonStyle())
-                    privacyPolicyShareView
+                    fullPolicyButton()
                 }
                 .padding(.vertical, 32)
                 .padding(.horizontal, 42)
@@ -80,6 +76,23 @@ public struct PrivacyNoticeView: View {
             if let notice = bridgeManager.appConfig?.decodePrivacyNotice() {
                 privacyNotice = notice
             }
+        }
+    }
+    
+    @ViewBuilder
+    private func fullPolicyButton() -> some View {
+        if let url = fullPolicyURL {
+            Button(action: { self.showFullNotice = true }) {
+                Label("Full Notice", systemImage: "square.and.arrow.up", bundle: .module)
+            }
+            .disabled(self.showFullNotice)
+            .buttonStyle(RoundedButtonStyle())
+            
+            DocumentPreview($showFullNotice, url: url)
+                .accentColor(.init("LinkColor"))
+        }
+        else {
+            EmptyView()
         }
     }
     
@@ -134,43 +147,50 @@ public struct PrivacyNoticeView: View {
     }
 }
 
-// Modified from https://stackoverflow.com/questions/56819360/swiftui-exporting-or-sharing-files
+// syoung 09/17/2021 Showing the share sheet for sharing the PDF (as the button suggests)
+// is mad slow and can take *several* seconds to load. This is a work-around intended to
+// show a preview of the PDF document and gives them the option to print, save to file,
+// air drop, etc.
+// https://stackoverflow.com/questions/60354684/presenting-uidocumentinteractioncontroller-with-uiviewcontrollerrepresentable-in
 
-class URLActivityViewController : UIViewController {
-    
-    var excludedActivityTypes: [UIActivity.ActivityType]? = nil
+struct DocumentPreview: UIViewControllerRepresentable {
+    private var isActive: Binding<Bool>
+    private let viewController = UIViewController()
+    private let docController: UIDocumentInteractionController
 
-    @objc func shareURL(_ url: URL) {
-        let vc = UIActivityViewController(activityItems: [url], applicationActivities: [])
-        vc.excludedActivityTypes = excludedActivityTypes
-        present(vc,
-                animated: true,
-                completion: nil)
-        vc.popoverPresentationController?.sourceView = self.view
-    }
-}
-
-struct URLActivityViewRepresentable : UIViewControllerRepresentable {
-
-    private let viewController = URLActivityViewController()
-    
-    var url: URL?
-    
-    init(_ url: URL? = nil) {
-        self.url = url
+    init(_ isActive: Binding<Bool>, url: URL) {
+        self.isActive = isActive
+        self.docController = UIDocumentInteractionController(url: url)
     }
 
-    func makeUIViewController(context: Context) -> URLActivityViewController {
-        viewController
+    func makeUIViewController(context: UIViewControllerRepresentableContext<DocumentPreview>) -> UIViewController {
+        return viewController
     }
-    
-    func updateUIViewController(_ uiViewController: URLActivityViewController, context: Context) {
-        //
+
+    func updateUIViewController(_ uiViewController: UIViewController, context: UIViewControllerRepresentableContext<DocumentPreview>) {
+        if self.isActive.wrappedValue && docController.delegate == nil { // to not show twice
+            docController.delegate = context.coordinator
+            self.docController.presentPreview(animated: true)
+        }
     }
-    
-    func share() {
-        guard let fileURL = self.url else { return }
-        viewController.shareURL(fileURL)
+
+    func makeCoordinator() -> Coordintor {
+        return Coordintor(owner: self)
+    }
+
+    final class Coordintor: NSObject, UIDocumentInteractionControllerDelegate { // works as delegate
+        let owner: DocumentPreview
+        init(owner: DocumentPreview) {
+            self.owner = owner
+        }
+        func documentInteractionControllerViewControllerForPreview(_ controller: UIDocumentInteractionController) -> UIViewController {
+            return owner.viewController
+        }
+
+        func documentInteractionControllerDidEndPreview(_ controller: UIDocumentInteractionController) {
+            controller.delegate = nil // done, so unlink self
+            owner.isActive.wrappedValue = false // notify external about done
+        }
     }
 }
 

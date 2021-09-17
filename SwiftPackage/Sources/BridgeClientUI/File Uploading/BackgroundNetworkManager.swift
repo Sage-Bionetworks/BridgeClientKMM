@@ -300,7 +300,7 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
         var retry = Int(request.value(forHTTPHeaderField: retryCountHeader) ?? "") ?? 0
         guard retry < maxRetries else { return false }
         
-        guard let sessionToken = appManager.authManager!.session()?.sessionToken else {
+        guard let sessionToken = threadsafeSessionToken() else {
             debugPrint("Unable to retry task--not signed in (auth manager's UserSessionInfo is nil)")
             return false
         }
@@ -318,6 +318,17 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
         return true
     }
     
+    func threadsafeSessionToken() -> String? {
+        guard Thread.isMainThread else {
+            var sessionToken: String?
+            DispatchQueue.main.sync {
+                sessionToken = self.threadsafeSessionToken()
+            }
+            return sessionToken
+        }
+        return appManager.authManager?.session()?.sessionToken
+    }
+    
     func handleError(_ error: NSError, session: URLSession, task: URLSessionDownloadTask) -> Bool {
         if isTemporaryError(errorCode: error.code) {
             // Retry, and let the caller know we're retrying.
@@ -328,28 +339,34 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
     }
     
     func handleUnsupportedAppVersion() {
-        appManager.authManager.notifyUIOfBridgeError(statusCode: Ktor_httpHttpStatusCode(value: 410, description: "Unsupported app version"))
+        DispatchQueue.main.async {
+            self.appManager.authManager.notifyUIOfBridgeError(statusCode: Ktor_httpHttpStatusCode(value: 410, description: "Unsupported app version"))
+        }
     }
     
     func handleServerPreconditionNotMet() {
-        appManager.authManager.notifyUIOfBridgeError(statusCode: Ktor_httpHttpStatusCode(value: 412, description: "User not consented" ))
+        DispatchQueue.main.async {
+            self.appManager.authManager.notifyUIOfBridgeError(statusCode: Ktor_httpHttpStatusCode(value: 412, description: "User not consented" ))
+        }
     }
     
     func handleHTTPErrorResponse(_ response: HTTPURLResponse, session: URLSession, task: URLSessionDownloadTask) -> Bool {
         switch response.statusCode {
         case 401:
-            appManager.authManager!.reauth { [self] error in
-                if let error = error {
-                    // Assume BridgeClientKMM will have handled any 410 or 412 error appropriately.
-                    debugPrint("Session token auto-refresh failed: \(String(describing: error))")
-                    return
+            DispatchQueue.main.async {
+                self.appManager.authManager!.reauth { [self] error in
+                    if let error = error {
+                        // Assume BridgeClientKMM will have handled any 410 or 412 error appropriately.
+                        debugPrint("Session token auto-refresh failed: \(String(describing: error))")
+                        return
+                    }
+                    
+                    debugPrint("Session token auto-refresh succeeded, retrying original request")
+                    retry(task: task)
                 }
-                
-                debugPrint("Session token auto-refresh succeeded, retrying original request")
-                retry(task: task)
             }
             return true
-            
+                
         case 410:
             handleUnsupportedAppVersion()
             

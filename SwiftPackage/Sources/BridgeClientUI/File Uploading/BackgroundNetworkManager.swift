@@ -289,6 +289,9 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
         return (errorCode == NSURLErrorTimedOut || errorCode == NSURLErrorCannotFindHost || errorCode == NSURLErrorCannotConnectToHost || errorCode == NSURLErrorNotConnectedToInternet || errorCode == NSURLErrorSecureConnectionFailed)
     }
     
+    // Make sure to only ever call this from the main thread--the session token
+    // lives in Kotlin Native code which only allows access from the thread on which
+    // the object was originally created. ~emm 2021-09-17
     @discardableResult
     func retry(task: URLSessionDownloadTask) -> Bool {
         guard var request = task.originalRequest else {
@@ -328,28 +331,34 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
     }
     
     func handleUnsupportedAppVersion() {
-        appManager.authManager.notifyUIOfBridgeError(statusCode: Ktor_httpHttpStatusCode(value: 410, description: "Unsupported app version"))
+        DispatchQueue.main.async {
+            self.appManager.authManager.notifyUIOfBridgeError(statusCode: Ktor_httpHttpStatusCode(value: 410, description: "Unsupported app version"))
+        }
     }
     
     func handleServerPreconditionNotMet() {
-        appManager.authManager.notifyUIOfBridgeError(statusCode: Ktor_httpHttpStatusCode(value: 412, description: "User not consented" ))
+        DispatchQueue.main.async {
+            self.appManager.authManager.notifyUIOfBridgeError(statusCode: Ktor_httpHttpStatusCode(value: 412, description: "User not consented" ))
+        }
     }
     
     func handleHTTPErrorResponse(_ response: HTTPURLResponse, session: URLSession, task: URLSessionDownloadTask) -> Bool {
         switch response.statusCode {
         case 401:
-            appManager.authManager!.reauth { [self] error in
-                if let error = error {
-                    // Assume BridgeClientKMM will have handled any 410 or 412 error appropriately.
-                    debugPrint("Session token auto-refresh failed: \(String(describing: error))")
-                    return
+            DispatchQueue.main.async {
+                self.appManager.authManager!.reauth { [self] error in
+                    if let error = error {
+                        // Assume BridgeClientKMM will have handled any 410 or 412 error appropriately.
+                        debugPrint("Session token auto-refresh failed: \(String(describing: error))")
+                        return
+                    }
+                    
+                    debugPrint("Session token auto-refresh succeeded, retrying original request")
+                    retry(task: task)
                 }
-                
-                debugPrint("Session token auto-refresh succeeded, retrying original request")
-                retry(task: task)
             }
             return true
-            
+                
         case 410:
             handleUnsupportedAppVersion()
             

@@ -1,12 +1,14 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.gradle.internal.classpath.Instrumented.systemProperty
 
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
     kotlin("plugin.serialization")
     id("com.squareup.sqldelight")
-    id ("maven-publish")
+    id("maven-publish")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
@@ -25,6 +27,14 @@ val iosFrameworkName = "BridgeClient"
 kotlin {
     android {
         publishAllLibraryVariants()
+        tasks.withType<Test> {
+            systemProperty(
+                "testExternalId01",
+                gradleLocalProperties(rootProject.rootDir)
+                    .getProperty("testExternalId01")
+                    ?: System.getenv("TEST_EXTERNAL_ID_01")
+            )
+        }
     }
 
     // This bit is here to build the XCFramework. syoung 07/02/21
@@ -44,7 +54,9 @@ kotlin {
 
     // This bit is here so that running `./gradlew build` will work. syoung 07/02/21
     // Block from https://github.com/cashapp/sqldelight/issues/2044#issuecomment-721299517.
-    val iOSTargetName  = System.getenv("SDK_NAME") ?: project.findProperty("XCODE_SDK_NAME") as? String ?: "iphonesimulator"
+    val iOSTargetName =
+        System.getenv("SDK_NAME") ?: project.findProperty("XCODE_SDK_NAME") as? String
+        ?: "iphonesimulator"
     val iOSTarget: (String, KotlinNativeTarget.() -> Unit) -> KotlinNativeTarget =
         if (iOSTargetName.startsWith("iphoneos"))
             ::iosArm64
@@ -110,7 +122,7 @@ kotlin {
         }
         val iosMain by getting {
             dependencies {
-                implementation (Deps.SqlDelight.nativeDriver)
+                implementation(Deps.SqlDelight.nativeDriver)
                 implementation(Deps.Ktor.clientIos)
             }
         }
@@ -159,10 +171,13 @@ publishing {
 
 val packForXcode by tasks.creating(Sync::class) {
     group = "build"
-    val mode = System.getenv("CONFIGURATION") ?: project.findProperty("XCODE_CONFIGURATION") as? String ?: "DEBUG"
+    val mode =
+        System.getenv("CONFIGURATION") ?: project.findProperty("XCODE_CONFIGURATION") as? String
+        ?: "DEBUG"
     //val sdkName = System.getenv("SDK_NAME") ?: project.findProperty("XCODE_SDK_NAME") as? String ?: "iphonesimulator"
     val targetName = "ios" //+ if (sdkName.startsWith("iphoneos")) "Arm64" else "X64"
-    val framework = kotlin.targets.getByName<KotlinNativeTarget>(targetName).binaries.getFramework(mode)
+    val framework =
+        kotlin.targets.getByName<KotlinNativeTarget>(targetName).binaries.getFramework(mode)
     inputs.property("mode", mode)
     dependsOn(framework.linkTask)
     val targetDir = File(buildDir, "xcode-frameworks")

@@ -289,6 +289,9 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
         return (errorCode == NSURLErrorTimedOut || errorCode == NSURLErrorCannotFindHost || errorCode == NSURLErrorCannotConnectToHost || errorCode == NSURLErrorNotConnectedToInternet || errorCode == NSURLErrorSecureConnectionFailed)
     }
     
+    // Make sure to only ever call this from the main thread--the session token
+    // lives in Kotlin Native code which only allows access from the thread on which
+    // the object was originally created. ~emm 2021-09-17
     @discardableResult
     func retry(task: URLSessionDownloadTask) -> Bool {
         guard var request = task.originalRequest else {
@@ -300,7 +303,7 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
         var retry = Int(request.value(forHTTPHeaderField: retryCountHeader) ?? "") ?? 0
         guard retry < maxRetries else { return false }
         
-        guard let sessionToken = threadsafeSessionToken() else {
+        guard let sessionToken = appManager.authManager!.session()?.sessionToken else {
             debugPrint("Unable to retry task--not signed in (auth manager's UserSessionInfo is nil)")
             return false
         }
@@ -316,17 +319,6 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
         }
         
         return true
-    }
-    
-    func threadsafeSessionToken() -> String? {
-        guard Thread.isMainThread else {
-            var sessionToken: String?
-            DispatchQueue.main.sync {
-                sessionToken = self.threadsafeSessionToken()
-            }
-            return sessionToken
-        }
-        return appManager.authManager?.session()?.sessionToken
     }
     
     func handleError(_ error: NSError, session: URLSession, task: URLSessionDownloadTask) -> Bool {

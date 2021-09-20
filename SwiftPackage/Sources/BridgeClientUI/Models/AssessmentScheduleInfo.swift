@@ -53,7 +53,7 @@ public struct AssessmentScheduleInfo {
                                scheduledOn: session.startDateTime)
         self.assessmentInfo = Info(identifier: assessment.assessmentInfo.identifier!,
                                    key: assessment.assessmentInfo.key,
-                                   guid: assessment.assessmentInfo.identifier,
+                                   guid: assessment.assessmentInfo.guid,
                                    label: assessment.assessmentInfo.label)
     }
     

@@ -114,8 +114,9 @@ public struct AboutStudyView: View {
     
     @ViewBuilder
     private func aboutHeader() -> some View {
-        if let logo = viewModel.logo {
-            logo
+        if let url = viewModel.studyLogoUrl {
+            LogoImage(url: url)
+                .background(viewModel.backgroundColor)
         }
         else {
             Text(viewModel.institutionName.localizedUppercase)

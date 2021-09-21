@@ -49,7 +49,7 @@ extension URLRequest {
         self.setValue("no-cache", forHTTPHeaderField: "cache-control")
         
         headers?.forEach {
-            self.addValue($0.key, forHTTPHeaderField: $0.value)
+            self.addValue($0.value, forHTTPHeaderField: $0.key)
         }
     }
 }

@@ -179,10 +179,13 @@ open class BridgeClientAppManager : ObservableObject {
             DispatchQueue.main.async {
                 self.isUploadingResults = true
                 archives.forEach { archive in
-                    // TODO: emm 2021-08-19 Find out what metadata scientists want us to mark uploads with for
-                    // exporter v3, and figure out how to get it here--maybe by putting it on the DataArchive?
-                    // In any case, it needs to consist of Json key-value pairs.
-                    let exporterV3Metadata: JsonElement? = nil
+                    var exporterV3Metadata: JsonElement? = nil
+                    if let schedule = (archive as? AbstractResultArchive)?.schedule {
+                        exporterV3Metadata = JsonElement([
+                            "instanceGuid": schedule.instanceGuid,
+                            "eventTimestamp": schedule.session.eventTimestamp
+                        ])
+                    }
                     let extras = StudyDataUploadExtras(encrypted: true, metadata: exporterV3Metadata, zipped: true)
                     let id = archive.identifier
                     guard let url = archive.encryptedURL else {

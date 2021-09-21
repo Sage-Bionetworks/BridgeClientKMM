@@ -214,11 +214,13 @@ public struct CustomScrollView<Content : View>: View {
             VStack {
                 if up {
                     Image(systemName: "arrow.up")
+                        .font(.system(size: 18))
                 }
                 Text("scroll", bundle: .module)
                     .font(.latoFont(10, relativeTo: nil, weight: .regular))
                 if !up {
                     Image(systemName: "arrow.down")
+                        .font(.system(size: 18))
                 }
             }
             .opacity(enabled ? 1 : 0.3)

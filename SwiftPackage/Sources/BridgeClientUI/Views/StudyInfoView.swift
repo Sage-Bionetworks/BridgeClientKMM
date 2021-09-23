@@ -131,12 +131,12 @@ public struct AboutStudyView: View {
     @ViewBuilder
     private func aboutBody() -> some View {
         Text(viewModel.title)
-            .font(.playfairDisplayFont(18, relativeTo: .title, weight: .regular))
+            .font(DesignSystem.fontRules.headerFont(at: 2))
             .padding(.top, 6)
             .padding(.horizontal, horizontalPadding)
         if let details = viewModel.details {
             Text(details)
-                .font(.latoFont(15, relativeTo: .body, weight: .regular))
+                .font(DesignSystem.fontRules.bodyFont(at: 1, isEmphasis: false))
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.horizontal, horizontalPadding)
         }
@@ -146,9 +146,9 @@ public struct AboutStudyView: View {
     private func studyInfo(_ contact: StudyContact) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(contact.name)
-                .font(.latoFont(14, relativeTo: .title2, weight: .bold))
+                .font(DesignSystem.fontRules.headerFont(at: 5))
             contact.position
-                .font(.latoFont(12, relativeTo: .title3, weight: .regular))
+                .font(DesignSystem.fontRules.bodyFont(at: 2, isEmphasis: false))
         }
         .foregroundColor(.textForeground)
     }
@@ -166,7 +166,7 @@ public struct AboutStudyView: View {
             VStack(alignment: .leading, spacing: 0) {
                 Button(action: hidePrivacyNotice) {
                     Label("Back", systemImage: "arrow.left", bundle: .module)
-                        .font(.latoFont(14, relativeTo: .title2, weight: .regular))
+                        .font(DesignSystem.fontRules.headerFont(at: 6))
                         .foregroundColor(.textForeground)
                         .padding(.horizontal, 16)
                 }
@@ -214,10 +214,10 @@ public struct ContactAndSupportView: View {
     private func section(title: Text, body: Text, contacts: [StudyContact]) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             title
-                .font(.poppinsFont(18, relativeTo: .title2, weight: .regular))
+                .font(DesignSystem.fontRules.headerFont(at: 4))
                 .padding(.bottom, 8)
             body
-                .font(.latoFont(12, relativeTo: .footnote, weight: .regular))
+                .font(DesignSystem.fontRules.bodyFont(at: 1, isEmphasis: false))
                 .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity)
@@ -241,9 +241,9 @@ public struct ContactAndSupportView: View {
         VStack(alignment: .leading, spacing: 10) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(contact.name)
-                    .font(.poppinsFont(14, relativeTo: .title2, weight: .bold))
+                    .font(DesignSystem.fontRules.headerFont(at: 5))
                 contact.position
-                    .font(.latoFont(12, relativeTo: .title3, weight: .regular))
+                    .font(DesignSystem.fontRules.bodyFont(at: 2, isEmphasis: false))
             }
             .padding(.leading, 26)
             if let phone = contact.phone {
@@ -254,7 +254,7 @@ public struct ContactAndSupportView: View {
             }
             if contact.isIRB {
                 protocolIdLabel()
-                    .font(.latoFont(12, relativeTo: .title3, weight: .regular))
+                    .font(DesignSystem.fontRules.bodyFont(at: 2, isEmphasis: false))
                     .padding(.leading, 26)
             }
         }
@@ -270,7 +270,7 @@ public struct ContactAndSupportView: View {
         Link(destination: url) {
             Label(title: {
                 Text(value)
-                    .font(.latoFont(12, relativeTo: .title3, weight: .regular))
+                    .font(DesignSystem.fontRules.bodyFont(at: 2, isEmphasis: false))
             },
             icon: {
                 CompositeTintedImage("\(imageName).background", foreground: "\(imageName).foreground", bundle: .module)
@@ -317,7 +317,7 @@ public struct ContactAndSupportView: View {
                 withdrawalRow(Text("Participant ID: ", bundle: .module), viewModel.participantId ?? "")
             }
         }
-        .font(.latoFont(12, relativeTo: .body, weight: .regular))
+        .font(DesignSystem.fontRules.bodyFont(at: 2, isEmphasis: false))
         .padding(.top, 19)
         .padding(.horizontal, 32)
         .padding(.bottom, 26)

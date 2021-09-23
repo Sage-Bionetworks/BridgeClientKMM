@@ -46,6 +46,8 @@ public struct PrivacyNoticeView: View {
         self._selectedTab = selectedTab
     }
     
+    let bodyFont = DesignSystem.fontRules.bodyFont(at: 1, isEmphasis: false)
+    
     public var body: some View {
         VStack(spacing: 0) {
             header()
@@ -59,7 +61,7 @@ public struct PrivacyNoticeView: View {
                             Image(decorative: notice.icon, bundle: .module)
                                 .frame(width: 48, height: 48)
                             Text(notice.text)
-                                .font(.poppinsFont(14, relativeTo: .body, weight: .regular))
+                                .font(bodyFont)
                                 .foregroundColor(.textForeground)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
@@ -101,7 +103,7 @@ public struct PrivacyNoticeView: View {
         HStack {
             Image(decorative: "privacy.notice.icon", bundle: .module)
             Text("Privacy Notice", bundle: .module)
-                .font(.playfairDisplayFont(21, relativeTo: .title2, weight: .regular))
+                .font(DesignSystem.fontRules.headerFont(at: 1))
                 .foregroundColor(.textForeground)
         }
         .padding(20)
@@ -123,7 +125,7 @@ public struct PrivacyNoticeView: View {
                 }
                 .frame(height: 49.0)
                 .frame(minWidth: 0, maxWidth: .infinity)
-                .font(.poppinsFont(14))
+                .font(DesignSystem.fontRules.headerFont(at: 6))
                 .foregroundColor(.textForeground)
                 .background(tabBackground(selected: selectedTab == tab))
             }

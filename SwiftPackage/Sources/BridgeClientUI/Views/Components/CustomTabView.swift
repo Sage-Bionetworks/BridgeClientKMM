@@ -156,6 +156,16 @@ public struct CustomTabView<Tab : TabItem, Content : View>: View {
         .background(backgroundColor().edgesIgnoringSafeArea(.all))
     }
     
+    let buttonFont: [Bool : Font] = [
+        true : DesignSystem.fontRules.buttonFont(at: 2, isSelected: true),
+        false : DesignSystem.fontRules.buttonFont(at: 2, isSelected: false)
+    ]
+    
+    let buttonColor: [Bool : Color] = [
+        true : DesignSystem.fontRules.buttonColor(at: 2, isSelected: true),
+        false : DesignSystem.fontRules.buttonColor(at: 2, isSelected: false)
+    ]
+    
     @ViewBuilder
     private func tabButton(for tab: Tab, isSelected: Bool) -> some View {
         let imageTopOffset: CGFloat = (placement == .bottom) ? 4 : 0
@@ -171,8 +181,8 @@ public struct CustomTabView<Tab : TabItem, Content : View>: View {
                 .padding(.top, imageTopOffset)
                 .frame(height: buttonSize - imageTopOffset, alignment: .top)
                 titles[tab]!
-                    .font(.latoFont(10, weight: isSelected ? .bold : .regular))
-                    .foregroundColor(.textForeground)
+                    .font(buttonFont[isSelected])
+                    .foregroundColor(buttonColor[isSelected])
                     .padding(.bottom, 12)
             }
         }

@@ -217,7 +217,7 @@ public struct CustomScrollView<Content : View>: View {
                         .font(.system(size: 18))
                 }
                 Text("scroll", bundle: .module)
-                    .font(.latoFont(10, relativeTo: nil, weight: .regular))
+                    .font(.latoFont(fixedSize: 10))
                 if !up {
                     Image(systemName: "arrow.down")
                         .font(.system(size: 18))

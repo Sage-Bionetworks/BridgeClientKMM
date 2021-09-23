@@ -16,12 +16,13 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
 
 /**
- * **Important: Headers of the same values must be used when doing the upload against the pre-signed URL.** 
+ * **Important: Headers of the same values must be used when doing the upload against the pre-signed URL.**
  * @param name File name
- * @param contentLength The size of the object in bytes. A standard HTTP header. For more information, go to [http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.13](http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.13) 
+ * @param contentLength The size of the object in bytes. A standard HTTP header. For more information, go to [http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.13](http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.13)
  * @param contentMd5 The base64-encoded, 128-bit MD5 digest of the object body.
- * @param contentType A standard MIME type. For more information, go to [http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.17](http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.17) 
+ * @param contentType A standard MIME type. For more information, go to [http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.17](http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.17)
  * @param encrypted True if the upload is encrypted. False if it is not encrypted. If not specified, defaults to true.
+ * @param metadata JSON map with key value pairs representing metadata for this upload, as submitted by the app. This corresponds with the uploadMetadataFieldDefinitions configured in the app.
  * @param zipped True if the upload is zipped. False if it is a single file. If not specified, defaults to true.
  * @param type UploadRequest
  */
@@ -42,6 +43,9 @@ internal data class UploadRequest (
     /* True if the upload is encrypted. False if it is not encrypted. If not specified, defaults to true. */
     @SerialName("encrypted")
     val encrypted: kotlin.Boolean? = null,
+    /* JSON map with key value pairs representing metadata for this upload, as submitted by the app. This corresponds with the uploadMetadataFieldDefinitions configured in the app.  */
+    @SerialName("metadata")
+    val metadata: kotlin.collections.Map<kotlin.String, kotlinx.serialization.json.JsonElement>? = null,
     /* True if the upload is zipped. False if it is a single file. If not specified, defaults to true. */
     @SerialName("zipped")
     val zipped: kotlin.Boolean? = null,

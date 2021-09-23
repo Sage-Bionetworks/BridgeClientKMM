@@ -8,6 +8,8 @@ import android.os.Build
 import android.util.Log
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonPrimitive
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.joda.time.Instant
@@ -51,6 +53,7 @@ abstract class AssessmentResultArchiveUploader(
     fun archiveResultAndQueueUpload(assessmentResult: AssessmentResult,
                                     jsonCoder: Json,
                                     assessmentInstanceId: String,
+                                    eventTimestamp: String,
                                     sessionWindowExpiration: kotlinx.datetime.Instant? = null) {
         if (assessmentResult.schemaIdentifier == null) {
             Log.e(
@@ -90,7 +93,13 @@ abstract class AssessmentResultArchiveUploader(
             assessmentResult.runUUIDString
         }
 
-        val uploadFile = persist(assessmentRunUUID, builder.build(), sessionWindowExpiration)
+        val uploadMetadata: Map<String, JsonElement> = mapOf(
+            "instanceGuid" to JsonPrimitive(assessmentInstanceId),
+            "eventTimeStamp" to JsonPrimitive(eventTimestamp)
+        )
+
+
+        val uploadFile = persist(assessmentRunUUID, builder.build(), uploadMetadata, sessionWindowExpiration)
         Log.i("Archiver", "UploadFile $uploadFile")
         uploadRequester.queueAndRequestUpload(context, uploadFile, assessmentInstanceId)
     }
@@ -100,7 +109,7 @@ abstract class AssessmentResultArchiveUploader(
         CMSException::class,
         NoSuchAlgorithmException::class
     )
-    fun persist(filename: String, archive: Archive, sessionWindowExpiration: kotlinx.datetime.Instant?): UploadFile {
+    fun persist(filename: String, archive: Archive, uploadMetadata: Map<String, JsonElement>, sessionWindowExpiration: kotlinx.datetime.Instant?): UploadFile {
         val encryptor = AndroidStudyUploadEncryptor(getPublicKey())
 
         val md5: MessageDigest = try {
@@ -131,10 +140,13 @@ abstract class AssessmentResultArchiveUploader(
             }
 
             return UploadFile(
-                filePath,
-                CONTENT_TYPE_DATA_ARCHIVE,
-                size,
-                digestEnc
+                filePath = filePath,
+                contentType = CONTENT_TYPE_DATA_ARCHIVE,
+                fileLength = size,
+                md5Hash = digestEnc,
+                encrypted = true,
+                metadata = uploadMetadata,
+                sessionExpires = sessionWindowExpiration
             )
 
         } catch (e: CMSException) {

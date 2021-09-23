@@ -95,7 +95,7 @@ abstract class AssessmentResultArchiveUploader(
 
         val uploadMetadata: Map<String, JsonElement> = mapOf(
             "instanceGuid" to JsonPrimitive(assessmentInstanceId),
-            "eventTimeStamp" to JsonPrimitive(eventTimestamp)
+            "eventTimestamp" to JsonPrimitive(eventTimestamp)
         )
 
 

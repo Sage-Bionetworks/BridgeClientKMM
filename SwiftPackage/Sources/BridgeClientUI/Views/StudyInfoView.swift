@@ -218,9 +218,9 @@ public struct ContactAndSupportView: View {
                 .padding(.bottom, 8)
             body
                 .font(DesignSystem.fontRules.bodyFont(at: 1, isEmphasis: false))
-                .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity)
+        .fixedSize(horizontal: false, vertical: true)
         
         ForEach(contacts) {
             contactView($0)
@@ -321,6 +321,7 @@ public struct ContactAndSupportView: View {
         .padding(.top, 19)
         .padding(.horizontal, 32)
         .padding(.bottom, 26)
+        .fixedSize(horizontal: false, vertical: true)
         .frame(maxWidth: .infinity)
         .background(Color.accentColor)
         .cornerRadius(10)

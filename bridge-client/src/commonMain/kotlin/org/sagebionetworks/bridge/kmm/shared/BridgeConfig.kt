@@ -102,7 +102,7 @@ interface BridgeConfig : PlatformConfig {
             }
             if (info.appName != null) {
                 sb.append("/")
-                sb.append(info.appName)
+                sb.append(info.appVersion)
             }
         }
         if (isNotBlank(info.deviceName) || isNotBlank(info.osName) || isNotBlank(info.osVersion)) {

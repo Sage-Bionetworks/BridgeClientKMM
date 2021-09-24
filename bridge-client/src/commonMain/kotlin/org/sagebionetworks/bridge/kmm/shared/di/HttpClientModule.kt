@@ -21,7 +21,7 @@ fun httpClientModule(enableNetworkLogs: Boolean) = module {
 
     //HttpClient configured for use with AuthenticationAPI, it needs its own HttpClient so as not to
     // include the re-authentication feature found in DefaultHttpClient, which would cause a dependency loop
-    single<HttpClient>(named("authHttpClient"))  { createHttpClient(enableNetworkLogs, get()) }
+    single<HttpClient>(named("authHttpClient")) { createHttpClient(enableNetworkLogs, get()) }
 
 }
 
@@ -29,12 +29,12 @@ fun httpClientModule(enableNetworkLogs: Boolean) = module {
  * Creates an HttpClient configured with session token and refresh token features for authenticated
  * Bridge calls.
  */
-private fun createBridgeHttpClient(enableNetworkLogs: Boolean, bridgeConfig: BridgeConfig, authenticationRepository: AuthenticationRepository) = HttpClient {
+private fun createBridgeHttpClient(
+    enableNetworkLogs: Boolean,
+    bridgeConfig: BridgeConfig,
+    authenticationRepository: AuthenticationRepository
+) = HttpClient {
     val sessionTokenHeaderKey = "Bridge-Session"
-
-    defaultRequest {
-
-    }
 
     install(UserAgent) {
         agent = bridgeConfig.userAgent
@@ -57,9 +57,13 @@ private fun createBridgeHttpClient(enableNetworkLogs: Boolean, bridgeConfig: Bri
         }
     }
 
+    // TODO: Add a Feature that updates Accept-Language - liujoshua 2021-09-21
+    // A Feature is likely needed. For example, on Android we may need to respond to
+    // https://developer.android.com/reference/android/content/Intent.html#ACTION_LOCALE_CHANGED
+
     install(SessionTokenFeature) {
         sessionTokenHeaderName = sessionTokenHeaderKey
-        sessionTokenProvider = object: SessionTokenFeature.SessionTokenProvider {
+        sessionTokenProvider = object : SessionTokenFeature.SessionTokenProvider {
 
             override fun getSessionToken(): String? {
                 return authenticationRepository.session()?.sessionToken

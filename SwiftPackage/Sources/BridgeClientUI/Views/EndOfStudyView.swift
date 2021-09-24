@@ -78,10 +78,10 @@ fileprivate struct EndOfStudyStatusView: View {
             CompositeTintedImage("\(image).tinted", defaultImage: image, isBehind: isBehind, bundle: .module)
                 .padding(.bottom, 30)
             Text(title, bundle: .module)
-                .font(.latoFont(24))
+                .font(DesignSystem.fontRules.headerFont(at: 3))
                 .padding(.bottom, 16)
             Text(detail, bundle: .module)
-                .font(.latoFont(18))
+                .font(DesignSystem.fontRules.bodyFont(at: 1, isEmphasis: false))
                 .padding(.horizontal, 30)
                 .padding(.bottom, 30)
         }

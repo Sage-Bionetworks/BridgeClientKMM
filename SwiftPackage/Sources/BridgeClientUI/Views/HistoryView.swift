@@ -72,15 +72,17 @@ public struct HistoryView: View {
                     .padding(.top, 12)
                 VStack(spacing: -6) {
                     Text("\(viewModel.minutes)")
-                        .font(.poppinsFont(21))
+                        // Use fixed size b/c otherwise real-estate will not fit with image.
+                        .font(.latoFont(fixedSize: 24, weight: .bold))
                         .foregroundColor(.textForeground)
                     Text("minutes", bundle: .module)
-                        .font(.poppinsFont(10))
+                        // Use fixed size b/c otherwise real-estate will not fit with image.
+                        .font(.poppinsFont(fixedSize: 12))
                         .foregroundColor(.textForeground)
                 }
             }
             Text("Thank you for your contributions!", bundle: .module)
-                .font(.playfairDisplayFont(16, relativeTo: .title2, weight: .regular))
+                .font(DesignSystem.fontRules.headerFont(at: 2))
                 .foregroundColor(.textForeground)
         }
         .padding(.top, 16)
@@ -103,6 +105,9 @@ public struct HistoryView: View {
             .frame(minHeight: 112)
     }
     
+    let detailHeaderFont = DesignSystem.fontRules.headerFont(at: 7)
+    let titleHeaderFont = DesignSystem.fontRules.headerFont(at: 5)
+    
     @ViewBuilder
     private func leftSide(_ record: AssessmentRecord) -> some View {
         VStack(alignment: .leading, spacing: 2) {
@@ -110,14 +115,14 @@ public struct HistoryView: View {
                 .padding(.bottom, 2)
             Text(DateFormatter.string(from: record.finishedOn, timeZone: record.timeZone, dateStyle: .medium, timeStyle: .none))
                 .foregroundColor(.textForeground)
-                .font(.poppinsFont(10, relativeTo: .caption, weight: .regular))
+                .font(detailHeaderFont)
             assessmentInfoMap.title(for: record.info)
-                .font(.latoFont(16, relativeTo: .title, weight: .regular))
+                .font(titleHeaderFont)
                 .foregroundColor(.textForeground)
                 .frame(maxWidth: .infinity, alignment: .leading)
             Text(durationFormatter.string(from: Double(record.minutes * 60)) ?? "")
                 .foregroundColor(.textForeground)
-                .font(.poppinsFont(10, relativeTo: .caption, weight: .regular))
+                .font(detailHeaderFont)
         }
         .padding(.leading, 16)
         .padding(.top, 8)

@@ -66,7 +66,8 @@ public struct TodayView: View {
                                 ZStack {
                                     Image(decorative: "available_complete", bundle: .module)
                                     Text("nice, you’re all up to date!", bundle: .module)
-                                        .font(.playfairDisplayFont(18))
+                                        // TODO: syoung 09/23/2021 Cut the image so that I can make this text dynamic.
+                                        .font(.playfairDisplayFont(fixedSize: 18))
                                 }
                                 .padding(.vertical, 24)
                             }
@@ -85,7 +86,7 @@ public struct TodayView: View {
     @ViewBuilder
     private func dateHeader() -> some View {
         Text(viewModel.today, style: .date)
-            .font(.poppinsFont(10, relativeTo: .title3, weight: .regular))
+            .font(DesignSystem.fontRules.headerFont(at: 7))
             .foregroundColor(Color.hex727272)
             .padding(.top, 16)
     }
@@ -93,7 +94,7 @@ public struct TodayView: View {
     @ViewBuilder
     private func availabilityHeader(_ state: TodayTimelineSession.SessionState) -> some View {
         availabilityText(state)
-            .font(.playfairDisplayFont(18, relativeTo: .subheadline, weight: .regular))
+            .font(DesignSystem.fontRules.headerFont(at: 2))
             .foregroundColor(.textForeground)
     }
     
@@ -147,7 +148,7 @@ public struct TodayView: View {
     private func sectionTitle(_ textValue: LocalizedStringKey, _ imageName: String) -> some View {
         Image(decorative: imageName, bundle: .module)
         Text(textValue, bundle: .module)
-            .font(.poppinsFont(10, relativeTo: .title3, weight: .medium))
+            .font(DesignSystem.fontRules.headerFont(at: 7))
             .foregroundColor(.sageBlack)
             .fixedSize()
         LineView()
@@ -212,7 +213,7 @@ struct AssessmentTimelineCardView : View {
     private func leftSide() -> some View {
         VStack(alignment: .leading) {
             assessmentInfoMap.title(for: assessment)
-                .font(.latoFont(16, relativeTo: .title, weight: .regular))
+                .font(DesignSystem.fontRules.headerFont(at: 4))
                 .foregroundColor(.textForeground)
                 .padding(10)
             
@@ -222,7 +223,7 @@ struct AssessmentTimelineCardView : View {
                 Spacer()
                 assessmentInfoMap.estimatedTime(for: assessment)
                     .foregroundColor(.textForeground)
-                    .font(.poppinsFont(10, relativeTo: .caption, weight: .regular))
+                    .font(DesignSystem.fontRules.headerFont(at: 6))
             }
             .padding()
         }

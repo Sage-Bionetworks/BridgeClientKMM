@@ -2,8 +2,6 @@ package org.sagebionetworks.bridge.kmm.shared.repo
 
 import co.touchlab.stately.ensureNeverFrozen
 import io.ktor.client.*
-import io.ktor.client.features.*
-import io.ktor.client.request.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.encodeToString
@@ -27,13 +25,7 @@ class AppConfigRepo(httpClient: HttpClient,
 
 
     internal var publicApi = PublicApi(
-        httpClient = httpClient.config {
-            defaultRequest {
-                // temporarily hard code Accept-Language to avoid a 404 - liujoshua 2021-09-21
-                // remove after implementing this functionality in HttpClientModule
-                header("Accept-Language", "en-US,en")
-            }
-        }
+        httpClient = httpClient
     )
 
     fun getAppConfig(): Flow<ResourceResult<AppConfig>> {

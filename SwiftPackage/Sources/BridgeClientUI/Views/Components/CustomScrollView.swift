@@ -79,7 +79,7 @@ public struct CustomScrollView<Content : View>: View {
     
     @ViewBuilder
     private func makeButtons(scrollView: ScrollViewProxy) -> some View {
-        VStack(alignment: .trailing, spacing: 13) {
+        VStack(alignment: .trailing, spacing: 1) {
             Button("Scroll Up", bundle: .module) {
                 viewModel.scrollUp(scrollView)
             }
@@ -91,8 +91,6 @@ public struct CustomScrollView<Content : View>: View {
             .buttonStyle(ScrollButtonStyle(up: false, enabled: $viewModel.downEnabled))
         }
         .opacity(viewModel.scrollEnabled ? 1 : 0)
-        .padding(.trailing, 9)
-        .padding(.bottom, 16)
     }
     
     @ViewBuilder
@@ -230,6 +228,9 @@ public struct CustomScrollView<Content : View>: View {
             .clipShape(Capsule())
             .shadow(color: .sageBlack.opacity(0.25), radius: 4, x: 0, y: 4)
             .opacity((enabled || !up) ? 1 : 0)
+            .padding(.bottom, up ? 6 : 16)
+            .padding(.top, up ? 16 : 6)
+            .padding(.horizontal, 9)
         }
     }
 }

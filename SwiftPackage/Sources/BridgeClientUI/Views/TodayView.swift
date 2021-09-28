@@ -48,7 +48,7 @@ public struct TodayView: View {
             VStack {
                 dateHeader()
                 CustomScrollView {
-                    LazyVStack(spacing: 16) {
+                    VStack(spacing: 16) {
                         ForEach(TodayTimelineSession.SessionState.allCases, id: \.rawValue) { state in
                             let sessions = viewModel.filterSchedules(for: state)
                             if sessions.count > 0 {

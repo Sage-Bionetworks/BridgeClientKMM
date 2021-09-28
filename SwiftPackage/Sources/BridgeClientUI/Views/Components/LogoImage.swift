@@ -43,6 +43,7 @@ public struct LogoImage: View {
 
     public var body: some View {
         Image(uiImage: imageLoader.image)
+            .resizable()
             .aspectRatio(contentMode: .fit)
             .frame(height:80)
             .frame(maxWidth: .infinity, alignment: .center)

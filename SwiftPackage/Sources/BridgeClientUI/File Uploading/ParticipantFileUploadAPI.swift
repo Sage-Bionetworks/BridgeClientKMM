@@ -103,7 +103,7 @@ public class ParticipantFileUploadAPI: BridgeFileUploadAPITyped {
         self.uploadManager.bridgeFileUploadApis[self.apiString] = self
     }
     
-    func uploadMetadata(for fileId: String, fileUrl: URL, mimeType: String, extras: Any? = nil) -> BridgeFileUploadMetadataBlob? {
+    func uploadMetadata(for fileId: String, fileUrl: URL, mimeType: String, extras: Codable? = nil) -> BridgeFileUploadMetadataBlob? {
         var createdOn: Date?
         do {
             let attrs = try FileManager.default.attributesOfItem(atPath: fileUrl.path)
@@ -132,6 +132,10 @@ public class ParticipantFileUploadAPI: BridgeFileUploadAPITyped {
     
     func mimeType(for uploadMetadata: BridgeFileUploadMetadataBlob) -> String {
         return (uploadMetadata as! BridgeFileUploadMetadata<TrackingType>).bridgeUploadTrackingObject.mimeType
+    }
+    
+    func extras(for uploadMetadata: BridgeFileUploadMetadataBlob) -> Codable? {
+        return nil
     }
     
     func uploadRequestUrlString(for uploadMetadata: BridgeFileUploadMetadataBlob) -> String {
@@ -234,6 +238,8 @@ public class ParticipantFileUploadAPI: BridgeFileUploadAPITyped {
         return uploadMetadata
     }
     
-
+    func uploadRequestExtras(from data: Data?) -> Codable? {
+        return nil
+    }
 }
 

@@ -99,6 +99,10 @@ open class BridgeClientAppManager : ObservableObject {
         // Set up the background network manager singleton and make us its app manager
         let bnm = BackgroundNetworkManager.shared
         bnm.appManager = self
+        
+        // Register the file upload APIs so that retries can happen
+        let _ = ParticipantFileUploadAPI.shared
+        let _ = StudyDataUploadAPI.shared
 }
     
     public func appWillFinishLaunching(_ launchOptions: [UIApplication.LaunchOptionsKey : Any]? ) {

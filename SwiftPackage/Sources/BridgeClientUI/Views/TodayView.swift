@@ -113,12 +113,11 @@ public struct TodayView: View {
     
     @ViewBuilder
     private func singleCardView(_ session: TodayTimelineSession, _ assessment: TodayTimelineAssessment) -> some View {
-        if (session.window.persistent || !(assessment.isDeclined || assessment.isCompleted)) {
+        if (session.persistent || !(assessment.isDeclined || assessment.isCompleted)) {
             AssessmentTimelineCardView(assessment)
                 .onTapGesture {
                     guard assessment.isEnabled else { return }
-                    self.viewModel.selectedAssessment =
-                            .init(session: session.window, assessment: assessment.assessment)
+                    self.viewModel.selectedAssessment = assessment.assessmentScheduleInfo
                     self.viewModel.isPresentingAssessment = true
                 }
                 .transition(.exitStageLeft)
@@ -165,7 +164,7 @@ struct AssessmentTimelineCardView : View {
     }
     
     private var assessment: AssessmentInfo {
-        viewModel.assessment.assessmentInfo
+        viewModel.assessmentInfo
     }
     
     private let horizontalPadding: CGFloat = 24

@@ -213,16 +213,12 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
 /// The `TodayTimelineSession` is an `ObservableObject` that wraps a Kotlin Native
 /// ``NativeScheduledSessionWindow``.
 public final class TodayTimelineSession : ObservableObject, Identifiable {
-    public final var id: String {
-        self.window.instanceGuid
-    }
+    public final var id: String { self.instanceGuid }
     
-    public final var instanceGuid: String {
-        self.window.instanceGuid
-    }
+    public final let instanceGuid: String
     
     /// The Kotlin Native session window information that backs this object.
-    public var window: NativeScheduledSessionWindow {
+    fileprivate var window: NativeScheduledSessionWindow {
         didSet {
             let newAssessments: [TodayTimelineAssessment] = window.assessments.map { nativeAssessment in
                 guard let existingAssessment = self.assessments.first(where: { $0.instanceGuid == nativeAssessment.instanceGuid })
@@ -249,6 +245,9 @@ public final class TodayTimelineSession : ObservableObject, Identifiable {
         case completed, expired, availableNow, upNext
     }
     
+    /// Are the assessments in this session persistent? As in, can they be performed more than once?
+    public let persistent: Bool
+    
     /// The current text to display for the section header based on the ``state``.
     ///
     /// - Note: This is *not* published b/c this should only ever change in association with a change
@@ -258,7 +257,9 @@ public final class TodayTimelineSession : ObservableObject, Identifiable {
     /// A timer that is fired when this session is going to change state based on the current time.
     private var updateTimer: Timer?
     
-    public init(_ window: NativeScheduledSessionWindow) {
+    init(_ window: NativeScheduledSessionWindow) {
+        self.instanceGuid = window.instanceGuid
+        self.persistent = window.persistent
         self.window = window
         self.assessments = window.assessments.map { TodayTimelineAssessment($0) }
         self.updateState()
@@ -276,6 +277,7 @@ public final class TodayTimelineSession : ObservableObject, Identifiable {
         let isCompleted = self.assessments.reduce(true) { (initial, assessment) in
             let isNext = !found && !assessment.isCompleted
             assessment.isEnabled = availableNow && (!performInOrder || isNext)
+            assessment.assessmentScheduleInfo = .init(session: self.window, assessment: assessment.assessment)
             if isNext { found = true }
             if let newFinishedOn = assessment.finishedOn,
                (finishedOn == nil || finishedOn! < newFinishedOn) {
@@ -340,21 +342,23 @@ public final class TodayTimelineSession : ObservableObject, Identifiable {
 /// The `TodayTimelineAssessment` is an `ObservableObject` that wraps a Kotlin Native
 /// ``NativeScheduledAssessment``.
 public final class TodayTimelineAssessment : ObservableObject, Identifiable {
-    public var id: String {
-        self.assessment.instanceGuid
-    }
+    public var id: String { self.instanceGuid }
     
-    public var instanceGuid: String {
-        self.assessment.instanceGuid
-    }
+    public let instanceGuid: String
     
     /// The Kotlin Native assessment information that backs this object.
-    public var assessment: NativeScheduledAssessment {
+    fileprivate var assessment: NativeScheduledAssessment {
         didSet {
             self.isCompleted = assessment.isCompleted
             self.isDeclined = assessment.isDeclined
         }
     }
+    
+    public var assessmentInfo: BridgeClient.AssessmentInfo {
+        assessment.assessmentInfo
+    }
+    
+    public fileprivate(set) var assessmentScheduleInfo: AssessmentScheduleInfo!
     
     /// Is the assessment enabled?
     @Published public var isEnabled: Bool
@@ -372,7 +376,8 @@ public final class TodayTimelineAssessment : ObservableObject, Identifiable {
     /// When was it finished?
     @Published public var finishedOn: Date?
     
-    public init(_ assessment: NativeScheduledAssessment, isEnabled: Bool = true) {
+    init(_ assessment: NativeScheduledAssessment, isEnabled: Bool = true) {
+        self.instanceGuid = assessment.instanceGuid
         self.assessment = assessment
         self.isCompleted = assessment.isCompleted
         self.isDeclined = assessment.isDeclined

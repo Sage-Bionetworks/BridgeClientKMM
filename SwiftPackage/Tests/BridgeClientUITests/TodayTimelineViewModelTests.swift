@@ -50,17 +50,17 @@ final class TodayTimelineViewModelTests: XCTestCase {
         
         XCTAssertEqual(sessions.count, 3)
         XCTAssertEqual(sessions.first?.assessments.count, 3)
-        XCTAssertEqual(sessions.first?.window.sessionInfo.guid, "current_SessionA")
+        XCTAssertEqual(sessions.first?.sessionInfo.guid, "current_SessionA")
         XCTAssertEqual(sessions.last?.assessments.count, 5)
-        XCTAssertEqual(sessions.last?.window.sessionInfo.guid, "upNext_SessionC")
+        XCTAssertEqual(sessions.last?.sessionInfo.guid, "upNext_SessionC")
         
         let availableNow = todayManager.filterSchedules(for: .availableNow)
         XCTAssertEqual(availableNow.count, 1)
-        XCTAssertEqual(availableNow.first?.window.sessionInfo.guid, "current_SessionA")
+        XCTAssertEqual(availableNow.first?.sessionInfo.guid, "current_SessionA")
         
         let upNext = todayManager.filterSchedules(for: .upNext)
         XCTAssertEqual(upNext.count, 1)
-        XCTAssertEqual(upNext.first?.window.sessionInfo.guid, "upNext_SessionB")
+        XCTAssertEqual(upNext.first?.sessionInfo.guid, "upNext_SessionB")
     }
     
     func testFindTimelineModel() {

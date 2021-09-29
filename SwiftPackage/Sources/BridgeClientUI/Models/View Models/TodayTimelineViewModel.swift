@@ -233,6 +233,10 @@ public final class TodayTimelineSession : ObservableObject, Identifiable {
         }
     }
     
+    var sessionInfo: BridgeClient.SessionInfo {
+        window.sessionInfo
+    }
+    
     /// The assessments included in this session.
     @Published public var assessments: [TodayTimelineAssessment]
 

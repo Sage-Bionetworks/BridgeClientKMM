@@ -178,6 +178,7 @@ struct AssessmentTimelineCardView : View {
                 .padding(.trailing, horizontalPadding - 8)
                 .padding(.top, 12)
         }
+        .fixedSize(horizontal: false, vertical: true)
     }
     
     @ViewBuilder

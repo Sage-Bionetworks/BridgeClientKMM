@@ -152,6 +152,11 @@ open class LocalNotificationManager : NSObject, UNUserNotificationCenterDelegate
         return requests
     }
     
+    public func clearAll() {
+        removeAllPendingNotifications() {
+        }
+    }
+    
     private func removeAllPendingNotifications(_ completionHandler: @escaping (() -> Void)) {
         UNUserNotificationCenter.current().getPendingNotificationRequests { (requests) in
             let requestIds: [String] = requests.compactMap {

@@ -48,7 +48,7 @@ public struct TodayView: View {
             VStack {
                 dateHeader()
                 CustomScrollView {
-                    LazyVStack(spacing: 16) {
+                    VStack(spacing: 16) {
                         ForEach(TodayTimelineSession.SessionState.allCases, id: \.rawValue) { state in
                             let sessions = viewModel.filterSchedules(for: state)
                             if sessions.count > 0 {
@@ -113,12 +113,11 @@ public struct TodayView: View {
     
     @ViewBuilder
     private func singleCardView(_ session: TodayTimelineSession, _ assessment: TodayTimelineAssessment) -> some View {
-        if (session.window.persistent || !(assessment.isDeclined || assessment.isCompleted)) {
+        if (session.persistent || !(assessment.isDeclined || assessment.isCompleted)) {
             AssessmentTimelineCardView(assessment)
                 .onTapGesture {
                     guard assessment.isEnabled else { return }
-                    self.viewModel.selectedAssessment =
-                            .init(session: session.window, assessment: assessment.assessment)
+                    self.viewModel.selectedAssessment = assessment.assessmentScheduleInfo
                     self.viewModel.isPresentingAssessment = true
                 }
                 .transition(.exitStageLeft)
@@ -165,7 +164,7 @@ struct AssessmentTimelineCardView : View {
     }
     
     private var assessment: AssessmentInfo {
-        viewModel.assessment.assessmentInfo
+        viewModel.assessmentInfo
     }
     
     private let horizontalPadding: CGFloat = 24
@@ -179,6 +178,7 @@ struct AssessmentTimelineCardView : View {
                 .padding(.trailing, horizontalPadding - 8)
                 .padding(.top, 12)
         }
+        .fixedSize(horizontal: false, vertical: true)
     }
     
     @ViewBuilder

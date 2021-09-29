@@ -125,6 +125,3 @@ public final class SingleStudyAppManager : BridgeClientAppManager {
     }
 }
 
-extension Study : Identifiable {
-    public var id: String { identifier }
-}

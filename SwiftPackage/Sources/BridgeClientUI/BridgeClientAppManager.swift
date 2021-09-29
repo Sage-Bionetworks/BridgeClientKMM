@@ -142,6 +142,7 @@ open class BridgeClientAppManager : ObservableObject {
     }
     
     public func signOut() {
+        localNotificationManager.clearAll()
         authManager.signOut()
         isOnboardingFinished = false
         userSessionInfo = nil

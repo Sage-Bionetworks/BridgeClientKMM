@@ -59,6 +59,7 @@ private fun createBridgeHttpClient(
 
     defaultRequest {
         // temporarily hard code to avoid a 404 when retrieving AppConfig - liujoshua 2021-09-21
+        // TODO: Set Accept-Language based on device setting - liujoshua 2021-09-21
         // A Feature is likely needed. For example, on Android we may need to respond to
         // https://developer.android.com/reference/android/content/Intent.html#ACTION_LOCALE_CHANGED
         header("Accept-Language", "en-US,en")

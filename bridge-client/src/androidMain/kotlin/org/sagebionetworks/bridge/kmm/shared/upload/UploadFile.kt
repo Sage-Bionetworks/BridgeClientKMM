@@ -11,6 +11,7 @@ data class UploadFile (
     val fileLength: Long,
     val md5Hash: String,
     val encrypted: Boolean = true,
+    val metadata: Map<kotlin.String, kotlinx.serialization.json.JsonElement>? = null,
     val sessionExpires: Instant? = null // Delay doing upload until after session expires
 ) {
 
@@ -29,6 +30,7 @@ data class UploadFile (
             contentMd5 = md5Hash,
             contentType = contentType,
             encrypted = encrypted,
+            metadata = metadata,
             type = "UploadRequest"
         )
     }

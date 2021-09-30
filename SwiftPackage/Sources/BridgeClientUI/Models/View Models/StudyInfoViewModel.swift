@@ -43,7 +43,7 @@ open class StudyInfoViewModel : ObservableObject {
     }
     
     @Published open var institutionName: String = ""
-    @Published open var logo: Image?
+    @Published open var studyLogoUrl: String?
     @Published open var foregroundColor: Color = .textForeground
     @Published open var backgroundColor: Color = .accentColor
     @Published open var title: String = ""
@@ -79,6 +79,7 @@ open class StudyInfoViewModel : ObservableObject {
     open func updateInfo() {
         self.title = study.name
         self.details = study.details
+        self.studyLogoUrl = study.studyLogoUrl
         
         if let hex = study.colorScheme?.foreground,
            let color = Color.init(hex: hex) {

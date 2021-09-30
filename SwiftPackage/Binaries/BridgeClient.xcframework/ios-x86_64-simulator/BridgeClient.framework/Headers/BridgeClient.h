@@ -2271,11 +2271,12 @@ __attribute__((swift_name("ScheduleTimelineRepo.Companion")))
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("ScheduledAssessmentReference")))
 @interface BridgeClientScheduledAssessmentReference : BridgeClientBase
-- (instancetype)initWithInstanceGuid:(NSString *)instanceGuid assessmentInfo:(BridgeClientAssessmentInfo *)assessmentInfo adherenceRecordList:(NSArray<BridgeClientAdherenceRecord *> *)adherenceRecordList __attribute__((swift_name("init(instanceGuid:assessmentInfo:adherenceRecordList:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithInstanceGuid:(NSString *)instanceGuid studyId:(NSString *)studyId assessmentInfo:(BridgeClientAssessmentInfo *)assessmentInfo adherenceRecordList:(NSArray<BridgeClientAdherenceRecord *> *)adherenceRecordList __attribute__((swift_name("init(instanceGuid:studyId:assessmentInfo:adherenceRecordList:)"))) __attribute__((objc_designated_initializer));
 - (NSString *)component1 __attribute__((swift_name("component1()")));
-- (BridgeClientAssessmentInfo *)component2 __attribute__((swift_name("component2()")));
-- (NSArray<BridgeClientAdherenceRecord *> *)component3 __attribute__((swift_name("component3()")));
-- (BridgeClientScheduledAssessmentReference *)doCopyInstanceGuid:(NSString *)instanceGuid assessmentInfo:(BridgeClientAssessmentInfo *)assessmentInfo adherenceRecordList:(NSArray<BridgeClientAdherenceRecord *> *)adherenceRecordList __attribute__((swift_name("doCopy(instanceGuid:assessmentInfo:adherenceRecordList:)")));
+- (NSString *)component2 __attribute__((swift_name("component2()")));
+- (BridgeClientAssessmentInfo *)component3 __attribute__((swift_name("component3()")));
+- (NSArray<BridgeClientAdherenceRecord *> *)component4 __attribute__((swift_name("component4()")));
+- (BridgeClientScheduledAssessmentReference *)doCopyInstanceGuid:(NSString *)instanceGuid studyId:(NSString *)studyId assessmentInfo:(BridgeClientAssessmentInfo *)assessmentInfo adherenceRecordList:(NSArray<BridgeClientAdherenceRecord *> *)adherenceRecordList __attribute__((swift_name("doCopy(instanceGuid:studyId:assessmentInfo:adherenceRecordList:)")));
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSArray<BridgeClientAssessmentHistoryRecord *> *)history __attribute__((swift_name("history()")));
@@ -2285,6 +2286,7 @@ __attribute__((swift_name("ScheduledAssessmentReference")))
 @property (readonly) NSString *instanceGuid __attribute__((swift_name("instanceGuid")));
 @property (readonly) BOOL isCompleted __attribute__((swift_name("isCompleted")));
 @property (readonly) BOOL isDeclined __attribute__((swift_name("isDeclined")));
+@property (readonly) NSString *studyId __attribute__((swift_name("studyId")));
 @end;
 
 __attribute__((objc_subclassing_restricted))

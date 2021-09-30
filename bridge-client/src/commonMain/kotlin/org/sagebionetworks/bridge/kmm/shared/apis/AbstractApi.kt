@@ -28,10 +28,8 @@ abstract class AbstractApi(protected val basePath: String, protected val httpCli
             builder.body = model
         }
 
-        with(builder.headers) {
-            append("Accept", "application/json")
-            append("Content-Type", "application/json; charset=UTF-8")
-        }
+        builder.header("Accept", "application/json")
+        builder.header("Content-Type", "application/json; charset=UTF-8")
 
         try {
             return httpClient.post(builder)
@@ -52,13 +50,11 @@ abstract class AbstractApi(protected val basePath: String, protected val httpCli
             }
         }
 
-        with(builder.headers) {
-            append("Accept", "application/json")
-        }
+
+        builder.header("Accept", "application/json")
+
         if (modifiedDateTimeString != null) {
-            with(builder.headers) {
-                append("If-Modified-Since", modifiedDateTimeString)
-            }
+            builder.header("If-Modified-Since", modifiedDateTimeString)
         }
 
         try {

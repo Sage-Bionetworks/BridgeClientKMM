@@ -17,7 +17,7 @@ interface PlatformConfig {
             override fun domainSuffix() = "-custom"
         };
 
-        abstract fun domainSuffix() : String
+        abstract fun domainSuffix(): String
 
         fun basePath(): String {
             return "https://webservices${domainSuffix()}.sagebridge.org"
@@ -52,18 +52,7 @@ interface BridgeConfig : PlatformConfig {
      */
     val userAgent: String
         get() {
-            val clientInfo = ClientInfo(
-                appName = appName,
-                appVersion = appVersion,
-                deviceName = deviceName,
-                osName = osName,
-                osVersion = osVersion,
-                sdkName = "BridgeClientKMM",
-                sdkVersion = sdkVersion
-            )
-            val userAgent: String? = getUserAgent(clientInfo)
-            return userAgent ?:
-            appName + "/" + appVersion + " (" + deviceName + "; " + osName + "/" + osVersion + ") BridgeClientKMM/" + sdkVersion
+            return "$appName/$appVersion ($deviceName; $osName/$osVersion) BridgeClientKMM/$sdkVersion"
         }
 
     /**
@@ -100,9 +89,9 @@ interface BridgeConfig : PlatformConfig {
             if (isNotBlank(info.appName)) {
                 sb.append(info.appName)
             }
-            if (info.appName != null) {
+            if (info.appVersion != null) {
                 sb.append("/")
-                sb.append(info.appName)
+                sb.append(info.appVersion ?: 0)
             }
         }
         if (isNotBlank(info.deviceName) || isNotBlank(info.osName) || isNotBlank(info.osVersion)) {
@@ -139,5 +128,4 @@ interface BridgeConfig : PlatformConfig {
     private fun isNotBlank(string: String?): Boolean {
         return string != null && string.length > 0
     }
-
 }

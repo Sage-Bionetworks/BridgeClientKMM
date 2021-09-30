@@ -57,7 +57,7 @@ protocol BridgeFileUploadManagerTestCase : XCTWaiterDelegate {
     var uploadToS3FailedNotification: Notification.Name { get }
     var bridgeNotificationFailedNotification: Notification.Name { get }
     var uploadApi: BridgeFileUploadAPI { get }
-    var uploadExtras: Any? { get }
+    var uploadExtras: Codable? { get }
     
     func uploadRequestFailed412Tests(userInfo: [AnyHashable : Any])
     func uploadSucceeded503RetriedTests(userInfo: [AnyHashable : Any])

@@ -183,13 +183,16 @@ protocol BridgeFileUploadAPI {
     var uploadManager: BridgeFileUploadManager { get }
     
     /// Create an instance of BridgeFileUploadMetadata for a file upload.
-    func uploadMetadata(for fileId: String, fileUrl: URL, mimeType: String, extras: Any?) -> BridgeFileUploadMetadataBlob?
+    func uploadMetadata(for fileId: String, fileUrl: URL, mimeType: String, extras: Codable?) -> BridgeFileUploadMetadataBlob?
     
     /// Return the fileId for the given uploadMetadata.
     func fileId(for uploadMetadata: BridgeFileUploadMetadataBlob) -> String
     
     /// Return the MIME type for the given uploadMetadata.
     func mimeType(for uploadMetadata: BridgeFileUploadMetadataBlob) -> String
+    
+    /// Return the upload request extras (if any) for the given uploadMetadata.
+    func extras(for uploadMetadata: BridgeFileUploadMetadataBlob) -> Codable?
     
     /// Return the S3 pre-signed URL string to which BridgeFileUploadManager should PUT the file.
     func s3UploadUrlString(for uploadMetadata: BridgeFileUploadMetadataBlob) -> String?
@@ -236,6 +239,7 @@ protocol BridgeFileUploadAPI {
     func markUploadingToS3(for relativePath: String, uploadMetadata: BridgeFileUploadMetadataBlob)
     
     /// Retrieve and un-map the temp file upload upload-to-S3's metadata.
+    @discardableResult
     func fetchUploadingToS3(for relativePath: String) -> BridgeFileUploadMetadataBlob?
     
     /// Retrieve the metadata for a temp file from a given mapping without removing it. Meant for internal use only.
@@ -259,11 +263,11 @@ protocol BridgeFileUploadAPI {
     func dequeueForRetry(relativePath: String) -> BridgeFileRetryInfoBlob?
     
     /// This method is the public face of the Bridge upload APIs.
-    func upload(fileId: String, fileUrl: URL, contentType: String?, extras: Any?)
+    func upload(fileId: String, fileUrl: URL, contentType: String?, extras: Codable?)
     
     /// Behaves identically to `upload(fileId:fileUrl:contentType:extras:)` but
     /// returns the temp file copy. For internal use in unit testing only.
-    func uploadInternal(fileId: String, fileUrl: URL, contentType: String?, extras: Any?) -> URL?
+    func uploadInternal(fileId: String, fileUrl: URL, contentType: String?, extras: Codable?) -> URL?
     
     /// Send the actual upload request to Bridge.
     /// Meant for internal use only.
@@ -272,6 +276,11 @@ protocol BridgeFileUploadAPI {
     /// Let Bridge know the upload succeeded.
     /// Meant for internal use only.
     func notifyBridgeUploadSucceeded(relativePath: String, uploadMetadata: BridgeFileUploadMetadataBlob)
+    
+    /// Decode the upload request extras object (if any) from data retrieved from the Xattrs of a file
+    /// whose upload was requested via this API.
+    /// Meant for internal use only.
+    func uploadRequestExtras(from data: Data?) -> Codable?
 }
 
 /// BridgeFileUploadAPITyped extends BridgeFileUploadAPI with an associated type, which is
@@ -288,7 +297,6 @@ protocol BridgeFileUploadAPITyped : BridgeFileUploadAPI {
     
     /// Return the URL string at which BridgeFileUploadManager should request an upload.
     func uploadRequestUrlString(for uploadMetadata: BridgeFileUploadMetadataBlob) -> String
-    
 }
     
 /// Implementations of functions that require compile-time knowledge of the associated type, but are
@@ -317,6 +325,7 @@ extension BridgeFileUploadAPITyped {
         self.uploadManager.persistMapping(from: relativePath, to: uploadMetadata as! BridgeFileUploadMetadata<TrackingType>, defaultsKey: self.uploadManager.uploadingToS3Key)
     }
     
+    @discardableResult
     func fetchUploadingToS3(for relativePath: String) -> BridgeFileUploadMetadataBlob? {
         return self.uploadManager.removeMapping(BridgeFileUploadMetadata<TrackingType>.self, from: relativePath, defaultsKey: self.uploadManager.uploadingToS3Key)
     }
@@ -385,11 +394,11 @@ extension BridgeFileUploadAPITyped {
         return self.uploadManager.dequeueForRetry(TrackingType.self, relativePath: relativePath)
     }
 
-    public func upload(fileId: String, fileUrl: URL, contentType: String? = nil, extras: Any? = nil) {
+    public func upload(fileId: String, fileUrl: URL, contentType: String? = nil, extras: Codable? = nil) {
         self.uploadManager.upload(TrackingType.self, uploadApi: self, fileId: fileId, fileUrl: fileUrl, contentType: contentType, extras: extras)
     }
 
-    public func uploadInternal(fileId: String, fileUrl: URL, contentType: String? = nil, extras: Any? = nil) -> URL? {
+    public func uploadInternal(fileId: String, fileUrl: URL, contentType: String? = nil, extras: Codable? = nil) -> URL? {
         return self.uploadManager.uploadInternal(TrackingType.self, uploadApi: self, fileId: fileId, fileUrl: fileUrl, contentType: contentType, extras: extras)
     }
     
@@ -462,6 +471,9 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
     /// The extended file attribute for the content (MIME) type of the file being uploaded.
     let contentTypeAttributeName = "org.sagebionetworks.bridge.contentType"
     
+    /// The extended file attribute for the upload request extras of the file being uploaded.
+    let uploadExtrasAttributeName = "org.sagebionetworks.bridge.uploadExtras"
+    
     /// The key under which we store the mappings of temp file -> original file.
     let bridgeFileUploadsKey = "bridgeFileUploadsKey"
     
@@ -526,11 +538,38 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         
         // Set up a listener to retry temporarily-failed uploads whenever the app becomes active
         NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: nil) { notification in
+            self.checkAndRetryOrphanedUploads()
             self.retryUploadsAfterDelay()
         }
         
         // Also do it right away
+        self.checkAndRetryOrphanedUploads()
         self.retryUploadsAfterDelay()
+    }
+    
+    fileprivate func touch(fileUrl: URL) {
+        let coordinator = NSFileCoordinator(filePresenter: nil)
+        coordinator.coordinate(writingItemAt: fileUrl, options: .contentIndependentMetadataOnly, error: nil) { (writeUrl) in
+            do {
+                try FileManager.default.setAttributes([.modificationDate : Date()], ofItemAtPath: writeUrl.path)
+            } catch let err {
+                debugPrint("FileManager failed to update the modification date of \(fileUrl): \(err)")
+            }
+        }
+    }
+    
+    fileprivate func modificationDate(of fileUrl: URL) -> Date? {
+        let coordinator = NSFileCoordinator(filePresenter: nil)
+        var modDate: Date? = nil
+        coordinator.coordinate(readingItemAt: fileUrl, options: .immediatelyAvailableMetadataOnly, error: nil) { (readUrl) in
+            do {
+                let attributes = try FileManager.default.attributesOfItem(atPath: readUrl.path)
+                modDate = attributes[.modificationDate] as? Date
+            } catch let err {
+                debugPrint("FileManager failed to read the modification date of \(fileUrl): \(err)")
+            }
+        }
+        return modDate
     }
     
     fileprivate func tempFileFor(inFileURL: URL, uploadApi: BridgeFileUploadAPI) -> URL? {
@@ -571,13 +610,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         }
         
         // "touch" the temp file for retry accounting purposes
-        coordinator.coordinate(writingItemAt: tempFileURL, options: .contentIndependentMetadataOnly, error: nil) { (writeURL) in
-            do {
-                try FileManager.default.setAttributes([.modificationDate : Date()], ofItemAtPath: writeURL.path)
-            } catch let err {
-                debugPrint("FileManager failed to update the modification date of \(tempFileURL): \(err)")
-            }
-        }
+        self.touch(fileUrl: tempFileURL)
         
         // Keep track of what file it's a copy of.
         self.persistMapping(from: invariantTempFilePath, to: filePath, defaultsKey: self.bridgeFileUploadsKey)
@@ -738,7 +771,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         
     /// Upload a  file to Bridge via the specified upload API.
     /// Generally intended to only be called by BridgeFileUploadAPI implementations.
-    func upload<T>(_ trackingType: T.Type, uploadApi: BridgeFileUploadAPI, fileId: String, fileUrl: URL, contentType: String? = nil, extras: Any? = nil) where T: Codable {
+    func upload<T>(_ trackingType: T.Type, uploadApi: BridgeFileUploadAPI, fileId: String, fileUrl: URL, contentType: String? = nil, extras: Codable? = nil) where T: Codable {
         uploadInternal(trackingType, uploadApi: uploadApi, fileId: fileId, fileUrl: fileUrl, contentType: contentType, extras: extras)
         return
     }
@@ -746,7 +779,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
     // Internal function returns temp file URL for tests, or nil on pre-flight check failures.
     // Should not be called directly except from unit/integration test cases.
     @discardableResult
-    func uploadInternal<T>(_ trackingType: T.Type, uploadApi: BridgeFileUploadAPI, fileId: String, fileUrl: URL, contentType: String? = nil, extras: Any? = nil) -> URL? where T: Codable {
+    func uploadInternal<T>(_ trackingType: T.Type, uploadApi: BridgeFileUploadAPI, fileId: String, fileUrl: URL, contentType: String? = nil, extras: Codable? = nil) -> URL? where T: Codable {
         // Check if this uploadApi is already registered, and if not, do so
         if !self.bridgeFileUploadApis.keys.contains(uploadApi.apiString) {
             self.bridgeFileUploadApis[uploadApi.apiString] = uploadApi
@@ -782,6 +815,9 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
                 try fileCopy?.setExtendedAttribute(data: uploadApi.apiString.data(using: .utf8)!, forName: self.uploadApiAttributeName)
                 try fileCopy?.setExtendedAttribute(data: uploadApi.fileId(for: uploadMetadata).data(using: .utf8)!, forName: self.fileIdAttributeName)
                 try fileCopy?.setExtendedAttribute(data: uploadApi.mimeType(for: uploadMetadata).data(using: .utf8)!, forName: self.contentTypeAttributeName)
+                if let extrasData = try uploadApi.extras(for: uploadMetadata)?.jsonEncodedData() {
+                    try fileCopy?.setExtendedAttribute(data: extrasData, forName: self.uploadExtrasAttributeName)
+                }
             } catch let err {
                 debugPrint("Error trying to set extended attributes for temp file \(fileUrl): \(err)")
                 return nil
@@ -804,14 +840,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
             }
             
             // "touch" the temp file for retry accounting purposes
-            let coordinator = NSFileCoordinator(filePresenter: nil)
-            coordinator.coordinate(writingItemAt: fileCopy, options: .contentIndependentMetadataOnly, error: nil) { (writeURL) in
-                do {
-                    try FileManager.default.setAttributes([.modificationDate : Date()], ofItemAtPath: writeURL.path)
-                } catch let err {
-                    debugPrint("FileManager failed to update the modification date of \(fileCopy): \(err)")
-                }
-            }
+            self.touch(fileUrl: fileCopy)
             
             // Keep track of what file it's a copy of.
             self.persistMapping(from: invariantFilePath!, to: fileUrl.path, defaultsKey: self.bridgeFileUploadsKey)
@@ -931,11 +960,14 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         
         // add the file to the uploadingToS3 list
         uploadApi.markUploadingToS3(for: invariantFilePath, uploadMetadata: bridgeUploadMetadata)
-
         
         // upload the file to S3
-        let headers = uploadApi.s3UploadHeaders(for: bridgeUploadMetadata)
-        self.netManager.uploadFile(fileUrl, httpHeaders: headers, to: uploadUrl, taskDescription: invariantFilePath)
+        self.upload(fileUrl, to: uploadUrl, for: invariantFilePath, uploadApi: uploadApi, uploadMetadata: bridgeUploadMetadata)
+    }
+
+    func upload(_ fileUrl: URL, to uploadUrlString: String, for invariantFilePath: String, uploadApi: BridgeFileUploadAPI, uploadMetadata: BridgeFileUploadMetadataBlob) {
+        let headers = uploadApi.s3UploadHeaders(for: uploadMetadata)
+        self.netManager.uploadFile(fileUrl, httpHeaders: headers, to: uploadUrlString, taskDescription: invariantFilePath)
     }
     
     /// Call this function to check for and run any retries where the required delay has elapsed.
@@ -953,6 +985,157 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
                         self.userDefaults.setValue(retryUploads, forKey: self.retryUploadsKey)
                     }
                 }
+            }
+        }
+    }
+    
+    fileprivate func cancelTasks(for relativePath: String, tasks: [URLSessionTask]) -> [URLSessionTask] {
+        var notCanceledTasks = [URLSessionTask]()
+        for task in tasks {
+            if task.description != relativePath {
+                notCanceledTasks.append(task)
+                continue
+            }
+            task.cancel()
+        }
+        return notCanceledTasks
+    }
+    
+    /// Call this function to check for and retry any orphaned uploads.
+    public func checkAndRetryOrphanedUploads() {
+        // App extensions are severely memory constrained, so don't even try this if we're in one.
+        guard !self.netManager.isRunningInAppExtension() else { return }
+        self.netManager.backgroundSession().getAllTasks { tasks in
+            var tasks = tasks
+            let defaults = self.userDefaults
+            let oneDay: TimeInterval = 60 * 60 * 24
+            
+            // Get the set of all temp files for which there is a currently-active background
+            // URLSession task.
+            let filesInFlight = tasks.rsd_flatMapSet { task in
+                task.description
+            }
+            
+            // Get the mappings from temp file to original file for all in-progress uploads.
+            let fileUploads = defaults.dictionary(forKey: self.bridgeFileUploadsKey) ?? [String : Any]()
+            
+            // Assume uploads in the uploadURLsRequested map that are more than 24 hours old
+            // are orphaned. Note that under some unusual circumstances this may lead to
+            // duplication of uploads.
+            let uploadURLsRequested = defaults.dictionary(forKey: self.uploadURLsRequestedKey) ?? [String : Any]()
+            for invariantFilePath in uploadURLsRequested.keys {
+                guard let api = self.apiFromXAttrs(for: invariantFilePath) else { continue }
+                guard let metadataBlob = api.retrieveMetadata(from: invariantFilePath, mappings: uploadURLsRequested) else { continue }
+                // Assume files with an active urlsession task are not (yet) orphaned, no matter how old.
+                guard !filesInFlight.contains(invariantFilePath) else { continue }
+                let fullPath = self.fullyQualifiedPath(of: invariantFilePath)
+                let fileUrl = URL(fileURLWithPath: fullPath)
+                guard let modDate = self.modificationDate(of: fileUrl) else { continue }
+                guard Date().timeIntervalSince(modDate) > oneDay else { continue }
+                
+                // If we get all the way here, touch the file to reset the orphanage clock
+                // and then send the upload request again.
+                self.touch(fileUrl: fileUrl)
+                api.sendUploadRequest(for: invariantFilePath, uploadMetadata: metadataBlob)
+            }
+            
+            // Assume any uploads in the uploadingToS3 map whose sessions are at or past their
+            // expiration datetime are orphaned.
+            let uploadingToS3 = defaults.dictionary(forKey: self.uploadingToS3Key) ?? [String : Any]()
+            for invariantFilePath in uploadingToS3.keys {
+                guard let api = self.apiFromXAttrs(for: invariantFilePath) else { continue }
+                guard let metadataBlob = api.retrieveMetadata(from: invariantFilePath, mappings: uploadingToS3) else { continue }
+                guard api.isUploadSessionExpired(for: metadataBlob) else { continue }
+                guard let originalFilePath = self.retrieveMapping(String.self, from: invariantFilePath, mappings: fileUploads) else { continue }
+                
+                // ok, the pre-signed upload URL is expired--so cancel any tasks for this file,
+                // remove it from the S3 upload mapping, touch it to reset the orphanage clock,
+                // and enqueue it for immediate retry
+                tasks = self.cancelTasks(for: invariantFilePath, tasks: tasks)
+                api.fetchUploadingToS3(for: invariantFilePath)
+                let fullPath = self.fullyQualifiedPath(of: invariantFilePath)
+                let fileUrl = URL(fileURLWithPath: fullPath)
+                self.touch(fileUrl: fileUrl)
+                api.enqueueForRetry(delay: 0, relativePath: invariantFilePath, originalFilePath: originalFilePath, uploadMetadata: metadataBlob)
+            }
+            
+            // Assume any attempts to notify Bridge of success for uploads that are more than
+            // 24 hours old are orphaned. Note that under some unusual circumstances this may
+            // lead to duplicate notifications to Bridge.
+            let notifyingBridge = defaults.dictionary(forKey: self.notifyingBridgeUploadSucceededKey) ?? [String : Any]()
+            for invariantFilePath in notifyingBridge.keys {
+                guard let api = self.apiFromXAttrs(for: invariantFilePath) else { continue }
+                guard let metadataBlob = api.retrieveMetadata(from: invariantFilePath, mappings: notifyingBridge) else { continue }
+                // Assume files with an active urlsession task are not (yet) orphaned, no matter how old.
+                guard !filesInFlight.contains(invariantFilePath) else { continue }
+                let fullPath = self.fullyQualifiedPath(of: invariantFilePath)
+                let fileUrl = URL(fileURLWithPath: fullPath)
+                guard let modDate = self.modificationDate(of: fileUrl) else { continue }
+                guard Date().timeIntervalSince(modDate) > oneDay else { continue }
+                
+                // If we get all the way here, touch the file to reset the orphanage clock
+                // and then send the notify request again.
+                self.touch(fileUrl: fileUrl)
+                api.notifyBridgeUploadSucceeded(relativePath: invariantFilePath, uploadMetadata: metadataBlob)
+            }
+            
+            // Assume any uploads in the bridgeFileUploads map which are not in any other map
+            // and have no in-flight tasks are orphaned.
+            for invariantFilePath in fileUploads.keys {
+                guard !filesInFlight.contains(invariantFilePath) else { continue }
+                guard !uploadURLsRequested.keys.contains(invariantFilePath) else { continue }
+                guard !uploadingToS3.keys.contains(invariantFilePath) else { continue }
+                guard !notifyingBridge.keys.contains(invariantFilePath) else { continue }
+                guard let originalFilePath = self.retrieveMapping(String.self, from: invariantFilePath, mappings: fileUploads) else { continue }
+                guard let (api, fileId, mimeType, extras) = self.apiInfoFromXAttrs(for: invariantFilePath) else { continue }
+                // get the upload metadata using the temp file URL (as the original file likely no longer exists)
+                let fullPath = self.fullyQualifiedPath(of: invariantFilePath)
+                let fileUrl = URL(fileURLWithPath: fullPath)
+                guard let metadataBlob = api.uploadMetadata(for: fileId, fileUrl: fileUrl, mimeType: mimeType, extras: extras) else { continue }
+                // touch the file to reset the orphanage clock and enqueue it for immediate retry.
+                self.touch(fileUrl: fileUrl)
+                api.enqueueForRetry(delay: 0, relativePath: invariantFilePath, originalFilePath: originalFilePath, uploadMetadata: metadataBlob)
+            }
+            
+            // Assume any files lingering in upload temp file directories which are not in any maps
+            // and not in any in-flight tasks are orphaned. Note that this assumes all Bridge Upload
+            // API implementations put their temp file copies in a subfolder of the app support dir
+            // whose name ends in "Uploads".
+            let  fileMan = FileManager.default
+            guard let appSupportDir = fileMan.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else { return }
+            let resourceKeys = Set<URLResourceKey>([.nameKey, .isDirectoryKey])
+            guard let dirEnumerator = fileMan.enumerator(at: appSupportDir, includingPropertiesForKeys: Array(resourceKeys), options: .skipsHiddenFiles) else { return }
+            var allFiles: [URL] = []
+            for case let fileUrl as URL in dirEnumerator {
+                guard let resourceValues = try? fileUrl.resourceValues(forKeys: resourceKeys),
+                    let isDirectory = resourceValues.isDirectory,
+                    let name = resourceValues.name
+                    else {
+                        continue
+                }
+                if isDirectory {
+                    if !name.hasSuffix("Uploads") {
+                        dirEnumerator.skipDescendants()
+                    }
+                } else {
+                    allFiles.append(fileUrl)
+                }
+            }
+            let retryQueue = defaults.dictionary(forKey: self.retryUploadsKey) ?? [String : Any]()
+            for fileUrl in allFiles {
+                let invariantFilePath = self.sandboxRelativePath(of: fileUrl.path)
+                guard !filesInFlight.contains(invariantFilePath) else { continue }
+                guard !fileUploads.keys.contains(invariantFilePath) else { continue }
+                guard !uploadURLsRequested.keys.contains(invariantFilePath) else { continue }
+                guard !uploadingToS3.keys.contains(invariantFilePath) else { continue }
+                guard !notifyingBridge.keys.contains(invariantFilePath) else { continue }
+                guard !retryQueue.keys.contains(invariantFilePath) else { continue }
+                guard let (api, fileId, mimeType, extras) = self.apiInfoFromXAttrs(for: invariantFilePath) else { continue }
+                guard let metadataBlob = api.uploadMetadata(for: fileId, fileUrl: fileUrl, mimeType: mimeType, extras: extras) else { continue }
+                // touch the file to reset the orphanage clock and enqueue it for immediate retry. We don't
+                // know the original file path, so we'll just use the temp file path.
+                self.touch(fileUrl: fileUrl)
+                api.enqueueForRetry(delay: 0, relativePath: invariantFilePath, originalFilePath: fileUrl.path, uploadMetadata: metadataBlob)
             }
         }
     }
@@ -1183,25 +1366,51 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
     }
 
     func apiFromXAttrs(for filePath: String) -> BridgeFileUploadAPI? {
+        let (uploadApi, _, _, _) = self.apiInfoFromXAttrs(for: filePath) ?? (nil, nil, nil, nil)
+        return uploadApi
+    }
+    
+    func apiInfoFromXAttrs(for filePath: String) -> (uploadApi: BridgeFileUploadAPI, fileId: String, contentType: String, extras: Codable?)? {
         let fullPath = self.fullyQualifiedPath(of: filePath)
         guard FileManager.default.fileExists(atPath: fullPath) else {
-            debugPrint("Unexpected: Attempting to retrieve upload API for temp file with invariant path '\(filePath) but temp file does not exist at '\(fullPath)")
+            debugPrint("Unexpected: Attempting to retrieve upload API info for temp file with invariant path '\(filePath) but temp file does not exist at '\(fullPath)")
             return nil
         }
         let tempFile = URL(fileURLWithPath: fullPath)
         var apiStringData: Data
+        var fileIdData: Data
+        var contentTypeData: Data
+        var extrasData: Data?
         do {
-            try apiStringData = tempFile.extendedAttribute(forName: self.uploadApiAttributeName)
+            apiStringData = try tempFile.extendedAttribute(forName: self.uploadApiAttributeName)
+            fileIdData = try tempFile.extendedAttribute(forName: self.fileIdAttributeName)
+            contentTypeData = try tempFile.extendedAttribute(forName: self.contentTypeAttributeName)
         } catch let err {
-            debugPrint("Error attempting to retrieve xattr \(self.uploadApiAttributeName) from file at \(fullPath): \(err)")
+            debugPrint("Error attempting to retrieve xattrs \(self.uploadApiAttributeName), \(self.fileIdAttributeName), and \(self.contentTypeAttributeName) from file at \(fullPath): \(err)")
             return nil
         }
+        // extras is an optional attribute so we don't care if it isn't present
+        extrasData = try? tempFile.extendedAttribute(forName: self.uploadExtrasAttributeName)
+        
         guard let apiString = String(data: apiStringData, encoding: .utf8) else {
             debugPrint("Unexpected: Could not convert apiStringData to a utf8 string: \(apiStringData)")
             return nil
         }
-        
-        return self.bridgeFileUploadApis[apiString]
+        guard let api = self.bridgeFileUploadApis[apiString] else {
+            debugPrint("Unexpected: Could not retrieve BridgeFileUploadAPI for \(apiString) from list of registered upload APIs")
+            return nil
+        }
+        guard let fileId = String(data: fileIdData, encoding: .utf8) else {
+            debugPrint("Unexpected: Could not convert fileIdData to a utf8 string: \(fileIdData)")
+            return nil
+        }
+        guard let contentType = String(data: contentTypeData, encoding: .utf8) else {
+            debugPrint("Unexpected: Could not convert contentTypeData to a utf8 string: \(contentTypeData)")
+            return nil
+        }
+        let extras = api.uploadRequestExtras(from: extrasData)
+
+        return (uploadApi: api, fileId: fileId, contentType: contentType, extras: extras)
     }
     
     func cleanUpTempFile(filePath: String) {

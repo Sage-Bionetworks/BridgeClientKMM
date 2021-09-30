@@ -73,7 +73,7 @@ struct StudyDataUploadObject: Codable {
     var uploadSession: UploadSession?
 }
 
-public struct StudyDataUploadExtras {
+public struct StudyDataUploadExtras: Codable {
     var encrypted: Bool?
     var metadata: JsonElement?
     var zipped: Bool?
@@ -152,7 +152,7 @@ public class StudyDataUploadAPI: BridgeFileUploadAPITyped {
         return digestData.base64EncodedString()
     }
         
-    func uploadMetadata(for fileId: String, fileUrl: URL, mimeType: String, extras: Any? = nil) -> BridgeFileUploadMetadataBlob? {
+    func uploadMetadata(for fileId: String, fileUrl: URL, mimeType: String, extras: Codable? = nil) -> BridgeFileUploadMetadataBlob? {
         // Get the file size and MD5 hash before making the temp copy, in case something goes wrong
         let contentLength: Int?
         do {
@@ -199,6 +199,11 @@ public class StudyDataUploadAPI: BridgeFileUploadAPITyped {
     
     func mimeType(for uploadMetadata: BridgeFileUploadMetadataBlob) -> String {
         return (uploadMetadata as! BridgeFileUploadMetadata<TrackingType>).bridgeUploadTrackingObject.uploadRequest.contentType
+    }
+    
+    func extras(for uploadMetadata: BridgeFileUploadMetadataBlob) -> Codable? {
+        let request = (uploadMetadata as! BridgeFileUploadMetadata<TrackingType>).bridgeUploadTrackingObject.uploadRequest
+        return StudyDataUploadExtras(encrypted: request.encrypted, metadata: request.metadata, zipped: request.zipped)
     }
     
     func uploadRequestUrlString(for uploadMetadata: BridgeFileUploadMetadataBlob) -> String {
@@ -291,6 +296,14 @@ public class StudyDataUploadAPI: BridgeFileUploadAPITyped {
         return uploadMetadata
     }
     
-
+    func uploadRequestExtras(from data: Data?) -> Codable? {
+        guard let data = data else { return nil }
+        do {
+            return try self.uploadManager.netManager.jsonDecoder.decode(StudyDataUploadExtras.self, from: data)
+        } catch let err {
+            debugPrint("Unexpected: Could not parse Xattrs upload extras data as a \(StudyDataUploadExtras.self) object: \"\(String(describing: String(data: data, encoding: .utf8)))\"\n\terror:\(err)")
+            return nil
+        }
+    }
 }
 

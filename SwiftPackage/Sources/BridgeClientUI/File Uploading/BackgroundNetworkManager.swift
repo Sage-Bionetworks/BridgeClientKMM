@@ -96,7 +96,7 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
     /// A singleton map of pending background URLSession completion handlers that have been passed in from the app delegate and not yet called.
     var backgroundSessionCompletionHandlers = [String : () -> Void]()
     
-    private func isRunningInAppExtension() -> Bool {
+    func isRunningInAppExtension() -> Bool {
         // "An app extension target’s Info.plist file identifies the extension point and may specify some details
         // about your extension. At a minimum, the file includes the NSExtension key and a dictionary of keys and
         // values that the extension point specifies."

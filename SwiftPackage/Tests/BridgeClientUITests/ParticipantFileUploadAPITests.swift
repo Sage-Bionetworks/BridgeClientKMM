@@ -47,7 +47,7 @@ class ParticipantFileUploadAPITests : XCTestCase, BridgeFileUploadManagerTestCas
     var savedDelay: TimeInterval?
     var savedAppManager: BridgeClientAppManager?
     var uploadApi: BridgeFileUploadAPI = ParticipantFileUploadAPI.shared
-    var uploadExtras: Any?
+    var uploadExtras: Codable?
     
     lazy var requestEndpoint: String = {
         "/v3/participants/self/files/\(testFileId)"

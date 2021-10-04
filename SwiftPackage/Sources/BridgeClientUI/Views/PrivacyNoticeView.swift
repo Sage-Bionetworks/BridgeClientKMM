@@ -191,8 +191,11 @@ struct DocumentPreview: UIViewControllerRepresentable {
         }
 
         func documentInteractionControllerDidEndPreview(_ controller: UIDocumentInteractionController) {
-            controller.delegate = nil // done, so unlink self
-            owner.isActive.wrappedValue = false // notify external about done
+            // Unlink on next run loop.
+            DispatchQueue.main.async {
+                self.owner.isActive.wrappedValue = false
+                controller.delegate = nil
+            }
         }
     }
 }

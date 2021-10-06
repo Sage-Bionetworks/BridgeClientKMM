@@ -49,8 +49,12 @@ class AuthenticationRepository(httpClient: HttpClient, val bridgeConfig: BridgeC
 
     suspend fun signOut() {
         session()?.let {
-            authenticationApi.signOut(it)
-            database.removeResource(USER_SESSION_ID, ResourceType.USER_SESSION_INFO, APP_WIDE_STUDY_ID)
+            try {
+                authenticationApi.signOut(it)
+            } catch (error: Throwable) {
+                println(error)
+            }
+            database.clearDatabase()
         }
     }
 

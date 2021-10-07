@@ -77,8 +77,8 @@ open class SageResearchTaskDelegate : NSObject, RSDTaskViewControllerDelegate {
         
         let taskResult = taskController.taskViewModel.taskResult
         let clientData = (taskController.task as? RSDTrackingTask)?.taskData(for: taskResult)?.json
-        let endedOn = (reason == .completed) ? taskResult.endDate : nil
-        let declined = (reason == .earlyExit)
+        let declined = taskController.taskViewModel.didAbandon
+        let endedOn = (reason == .completed) && !declined ? taskResult.endDate : nil
         
         assessmentManager.updateAdherenceRecord(scheduleInfo: scheduledAssessment,
                                    startedOn: taskResult.startDate,

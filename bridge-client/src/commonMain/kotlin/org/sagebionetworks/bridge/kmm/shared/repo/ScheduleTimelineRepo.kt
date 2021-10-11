@@ -370,10 +370,11 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
 
         //Used for sorting when sessions span multiple days
         val startDaysFromDay = scheduledSession.startDay - daysSince
-        val startDate = day.plus(startDaysFromDay.toLong(), DateTimeUnit.DateBased.DayBased(1))
+        val startDate = day.plus(startDaysFromDay.toLong(), DateTimeUnit.DayBased(1))
 
         // LocalTime support is hopefully coming: https://github.com/Kotlin/kotlinx-datetime/issues/57#issuecomment-800287971
         // Construct a startDateTime from today and startTime
+
         val startDateTimeString =
             startDate.toString() + "T" + scheduledSession.startTime
         val startDateTime = LocalDateTime.parse(startDateTimeString)

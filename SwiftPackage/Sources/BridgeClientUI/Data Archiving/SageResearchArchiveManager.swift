@@ -53,8 +53,7 @@ open class SageResearchArchiveManager : NSObject, RSDDataArchiveManager {
     }
     
     private func _schemaReference(_ taskResult: RSDTaskResult) -> RSDSchemaInfo? {
-        var ret: RSDSchemaInfo? = nil
-        DispatchQueue.main.sync {
+        return processResultOnMainThread() {
             let schemaIdentifier =
                 self._appConfigTaskToSchemaMapping?[taskResult.identifier] ??
                 self._defaultTaskToSchemaMapping?[taskResult.identifier] ??
@@ -62,24 +61,24 @@ open class SageResearchArchiveManager : NSObject, RSDDataArchiveManager {
                 taskResult.identifier
             
             if let ref = bridgeManager.appConfig?.schemaReferences?.first(where: { $0.id == schemaIdentifier }) {
-                ret = RSDSchemaInfoObject(identifier: ref.id, revision: ref.revision?.intValue ?? 0)
+                return RSDSchemaInfoObject(identifier: ref.id, revision: ref.revision?.intValue ?? 0)
             }
             else if let assessmentResult = taskResult as? AssessmentResult,
                     let schemaIdentifier = assessmentResult.schemaIdentifier,
                     let versionString = assessmentResult.versionString,
                     let revision = Int(versionString) {
-                ret = RSDSchemaInfoObject(identifier: schemaIdentifier, revision: revision)
+                return RSDSchemaInfoObject(identifier: schemaIdentifier, revision: revision)
+            }
+            else {
+                return nil
             }
         }
-        return ret
     }
     
     public final func dataGroups() -> [String]? {
-        var ret: [String]? = nil
-        DispatchQueue.main.sync {
-            ret = bridgeManager.userSessionInfo?.dataGroups
+        return processResultOnMainThread() {
+            bridgeManager.userSessionInfo?.dataGroups
         }
-        return ret
     }
         
     open func schedule(for taskResult: RSDTaskResult) -> AssessmentScheduleInfo? {
@@ -274,5 +273,17 @@ open class SageResearchResultArchive : AbstractResultArchive, RSDDataArchive {
         let metadataDictionary = try metadata.rsd_jsonEncodedDictionary()
         try completeArchive(createdOn: metadata.startDate, with: metadataDictionary)
     }
+}
+
+func processResultOnMainThread<T>(_ process: () -> T?) -> T? {
+    var ret: T? = nil
+    if Thread.isMainThread {
+        ret = process()
+    } else {
+        DispatchQueue.main.sync {
+            ret = process()
+        }
+    }
+    return ret
 }
 

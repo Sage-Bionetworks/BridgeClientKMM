@@ -53,6 +53,7 @@ public struct HistoryView: View {
                     Text("Your completed activities will be shown here.", bundle: .module)
                         .font(DesignSystem.fontRules.headerFont(at: 2))
                         .foregroundColor(.textForeground)
+                        .padding(.horizontal, 24)
                 }
                 else {
                     header()

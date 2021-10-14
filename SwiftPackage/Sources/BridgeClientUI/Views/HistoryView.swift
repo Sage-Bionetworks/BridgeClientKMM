@@ -48,15 +48,24 @@ public struct HistoryView: View {
     public var body: some View {
         ScreenBackground {
             VStack(spacing: 21) {
-                header()
-                CustomScrollView {
-                    LazyVStack(spacing: 16) {
-                        ForEach(viewModel.records) { record in
-                            card(record)
+                if viewModel.minutes == 0 {
+                    heroImage()
+                    Text("Your completed activities will be shown here.", bundle: .module)
+                        .font(DesignSystem.fontRules.headerFont(at: 2))
+                        .foregroundColor(.textForeground)
+                        .padding(.horizontal, 24)
+                }
+                else {
+                    header()
+                    CustomScrollView {
+                        LazyVStack(spacing: 16) {
+                            ForEach(viewModel.records) { record in
+                                card(record)
+                            }
                         }
-                    }
-                    .padding(.bottom, 20)
-                }// end scrollview
+                        .padding(.bottom, 20)
+                    }// end scrollview
+                }
             }
         }
         .onAppear {
@@ -68,7 +77,7 @@ public struct HistoryView: View {
     private func header() -> some View {
         VStack(spacing: 10) {
             ZStack(alignment: .top) {
-                CompositeTintedImage("History.tinted", background: "History", bundle: .module)
+                heroImage()
                     .padding(.top, 12)
                 VStack(spacing: -6) {
                     Text("\(viewModel.minutes)")
@@ -86,6 +95,11 @@ public struct HistoryView: View {
                 .foregroundColor(.textForeground)
         }
         .padding(.top, 16)
+    }
+    
+    @ViewBuilder
+    private func heroImage() -> some View {
+        CompositeTintedImage("History.tinted", background: "History", bundle: .module)
     }
     
     @ViewBuilder

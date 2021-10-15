@@ -38,17 +38,18 @@ public struct StudyInfoView: View {
     @EnvironmentObject private var bridgeManager: SingleStudyAppManager
     @StateObject private var viewModel: StudyInfoViewModel = .init()
     
-    @State private var selectedTab: Tab = .about
+    @Binding private var selectedTab: Tab
     
-    public init() {
+    public init(_ selectedTab: Binding<Tab>) {
+        self._selectedTab = selectedTab
     }
     
-    enum Tab : String, CaseIterable, EnumTabItem {
+    public enum Tab : String, CaseIterable, EnumTabItem {
         case about, contact
         
-        var bundle: Bundle? { .module }
+        public var bundle: Bundle? { .module }
 
-        func title() -> Text {
+        public func title() -> Text {
             switch self {
             case .about:
                 return Text("ABOUT THE STUDY", bundle: .module)

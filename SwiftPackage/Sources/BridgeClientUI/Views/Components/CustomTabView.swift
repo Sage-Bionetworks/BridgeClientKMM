@@ -135,6 +135,9 @@ public struct CustomTabView<Tab : TabItem, Content : View>: View {
     // The size of the tab buttons
     private let buttonSize: CGFloat = 64
     
+    // Uses to allow for resizable text.
+    @State private var wordHeight: CGFloat = SizePreferenceKey.defaultValue
+    
     @ViewBuilder
     private func tabBar() -> some View {
         HStack(alignment: .bottom, spacing: 0) {
@@ -153,6 +156,7 @@ public struct CustomTabView<Tab : TabItem, Content : View>: View {
                 .frame(minWidth: 0, maxWidth: .infinity)
             }
         }
+        .onPreferenceChange(SizePreferenceKey.self, perform: { wordHeight = $0 })
         .background(backgroundColor().edgesIgnoringSafeArea(.all))
     }
     
@@ -183,7 +187,15 @@ public struct CustomTabView<Tab : TabItem, Content : View>: View {
                 titles[tab]!
                     .font(buttonFont[isSelected])
                     .foregroundColor(buttonColor[isSelected])
-                    .padding(.bottom, 12)
+                    .scaledToFit()
+                    .minimumScaleFactor(0.5)
+                    .lineLimit(1)
+                    .background(GeometryReader {
+                        Color.clear.preference(key: SizePreferenceKey.self, value: $0.size.height)
+                    })
+                    .frame(maxHeight: wordHeight)
+                    .padding(.top, 5)
+                    .padding(.bottom, 9)
             }
         }
         .accessibility(label: titles[tab]!)
@@ -193,6 +205,13 @@ public struct CustomTabView<Tab : TabItem, Content : View>: View {
     
     private func backgroundColor() -> Color {
         placement == .bottom ? .hexFDFDFD : .screenBackground
+    }
+}
+
+fileprivate struct SizePreferenceKey: PreferenceKey {
+    static var defaultValue: CGFloat = 28.0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = min(value, nextValue())
     }
 }
 

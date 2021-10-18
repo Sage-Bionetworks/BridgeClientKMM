@@ -45,7 +45,7 @@ open class StudyInfoViewModel : ObservableObject {
     @Published open var institutionName: String = ""
     @Published open var studyLogoUrl: String?
     @Published open var foregroundColor: Color = .textForeground
-    @Published open var backgroundColor: Color = .accentColor
+    @Published open var backgroundColor: Color = .clear
     @Published open var title: String = ""
     @Published open var details: String?
     @Published open var supportContacts: [StudyContact] = []

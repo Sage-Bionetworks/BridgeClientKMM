@@ -115,18 +115,8 @@ public struct AboutStudyView: View {
     
     @ViewBuilder
     private func aboutHeader() -> some View {
-        if let url = viewModel.studyLogoUrl {
-            LogoImage(url: url)
-                .background(viewModel.backgroundColor)
-        }
-        else {
-            Text(viewModel.institutionName.localizedUppercase)
-                .foregroundColor(viewModel.foregroundColor)
-                .padding(.vertical, 28)
-                .padding(.horizontal, horizontalPadding)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(viewModel.backgroundColor)
-        }
+        LogoImage(url: viewModel.studyLogoUrl)
+            .background(viewModel.backgroundColor)
     }
     
     @ViewBuilder

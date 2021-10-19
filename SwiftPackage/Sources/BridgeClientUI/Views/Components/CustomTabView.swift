@@ -135,8 +135,10 @@ public struct CustomTabView<Tab : TabItem, Content : View>: View {
     // The size of the tab buttons
     private let buttonSize: CGFloat = 64
     
-    // Uses to allow for resizable text.
-    @State private var wordHeight: CGFloat = SizePreferenceKey.defaultValue
+    // Used to set the allowed max height of all titles so that different length
+    // strings will all be at the same height.
+    // Modified from https://georgegarside.com/blog/ios/swiftui-equal-scaling-text-size-to-fit/
+    @State private var labelHeight: CGFloat = SizePreferenceKey.defaultValue
     
     @ViewBuilder
     private func tabBar() -> some View {
@@ -156,7 +158,7 @@ public struct CustomTabView<Tab : TabItem, Content : View>: View {
                 .frame(minWidth: 0, maxWidth: .infinity)
             }
         }
-        .onPreferenceChange(SizePreferenceKey.self, perform: { wordHeight = $0 })
+        .onPreferenceChange(SizePreferenceKey.self, perform: { labelHeight = $0 })
         .background(backgroundColor().edgesIgnoringSafeArea(.all))
     }
     
@@ -193,7 +195,7 @@ public struct CustomTabView<Tab : TabItem, Content : View>: View {
                     .background(GeometryReader {
                         Color.clear.preference(key: SizePreferenceKey.self, value: $0.size.height)
                     })
-                    .frame(maxHeight: wordHeight)
+                    .frame(maxHeight: labelHeight)
                     .padding(.top, 5)
                     .padding(.bottom, 9)
             }

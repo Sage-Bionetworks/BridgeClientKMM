@@ -52,16 +52,13 @@ public struct EndOfStudyView: View {
     public init() {}
     
     public var body: some View {
-        ScreenBackground(content: message)
-    }
-    
-    @ViewBuilder
-    private func message() -> some View {
-        if bridgeManager.isUploadingResults {
-            waitMessage
-        }
-        else {
-            allDoneMessage
+        ScreenBackground {
+            if bridgeManager.isUploadingResults {
+                waitMessage
+            }
+            else {
+                allDoneMessage
+            }
         }
     }
 }

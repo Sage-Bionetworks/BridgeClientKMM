@@ -44,6 +44,7 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
     @Published open var today: Date = Date()
     @Published open var studyId: String?
     @Published open var sessions: [TodayTimelineSession] = []
+    @Published open var isLoading: Bool = true
     
     /// A flag that can be used to set whether or not a view is presenting the assessment. How the assessment is
     /// presented is up to the views built specifically for a given application.
@@ -60,6 +61,7 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
             
     private var schedules: [NativeScheduledSessionWindow] = [] {
         didSet {
+            self.isLoading = false
             let newSessions: [TodayTimelineSession] = schedules.map { schedule in
                 guard let existingSession = self.sessions.first(where: { $0.instanceGuid == schedule.instanceGuid })
                 else {

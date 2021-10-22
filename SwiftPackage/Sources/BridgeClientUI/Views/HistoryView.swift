@@ -52,6 +52,7 @@ public struct HistoryView: View {
                     heroImage()
                     Text("Your completed activities will be shown here.", bundle: .module)
                         .font(DesignSystem.fontRules.headerFont(at: 2))
+                        .multilineTextAlignment(.center)
                         .foregroundColor(.textForeground)
                         .padding(.horizontal, 24)
                 }

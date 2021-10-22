@@ -77,7 +77,7 @@ class MockDownloadTask: URLSessionDownloadTask {
             let (fileUrl, error) = session.downloadFileUrlAndError(for: request)
             session.remove(mockTask: self)
             guard let fileUrl = fileUrl else {
-                debugPrint("TEST SETUP ERROR: No download file URL provided for mock download task request: \(self.request.url)")
+                debugPrint("TEST SETUP ERROR: No download file URL provided for mock download task request: \(String(describing: self.request.url))")
                 return
             }
             (session.delegate as? URLSessionDownloadDelegate)?.urlSession(self.session, downloadTask: self, didFinishDownloadingTo: fileUrl)

@@ -63,11 +63,12 @@ final class LocalNotificationManagerTests: XCTestCase {
         var repeatIntervalA = DateComponents()
         repeatIntervalA.day = 1
         self.scheduleA = NativeScheduledNotification(instanceGuid: "scheduleA",
-                                                    scheduleOn: calendar.dateComponents(dateTime, from: scheduleOnA),
-                                                    repeatInterval: repeatIntervalA,
-                                                    repeatUntil: calendar.dateComponents(dateTime, from: repeatUntilA),
-                                                    allowSnooze: false,
-                                                    message: .init(subject: "Schedule A", message: "Do schedule A", lang: nil, type: nil))
+                                                     scheduleOn: calendar.dateComponents(dateTime, from: scheduleOnA),
+                                                     repeatInterval: repeatIntervalA,
+                                                     repeatUntil: calendar.dateComponents(dateTime, from: repeatUntilA),
+                                                     allowSnooze: false,
+                                                     message: .init(subject: "Schedule A", message: "Do schedule A", lang: nil, type: nil),
+                                                     isTimeSensitive: false)
         
         // Schedule B starts in an hour. Repeats once a week for ~2 years.
         self.scheduleOnB = now.addingTimeInterval(60*60)
@@ -75,11 +76,12 @@ final class LocalNotificationManagerTests: XCTestCase {
         var repeatIntervalB = DateComponents()
         repeatIntervalB.day = 7
         self.scheduleB = NativeScheduledNotification(instanceGuid: "scheduleB",
-                                                    scheduleOn: calendar.dateComponents(dateTime, from: scheduleOnB),
-                                                    repeatInterval: repeatIntervalB,
-                                                    repeatUntil: calendar.dateComponents(dateTime, from: repeatUntilB),
-                                                    allowSnooze: true,
-                                                    message: .init(subject: "Schedule B", message: "Do schedule B", lang: nil, type: nil))
+                                                     scheduleOn: calendar.dateComponents(dateTime, from: scheduleOnB),
+                                                     repeatInterval: repeatIntervalB,
+                                                     repeatUntil: calendar.dateComponents(dateTime, from: repeatUntilB),
+                                                     allowSnooze: true,
+                                                     message: .init(subject: "Schedule B", message: "Do schedule B", lang: nil, type: nil),
+                                                     isTimeSensitive: false)
     }
     
     func testBuildRequests_ScheduleB() {

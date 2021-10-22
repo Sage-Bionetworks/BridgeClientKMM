@@ -12,9 +12,9 @@ jobs:
     steps:
     - name: Repository checkout
       uses: actions/checkout@v2
-    - name: Force Xcode 12.5
-      run: sudo xcode-select -switch /Applications/Xcode_12.5.app
+    - name: Force Xcode 13.0
+      run: sudo xcode-select -switch /Applications/Xcode_13.0.app
     - name: Build for iOS
-      run: set -o pipefail && env NSUnbufferedIO=YES xcodebuild build-for-testing -scheme BridgeClient -destination "platform=iOS Simulator,OS=14.5,name=iPhone 12" | xcpretty
+      run: set -o pipefail && env NSUnbufferedIO=YES xcodebuild build-for-testing -scheme BridgeClient -destination "platform=iOS Simulator,OS=15.0,name=iPhone 12" | xcpretty
     - name: Run iOS tests
-      run: set -o pipefail && env NSUnbufferedIO=YES xcodebuild test-without-building -scheme BridgeClient -destination "platform=iOS Simulator,OS=14.5,name=iPhone 12" | xcpretty
+      run: set -o pipefail && env NSUnbufferedIO=YES xcodebuild test-without-building -scheme BridgeClient -destination "platform=iOS Simulator,OS=15.0,name=iPhone 12" | xcpretty

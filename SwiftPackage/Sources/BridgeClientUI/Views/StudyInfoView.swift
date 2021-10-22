@@ -61,17 +61,18 @@ public struct StudyInfoView: View {
     
     public var body: some View {
         CustomTabView(selectedTab: $selectedTab, tabs: Tab.allCases, placement: .top) { tab in
-            ScrollView {
-                switch tab {
-                case .about:
-                    AboutStudyView()
-                case .contact:
-                    ContactAndSupportView()
+            ScreenBackground {
+                ScrollView {
+                    switch tab {
+                    case .about:
+                        AboutStudyView()
+                    case .contact:
+                        ContactAndSupportView()
+                    }
                 }
             }
         }
         .environmentObject(viewModel)
-        .background(Color.screenBackground.edgesIgnoringSafeArea(.all))
         .onAppear {
             viewModel.onAppear(bridgeManager)
         }
@@ -115,8 +116,13 @@ public struct AboutStudyView: View {
     
     @ViewBuilder
     private func aboutHeader() -> some View {
-        LogoImage(url: viewModel.studyLogoUrl)
-            .background(viewModel.backgroundColor)
+        if let url = viewModel.studyLogoUrl {
+            LogoImage(url: url)
+                .background(viewModel.backgroundColor)
+        }
+        else {
+            EmptyView()
+        }
     }
     
     @ViewBuilder
@@ -154,16 +160,17 @@ public struct AboutStudyView: View {
         .padding(.horizontal, horizontalPadding)
         .padding(.bottom, 32)
         .fullScreenCover(isPresented: $isPresentingPrivacyNotice) {
-            VStack(alignment: .leading, spacing: 0) {
-                Button(action: hidePrivacyNotice) {
-                    Label("Back", systemImage: "arrow.left", bundle: .module)
-                        .font(DesignSystem.fontRules.headerFont(at: 6))
-                        .foregroundColor(.textForeground)
-                        .padding(.horizontal, 16)
+            ScreenBackground {
+                VStack(alignment: .leading, spacing: 0) {
+                    Button(action: hidePrivacyNotice) {
+                        Label("Back", systemImage: "arrow.left", bundle: .module)
+                            .font(DesignSystem.fontRules.headerFont(at: 6))
+                            .foregroundColor(.textForeground)
+                            .padding(.horizontal, 16)
+                    }
+                    PrivacyNoticeView(selectedTab: $privacyNoticeTab)
                 }
-                PrivacyNoticeView(selectedTab: $privacyNoticeTab)
             }
-            .background(Color.screenBackground.edgesIgnoringSafeArea(.top))
         }
     }
     

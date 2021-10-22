@@ -49,31 +49,32 @@ public struct PrivacyNoticeView: View {
     let bodyFont = DesignSystem.fontRules.bodyFont(at: 1, isEmphasis: false)
     
     public var body: some View {
-        VStack(spacing: 0) {
-            header()
-            tabBar()
-            
-            ScrollView {
-                LazyVStack(spacing: 32) {
-                    let notices = privacyNotice.notices.filter { $0.category == selectedTab }
-                    ForEach(notices) { notice in
-                        HStack(spacing: 24) {
-                            Image(decorative: notice.icon, bundle: .module)
-                                .frame(width: 48, height: 48)
-                            Text(notice.text)
-                                .font(bodyFont)
-                                .foregroundColor(.textForeground)
-                                .frame(maxWidth: .infinity, alignment: .leading)
+        ScreenBackground {
+            VStack(spacing: 0) {
+                header()
+                tabBar()
+                
+                ScrollView {
+                    LazyVStack(spacing: 32) {
+                        let notices = privacyNotice.notices.filter { $0.category == selectedTab }
+                        ForEach(notices) { notice in
+                            HStack(spacing: 24) {
+                                Image(decorative: notice.icon, bundle: .module)
+                                    .frame(width: 48, height: 48)
+                                Text(notice.text)
+                                    .font(bodyFont)
+                                    .foregroundColor(.textForeground)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
                         }
+                        fullPolicyButton()
                     }
-                    fullPolicyButton()
+                    .padding(.vertical, 32)
+                    .padding(.horizontal, 42)
                 }
-                .padding(.vertical, 32)
-                .padding(.horizontal, 42)
+                .background(Color.sageWhite.edgesIgnoringSafeArea(.all))
             }
-            .background(Color.sageWhite.edgesIgnoringSafeArea(.bottom))
         }
-        .background(Color.screenBackground.edgesIgnoringSafeArea(.all))
         .onAppear {
             if let notice = bridgeManager.appConfig?.decodePrivacyNotice() {
                 privacyNotice = notice

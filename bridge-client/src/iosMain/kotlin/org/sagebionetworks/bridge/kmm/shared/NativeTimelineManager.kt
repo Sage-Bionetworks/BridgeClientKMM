@@ -121,6 +121,7 @@ internal fun ScheduledNotification.toNative()  =
         repeatUntil = repeatUntil?.toNSDateComponents(),
         allowSnooze = allowSnooze,
         message = message,
+        isTimeSensitive = isTimeSensitive,
     )
 
 data class NativeScheduledSessionTimelineSlice (
@@ -167,5 +168,6 @@ data class NativeScheduledNotification(
     val repeatUntil: NSDateComponents?,
     val allowSnooze: Boolean,
     val message: NotificationMessage?,
+    val isTimeSensitive: Boolean,
 )
 

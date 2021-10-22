@@ -409,7 +409,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
 
         // Convert notifications
         val notifications = session.notifications?.mapNotNull {
-            it.scheduleAt(scheduledSession.instanceGuid, instantInDay, startDateTime, endDateTime)
+            it.scheduleAt(scheduledSession.instanceGuid, instantInDay, startDateTime, endDateTime, scheduledSession.expiration.days == 0)
         }
         // Exit early if this is only getting future notifications and there aren't any.
         if (notifications.isNullOrEmpty() &&
@@ -457,6 +457,7 @@ internal fun NotificationInfo.scheduleAt(instanceGuid: String,
                                          instantInDay: Instant,
                                          startDateTime: LocalDateTime,
                                          endDateTime: LocalDateTime,
+                                         isTimeSensitive: Boolean,
 ): ScheduledNotification? {
 
     // Get the first notification trigger
@@ -486,7 +487,8 @@ internal fun NotificationInfo.scheduleAt(instanceGuid: String,
         intervalPeriod,
         if (intervalPeriod ==null) null else lastInstant.toLocalDateTime(timeZone),
         allowSnooze ?: false,
-        message
+        message,
+        isTimeSensitive
     )
 }
 
@@ -561,6 +563,7 @@ data class ScheduledNotification(
     val repeatUntil: LocalDateTime?,
     val allowSnooze: Boolean,
     val message: NotificationMessage?,
+    val isTimeSensitive: Boolean = false,
 )
 
 data class AssessmentHistoryRecord (

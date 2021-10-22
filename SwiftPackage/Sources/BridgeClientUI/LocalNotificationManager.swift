@@ -102,6 +102,9 @@ open class LocalNotificationManager : NSObject, UNUserNotificationCenterDelegate
             content.title = message.subject
             content.body = message.message
         }
+        if #available(iOS 15.0, *) {
+            content.interruptionLevel = notification.isTimeSensitive ? .timeSensitive : .active
+        }
         content.userInfo = [kAllowSnoozeKey : notification.allowSnooze]
         return content
     }

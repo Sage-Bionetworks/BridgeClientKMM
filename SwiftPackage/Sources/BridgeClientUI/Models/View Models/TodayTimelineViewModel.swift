@@ -41,9 +41,14 @@ import JsonModel
 ///
 open class TodayTimelineViewModel : NSObject, ObservableObject {
     
+    /// Current date. This is updated to match the date used in calculating timelines when the timeline is updated.
     @Published open var today: Date = Date()
+    /// The identifier of the study that is associated with this timeline.
     @Published open var studyId: String?
+    /// The list of sessions for "today" and "next day". An update is triggered by the app entering the foreground
+    /// *or* a session changing state.
     @Published open var sessions: [TodayTimelineSession] = []
+    /// Is the session state loading?
     @Published open var isLoading: Bool = true
     
     /// A flag that can be used to set whether or not a view is presenting the assessment. How the assessment is
@@ -74,6 +79,9 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
         }
     }
     
+    /// Today timelines use a one-to-one mapping to a single study and are not designed to support participants who
+    /// are in more than one study. As such, this connects to an instance (or subclass) of a `SingleStudyAppManager`.
+    /// The view that uses this model must hook up the manager - typically by calling `onAppear()`.
     public private(set) var bridgeManager: SingleStudyAppManager!
     
     private var timelineManager: NativeTimelineManager! {
@@ -220,7 +228,7 @@ public final class TodayTimelineSession : ObservableObject, Identifiable {
     public final let instanceGuid: String
     
     /// The Kotlin Native session window information that backs this object.
-    fileprivate var window: NativeScheduledSessionWindow {
+    fileprivate var window: BridgeClient.NativeScheduledSessionWindow {
         didSet {
             let newAssessments: [TodayTimelineAssessment] = window.assessments.map { nativeAssessment in
                 guard let existingAssessment = self.assessments.first(where: { $0.instanceGuid == nativeAssessment.instanceGuid })
@@ -231,10 +239,12 @@ public final class TodayTimelineSession : ObservableObject, Identifiable {
                 return existingAssessment
             }
             self.assessments = newAssessments
-            updateState()
+            _updateStateOnMainThread()
         }
     }
     
+    // WARNING: Do not expose publicly. This property is *not* threadsafe and
+    // must only be called on the main thread. - syoung 10/25/2021
     var sessionInfo: BridgeClient.SessionInfo {
         window.sessionInfo
     }
@@ -263,16 +273,29 @@ public final class TodayTimelineSession : ObservableObject, Identifiable {
     /// A timer that is fired when this session is going to change state based on the current time.
     private var updateTimer: Timer?
     
-    init(_ window: NativeScheduledSessionWindow) {
+    // WARNING: Do not expose publicly. This initializer is *not* threadsafe and
+    // must only be called on the main thread. - syoung 10/25/2021
+    init(_ window: BridgeClient.NativeScheduledSessionWindow) {
         self.instanceGuid = window.instanceGuid
         self.persistent = window.persistent
         self.window = window
         self.assessments = window.assessments.map { TodayTimelineAssessment($0) }
-        self.updateState()
+        self._updateStateOnMainThread()
     }
     
     /// Update the session ``state``.
     public func updateState(_ now: Date = Date()) {
+        if Thread.isMainThread {
+            _updateStateOnMainThread(now)
+        }
+        else {
+            DispatchQueue.main.async {
+                self._updateStateOnMainThread(now)
+            }
+        }
+    }
+    
+    private func _updateStateOnMainThread(_ now: Date = Date()) {
         
         // Determine availability.
         let availableNow = window.availableNow(now)
@@ -322,7 +345,6 @@ public final class TodayTimelineSession : ObservableObject, Identifiable {
     
     /// The timer is used to update the session state when it's going to change due to a date-time trigger.
     private func setupTimer(_ now: Date) {
-        // Set up a timer to update the
         updateTimer?.invalidate()
         if self.state == .availableNow, window.endDateTime != .distantFuture {
             let timeInterval = window.endDateTime.timeIntervalSince(now) + 1
@@ -360,10 +382,13 @@ public final class TodayTimelineAssessment : ObservableObject, Identifiable {
         }
     }
     
-    public var assessmentInfo: BridgeClient.AssessmentInfo {
+    // WARNING: Do not expose publicly. This property is *not* threadsafe and
+    // must only be called on the main thread. - syoung 10/25/2021
+    var assessmentInfo: BridgeClient.AssessmentInfo {
         assessment.assessmentInfo
     }
     
+    /// The thread-safe information needed to access and update scheduled assessments.
     public fileprivate(set) var assessmentScheduleInfo: AssessmentScheduleInfo!
     
     /// Is the assessment enabled?
@@ -382,6 +407,8 @@ public final class TodayTimelineAssessment : ObservableObject, Identifiable {
     /// When was it finished?
     @Published public var finishedOn: Date?
     
+    // WARNING: Do not expose publicly. This initializer is *not* threadsafe and
+    // must only be called on the main thread. - syoung 10/25/2021
     init(_ assessment: NativeScheduledAssessment, isEnabled: Bool = true) {
         self.instanceGuid = assessment.instanceGuid
         self.assessment = assessment

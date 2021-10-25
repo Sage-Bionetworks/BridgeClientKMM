@@ -62,7 +62,7 @@ public struct TodayView: View {
                                     }
                                 }// Section state
                             }
-                            else if state == .availableNow {
+                            else if state == .availableNow, !viewModel.isLoading {
                                 ZStack {
                                     Image(decorative: "available_complete", bundle: .module)
                                     Text("nice, you’re all up to date!", bundle: .module)

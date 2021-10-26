@@ -242,7 +242,7 @@ extension AnyTransition {
 // for this element is in iosApp.
 struct TodayScheduleView_Previews: PreviewProvider {
     static var previews: some View {
-        Text("Hello, World")
+        Text("Hello, World!")
     }
 }
 

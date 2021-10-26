@@ -34,6 +34,8 @@ import SwiftUI
 import BridgeClient
 import JsonModel
 
+/// The view model that backs a `HistoryView` and wraps `BridgeClient.NativeAdherenceRecord`
+/// objects to create threadsafe objects that can be used to build views.
 open class HistoryViewModel : NSObject, ObservableObject {
     
     /// The sum of all the minutes spent on the performed assessments.

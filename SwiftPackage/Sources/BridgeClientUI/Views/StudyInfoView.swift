@@ -184,7 +184,6 @@ public struct AboutStudyView: View {
 }
 
 public struct ContactAndSupportView: View {
-    @EnvironmentObject private var bridgeManager: SingleStudyAppManager
     @EnvironmentObject private var viewModel: StudyInfoViewModel
         
     public var body: some View {
@@ -306,12 +305,12 @@ public struct ContactAndSupportView: View {
         VStack(alignment: .leading, spacing: 16) {
             if let phone = viewModel.participantPhone {
                 withdrawalHeader(Text("To withdraw from this study, you’ll need the Study ID and the phone number you registered with:", bundle: .module))
-                withdrawalRow(Text("Study ID: ", bundle: .module), bridgeManager.studyId!)
+                withdrawalRow(Text("Study ID: ", bundle: .module), viewModel.studyId)
                 withdrawalRow(Text("Registration Phone Number: ", bundle: .module), phone.nationalFormat ?? phone.number)
             }
             else {
                 withdrawalHeader(Text("To withdraw from this study, you’ll need the following info:", bundle: .module))
-                withdrawalRow(Text("Study ID: ", bundle: .module), bridgeManager.studyId!)
+                withdrawalRow(Text("Study ID: ", bundle: .module), viewModel.studyId)
                 withdrawalRow(Text("Participant ID: ", bundle: .module), viewModel.participantId ?? "")
             }
         }
@@ -345,6 +344,6 @@ extension CharacterSet {
 // for this element is in iosApp.
 struct StudyInfoView_Previews: PreviewProvider {
     static var previews: some View {
-        Text("Hello, World")
+        Text("Hello, World!")
     }
 }

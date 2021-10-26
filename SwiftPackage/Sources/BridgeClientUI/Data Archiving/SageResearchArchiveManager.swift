@@ -35,24 +35,36 @@ import Research
 import JsonModel
 import BridgeClient
 
+/// Base-class implementation of archiving results from a ``Research.RSDTaskState`` run.
+/// Typically, this is used for active assessments, but can be used for any data collected using the
+/// SageResearch libraries.
 open class SageResearchArchiveManager : NSObject, RSDDataArchiveManager {
     
+    /// Pointer to the app manager singleton for this application.
     public var bridgeManager: BridgeClientAppManager!
     
     private var _defaultTaskToSchemaMapping: [String : String]?
     private var _appConfigTaskToSchemaMapping: [String : String]?
     
+    /// Set up the archive manager by attaching the ``BridgeClientAppManager`` singleton to it.
+    ///
+    /// - Parameters:
+    ///   - bridgeManager: The app manager singleton for this application
+    ///   - taskToSchemaMapping: The mapping to use for mapping which results to include in a single archive.
     open func load(bridgeManager: BridgeClientAppManager, taskToSchemaMapping: [String : String]? = nil) {
         self.bridgeManager = bridgeManager
         self._defaultTaskToSchemaMapping = taskToSchemaMapping
         self._appConfigTaskToSchemaMapping = bridgeManager.appConfig?.taskToSchemaMapping()
     }
     
+    /// Get the ```RSDSchemaInfo`` associated with this task result.
     open func schemaReference(for taskResult: RSDTaskResult) -> RSDSchemaInfo? {
         _schemaReference(taskResult)
     }
     
     private func _schemaReference(_ taskResult: RSDTaskResult) -> RSDSchemaInfo? {
+        // Because this accesses the ``BridgeClient.AppConfig``, it must be processed
+        // on the main thread. Kotlin classes are not threadsafe.
         return processResultOnMainThread() {
             let schemaIdentifier =
                 self._appConfigTaskToSchemaMapping?[taskResult.identifier] ??
@@ -75,12 +87,16 @@ open class SageResearchArchiveManager : NSObject, RSDDataArchiveManager {
         }
     }
     
+    /// Get the data groups associated with this user.
     public final func dataGroups() -> [String]? {
+        // Because this accesses the ``BridgeClient.UserSessionInfo``, it must be processed
+        // on the main thread. Kotlin classes are not threadsafe.
         return processResultOnMainThread() {
             bridgeManager.userSessionInfo?.dataGroups
         }
     }
         
+    /// Get the schedule info associated with the given task result.
     open func schedule(for taskResult: RSDTaskResult) -> AssessmentScheduleInfo? {
         guard let taskRunUUID = (taskResult as? AssessmentResult)?.taskRunUUID else { return nil }
         var found: AssessmentScheduleInfo?
@@ -246,19 +262,41 @@ extension AppConfig {
     }
 }
 
+/// Depending upon the needs of the researchers using this application, a collection of assessments may be
+/// presented to the participant as a single "task" that then needs to be split into different archives for
+/// post-processing. This structure of having a manager for the state object and a separate class for holding
+/// the archive data is intended to allow for that scenario.
 open class SageResearchResultArchive : AbstractResultArchive, RSDDataArchive {
     
     /// Hold the task result (if any) used to create the archive.
     internal var taskResult: RSDTaskResult?
     
+    /// Whether or not the archive should include "reserved" files that are collated separately from the
+    /// default behavoir of iteratively looking through the result for objects that support the ``RSDArchivable``
+    /// protocol.
+    /// - Parameter filename: The enum for the reserved file name.
+    /// - Returns: Whether or not the file should be added. (Default == true)
     open func shouldInsertData(for filename: RSDReservedFilename) -> Bool {
         true
     }
     
+    /// The archivable object to use to process the given result.
+    ///
+    /// - Parameters:
+    ///   - result: The result to process.
+    ///   - sectionIdentifier: The section identifier for result within the assessment.
+    ///   - stepPath: The step path for the result within the assessment
+    /// - Returns: The archivable or `nil` if the result is ignored.
     open func archivableData(for result: ResultData, sectionIdentifier: String?, stepPath: String?) -> RSDArchivable? {
         result as? RSDArchivable
     }
     
+    
+    /// Insert the data into the archive.
+    ///
+    /// - Parameters:
+    ///   - data: The data to be added to the archive.
+    ///   - manifest: The file manifest for this data.
     open func insertDataIntoArchive(_ data: Data, manifest: RSDFileManifest) throws {
         let filename = manifest.filename
         let fileKey = (filename as NSString).deletingPathExtension
@@ -275,6 +313,7 @@ open class SageResearchResultArchive : AbstractResultArchive, RSDDataArchive {
     }
 }
 
+/// A convenience method for ensuring that a given result is processed on the main thread.
 func processResultOnMainThread<T>(_ process: () -> T?) -> T? {
     var ret: T? = nil
     if Thread.isMainThread {

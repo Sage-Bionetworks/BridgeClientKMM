@@ -34,14 +34,19 @@ import SwiftUI
 import SharedMobileUI
 import BridgeClient
 
+/// This is a wrapper object used to take information from the ``BridgeClient.Study`` model and convert
+/// the values to those that match the design requirements for ``StudyInfoView``.
 open class StudyInfoViewModel : ObservableObject {
     
-    @Published open var study: Study! {
+    @Published open var study: BridgeClient.Study! {
         didSet {
             updateInfo()
         }
     }
     
+    // MARK: Properties of the `Study`
+    
+    @Published open var studyId: String = ""
     @Published open var institutionName: String = ""
     @Published open var studyLogoUrl: String?
     @Published open var foregroundColor: Color = .textForeground
@@ -51,6 +56,8 @@ open class StudyInfoViewModel : ObservableObject {
     @Published open var supportContacts: [StudyContact] = []
     @Published open var irbContacts: [StudyContact] = []
     @Published open var studyContacts: [StudyContact] = []
+    
+    // MARK: Properties of the `UserSessionInfo`
     
     @Published open var participantPhone: Phone?
     @Published open var participantId: String?
@@ -77,6 +84,7 @@ open class StudyInfoViewModel : ObservableObject {
     }
     
     open func updateInfo() {
+        self.studyId = study.identifier
         self.title = study.name
         self.details = study.details
         self.studyLogoUrl = study.studyLogoUrl
@@ -117,32 +125,65 @@ open class StudyInfoViewModel : ObservableObject {
         
         self.institutionName = firstContact.affiliation!
         self.studyContacts = studyContacts.map { StudyContact($0) }
-        self.studyContacts.insert(StudyContact(name: self.institutionName, position: Text("Institution")), at: 1)
+        self.studyContacts.insert(StudyContact(name: self.institutionName, role: .institution), at: 1)
     }
 }
 
-public struct StudyContact : Identifiable {
-    public var id: String { "\(name)|\(position)" }
+public struct StudyContact : Hashable, Identifiable {
+    public var id: Int { self.hashValue }
     public let name: String
-    public let position: Text
     public let phone: String?
     public let email: String?
     public let isIRB: Bool
     
-    public init(_ contact: BridgeClient.Contact) {
+    public var position: Text {
+        if let value = self.positionValue {
+            return Text(value)
+        }
+        switch role {
+        case .institution:
+            return Text("Institution", bundle: .module)
+        case .investigator:
+            return Text("Investigator", bundle: .module)
+        case .irb:
+            return Text("Investigator", bundle: .module)
+        case .principalInvestigator:
+            return Text("Principal Investigator", bundle: .module)
+        case .sponsor:
+            return Text("Funder", bundle: .module)
+        case .support:
+            return Text("Study Support", bundle: .module)
+        }
+    }
+    private let role: Role
+    private let positionValue: String?
+    
+    enum Role : String {
+        case investigator
+        case irb
+        case principalInvestigator
+        case sponsor
+        case support
+        case institution
+    }
+    
+    // WARNING: Do not expose publicly. This initializer is *not* threadsafe and
+    // must only be called on the main thread. - syoung 10/25/2021
+    init(_ contact: BridgeClient.Contact) {
         self.name = contact.name
-        self.position = contact.position.map { Text($0) } ?? {
+        self.positionValue = contact.position
+        self.role =  {
             switch contact.role {
             case .investigator:
-                return Text("Investigator")
+                return .investigator
             case .irb:
-                return Text("IRB/Ethics Board of Record")
+                return .irb
             case .principalInvestigator:
-                return Text("Principal Investigator")
+                return .principalInvestigator
             case .sponsor:
-                return Text("Funder")
+                return .sponsor
             default:
-                return Text("Study Support")
+                return .support
             }
         }()
         self.email = contact.email
@@ -150,12 +191,13 @@ public struct StudyContact : Identifiable {
         self.isIRB = (contact.role == .irb)
     }
     
-    public init(name: String, position: Text, phone: String? = nil, email: String? = nil, isIRB: Bool = false) {
+    init(name: String, role: Role, phone: String? = nil, email: String? = nil, isIRB: Bool = false) {
         self.name = name
-        self.position = position
+        self.role = role
         self.email = email
         self.phone = phone
         self.isIRB = isIRB
+        self.positionValue = nil
     }
 }
 

@@ -205,7 +205,7 @@ struct DocumentPreview: UIViewControllerRepresentable {
 // for this element is in iosApp.
 struct PrivacyNoticeView_Previews: PreviewProvider {
     static var previews: some View {
-        Text("Hello, World")
+        Text("Hello, World!")
     }
 }
 

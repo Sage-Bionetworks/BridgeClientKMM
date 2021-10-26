@@ -165,7 +165,7 @@ extension DateFormatter {
 // for this element is in iosApp.
 struct HistoryView_Previews: PreviewProvider {
     static var previews: some View {
-        Text("Hello, World")
+        Text("Hello, World!")
     }
 }
  

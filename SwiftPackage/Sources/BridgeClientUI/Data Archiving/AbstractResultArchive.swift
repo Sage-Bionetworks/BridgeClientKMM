@@ -42,6 +42,7 @@ fileprivate let kScheduledOnKey                   = "scheduledOn"
 fileprivate let kScheduledActivityLabelKey        = "activityLabel"
 fileprivate let kDataGroups                       = "dataGroups"
 
+/// An abstract class for archiving result data.
 open class AbstractResultArchive : DataArchive {
     
     /// The schedule used to start this task (if any).

@@ -36,18 +36,27 @@ import BridgeClient
 
 extension Date {
     
+    /// Convenience method for returning the "start" of the day (ie, midnight).
+    ///
+    /// - Returns: The start of the day using the current  calendar.
     public func startOfDay() -> Date {
         Calendar.current.startOfDay(for: self)
     }
     
+    /// Is this date "today"?
     public var isToday: Bool {
         Calendar.current.isDateInToday(self)
     }
     
+    /// Is this date "tomorrow"?
     public var isTomorrow: Bool {
         Calendar.current.isDateInTomorrow(self)
     }
     
+    /// This date localized using the participants preferred locale.
+    ///
+    /// - Parameter hasTimeOfDay: Whether or not the time of day should be included.
+    /// - Returns: Localized formatted string for the date.
     public func localizeDate(hasTimeOfDay: Bool) -> String {
         if !hasTimeOfDay {
             return DateFormatter.localizedString(from: self, dateStyle: .medium, timeStyle: .none)
@@ -60,7 +69,6 @@ extension Date {
             return DateFormatter.localizedString(from: self, dateStyle: .medium, timeStyle: .short)
         }
     }
-    
 }
 
 extension Kotlinx_datetimeInstant {

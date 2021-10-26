@@ -34,13 +34,32 @@ import SwiftUI
 import BridgeClient
 import SharedMobileUI
 
+/// A protocol for mapping the display information about an assessment.
 public protocol AssessmentInfoExtension {
+    /// The **Bridge 2.0** assessment identifier. (Not to be confused with the "task identifier" used in
+    /// mappings of BridgeSDK/BridgeApp "legacy" assessments.)
     var assessmentIdentifier: String { get }
+    
+    /// The title of the assessment.
     func title() -> Text
+    
+    /// The icon to use when displaying an `AssessmentTimelineCardView`.
+    ///
+    /// - Note: This is different from the smaller icon used for displaying BridgeSDK/BridgeApp
+    /// lists of tasks.
     func icon() -> Image
+    
+    /// The color to use when displaying an `AssessmentTimelineCardView`.
     func color() -> Color
 }
 
+/// The `AssessmentInfoMap` is an environmental variable that is used to allow shared views
+/// to know about the `Color`, `Text`, and `Image` to use for a given assessment while
+/// allowing those values to be set at the app level. Since this framework does not directly link in
+/// any assessment libraries, the app has the responsibility for setting up those mappings.
+///
+/// - Note: This struct uses `BridgeClient.AssessmentInfo` in it's mapping and its
+/// functions should only ever be called from the main thread.
 public struct AssessmentInfoMap {
     private let mappings: [String : Mapping]
     
@@ -65,15 +84,18 @@ public struct AssessmentInfoMap {
         }
     }
     
-    public func title(for info: AssessmentInfo) -> Text {
+    /// The mapped title for a given assessment.
+    public func title(for info: BridgeClient.AssessmentInfo) -> Text {
         info.label.map { Text(LocalizedStringKey($0)) } ?? mappings[info.assessmentId]?.title ?? Text(info.assessmentId)
     }
     
-    public func icon(for info: AssessmentInfo) -> Image {
+    /// The mapped icon to use for a given assessment when displaying an `AssessmentTimelineCardView`.
+    public func icon(for info: BridgeClient.AssessmentInfo) -> Image {
         mappings[info.assessmentId]?.icon ?? Image(info.assessmentId, bundle: Bundle.main, label: title(for: info))
     }
     
-    public func color(for info: AssessmentInfo) -> Color {
+    /// The mapped color to use for a given assessment when displaying an `AssessmentTimelineCardView`.
+    public func color(for info: BridgeClient.AssessmentInfo) -> Color {
         if let hexString = info.colorScheme?.foreground,
            let color = Color.init(hex: hexString) {
             return color
@@ -83,13 +105,14 @@ public struct AssessmentInfoMap {
         }
     }
     
-    public func estimatedTime(for info: AssessmentInfo) -> Text {
+    /// The estimated time required to perform the assessment.
+    public func estimatedTime(for info: BridgeClient.AssessmentInfo) -> Text {
         let duration: TimeInterval = Double(truncating: info.minutesToComplete ?? 3) * 60
         return Text(durationFormatter.string(from: duration) ?? "")
     }
 }
 
-extension AssessmentInfo {
+extension BridgeClient.AssessmentInfo {
     fileprivate var assessmentId: String { identifier ?? "" }
 }
 

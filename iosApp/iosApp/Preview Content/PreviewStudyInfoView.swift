@@ -35,8 +35,9 @@ import BridgeClient
 import BridgeClientUI
 
 struct PreviewStudyInfoView: View {
+    @State var selectedTab: StudyInfoView.Tab = .about
     var body: some View {
-        StudyInfoView()
+        StudyInfoView($selectedTab)
             .environmentObject(SingleStudyAppManager(appId: kPreviewStudyId))
     }
 }

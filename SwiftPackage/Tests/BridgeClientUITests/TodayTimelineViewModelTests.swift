@@ -176,7 +176,6 @@ extension NativeScheduledSessionWindow {
               assessments: assessments,
               sessionInfo: SessionInfo(guid: guid,
                                        label: "Some Activities",
-                                       startEventId: "foo",
                                        performanceOrder: performanceOrder,
                                        timeWindowGuids: nil,
                                        minutesToComplete: nil,

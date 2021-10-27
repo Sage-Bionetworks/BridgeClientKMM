@@ -39,18 +39,64 @@ fileprivate let kOnboardingStateKey = "isOnboardingFinished"
 
 public let kPreviewStudyId = "xcode_preview"
 
+/// This class is intended to be used as the `BridgeClient` app singleton. It manages login, app state,
+/// app configuration, user configuration, notifications, and uploading files to Bridge services. It is intended
+/// to be used in conjunction with a `UIApplicationDelegate` to handle start up and background
+/// uploading.
+///
+/// At a minimum, the app must implement the following methods in the app delegate:
+/// ```
+/// class AppDelegate: UIResponder, UIApplicationDelegate {
+///     let bridgeManager = BridgeClientAppManager(appId: PrivateKeys.shared.appId, pemPath: PrivateKeys.shared.pemPath)
+///
+///     func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]?) -> Bool {
+///         bridgeManager.appWillFinishLaunching(launchOptions)
+///         return super.application(application, willFinishLaunchingWithOptions: launchOptions)
+///     }
+///
+///     func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String,
+///        completionHandler: @escaping () -> Void) {
+///         bridgeManager.handleEvents(for: identifier, completionHandler: completionHandler)
+///     }
+/// }
+/// ```
+///
+/// - SeeAlso: ``SingleStudyAppManager`` which subclasses ``BridgeClientAppManager``
+///             to support features of a single study sign-in that is required to get a timeline for the participant.
+/// 
 open class BridgeClientAppManager : ObservableObject {
     
+    /// The  "state" of the app. SwiftUI relies upon observance patterns that do not work with Kotlin classes
+    /// because those classes are not threadsafe. The state handling of SwiftUI relies upon being able to
+    /// process observed changes on a background thread so the Kotlin classes must be wrapped. This
+    /// state enum is used to allow the app content view to
+    ///
     public enum AppState : String {
         case launching, login, onboarding, main
     }
 
+    /// Is this manager used for previewing the app? (Unit tests, SwiftUI Preview, etc.)
     public let isPreview: Bool
+    
+    /// The configuration bits that need to be set on the 'BridgeClient.xcframework' in order to connect to
+    /// Bridge services.
     public let platformConfig: IOSPlatformConfig
+    
+    /// The path to the pem file that is used to encrypt data being uploaded to Bridge.
+    ///
+    /// - Note: Data should be encrypted so that it is not stored insecurely on the phone (while waiting
+    ///         for an upload connection).
     public let pemPath: String?
         
+    /// The title of the app to display. By default, this is the localized display name of the app that is shown
+    /// to the participant in their phone home screen.
     @Published public var title: String
+    
+    /// The "state" of the app.
     @Published public var appState: AppState = .launching
+    
+    /// Is the app currently uploading results?
+    /// TODO: syoung 10/27/2021 This flag is currently never being reset. https://sagebionetworks.jira.com/browse/BMC-244
     @Published public var isUploadingResults: Bool = false
     
     @Published public var appConfig: AppConfig? {
@@ -103,7 +149,7 @@ open class BridgeClientAppManager : ObservableObject {
         // Register the file upload APIs so that retries can happen
         let _ = ParticipantFileUploadAPI.shared
         let _ = StudyDataUploadAPI.shared
-}
+    }
     
     public func appWillFinishLaunching(_ launchOptions: [UIApplication.LaunchOptionsKey : Any]? ) {
 

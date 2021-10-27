@@ -1,4 +1,4 @@
-name: Build CI
+name: KMM Tests
 
 on:
   pull_request:

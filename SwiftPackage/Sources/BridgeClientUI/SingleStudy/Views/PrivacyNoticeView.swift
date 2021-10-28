@@ -76,7 +76,7 @@ public struct PrivacyNoticeView: View {
             }
         }
         .onAppear {
-            if let notice = bridgeManager.appConfig?.decodePrivacyNotice() {
+            if let notice = bridgeManager.appConfig.decodePrivacyNotice() {
                 privacyNotice = notice
             }
         }

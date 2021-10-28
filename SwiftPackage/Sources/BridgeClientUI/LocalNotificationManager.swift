@@ -37,14 +37,24 @@ import BridgeClient
 fileprivate let kAllowSnoozeKey = "allowSnooze"
 fileprivate let maxTotalNotifications = 60
 
+/// A manager that be used to set up and respond to local notifications. The base class will set up notifications
+/// calculated for the current partipant's timeline. This class must be overridden to add additional custom
+/// notifications to the application because there can be only one ``UNUserNotificationCenterDelegate``.
+/// In order for this manager to implement features such as "snooze", it must be set during launch as the
+/// notification center delegate.
 open class LocalNotificationManager : NSObject, UNUserNotificationCenterDelegate {
     
+    /// The category identifier used to filter out the notifications that are associated with schedules.
     open private(set) var scheduledNotificationCategory = "org.sagebionetworks.ScheduledSession"
     
-    open var notifications: [NativeScheduledNotification] = []
+    /// The max number of notifications that can be associated with scheduled sessions. This value can be
+    /// overridden to allow allocating notifications for a purpose other than schedule adherence.
     open var maxScheduledSessionNotifications: Int = .max
     
-    open func setupNotifications(_ notifications: [NativeScheduledNotification]) {
+    // Do not expose publicly. This class is not threadsafe.
+    var notifications: [NativeScheduledNotification] = []
+    
+    func setupNotifications(_ notifications: [NativeScheduledNotification]) {
         self.notifications = notifications
         UIApplication.shared.applicationIconBadgeNumber = 0
         UNUserNotificationCenter.current().getNotificationSettings { settings in
@@ -79,7 +89,7 @@ open class LocalNotificationManager : NSObject, UNUserNotificationCenterDelegate
         min(maxRequests, notifications.count)
     }
     
-    open func createRequests() -> [UNNotificationRequest] {
+    func createRequests() -> [UNNotificationRequest] {
         createBuilders().map { $0.buildNotificationRequest()}
     }
     
@@ -91,7 +101,7 @@ open class LocalNotificationManager : NSObject, UNUserNotificationCenterDelegate
         return Array(builders[..<min(maxRequests, builders.count)])
     }
     
-    open func buildContent(for notification: NativeScheduledNotification) -> UNNotificationContent {
+    func buildContent(for notification: NativeScheduledNotification) -> UNNotificationContent {
         // Set up the notification
         let content = UNMutableNotificationContent()
         content.sound = UNNotificationSound.default

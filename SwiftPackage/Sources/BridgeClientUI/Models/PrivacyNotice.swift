@@ -59,7 +59,7 @@ public struct PrivacyNotice : Codable, Hashable {
     }()
 }
 
-extension AppConfig {
+extension AppConfigObserver {
     /// By default, the ``PrivacyNotice`` is the same for all studies supported by a given app and is defined
     /// as a `ConfigElement` in Bridge with the identifier "PrivacyNotice".
     func decodePrivacyNotice() -> PrivacyNotice? {

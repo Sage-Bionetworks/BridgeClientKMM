@@ -81,12 +81,14 @@ public final class UserSessionInfoObserver : ObservableObject {
     
     /// The studies this participant is associated to.
     @Published public var studyIds: [String] = []
+    
     /// An externally-assignable identifier a research partner can use to re-identify a user's data in the
     /// exported data set (this must be provided by the application, it is not created by Bridge). It is a
     /// string that can be set or updated to any value without constraints, unless Bridge is configured
     /// to manage the study's external IDs. Then the ID must be submitted on sign up, and cannot be
     /// modified afterward.
     @Published public var externalId: String?
+    
     /// The exernal IDs this participant is associated to, mapped to the study that issued the external ID.
     /// Typically a user signs up with the external ID, and is assigned to that study as a result.
     @Published public var externalIds: [String : String]?

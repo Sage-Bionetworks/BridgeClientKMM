@@ -126,14 +126,27 @@ open class BridgeClientAppManager : ObservableObject {
     /// TODO: syoung 10/27/2021 This flag is currently never being reset. https://sagebionetworks.jira.com/browse/BMC-244
     @Published public var isUploadingResults: Bool = false
     
-    public var appConfig: AppConfig? {
+    /// A threadsafe observer for the `BridgeClient.UserSessionInfo` for the current user.
+    public let appConfig: AppConfigObserver = .init()
+    
+    // Do not expose publicly. This class is not threadsafe.
+    var config: AppConfig? {
         didSet {
+            appConfig.appConfig = config
+            didUpdateAppConfig()
             updateAppState()
         }
     }
     
-    public final var userSessionInfo: UserSessionInfoObserver = .init()
+    /// Called when the `BridgeClient.AppConfig` is updated.
+    func didUpdateAppConfig() {
+        // Do nothing. Allows subclass override of `config.didSet`.
+    }
     
+    /// A threadsafe observer for the `BridgeClient.UserSessionInfo` for the current user.
+    public let userSessionInfo: UserSessionInfoObserver = .init()
+    
+    // Do not expose publicly. This class is not threadsafe.
     var session: UserSessionInfo? {
         didSet {
             userSessionInfo.userSessionInfo = session
@@ -142,10 +155,12 @@ open class BridgeClientAppManager : ObservableObject {
         }
     }
     
-    open func didUpdateUserSessionInfo() {
+    /// Called when the `BridgeClient.UserSessionInfo` is updated.
+    func didUpdateUserSessionInfo() {
         // Do nothing. Allows subclass override of `session.didSet`.
     }
     
+    /// Has the participant been shown the onboarding flow?
     @Published public var isOnboardingFinished: Bool = UserDefaults.standard.bool(forKey: kOnboardingStateKey) {
         didSet {
             UserDefaults.standard.set(isOnboardingFinished, forKey: kOnboardingStateKey)
@@ -154,15 +169,30 @@ open class BridgeClientAppManager : ObservableObject {
     }
     
     private var appConfigManager: NativeAppConfigManager!
-    public private(set) var authManager: NativeAuthenticationManager!
+    internal private(set) var authManager: NativeAuthenticationManager!
     
     /// The local notification manager is a singleton that can be set up as the notification delegate (to handle snoozing).
     lazy public var localNotificationManager : LocalNotificationManager = LocalNotificationManager()
     
+    /// Convenience initializer for intializing a bridge manager with just an app id and pem file.
+    ///
+    /// Both the APP ID and the CMS Public Key (ie. pem file) are accessible through the [Bridge Study Manager](https://research.sagebridge.org).
+    /// Once logged into an "app" (which can host multiple "studies"), select "Server Config -> Settings" from the menu.
+    ///
+    /// - Parameters:
+    ///   - appId: The "APP ID" is shown in the upper right corner of the [Bridge Study Manager](https://research.sagebridge.org).
+    ///   - pemPath: The path to the pem file (as an embedded resource) to use for encrypting uploads. The pem file can be downloaded
+    ///     from the [Bridge Study Manager](https://research.sagebridge.org) by going "Server Settings -> Settings"
+    ///     and tapping on the button labeled "Download CMS Public Key..." and saving the file to a secure location.
     public convenience init(appId: String, pemPath: String? = nil) {
         self.init(platformConfig: PlatformConfigImpl(appId: appId), pemPath: pemPath)
     }
     
+    /// Initialize the bridge manager with a custom platform config.
+    ///
+    /// - Parameters:
+    ///   - platformConfig: The platform config to use to set up the connection to Bridge.
+    ///   - pemPath: The path to the location of the pem file to use when encrypting uploads.
     public init(platformConfig: IOSPlatformConfig, pemPath: String? = nil) {
         self.pemPath = pemPath ?? Bundle.main.path(forResource: platformConfig.appId, ofType: "pem")
         self.platformConfig = platformConfig
@@ -181,7 +211,8 @@ open class BridgeClientAppManager : ObservableObject {
         let _ = StudyDataUploadAPI.shared
     }
     
-    public func appWillFinishLaunching(_ launchOptions: [UIApplication.LaunchOptionsKey : Any]? ) {
+    /// **Required:** This method should be called by the app delegate when the app is launching in either `willLaunch` or `didLaunch`.
+    open func appWillFinishLaunching(_ launchOptions: [UIApplication.LaunchOptionsKey : Any]? ) {
 
         // Initialize koin
         #if DEBUG
@@ -193,7 +224,7 @@ open class BridgeClientAppManager : ObservableObject {
         
         // Hook up app config
         self.appConfigManager = NativeAppConfigManager() { appConfig, _ in
-            self.appConfig = appConfig ?? self.appConfig
+            self.config = appConfig ?? self.config
         }
         self.appConfigManager.observeAppConfig()
         
@@ -209,11 +240,20 @@ open class BridgeClientAppManager : ObservableObject {
         updateAppState()
     }
     
-    public func handleEvents(for backgroundSession: String, completionHandler: @escaping () -> Void) {
+    /// **Required:** This method should be called by the app delegate in the implementation of
+    /// `application(:, handleEventsForBackgroundURLSession:, completionHandler:)` and is used to
+    /// restore a background upload session.
+    public final func handleEvents(for backgroundSession: String, completionHandler: @escaping () -> Void) {
         BackgroundNetworkManager.shared.restore(backgroundSession: backgroundSession, completionHandler: completionHandler)
     }
     
-    public func loginWithExternalId(_ externalId: String, password: String, completion: @escaping ((BridgeClient.ResourceStatus) -> Void)) {
+    /// Login with the given external ID and password.
+    ///
+    /// - Parameters:
+    ///   - externalId: The external ID to use as the signin credentials.
+    ///   - password: The password to use as the signin credentials.
+    ///   - completion: The completion handler that is called with the server response.
+    public final func loginWithExternalId(_ externalId: String, password: String, completion: @escaping ((BridgeClient.ResourceStatus) -> Void)) {
         self.authManager.signInExternalId(externalId: externalId, password: password) { (userSessionInfo, status) in
             guard status == ResourceStatus.success || status == ResourceStatus.failed else { return }
             self.session = userSessionInfo
@@ -221,15 +261,17 @@ open class BridgeClientAppManager : ObservableObject {
         }
     }
     
-    public func signOut() {
+    /// Sign out the current user.
+    open func signOut() {
         localNotificationManager.clearAll()
         authManager.signOut()
         isOnboardingFinished = false
         self.session = nil
     }
     
+    // @Protected - Only this class should call this method and only subclasses should implement.
     func updateAppState() {
-        if appConfig == nil {
+        if appConfig.isLaunching {
             appState = .launching
         }
         else if !userSessionInfo.isAuthenticated {
@@ -243,7 +285,10 @@ open class BridgeClientAppManager : ObservableObject {
         }
     }
     
-    public func encryptAndUpload(_ archives: [DataArchive]) {
+    /// Encrypt and upload the given data archives.
+    ///
+    /// - Parameter archives: The archives to encrypt and upload.
+    public final func encryptAndUpload(_ archives: [DataArchive]) {
         DispatchQueue.global().async {
 
             // Encrypt the files.

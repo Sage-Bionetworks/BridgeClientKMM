@@ -54,7 +54,9 @@ open class SageResearchArchiveManager : NSObject, RSDDataArchiveManager {
     open func load(bridgeManager: BridgeClientAppManager, taskToSchemaMapping: [String : String]? = nil) {
         self.bridgeManager = bridgeManager
         self._defaultTaskToSchemaMapping = taskToSchemaMapping
-        self._appConfigTaskToSchemaMapping = bridgeManager.appConfig?.taskToSchemaMapping()
+        self._appConfigTaskToSchemaMapping = processResultOnMainThread() {
+            bridgeManager.config?.taskToSchemaMapping()
+        }
     }
     
     /// Get the ```RSDSchemaInfo`` associated with this task result.
@@ -72,7 +74,7 @@ open class SageResearchArchiveManager : NSObject, RSDDataArchiveManager {
                 (taskResult as? AssessmentResult)?.schemaIdentifier ??
                 taskResult.identifier
             
-            if let ref = bridgeManager.appConfig?.schemaReferences?.first(where: { $0.id == schemaIdentifier }) {
+            if let ref = bridgeManager.config?.schemaReferences?.first(where: { $0.id == schemaIdentifier }) {
                 return RSDSchemaInfoObject(identifier: ref.id, revision: ref.revision?.intValue ?? 0)
             }
             else if let assessmentResult = taskResult as? AssessmentResult,
@@ -320,5 +322,16 @@ func processResultOnMainThread<T>(_ process: () -> T?) -> T? {
         }
     }
     return ret
+}
+
+/// A convenience method for ensuring that a given result is processed on the main thread.
+func processOnMainThread(_ process: () -> Void) {
+    if Thread.isMainThread {
+        process()
+    } else {
+        DispatchQueue.main.sync {
+            process()
+        }
+    }
 }
 

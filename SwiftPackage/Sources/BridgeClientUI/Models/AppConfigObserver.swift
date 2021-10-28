@@ -1,5 +1,5 @@
 //
-//  NativeScheduledSessionWindow+View.swift
+//  AppConfigObserver.swift
 //
 //
 //  Copyright © 2021 Sage Bionetworks. All rights reserved.
@@ -31,34 +31,48 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-import SwiftUI
+import Foundation
 import BridgeClient
+import JsonModel
 
-extension NativeScheduledSessionWindow {
+/// This is a threadsafe wrapper for the Kotlin class ``BridgeClient.UserSessionInfo``.
+public final class AppConfigObserver : ObservableObject {
     
-    /// Is the schedule available?
-    public func availableNow(_ now: Date = Date()) -> Bool {
-        startDateTime < now && now < endDateTime
+    var appConfig : AppConfig? {
+        get { self._appConfig }
+        set {
+            self._appConfig = processResultOnMainThread {
+                self.isLaunching = false
+                self.copyFrom(newValue)
+                return newValue
+            }
+        }
+    }
+    private var _appConfig : AppConfig?
+    
+    init() {}
+    
+    /// Is the app launching?
+    @Published public var isLaunching: Bool = true
+    
+    /// Client data for a user should be in a syntactically valid JSON format. It will be returned as is to the client
+    /// (as JSON).
+    @Published public var clientData: Data?
+    
+    /// A map of app config element IDs to the app config element JSON of a specific app config element revision
+    /// (the revision given in the configReferences map).
+    @Published public var configElements: [String : Data]?
+    
+    /// Get the config element with the given identifier.
+    public func configElementJson(identifier: String) -> Data? {
+        configElements?[identifier]
     }
     
-    /// Is the schedule expired?
-    public func isExpired(_ now: Date = Date()) -> Bool {
-        now > endDateTime
-    }
-    
-    /// Should the assessments in the session be performed in order?
-    public var performInOrder: Bool {
-        sessionInfo.performanceOrder != .participantChoice
-    }
-    
-    /// Localized date string for when the schedule will be available.
-    public var availableDateString: String {
-        startDateTime.localizeDate(hasTimeOfDay: hasStartTimeOfDay)
-    }
-    
-    /// Localized date string for when the schedule is due.
-    public var dueDateString: String {
-        endDateTime == .distantFuture ? "" : endDateTime.localizeDate(hasTimeOfDay: hasEndTimeOfDay)
+    func copyFrom(_ newValue: AppConfig?) {
+        guard let config = newValue else { return }
+        self.clientData = config.clientDataJson()
+        self.configElements = config.configElements?.keys.reduce(into: [String : Data]()) { (partialResult, key) in
+            partialResult[key] = config.configElementJson(identifier: key)
+        }
     }
 }
-

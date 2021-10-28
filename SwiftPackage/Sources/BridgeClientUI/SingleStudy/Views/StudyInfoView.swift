@@ -36,8 +36,6 @@ import SharedMobileUI
 
 public struct StudyInfoView: View {
     @EnvironmentObject private var bridgeManager: SingleStudyAppManager
-    @StateObject private var viewModel: StudyInfoViewModel = .init()
-    
     @Binding private var selectedTab: Tab
     
     public init(_ selectedTab: Binding<Tab>) {
@@ -72,15 +70,11 @@ public struct StudyInfoView: View {
                 }
             }
         }
-        .environmentObject(viewModel)
-        .onAppear {
-            viewModel.onAppear(bridgeManager)
-        }
     }
 }
 
 public struct AboutStudyView: View {
-    @EnvironmentObject private var viewModel: StudyInfoViewModel
+    @EnvironmentObject private var bridgeManager: SingleStudyAppManager
     
     @State var isPresentingPrivacyNotice: Bool = false
     @State var privacyNoticeTab: PrivacyNotice.Category = .weWill
@@ -104,7 +98,8 @@ public struct AboutStudyView: View {
                 .foregroundColor(.textForeground)
             LineView()
                 .padding(.horizontal, horizontalPadding)
-            ForEach(viewModel.studyContacts) { contact in
+            let studyContacts = filterStudyContacts()
+            ForEach(studyContacts) { contact in
                 studyInfo(contact)
                     .padding(.horizontal, horizontalPadding)
             }
@@ -114,11 +109,27 @@ public struct AboutStudyView: View {
         .padding(.all, 16)
     }
     
+    func filterStudyContacts() -> [StudyContact] {
+        guard let contacts = bridgeManager.study?.contacts else { return [] }
+        
+        let studyRoles: [StudyContact.Role] = [.principalInvestigator, .investigator, .sponsor]
+        var studyContacts = contacts
+            .filter { studyRoles.contains($0.role) }
+            .sorted(by: { studyRoles.firstIndex(of: $0.role)! < studyRoles.firstIndex(of: $1.role)! })
+
+        if let firstContact = studyContacts.first(where: { $0.affiliation != nil }) {
+            studyContacts.insert(StudyContact(name: firstContact.affiliation!, role: .institution), at: 1)
+        }
+
+        return studyContacts
+    }
+    
     @ViewBuilder
     private func aboutHeader() -> some View {
-        if let url = viewModel.studyLogoUrl {
+        if let study = bridgeManager.study,
+            let url = study.studyLogoUrl {
             LogoImage(url: url)
-                .background(viewModel.backgroundColor)
+                .background(study.backgroundColor)
         }
         else {
             EmptyView()
@@ -127,11 +138,11 @@ public struct AboutStudyView: View {
     
     @ViewBuilder
     private func aboutBody() -> some View {
-        Text(viewModel.title)
+        Text(bridgeManager.study?.name ?? Bundle.localizedAppName)
             .font(DesignSystem.fontRules.headerFont(at: 2))
             .padding(.top, 6)
             .padding(.horizontal, horizontalPadding)
-        if let details = viewModel.details {
+        if let details = bridgeManager.study?.details {
             Text(details)
                 .font(DesignSystem.fontRules.bodyFont(at: 1, isEmphasis: false))
                 .fixedSize(horizontal: false, vertical: true)
@@ -184,19 +195,19 @@ public struct AboutStudyView: View {
 }
 
 public struct ContactAndSupportView: View {
-    @EnvironmentObject private var viewModel: StudyInfoViewModel
-        
+    @EnvironmentObject private var bridgeManager: SingleStudyAppManager
+
     public var body: some View {
         VStack(alignment: .leading, spacing: 25) {
             Spacer()
             section(title: Text("General Support", bundle: .module),
                     body: Text("For general questions about the study or to withdraw from the study, please contact:", bundle: .module),
-                    contacts: viewModel.supportContacts)
+                    contactRoles: [.studySupport, .technicalSupport])
             withdrawalInfoView()
             LineView()
             section(title: Text("Your Participant Rights", bundle: .module),
                     body: Text("For questions about your rights as a research participant, please contact:", bundle: .module),
-                    contacts: viewModel.irbContacts)
+                    contactRoles: [.irb])
             Spacer()
         }
         .padding(.horizontal, 26)
@@ -208,7 +219,7 @@ public struct ContactAndSupportView: View {
     // MARK: Section Header
     
     @ViewBuilder
-    private func section(title: Text, body: Text, contacts: [StudyContact]) -> some View {
+    private func section(title: Text, body: Text, contactRoles: [StudyContact.Role]) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             title
                 .font(DesignSystem.fontRules.headerFont(at: 4))
@@ -219,6 +230,7 @@ public struct ContactAndSupportView: View {
         .frame(maxWidth: .infinity)
         .fixedSize(horizontal: false, vertical: true)
         
+        let contacts = bridgeManager.study?.contacts.filter { contactRoles.contains($0.role) } ?? []
         ForEach(contacts) {
             contactView($0)
                 .padding(.horizontal, 16)
@@ -228,7 +240,7 @@ public struct ContactAndSupportView: View {
     // MARK: Protocol ID
     
     private func protocolIdLabel() -> Text {
-        Text("IRB Protocol ID: ", bundle: .module) + Text(viewModel.study?.irbProtocolId ?? "")
+        Text("IRB Protocol ID: ", bundle: .module) + Text(bridgeManager.study?.protocolInfo?.protocolId ?? "")
     }
     
     // MARK: Contact Info
@@ -249,7 +261,7 @@ public struct ContactAndSupportView: View {
             if let email = contact.email {
                 contactValue(email, contactType: .email)
             }
-            if contact.isIRB {
+            if contact.role == .irb {
                 protocolIdLabel()
                     .font(DesignSystem.fontRules.bodyFont(at: 2, isEmphasis: false))
                     .padding(.leading, 26)
@@ -303,15 +315,19 @@ public struct ContactAndSupportView: View {
     @ViewBuilder
     private func withdrawalInfoView() -> some View {
         VStack(alignment: .leading, spacing: 16) {
-            if let phone = viewModel.participantPhone {
+            let studyId = bridgeManager.study?.identifier ?? ""
+            if let phone = bridgeManager.userSessionInfo.phone {
                 withdrawalHeader(Text("To withdraw from this study, you’ll need the Study ID and the phone number you registered with:", bundle: .module))
-                withdrawalRow(Text("Study ID: ", bundle: .module), viewModel.studyId)
+                withdrawalRow(Text("Study ID: ", bundle: .module), studyId)
                 withdrawalRow(Text("Registration Phone Number: ", bundle: .module), phone)
             }
-            else {
+            else if let participantId = bridgeManager.userSessionInfo.participantId(for: studyId) {
                 withdrawalHeader(Text("To withdraw from this study, you’ll need the following info:", bundle: .module))
-                withdrawalRow(Text("Study ID: ", bundle: .module), viewModel.studyId)
-                withdrawalRow(Text("Participant ID: ", bundle: .module), viewModel.participantId ?? "")
+                withdrawalRow(Text("Study ID: ", bundle: .module), studyId)
+                withdrawalRow(Text("Participant ID: ", bundle: .module), participantId)
+            }
+            else {
+                EmptyView()
             }
         }
         .font(DesignSystem.fontRules.bodyFont(at: 2, isEmphasis: false))

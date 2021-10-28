@@ -306,7 +306,7 @@ public struct ContactAndSupportView: View {
             if let phone = viewModel.participantPhone {
                 withdrawalHeader(Text("To withdraw from this study, you’ll need the Study ID and the phone number you registered with:", bundle: .module))
                 withdrawalRow(Text("Study ID: ", bundle: .module), viewModel.studyId)
-                withdrawalRow(Text("Registration Phone Number: ", bundle: .module), phone.nationalFormat ?? phone.number)
+                withdrawalRow(Text("Registration Phone Number: ", bundle: .module), phone)
             }
             else {
                 withdrawalHeader(Text("To withdraw from this study, you’ll need the following info:", bundle: .module))

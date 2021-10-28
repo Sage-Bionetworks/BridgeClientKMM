@@ -126,21 +126,24 @@ open class BridgeClientAppManager : ObservableObject {
     /// TODO: syoung 10/27/2021 This flag is currently never being reset. https://sagebionetworks.jira.com/browse/BMC-244
     @Published public var isUploadingResults: Bool = false
     
-    @Published public var appConfig: AppConfig? {
+    public var appConfig: AppConfig? {
         didSet {
             updateAppState()
         }
     }
     
-    @Published public var userSessionInfo: UserSessionInfo? {
+    public final var userSessionInfo: UserSessionInfoObserver = .init()
+    
+    var session: UserSessionInfo? {
         didSet {
-            didSetUserSessionInfo(oldValue: oldValue)
+            userSessionInfo.userSessionInfo = session
+            didUpdateUserSessionInfo()
             updateAppState()
         }
     }
     
-    open func didSetUserSessionInfo(oldValue: UserSessionInfo?) {
-        // Do nothing. Allows subclass override of `userSessionInfo.didSet`.
+    open func didUpdateUserSessionInfo() {
+        // Do nothing. Allows subclass override of `session.didSet`.
     }
     
     @Published public var isOnboardingFinished: Bool = UserDefaults.standard.bool(forKey: kOnboardingStateKey) {
@@ -197,9 +200,9 @@ open class BridgeClientAppManager : ObservableObject {
         // Hook up user session info
         self.authManager = NativeAuthenticationManager() { userSessionInfo in
             guard userSessionInfo == nil || !userSessionInfo!.isEqual(userSessionInfo) else { return }
-            self.userSessionInfo = userSessionInfo
+            self.session = userSessionInfo
         }
-        self.userSessionInfo = self.authManager.session()
+        self.session = self.authManager.session()
         self.authManager.observeUserSessionInfo()
         
         // Update the app state
@@ -213,7 +216,7 @@ open class BridgeClientAppManager : ObservableObject {
     public func loginWithExternalId(_ externalId: String, password: String, completion: @escaping ((BridgeClient.ResourceStatus) -> Void)) {
         self.authManager.signInExternalId(externalId: externalId, password: password) { (userSessionInfo, status) in
             guard status == ResourceStatus.success || status == ResourceStatus.failed else { return }
-            self.userSessionInfo = userSessionInfo
+            self.session = userSessionInfo
             completion(status)
         }
     }
@@ -222,14 +225,14 @@ open class BridgeClientAppManager : ObservableObject {
         localNotificationManager.clearAll()
         authManager.signOut()
         isOnboardingFinished = false
-        userSessionInfo = nil
+        self.session = nil
     }
     
     func updateAppState() {
         if appConfig == nil {
             appState = .launching
         }
-        else if userSessionInfo == nil {
+        else if !userSessionInfo.isAuthenticated {
             appState = .login
         }
         else if !isOnboardingFinished {

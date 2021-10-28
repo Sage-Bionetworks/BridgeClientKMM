@@ -89,11 +89,7 @@ open class SageResearchArchiveManager : NSObject, RSDDataArchiveManager {
     
     /// Get the data groups associated with this user.
     public final func dataGroups() -> [String]? {
-        // Because this accesses the ``BridgeClient.UserSessionInfo``, it must be processed
-        // on the main thread. Kotlin classes are not threadsafe.
-        return processResultOnMainThread() {
-            bridgeManager.userSessionInfo?.dataGroups
-        }
+        bridgeManager.userSessionInfo.dataGroups
     }
         
     /// Get the schedule info associated with the given task result.

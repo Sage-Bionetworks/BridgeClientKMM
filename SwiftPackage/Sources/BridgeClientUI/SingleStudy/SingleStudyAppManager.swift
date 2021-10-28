@@ -43,8 +43,8 @@ public final class SingleStudyAppManager : BridgeClientAppManager {
         }
     }
     
-    public override func didSetUserSessionInfo(oldValue: UserSessionInfo?) {
-        super.didSetUserSessionInfo(oldValue: oldValue)
+    public override func didUpdateUserSessionInfo() {
+        super.didUpdateUserSessionInfo()
         updateStudy()
     }
     
@@ -80,8 +80,8 @@ public final class SingleStudyAppManager : BridgeClientAppManager {
     private var observedStudyId: String?
     
     private func updateStudy() {
-        guard (authManager?.isAuthenticated() ?? false),
-              let studyIds = userSessionInfo?.studyIds, studyIds.count > 0
+        let studyIds = userSessionInfo.studyIds
+        guard (authManager?.isAuthenticated() ?? false), studyIds.count > 0
         else {
             return
         }
@@ -107,7 +107,7 @@ public final class SingleStudyAppManager : BridgeClientAppManager {
         if appConfig == nil {
             appState = .launching
         }
-        else if userSessionInfo == nil {
+        else if !userSessionInfo.isAuthenticated {
             appState = .login
         }
         else if study == nil {

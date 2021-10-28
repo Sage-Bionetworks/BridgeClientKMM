@@ -59,7 +59,7 @@ open class StudyInfoViewModel : ObservableObject {
     
     // MARK: Properties of the `UserSessionInfo`
     
-    @Published open var participantPhone: Phone?
+    @Published open var participantPhone: String?
     @Published open var participantId: String?
     
     public init(isPreview: Bool = false) {
@@ -78,8 +78,8 @@ open class StudyInfoViewModel : ObservableObject {
             return
         }
         self.study = study
-        self.participantPhone = bridgeManager.userSessionInfo?.phone
-        self.participantId = bridgeManager.userSessionInfo?.participantId(for: study.identifier) ?? (bridgeManager.isPreview ? "123456" : nil)
+        self.participantPhone = bridgeManager.userSessionInfo.phone
+        self.participantId = bridgeManager.userSessionInfo.participantId(for: study.identifier) ?? (bridgeManager.isPreview ? "123456" : nil)
         updateInfo()
     }
     

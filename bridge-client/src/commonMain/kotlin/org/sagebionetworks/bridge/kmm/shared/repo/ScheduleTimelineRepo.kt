@@ -284,16 +284,10 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
 
         val foundState = FoundWindowState()
         return sessions.mapNotNull { session ->
-            val event = eventMap[session.startEventId]
             val scheduledSessionList = scheduleSessionMap[session.guid]
-            if (event == null || scheduledSessionList == null) {
+            if (scheduledSessionList == null) {
                 null
             } else {
-                // Convert the event timestamp to a LocalDate
-                val eventLocalDate = event.timestamp.toLocalDateTime(timezone).date
-                // Get number of days since the event date
-                val daysSince = eventLocalDate.daysUntil(day)
-
                 //Map the schedules to windows
                 scheduledSessionList.mapNotNull { scheduledSession ->
                     createScheduledSessionWindow(
@@ -302,11 +296,10 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
                         alwaysIncludeNextDay,
                         day,
                         instantInDay,
-                        daysSince,
                         studyId,
                         assessmentInfoMap,
                         session,
-                        event,
+                        eventMap,
                         timezone,
                         foundState
                     )
@@ -339,14 +332,20 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         alwaysIncludeNextDay: Boolean,
         day: LocalDate,
         instantInDay: Instant,
-        daysSince: Int,
         studyId: String,
         assessmentInfoMap: Map<String?, AssessmentInfo>,
         session: SessionInfo,
-        event: StudyActivityEvent,
+        eventMap: Map<String,StudyActivityEvent>,
         timezone: TimeZone,
         foundState: FoundWindowState,
     ): ScheduledSessionWindow? {
+        val event = eventMap[scheduledSession.startEventId] ?: return null
+
+        // Convert the event timestamp to a LocalDate
+        val eventLocalDate = event.timestamp.toLocalDateTime(timezone).date
+        // Get number of days since the event date
+        val daysSince = eventLocalDate.daysUntil(day)
+
 
         fun rulesForNotifications() =
             scheduledSession.startDay >= daysSince && !session.notifications.isNullOrEmpty()

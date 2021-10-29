@@ -10,7 +10,7 @@ class AuthenticationIntegrationTest: AbstractBaseIntegrationTest() {
 
     private val authRepo by inject<AuthenticationRepository>()
 
-    @Test
+    @Test @Ignore
     fun testExternalIdSignIn() {
         runTest {
 

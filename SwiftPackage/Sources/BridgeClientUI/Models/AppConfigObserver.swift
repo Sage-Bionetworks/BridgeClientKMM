@@ -71,8 +71,6 @@ public final class AppConfigObserver : ObservableObject {
     func copyFrom(_ newValue: AppConfig?) {
         guard let config = newValue else { return }
         self.clientData = config.clientDataJson()
-        self.configElements = config.configElements?.keys.reduce(into: [String : Data]()) { (partialResult, key) in
-            partialResult[key] = config.configElementJson(identifier: key)
-        }
+        self.configElements = config.mapConfigElements()
     }
 }

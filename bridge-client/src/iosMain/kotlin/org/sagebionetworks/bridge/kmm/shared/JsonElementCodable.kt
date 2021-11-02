@@ -76,6 +76,10 @@ fun AppConfig.configElementJson(identifier: String) : NSData? {
     return this.configElements?.get(identifier)?.toString()?.toNSData()
 }
 
+fun AppConfig.mapConfigElements() : Map<String, NSData>? {
+    return this.configElements?.mapValues { it.value.toString().toNSData() ?: NSData() }
+}
+
 fun AppConfig.clientDataJson() : NSData? {
     return this.clientData?.toString()?.toNSData()
 }

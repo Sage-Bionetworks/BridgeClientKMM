@@ -36,9 +36,9 @@ import BridgeClient
 
 extension Date {
     
-    /// Convenience method for returning the "start" of the day (ie, midnight).
+    /// Convenience method for returning the "start" of the day (i.e., midnight).
     ///
-    /// - Returns: The start of the day using the current  calendar.
+    /// - Returns: The start of the day using the current calendar.
     public func startOfDay() -> Date {
         Calendar.current.startOfDay(for: self)
     }
@@ -53,7 +53,7 @@ extension Date {
         Calendar.current.isDateInTomorrow(self)
     }
     
-    /// This date localized using the participants preferred locale.
+    /// This date localized using the participant's preferred locale.
     ///
     /// - Parameter hasTimeOfDay: Whether or not the time of day should be included.
     /// - Returns: Localized formatted string for the date.

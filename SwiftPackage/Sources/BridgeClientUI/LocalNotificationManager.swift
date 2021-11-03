@@ -37,7 +37,7 @@ import BridgeClient
 fileprivate let kAllowSnoozeKey = "allowSnooze"
 fileprivate let maxTotalNotifications = 60
 
-/// A manager that be used to set up and respond to local notifications. The base class will set up notifications
+/// A manager that is used to set up and respond to local notifications. The base class will set up notifications
 /// calculated for the current partipant's timeline. This class must be overridden to add additional custom
 /// notifications to the application because there can be only one ``UNUserNotificationCenterDelegate``.
 /// In order for this manager to implement features such as "snooze", it must be set during launch as the

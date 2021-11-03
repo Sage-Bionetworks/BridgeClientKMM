@@ -58,7 +58,7 @@ public protocol AssessmentInfoExtension {
 /// allowing those values to be set at the app level. Since this framework does not directly link in
 /// any assessment libraries, the app has the responsibility for setting up those mappings.
 ///
-/// - Note: This struct uses `BridgeClient.AssessmentInfo` in it's mapping and its
+/// - Note: This struct uses `BridgeClient.AssessmentInfo` in its mapping and its
 /// functions should only ever be called from the main thread.
 public struct AssessmentInfoMap {
     private let mappings: [String : Mapping]

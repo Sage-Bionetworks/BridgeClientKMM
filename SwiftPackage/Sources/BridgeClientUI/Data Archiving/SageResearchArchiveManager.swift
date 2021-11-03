@@ -49,7 +49,7 @@ open class SageResearchArchiveManager : NSObject, RSDDataArchiveManager {
     /// Set up the archive manager by attaching the ``BridgeClientAppManager`` singleton to it.
     ///
     /// - Parameters:
-    ///   - bridgeManager: The app manager singleton for this application
+    ///   - bridgeManager: The app manager singleton for this application.
     ///   - taskToSchemaMapping: The mapping to use for mapping which results to include in a single archive.
     open func load(bridgeManager: BridgeClientAppManager, taskToSchemaMapping: [String : String]? = nil) {
         self.bridgeManager = bridgeManager
@@ -270,7 +270,7 @@ open class SageResearchResultArchive : AbstractResultArchive, RSDDataArchive {
     internal var taskResult: RSDTaskResult?
     
     /// Whether or not the archive should include "reserved" files that are collated separately from the
-    /// default behavoir of iteratively looking through the result for objects that support the ``RSDArchivable``
+    /// default behavior of iteratively looking through the result for objects that support the ``RSDArchivable``
     /// protocol.
     /// - Parameter filename: The enum for the reserved file name.
     /// - Returns: Whether or not the file should be added. (Default == true)
@@ -282,8 +282,8 @@ open class SageResearchResultArchive : AbstractResultArchive, RSDDataArchive {
     ///
     /// - Parameters:
     ///   - result: The result to process.
-    ///   - sectionIdentifier: The section identifier for result within the assessment.
-    ///   - stepPath: The step path for the result within the assessment
+    ///   - sectionIdentifier: The section identifier for the result within the assessment.
+    ///   - stepPath: The step path for the result within the assessment.
     /// - Returns: The archivable or `nil` if the result is ignored.
     open func archivableData(for result: ResultData, sectionIdentifier: String?, stepPath: String?) -> RSDArchivable? {
         result as? RSDArchivable

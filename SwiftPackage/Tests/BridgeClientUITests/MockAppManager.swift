@@ -60,7 +60,7 @@ class MockBridgeClientAppManager : BridgeClientAppManager {
         mockAuthManager
     }
     
-    override var userSessionInfo: UserSessionInfo? {
+    override var session: UserSessionInfo? {
         set {
             mockAuthManager.mockUserSessionInfo = newValue
         }

@@ -34,6 +34,7 @@ import Foundation
 import BridgeArchiver
 import JsonModel
 
+/// Wrapper for tying a ``BridgeArchiver`` to an uploaded archive.
 open class DataArchive : NSObject {
     
     /// The identifier for this archive.
@@ -41,10 +42,13 @@ open class DataArchive : NSObject {
     
     private let archiver: BridgeArchiver
     
+    /// Has the archive been zipped?
     public final internal(set) var isCompleted: Bool = false
     
+    /// The local file URL for the encrypted archive.
     public final private(set) var encryptedURL: URL?
     
+    /// A list of all the files included in the archive.
     public var files: [FileEntry] {
         archiver.files
     }
@@ -56,18 +60,32 @@ open class DataArchive : NSObject {
         super.init()
     }
     
+    /// Is the archive empty?
     public final func isEmpty() -> Bool {
         archiver.files.count == 0
     }
     
+    /// Clean up and delete the archive.
     public final func remove() {
         try? archiver.remove()
     }
     
+    /// Add a file to the archive.
+    ///
+    /// - Parameters:
+    ///   - data: The data to be added.
+    ///   - filepath: The file path for the added data.
+    ///   - createdOn: The timestamp for when the data was created.
+    ///   - contentType: The content type of the data.
     public final func addFile(data: Data, filepath: String, createdOn: Date = Date(), contentType: String? = nil) throws {
         try archiver.addFile(data: data, filepath: filepath, createdOn: createdOn, contentType: contentType)
     }
     
+    
+    /// Encrypt the upload using the pem file at the given path.
+    ///
+    /// - Parameter pemFile: The path to the pem file to use to encrypt the archive.
+    /// - Returns: The URL to the encrypted archive.
     @discardableResult
     public final func encryptArchive(using pemFile: String) throws -> URL {
         self.encryptedURL = try archiver.encryptArchive(using: pemFile)
@@ -75,6 +93,8 @@ open class DataArchive : NSObject {
     }
     
     #if DEBUG
+    /// When testing an app, it can be helpful to be able to inspect the archive. This allows the developer to store an unencrypted
+    /// copy of the archive. This method should **not** be made public or be exposed without the `#if DEBUG` flag.
     internal func copyTestArchive() {
         guard let url = archiver.archiveURL else { return }
         do {

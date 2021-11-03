@@ -36,12 +36,27 @@ import JsonModel
 import Research
 import ResearchUI
 
+/// A wrapper that can be used to launch and control an assessment.
 open class SageResearchTaskDelegate : NSObject, RSDTaskViewControllerDelegate {
     
+    /// The timeline manager that "called" this assessment.
     public let assessmentManager: TodayTimelineViewModel
+    
+    /// The schedule info for this assessment.
     public let scheduledAssessment: AssessmentScheduleInfo!
     
     /// The archive manager to use for archiving Sage Research assessments.
+    ///
+    /// The base class uses lazy initialization of a private ivar to back this publicly exposed open
+    /// property. That allows both only instantiating the archive manager if necessary as well as
+    /// loading it with a pointer to the ``BridgeClientAppManager``. If a subclass of this
+    /// task delegate needs to customize the archive, it can override the open property above to
+    /// do so, but the lazy load pattern is recommended.
+    ///
+    /// - Note: ``SageResearchArchiveManager`` is self-retaining. It handles retaining both
+    /// itself and the ``RSDTaskViewModel`` while processing is done on a background queue.
+    /// Then it will release the task view model and itself when it's done.
+    ///
     open var sageResearchArchiveManager: SageResearchArchiveManager {
         _sageResearchArchiveManager
     }
@@ -51,16 +66,25 @@ open class SageResearchTaskDelegate : NSObject, RSDTaskViewControllerDelegate {
         return manager
     }()
     
+    /// A flag used to track whether or not "ready to save" was called by the assessment.
     public private(set) var didCallReadyToSave: Bool = false
     
+    /// The schedule identifier to attach to the task view model.
     public var scheduleIdentifier: String {
         "\(scheduledAssessment.session.instanceGuid)|\(scheduledAssessment.instanceGuid)"
     }
     
-    public init(_ assessmentManager: TodayTimelineViewModel) {
+    /// Default initializer.
+    ///
+    /// - Parameters:
+    ///   - assessmentManager: The timeline manager that launched the assessment.
+    ///   - selectedAssessment: (Optional) The assessment info for creating this assessment. If nil, the ``assessmentManager.selectedAssessment`` will be used.
+    public init(_ assessmentManager: TodayTimelineViewModel, selectedAssessment: AssessmentScheduleInfo? = nil) {
         self.assessmentManager = assessmentManager
-        self.scheduledAssessment = assessmentManager.selectedAssessment
+        self.scheduledAssessment = selectedAssessment ?? assessmentManager.selectedAssessment
     }
+    
+    // MARK: RSDTaskViewControllerDelegate
     
     open func taskController(_ taskController: RSDTaskController, didFinishWith reason: RSDTaskFinishReason, error: Error?) {
         

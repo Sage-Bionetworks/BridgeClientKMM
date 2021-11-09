@@ -25,13 +25,13 @@ import kotlinx.serialization.SerialName
 data class ConfigReference (
     /* Schema ID */
     @SerialName("id")
-    val id: kotlin.String,
+    val id: String,
     /* Revision number */
     @SerialName("revision")
-    val revision: kotlin.Long,
+    val revision: Long,
     /* ConfigReference */
     @SerialName("type")
-    val type: kotlin.String? = null
+    val type: String? = null
 ) {
 
 }

@@ -19,25 +19,25 @@ import kotlinx.serialization.SerialName
 internal data class ConsentSignature (
     /* The participant's name. */
     @SerialName("name")
-    val name: kotlin.String,
+    val name: String,
     @SerialName("scope")
     val scope: SharingScope,
     /* The participant's date of birth in ISO 8601 format (YYYY-MM-DD). */
     @SerialName("birthdate")
-    val birthdate: kotlin.String? = null,
+    val birthdate: String? = null,
     /* Base 64 encoded image of the participant's signature. If `imageData` is supplied, `imageMimeType` must also be supplied.  */
     @SerialName("imageData")
-    val imageData: kotlin.String? = null,
+    val imageData: String? = null,
     /* Mime type of this image (e.g. \"image/png\"). If `imageData` is supplied, `imageMimeType` must also be supplied.  */
     @SerialName("imageMimeType")
-    val imageMimeType: kotlin.String? = null,
+    val imageMimeType: String? = null,
     /* The date and time the referenced consent was signed and agreed to by the participant. */
     @SerialName("signedOn")
-    val signedOn: kotlin.String? = null,
+    val signedOn: String? = null,
     /* The date and time the participant withdrew consent (can be blank). */
     @SerialName("withdrewOn")
-    val withdrewOn: kotlin.String? = null,
+    val withdrewOn: String? = null,
     /* ConsentSignature */
     @SerialName("type")
-    val type: kotlin.String? = null
+    val type: String? = null
 )

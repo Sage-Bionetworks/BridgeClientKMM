@@ -13,7 +13,7 @@ import org.sagebionetworks.bridge.kmm.shared.models.AdherenceRecordList
 import org.sagebionetworks.bridge.kmm.shared.models.AdherenceRecordUpdates
 import org.sagebionetworks.bridge.kmm.shared.models.Message
 
-internal class SchedulesV2Api(basePath: kotlin.String = BASE_PATH, httpClient: HttpClient) : AbstractApi(basePath, httpClient) {
+internal class SchedulesV2Api(basePath: String = BASE_PATH, httpClient: HttpClient) : AbstractApi(basePath, httpClient) {
 
     /**
      * Get the caller’s timeline of scheduled assessments in this study.

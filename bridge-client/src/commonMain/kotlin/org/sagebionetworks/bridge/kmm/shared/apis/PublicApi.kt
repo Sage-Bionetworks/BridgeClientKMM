@@ -7,7 +7,7 @@ package org.sagebionetworks.bridge.kmm.shared.apis
 import io.ktor.client.*
 import org.sagebionetworks.bridge.mpp.network.generated.models.AppConfig
 
-internal class PublicApi(basePath: kotlin.String = BASE_PATH, httpClient: HttpClient) : AbstractApi(basePath, httpClient) {
+internal class PublicApi(basePath: String = BASE_PATH, httpClient: HttpClient) : AbstractApi(basePath, httpClient) {
 
     /**
      * Get the config for the current version of the app making the request.

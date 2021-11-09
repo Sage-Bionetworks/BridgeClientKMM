@@ -26,16 +26,16 @@ import kotlinx.serialization.SerialName
 data class NotificationMessage (
     /* Very short rendition of the notification. For example, this value will be displayed on an Apple iWatch, where the message is shown for a short time only. */
     @SerialName("subject")
-    val subject: kotlin.String,
+    val subject: String,
     /* Full notification message. */
     @SerialName("message")
-    val message: kotlin.String,
+    val message: String,
     /* A valid ISO 639 alpha-2 or alpha-3 language code specifying the language of the notification. */
     @SerialName("lang")
-    val lang: kotlin.String? = null,
+    val lang: String? = null,
     /* NotificationMessage */
     @SerialName("type")
-    val type: kotlin.String? = null
+    val type: String? = null
 ) {
 
 }

@@ -58,80 +58,80 @@ import kotlinx.serialization.SerialName
 @Serializable
 internal data class RequestParams (
     @SerialName("allOfGroups")
-    val allOfGroups: kotlin.collections.List<kotlin.String>? = null,
+    val allOfGroups: List<String>? = null,
     @SerialName("assessmentIds")
-    val assessmentIds: kotlin.collections.List<kotlin.String>? = null,
+    val assessmentIds: List<String>? = null,
     @SerialName("assignmentFilter")
-    val assignmentFilter: kotlin.Boolean? = null,
+    val assignmentFilter: Boolean? = null,
     @SerialName("currentTimestampsOnly")
-    val currentTimestampsOnly: kotlin.Boolean? = null,
+    val currentTimestampsOnly: Boolean? = null,
     @SerialName("emailFilter")
-    val emailFilter: kotlin.String? = null,
+    val emailFilter: String? = null,
     @SerialName("endDate")
-    val endDate: kotlin.String? = null,
+    val endDate: String? = null,
     @SerialName("endTime")
-    val endTime: kotlin.String? = null,
+    val endTime: String? = null,
     @SerialName("eventTimestamps")
-    val eventTimestamps: kotlin.collections.Map<kotlin.String, kotlin.String>? = null,
+    val eventTimestamps: Map<String, String>? = null,
     @SerialName("idFilter")
-    val idFilter: kotlin.String? = null,
+    val idFilter: String? = null,
     @SerialName("includeDeleted")
-    val includeDeleted: kotlin.Boolean? = null,
+    val includeDeleted: Boolean? = null,
     @SerialName("includeRepeats")
-    val includeRepeats: kotlin.Boolean? = null,
+    val includeRepeats: Boolean? = null,
     @SerialName("instanceGuids")
-    val instanceGuids: kotlin.collections.List<kotlin.String>? = null,
+    val instanceGuids: List<String>? = null,
     @SerialName("language")
-    val language: kotlin.String? = null,
+    val language: String? = null,
     @SerialName("noneOfGroups")
-    val noneOfGroups: kotlin.collections.List<kotlin.String>? = null,
+    val noneOfGroups: List<String>? = null,
     @SerialName("offsetBy")
-    val offsetBy: kotlin.Int? = null,
+    val offsetBy: Int? = null,
     @SerialName("offsetKey")
-    val offsetKey: kotlin.String? = null,
+    val offsetKey: String? = null,
     @SerialName("pageSize")
-    val pageSize: kotlin.Int? = null,
+    val pageSize: Int? = null,
     @SerialName("phoneFilter")
-    val phoneFilter: kotlin.String? = null,
+    val phoneFilter: String? = null,
     @SerialName("recordType")
     val recordType: AdherenceRecordType? = null,
     @SerialName("reportType")
     val reportType: ReportType? = null,
     @SerialName("scheduledOnStart")
-    val scheduledOnStart: kotlin.String? = null,
+    val scheduledOnStart: String? = null,
     @SerialName("scheduledOnEnd")
-    val scheduledOnEnd: kotlin.String? = null,
+    val scheduledOnEnd: String? = null,
     @SerialName("sessionGuids")
-    val sessionGuids: kotlin.collections.List<kotlin.String>? = null,
+    val sessionGuids: List<String>? = null,
     @SerialName("sortOrder")
     val sortOrder: SortOrder? = null,
     @SerialName("startDate")
-    val startDate: kotlin.String? = null,
+    val startDate: String? = null,
     @SerialName("startTime")
-    val startTime: kotlin.String? = null,
+    val startTime: String? = null,
     @SerialName("studyId")
-    val studyId: kotlin.String? = null,
+    val studyId: String? = null,
     @SerialName("timeWindowGuids")
-    val timeWindowGuids: kotlin.collections.List<kotlin.String>? = null,
+    val timeWindowGuids: List<String>? = null,
     @SerialName("total")
-    val total: kotlin.Int? = null,
+    val total: Int? = null,
     @SerialName("summary")
-    val summary: kotlin.Boolean? = null,
+    val summary: Boolean? = null,
     @SerialName("tags")
-    val tags: kotlin.collections.List<kotlin.String>? = null,
+    val tags: List<String>? = null,
     @SerialName("categories")
-    val categories: kotlin.collections.List<ResourceCategory>? = null,
+    val categories: List<ResourceCategory>? = null,
     @SerialName("minRevision")
-    val minRevision: kotlin.Int? = null,
+    val minRevision: Int? = null,
     @SerialName("maxRevision")
-    val maxRevision: kotlin.Int? = null,
+    val maxRevision: Int? = null,
     @SerialName("adminOnly")
-    val adminOnly: kotlin.Boolean? = null,
+    val adminOnly: Boolean? = null,
     @SerialName("orgMembership")
-    val orgMembership: kotlin.String? = null,
+    val orgMembership: String? = null,
     /* RequestParams */
     @SerialName("type")
-    val type: kotlin.String? = null
+    val type: String? = null
 ) {
 
 }

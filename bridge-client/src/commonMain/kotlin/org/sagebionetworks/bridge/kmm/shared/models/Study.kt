@@ -48,74 +48,74 @@ import kotlinx.serialization.SerialName
 data class Study (
     /* The identifier for this study. */
     @SerialName("identifier")
-    val identifier: kotlin.String,
+    val identifier: String,
     /* The name of the study. */
     @SerialName("name")
-    val name: kotlin.String,
+    val name: String,
     @SerialName("phase")
     val phase: StudyPhase,
     /* The optimistic locking version of the study. This value must be submitted as part of the next update of the model. If it does not match the value on the server, a 409 error (Conflict) will prevent the update from occurring. It can also serve as a key to determine if a local cache of this `Study` revision needs to be updated.  */
     @SerialName("version")
-    val version: kotlin.Long,
+    val version: Long,
     /* An in-depth description of this study for prospective participants, or to show participants after they have joined a study (the “about” screen for the study). */
     @SerialName("details")
-    val details: kotlin.String? = null,
+    val details: String? = null,
     /* Client data for a study should be in a syntactically valid JSON format. It will be returned as is to the client (as JSON). It can contain any information that is useful to study authoring tools or administration tools that is not part of the Bridge data model.  */
     @SerialName("clientData")
-    val clientData: kotlinx.serialization.json.JsonElement? = null,
+    val clientData: JsonElement? = null,
     /* The name of the IRB that approved the study or decided it was exempt from human subjects research guidelines. Optional, but can be used to identify one of several IRBs if more than one is included in the study’s contact information. */
     @SerialName("irbName")
-    val irbName: kotlin.String? = null,
+    val irbName: String? = null,
     /* Before the study can launch, it must be reviewed by your IRB and either be approved, or considered exempt from human subjects research guidelines. */
     @SerialName("irbDecisionOn")
-    val irbDecisionOn: kotlin.String? = null,
+    val irbDecisionOn: String? = null,
     /* The last date that the IRB’s review is considered up-to-date for this study. */
     @SerialName("irbExpiresOn")
-    val irbExpiresOn: kotlin.String? = null,
+    val irbExpiresOn: String? = null,
     @SerialName("irbDecisionType")
     val irbDecisionType: IrbDecisionType? = null,
     /* The name of the protocol as it was submitted to the IRB for approval. */
     @SerialName("irbProtocolName")
-    val irbProtocolName: kotlin.String? = null,
+    val irbProtocolName: String? = null,
     /* An identification number for the study that has been assigned by the IRB. */
     @SerialName("irbProtocolId")
-    val irbProtocolId: kotlin.String? = null,
+    val irbProtocolId: String? = null,
     /* An URL to a logo for the study. */
     @SerialName("studyLogoUrl")
-    val studyLogoUrl: kotlin.String? = null,
+    val studyLogoUrl: String? = null,
     @SerialName("colorScheme")
     val colorScheme: ColorScheme? = null,
     /* An identification number for the study that has been assigned by the sponsor or institution running the study. */
     @SerialName("institutionId")
-    val institutionId: kotlin.String? = null,
+    val institutionId: String? = null,
     /* The GUID of the schedule to use for this study. **NOTE: this is temporary, and will be replaced with a model of the study protocol that can include multiple arms in the study.**  */
     @SerialName("scheduleGuid")
-    val scheduleGuid: kotlin.String? = null,
+    val scheduleGuid: String? = null,
     /* Free text that can be used in searches to locate studies. */
     @SerialName("keywords")
-    val keywords: kotlin.String? = null,
+    val keywords: String? = null,
     /* A list of the diseases that are the subject of this study. */
     @SerialName("diseases")
-    val diseases: kotlin.collections.List<kotlin.String>? = null,
+    val diseases: List<String>? = null,
     /* The type of study (e.g. observational, interventional, etc.). */
     @SerialName("studyDesignTypes")
-    val studyDesignTypes: kotlin.collections.List<kotlin.String>? = null,
+    val studyDesignTypes: List<String>? = null,
     @SerialName("signInTypes")
-    val signInTypes: kotlin.collections.List<SignInType>? = null,
+    val signInTypes: List<SignInType>? = null,
     @SerialName("contacts")
-    val contacts: kotlin.collections.List<Contact>? = null,
+    val contacts: List<Contact>? = null,
     /* Has this study been logically deleted (an admin can restore it)?  */
     @SerialName("deleted")
-    val deleted: kotlin.Boolean? = null,
+    val deleted: Boolean? = null,
     /* The date and time the study was created. */
     @SerialName("createdOn")
-    val createdOn: kotlin.String? = null,
+    val createdOn: String? = null,
     /* The date and time the study was last modified. */
     @SerialName("modifiedOn")
-    val modifiedOn: kotlin.String? = null,
+    val modifiedOn: String? = null,
     /* Study */
     @SerialName("type")
-    val type: kotlin.String? = null
+    val type: String? = null
 ) {
 
 }

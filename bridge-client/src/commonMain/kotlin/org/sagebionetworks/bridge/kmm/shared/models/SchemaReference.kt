@@ -25,13 +25,13 @@ import kotlinx.serialization.SerialName
 data class SchemaReference (
     /* Schema ID */
     @SerialName("id")
-    val id: kotlin.String,
+    val id: String,
     /* Schema revision number. Can be blank in a Schedule Plan if you want the Scheduler to automatically resolve to the latest revision for the user's app version.  */
     @SerialName("revision")
-    val revision: kotlin.Long? = null,
+    val revision: Long? = null,
     /* SchemaReference */
     @SerialName("type")
-    val type: kotlin.String? = null
+    val type: String? = null
 ) {
 
 }

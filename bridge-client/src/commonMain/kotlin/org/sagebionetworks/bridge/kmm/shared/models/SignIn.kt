@@ -29,23 +29,23 @@ import kotlinx.serialization.SerialName
 internal data class SignIn (
     /* App identifier of the participant's app */
     @SerialName("appId")
-    val appId: kotlin.String,
+    val appId: String,
     /* User's email address */
     @SerialName("email")
-    val email: kotlin.String? = null,
+    val email: String? = null,
     @SerialName("phone")
     val phone: Phone? = null,
     /* The external ID associated with this app participant */
     @SerialName("externalId")
-    val externalId: kotlin.String? = null,
+    val externalId: String? = null,
     /* User's password */
     @SerialName("password")
-    val password: kotlin.String? = null,
+    val password: String? = null,
     /* The token sent with a new session to reauthenticate with the server. This removes the need for a client app to store the user's password. The reauth token is rotated each time the caller authenticates or reauthenticates.  */
     @SerialName("reauthToken")
-    val reauthToken: kotlin.String? = null,
+    val reauthToken: String? = null,
     /* SignIn */
     @SerialName("type")
-    val type: kotlin.String? = null
+    val type: String? = null
 )
 

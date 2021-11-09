@@ -29,22 +29,22 @@ import kotlinx.serialization.SerialName
 @Serializable
 data class Address (
     @SerialName("placeName")
-    val placeName: kotlin.String? = null,
+    val placeName: String? = null,
     @SerialName("street")
-    val street: kotlin.String? = null,
+    val street: String? = null,
     @SerialName("mailRouting")
-    val mailRouting: kotlin.String? = null,
+    val mailRouting: String? = null,
     @SerialName("city")
-    val city: kotlin.String? = null,
+    val city: String? = null,
     @SerialName("division")
-    val division: kotlin.String? = null,
+    val division: String? = null,
     @SerialName("postalCode")
-    val postalCode: kotlin.String? = null,
+    val postalCode: String? = null,
     @SerialName("country")
-    val country: kotlin.String? = null,
+    val country: String? = null,
     /* Address */
     @SerialName("type")
-    val type: kotlin.String? = null
+    val type: String? = null
 ) {
 
 }

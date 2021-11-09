@@ -13,6 +13,7 @@ package org.sagebionetworks.bridge.mpp.network.generated.models
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 import org.sagebionetworks.bridge.kmm.shared.models.Criteria
 
 /**
@@ -35,40 +36,40 @@ import org.sagebionetworks.bridge.kmm.shared.models.Criteria
 @Serializable
 data class AppConfig (
     @SerialName("label")
-    val label: kotlin.String,
+    val label: String,
     /* The date and time the app config was created. */
     @SerialName("createdOn")
-    val createdOn: kotlin.String? = null,
+    val createdOn: String? = null,
     /* The date and time the app config was last modified. */
     @SerialName("modifiedOn")
-    val modifiedOn: kotlin.String? = null,
+    val modifiedOn: String? = null,
     @SerialName("guid")
-    val guid: kotlin.String? = null,
+    val guid: String? = null,
     /* Has this app config been logically deleted (an admin can restore it)? */
     @SerialName("deleted")
-    val deleted: kotlin.Boolean? = null,
+    val deleted: Boolean? = null,
     @SerialName("criteria")
     val criteria: Criteria? = null,
     /* An arbitrary object that will be serialized and stored as JSON using the GSON serialization mechanisms. In Java this field is an Object; since the type of the object is not known, the rest-client includes a utility method: ``` MyCustomObject data = RestUtils.toType(     activity.getClientData(), MyCustomObject.class); ```  */
     @SerialName("clientData")
     val clientData: kotlinx.serialization.json.JsonElement? = null,
     @SerialName("surveyReferences")
-    val surveyReferences: kotlin.collections.List<SurveyReference>? = null,
+    val surveyReferences: List<SurveyReference>? = null,
     @SerialName("schemaReferences")
-    val schemaReferences: kotlin.collections.List<SchemaReference>? = null,
+    val schemaReferences: List<SchemaReference>? = null,
     @SerialName("configReferences")
-    val configReferences: kotlin.collections.List<ConfigReference>? = null,
+    val configReferences: List<ConfigReference>? = null,
     @SerialName("fileReferences")
-    val fileReferences: kotlin.collections.List<FileReference>? = null,
+    val fileReferences: List<FileReference>? = null,
     /* A map of app config element IDs to the app config element JSON of a specific app config element revision (the revision given in the configReferences map).  */
     @SerialName("configElements")
-    val configElements: kotlin.collections.Map<kotlin.String, kotlinx.serialization.json.JsonElement>? = null,
+    val configElements: Map<String, JsonElement>? = null,
     /* The optimistic locking version of the app config. This value must be submitted as part of the next update of the model. If it does not match the value on the server, a 409 error (Conflict) will prevent the update from occurring. It can also serve as a key to determine if a local cache of `AppConfig` needs to be updated.  */
     @SerialName("version")
-    val version: kotlin.Long? = null,
+    val version: Long? = null,
     /* AppConfig */
     @SerialName("type")
-    val type: kotlin.String? = null
+    val type: String? = null
 ) {
 
 }

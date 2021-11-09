@@ -32,22 +32,22 @@ data class Contact (
     @SerialName("role")
     val role: ContactRole,
     @SerialName("name")
-    val name: kotlin.String,
+    val name: String,
     @SerialName("position")
-    val position: kotlin.String? = null,
+    val position: String? = null,
     @SerialName("affiliation")
-    val affiliation: kotlin.String? = null,
+    val affiliation: String? = null,
     @SerialName("address")
     val address: Address? = null,
     @SerialName("email")
-    val email: kotlin.String? = null,
+    val email: String? = null,
     @SerialName("phone")
     val phone: Phone? = null,
     @SerialName("jurisdiction")
-    val jurisdiction: kotlin.String? = null,
+    val jurisdiction: String? = null,
     /* Contact */
     @SerialName("type")
-    val type: kotlin.String? = null
+    val type: String? = null
 ) {
 
 }

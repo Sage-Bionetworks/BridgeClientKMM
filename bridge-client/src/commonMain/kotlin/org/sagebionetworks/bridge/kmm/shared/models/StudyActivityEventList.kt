@@ -22,12 +22,12 @@ import kotlinx.serialization.SerialName
 @Serializable
 data class StudyActivityEventList (
     @SerialName("items")
-    val items: kotlin.collections.List<StudyActivityEvent>? = null,
+    val items: List<StudyActivityEvent>? = null,
     //@SerialName("requestParams")
     //val requestParams: RequestParams? = null,
     /* ResourceList */
     @SerialName("type")
-    val type: kotlin.String? = null
+    val type: String? = null
 ) {
 
 }

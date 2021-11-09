@@ -35,10 +35,10 @@ import kotlinx.serialization.SerialName
 data class ScheduledSession (
 
     @SerialName("refGuid")
-    val refGuid: kotlin.String,
+    val refGuid: String,
 
     @SerialName("instanceGuid")
-    val instanceGuid: kotlin.String,
+    val instanceGuid: String,
 
     /* An event ID for this scheduled session. The event ID may be mapped to a timestamp for a user.
     If the event ID does not exist for the user, the client should ignore this scheduled session.
@@ -47,32 +47,32 @@ data class ScheduledSession (
     val startEventId: String? = null,
 
     @SerialName("startDay")
-    val startDay: kotlin.Int,
+    val startDay: Int,
 
     @SerialName("endDay")
-    val endDay: kotlin.Int,
+    val endDay: Int,
 
     @SerialName("startTime")
-    val startTime: kotlin.String,
+    val startTime: String,
 
     @SerialName("delayTime")
-    val delayTime: kotlin.String? = null,
+    val delayTime: String? = null,
 
     @SerialName("expiration")
     val expiration: DateTimePeriod,
 
     @SerialName("persistent")
-    val persistent: kotlin.Boolean = false,
+    val persistent: Boolean = false,
 
     @SerialName("timeWindowGuid")
-    val timeWindowGuid: kotlin.String? = null,
+    val timeWindowGuid: String? = null,
 
     @SerialName("assessments")
-    val assessments: kotlin.collections.List<ScheduledAssessment>,
+    val assessments: List<ScheduledAssessment>,
 
     /* ScheduledSession */
     @SerialName("type")
-    val type: kotlin.String? = null
+    val type: String? = null
 
 ) {
 

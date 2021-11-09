@@ -14,6 +14,7 @@ package org.sagebionetworks.bridge.mpp.network.generated.models
 import kotlinx.serialization.Serializable
 
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.json.JsonElement
 
 /**
  * **Important: Headers of the same values must be used when doing the upload against the pre-signed URL.**
@@ -30,28 +31,28 @@ import kotlinx.serialization.SerialName
 internal data class UploadRequest (
     /* File name */
     @SerialName("name")
-    val name: kotlin.String,
+    val name: String,
     /* The size of the object in bytes. A standard HTTP header. For more information, go to [http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.13](http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.13)  */
     @SerialName("contentLength")
-    val contentLength: kotlin.Long,
+    val contentLength: Long,
     /* The base64-encoded, 128-bit MD5 digest of the object body. */
     @SerialName("contentMd5")
-    val contentMd5: kotlin.String,
+    val contentMd5: String,
     /* A standard MIME type. For more information, go to [http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.17](http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.17)  */
     @SerialName("contentType")
-    val contentType: kotlin.String,
+    val contentType: String,
     /* True if the upload is encrypted. False if it is not encrypted. If not specified, defaults to true. */
     @SerialName("encrypted")
-    val encrypted: kotlin.Boolean? = null,
+    val encrypted: Boolean? = null,
     /* JSON map with key value pairs representing metadata for this upload, as submitted by the app. This corresponds with the uploadMetadataFieldDefinitions configured in the app.  */
     @SerialName("metadata")
-    val metadata: kotlin.collections.Map<kotlin.String, kotlinx.serialization.json.JsonElement>? = null,
+    val metadata: Map<String, JsonElement>? = null,
     /* True if the upload is zipped. False if it is a single file. If not specified, defaults to true. */
     @SerialName("zipped")
-    val zipped: kotlin.Boolean? = null,
+    val zipped: Boolean? = null,
     /* UploadRequest */
     @SerialName("type")
-    val type: kotlin.String? = null
+    val type: String? = null
 ) {
 
 }

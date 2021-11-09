@@ -27,19 +27,19 @@ import kotlinx.serialization.SerialName
 data class SurveyReference (
     /* The survey guid */
     @SerialName("guid")
-    val guid: kotlin.String,
+    val guid: String,
     /* The survey identifier. */
     @SerialName("identifier")
-    val identifier: kotlin.String? = null,
+    val identifier: String? = null,
     /* The createdOn timestamp of the version of the survey. This can be null, which indicates the most recently published version of the study should be used.  */
     @SerialName("createdOn")
-    val createdOn: kotlin.String? = null,
+    val createdOn: String? = null,
     /* An URL to retrieve the survey. */
     @SerialName("href")
-    val href: kotlin.String? = null,
+    val href: String? = null,
     /* SurveyReference */
     @SerialName("type")
-    val type: kotlin.String? = null
+    val type: String? = null
 ) {
 
 }

@@ -26,16 +26,16 @@ import kotlinx.serialization.SerialName
 data class FileReference (
     /* The file guid */
     @SerialName("guid")
-    val guid: kotlin.String,
+    val guid: String,
     /* The createdOn timestamp of the file revision */
     @SerialName("createdOn")
-    val createdOn: kotlin.String,
+    val createdOn: String,
     /* An URL to retrieve the file revision */
     @SerialName("href")
-    val href: kotlin.String? = null,
+    val href: String? = null,
     /* FileReference */
     @SerialName("type")
-    val type: kotlin.String? = null
+    val type: String? = null
 ) {
 
 }

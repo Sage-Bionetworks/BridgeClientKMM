@@ -14,7 +14,6 @@ package org.sagebionetworks.bridge.kmm.shared.models
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
-import org.sagebionetworks.bridge.kmm.shared.models.Criteria
 
 /**
  * An app configuration object. 

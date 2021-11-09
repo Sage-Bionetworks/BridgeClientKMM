@@ -5,13 +5,7 @@ package org.sagebionetworks.bridge.kmm.shared.apis
 
 
 import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.request.*
-import io.ktor.http.*
 import org.sagebionetworks.bridge.kmm.shared.models.*
-import org.sagebionetworks.bridge.kmm.shared.models.AdherenceRecordList
-import org.sagebionetworks.bridge.kmm.shared.models.AdherenceRecordUpdates
-import org.sagebionetworks.bridge.kmm.shared.models.Message
 
 internal class SchedulesV2Api(basePath: String = BASE_PATH, httpClient: HttpClient) : AbstractApi(basePath, httpClient) {
 

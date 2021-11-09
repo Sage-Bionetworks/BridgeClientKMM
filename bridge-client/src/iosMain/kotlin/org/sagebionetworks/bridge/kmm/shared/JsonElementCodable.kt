@@ -3,9 +3,11 @@ package org.sagebionetworks.bridge.kmm.shared
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import org.sagebionetworks.bridge.kmm.shared.models.AdherenceRecord
+import org.sagebionetworks.bridge.kmm.shared.models.AppConfig
+import org.sagebionetworks.bridge.kmm.shared.models.Study
+import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
 import platform.Foundation.*
-import org.sagebionetworks.bridge.kmm.shared.models.*
-import org.sagebionetworks.bridge.mpp.network.generated.models.AppConfig
 
 // TODO: syoung 09/08/2021 Deprecate this class and use Generic JsonDecoder below
 class JsonElementDecoder(private val jsonData: NSData) {

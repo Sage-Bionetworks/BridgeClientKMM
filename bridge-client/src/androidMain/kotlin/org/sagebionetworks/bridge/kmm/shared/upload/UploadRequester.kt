@@ -32,13 +32,13 @@ class UploadRequester(
         val pendingUploads = database.getResourcesBySecondaryId(assessmentInstanceId, ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID)
         if (pendingUploads.isNotEmpty()) {
             for (uploadResource in pendingUploads) {
-                uploadResource.loadResource<UploadFile>()?.let { uploadFile ->
-                    if (uploadFile.sessionExpires != null) {
+                uploadResource.loadResource<UploadFile>()?.let { pendingUploadFile ->
+                    if (pendingUploadFile.sessionExpires != null) {
                         //We already have pending upload for this assessmentInstanceID waiting for
                         //the scheduled session to expire before uploading. It will be replaced
                         //with the new one.
-                        FileSystem.SYSTEM.delete(uploadFile.filePath.toPath())
-                        database.removeResource(uploadFile.getUploadFileResourceId(), ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID)
+                        FileSystem.SYSTEM.delete(pendingUploadFile.filePath.toPath())
+                        database.removeResource(pendingUploadFile.getUploadFileResourceId(), ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID)
                     }
                 }
             }

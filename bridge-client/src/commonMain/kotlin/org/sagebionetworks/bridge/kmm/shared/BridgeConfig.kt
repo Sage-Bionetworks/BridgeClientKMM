@@ -80,11 +80,8 @@ interface BridgeConfig : PlatformConfig {
      * string User-Agent header value
      */
     fun getUserAgent(info: ClientInfo): String? {
-        if (info == null) {
-            return null
-        }
         // Send what is available. The server can handle all meaningful combinations.
-        val sb: StringBuilder = StringBuilder()
+        val sb = StringBuilder()
         if (isNotBlank(info.appName) || info.appName != null) {
             if (isNotBlank(info.appName)) {
                 sb.append(info.appName)

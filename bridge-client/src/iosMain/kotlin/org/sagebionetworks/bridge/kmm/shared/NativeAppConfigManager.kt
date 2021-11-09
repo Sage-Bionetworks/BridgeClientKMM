@@ -8,8 +8,8 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus
+import org.sagebionetworks.bridge.kmm.shared.models.AppConfig
 import org.sagebionetworks.bridge.kmm.shared.repo.AppConfigRepo
-import org.sagebionetworks.bridge.mpp.network.generated.models.AppConfig
 
 class NativeAppConfigManager(
     private val viewUpdate: (AppConfig?, ResourceStatus?) -> Unit

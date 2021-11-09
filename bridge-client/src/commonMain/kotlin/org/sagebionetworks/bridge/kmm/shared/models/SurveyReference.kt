@@ -40,7 +40,5 @@ data class SurveyReference (
     /* SurveyReference */
     @SerialName("type")
     val type: String? = null
-) {
-
-}
+)
 

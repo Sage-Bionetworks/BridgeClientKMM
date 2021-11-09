@@ -132,7 +132,5 @@ internal data class RequestParams (
     /* RequestParams */
     @SerialName("type")
     val type: String? = null
-) {
-
-}
+)
 

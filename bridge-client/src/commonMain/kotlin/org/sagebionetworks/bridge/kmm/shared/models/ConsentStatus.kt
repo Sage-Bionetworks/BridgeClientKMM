@@ -48,7 +48,5 @@ data class ConsentStatus (
     /* ConsentStatus */
     @SerialName("type")
     val type: String? = null
-) {
-
-}
+)
 

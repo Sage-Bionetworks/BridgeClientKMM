@@ -28,7 +28,5 @@ data class StudyActivityEventList (
     /* ResourceList */
     @SerialName("type")
     val type: String? = null
-) {
-
-}
+)
 

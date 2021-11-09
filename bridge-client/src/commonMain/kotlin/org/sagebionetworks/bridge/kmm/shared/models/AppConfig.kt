@@ -70,7 +70,5 @@ data class AppConfig (
     /* AppConfig */
     @SerialName("type")
     val type: String? = null
-) {
-
-}
+)
 

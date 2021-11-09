@@ -74,7 +74,5 @@ data class AdherenceRecordsSearch (
     /* AdherenceRecordsSearch */
     @SerialName("type")
     val type: String? = null
-) {
-
-}
+)
 

@@ -33,7 +33,5 @@ internal data class AdherenceRecordList (
     val total: Int,
     @SerialName("items")
     val items: List<AdherenceRecord>
-) {
-
-}
+)
 

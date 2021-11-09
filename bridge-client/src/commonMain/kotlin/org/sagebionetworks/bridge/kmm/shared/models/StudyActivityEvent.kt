@@ -49,7 +49,5 @@ data class StudyActivityEvent (
     /* StudyActivityEvent */
     @SerialName("type")
     val type: String? = null
-) {
-
-}
+)
 

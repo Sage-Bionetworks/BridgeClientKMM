@@ -74,8 +74,6 @@ data class ScheduledSession (
     @SerialName("type")
     val type: String? = null
 
-) {
-
-}
+)
 
 

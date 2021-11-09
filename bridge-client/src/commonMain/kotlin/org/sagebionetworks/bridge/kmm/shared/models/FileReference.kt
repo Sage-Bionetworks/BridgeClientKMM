@@ -36,7 +36,5 @@ data class FileReference (
     /* FileReference */
     @SerialName("type")
     val type: String? = null
-) {
-
-}
+)
 

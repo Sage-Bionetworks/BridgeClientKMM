@@ -40,7 +40,5 @@ data class ColorScheme (
     /* ColorScheme */
     @SerialName("type")
     val type: String? = null
-) {
-
-}
+)
 

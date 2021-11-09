@@ -32,7 +32,5 @@ data class ConfigReference (
     /* ConfigReference */
     @SerialName("type")
     val type: String? = null
-) {
-
-}
+)
 

@@ -52,7 +52,5 @@ data class Criteria (
     /* Criteria */
     @SerialName("type")
     val type: String? = null
-) {
-
-}
+)
 

@@ -38,7 +38,5 @@ internal data class UploadValidationStatus (
     /* UploadValidationStatus */
     @SerialName("type")
     val type: String? = null
-) {
-
-}
+)
 

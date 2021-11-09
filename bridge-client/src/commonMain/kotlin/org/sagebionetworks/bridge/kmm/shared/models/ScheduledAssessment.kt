@@ -30,7 +30,5 @@ data class ScheduledAssessment (
     /* ScheduledAssessment */
     @SerialName("type")
     val type: String? = null
-) {
-
-}
+)
 

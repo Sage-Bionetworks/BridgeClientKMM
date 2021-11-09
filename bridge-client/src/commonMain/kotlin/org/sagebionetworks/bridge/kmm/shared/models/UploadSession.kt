@@ -36,7 +36,5 @@ internal data class UploadSession (
     /* UploadSession */
     @SerialName("type")
     val type: String? = null
-) {
-
-}
+)
 

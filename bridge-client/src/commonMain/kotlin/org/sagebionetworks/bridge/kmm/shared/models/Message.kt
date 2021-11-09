@@ -27,7 +27,5 @@ internal data class Message (
     /* StatusMessage */
     @SerialName("type")
     val type: String? = null
-) {
-
-}
+)
 

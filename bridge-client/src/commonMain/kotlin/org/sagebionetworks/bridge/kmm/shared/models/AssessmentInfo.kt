@@ -53,7 +53,5 @@ data class AssessmentInfo (
     /* AssessmentInfo */
     @SerialName("type")
     val type: String? = null
-) {
-
-}
+)
 

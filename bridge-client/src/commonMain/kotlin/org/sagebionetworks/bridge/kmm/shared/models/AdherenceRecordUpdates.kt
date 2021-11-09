@@ -27,7 +27,5 @@ data class AdherenceRecordUpdates (
     /* AdherenceRecordUpdates */
     @SerialName("type")
     val type: String = "AdherenceRecordUpdates"
-) {
-
-}
+)
 

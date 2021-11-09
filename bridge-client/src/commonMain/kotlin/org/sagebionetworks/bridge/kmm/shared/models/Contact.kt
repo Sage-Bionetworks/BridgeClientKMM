@@ -48,7 +48,5 @@ data class Contact (
     /* Contact */
     @SerialName("type")
     val type: String? = null
-) {
-
-}
+)
 

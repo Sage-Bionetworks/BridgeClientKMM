@@ -32,7 +32,5 @@ data class SchemaReference (
     /* SchemaReference */
     @SerialName("type")
     val type: String? = null
-) {
-
-}
+)
 

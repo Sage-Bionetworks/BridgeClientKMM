@@ -42,7 +42,5 @@ data class NotificationInfo (
     /* NotificationInfo */
     @SerialName("type")
     val type: String? = null
-) {
-
-}
+)
 

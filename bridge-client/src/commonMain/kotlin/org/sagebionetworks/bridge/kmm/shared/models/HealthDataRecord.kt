@@ -113,7 +113,5 @@ internal data class HealthDataRecord (
     /* HealthDataRecord */
     @SerialName("type")
     val type: String? = null
-) {
-
-}
+)
 

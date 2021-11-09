@@ -53,7 +53,5 @@ internal data class UploadRequest (
     /* UploadRequest */
     @SerialName("type")
     val type: String? = null
-) {
-
-}
+)
 

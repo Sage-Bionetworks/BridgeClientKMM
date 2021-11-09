@@ -116,7 +116,5 @@ data class Study (
     /* Study */
     @SerialName("type")
     val type: String? = null
-) {
-
-}
+)
 

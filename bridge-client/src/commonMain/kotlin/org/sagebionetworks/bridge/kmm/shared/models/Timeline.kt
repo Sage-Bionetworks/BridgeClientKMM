@@ -38,7 +38,5 @@ data class Timeline (
     /* Timeline */
     @SerialName("type")
     val type: String? = null
-) {
-
-}
+)
 

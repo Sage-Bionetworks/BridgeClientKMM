@@ -52,7 +52,5 @@ data class SessionInfo (
     @SerialName("type")
     val type: String? = null
 
-) {
-
-}
+)
 

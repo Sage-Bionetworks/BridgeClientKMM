@@ -36,7 +36,5 @@ data class NotificationMessage (
     /* NotificationMessage */
     @SerialName("type")
     val type: String? = null
-) {
-
-}
+)
 

@@ -7,11 +7,9 @@ import kotlinx.datetime.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okio.FileSystem
-import okio.Path
 import okio.Path.Companion.toPath
 import org.sagebionetworks.bridge.kmm.shared.apis.S3UploadApi
 import org.sagebionetworks.bridge.kmm.shared.apis.UploadsApi
-import org.sagebionetworks.bridge.kmm.shared.cache.DbDriverFactory
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper.Companion.APP_WIDE_STUDY_ID
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType

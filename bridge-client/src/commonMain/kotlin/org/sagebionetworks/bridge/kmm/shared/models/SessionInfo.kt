@@ -11,12 +11,8 @@
  */
 package org.sagebionetworks.bridge.kmm.shared.models
 
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.Serializable
-
 import kotlinx.serialization.SerialName
-import org.sagebionetworks.bridge.kmm.shared.models.NotificationInfo
-import org.sagebionetworks.bridge.kmm.shared.models.PerformanceOrder
+import kotlinx.serialization.Serializable
 
 /**
  * Information about a session in order to render it in a UI prior to execution.

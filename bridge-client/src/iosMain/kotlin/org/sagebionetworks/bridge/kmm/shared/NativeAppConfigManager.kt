@@ -6,10 +6,9 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.sagebionetworks.bridge.kmm.shared.cache.*
-import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
+import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
+import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus
 import org.sagebionetworks.bridge.kmm.shared.repo.AppConfigRepo
-import org.sagebionetworks.bridge.kmm.shared.repo.AuthenticationRepository
 import org.sagebionetworks.bridge.mpp.network.generated.models.AppConfig
 
 class NativeAppConfigManager(

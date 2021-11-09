@@ -5,10 +5,6 @@ package org.sagebionetworks.bridge.kmm.shared.apis
 
 
 import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.request.*
-import io.ktor.http.*
-import org.sagebionetworks.bridge.kmm.shared.models.AssessmentConfig
 import org.sagebionetworks.bridge.mpp.network.generated.models.AppConfig
 
 internal class PublicApi(basePath: kotlin.String = BASE_PATH, httpClient: HttpClient) : AbstractApi(basePath, httpClient) {

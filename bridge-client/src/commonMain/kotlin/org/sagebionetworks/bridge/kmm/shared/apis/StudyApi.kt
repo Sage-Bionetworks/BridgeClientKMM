@@ -5,7 +5,6 @@ package org.sagebionetworks.bridge.kmm.shared.apis
 
 
 import io.ktor.client.*
-import org.sagebionetworks.bridge.kmm.shared.models.AssessmentConfig
 import org.sagebionetworks.bridge.kmm.shared.models.Study
 import org.sagebionetworks.bridge.kmm.shared.models.StudyInfo
 

@@ -11,10 +11,8 @@
 */
 package org.sagebionetworks.bridge.kmm.shared.models
 
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.Serializable
-
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 /**
  * 

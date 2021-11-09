@@ -12,10 +12,8 @@
 package org.sagebionetworks.bridge.kmm.shared.models
 
 import kotlinx.datetime.Instant
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.Serializable
-
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 /**
  * A record describing the performance state of a scheduled session or assessment, as requested in a `Timeline`. Each record describes the state of a session or an assessment.

@@ -17,7 +17,7 @@ class S3UploadApi(private val httpClient: HttpClient) {
             LocalFileContent(File(uploadFile.filePath), ContentType.parse(uploadFile.contentType))
 
         try {
-            return httpClient.put<Unit>(url) {
+            return httpClient.put(url) {
                 body = fileRequest
                 method = HttpMethod.Put
                 with(headers) {

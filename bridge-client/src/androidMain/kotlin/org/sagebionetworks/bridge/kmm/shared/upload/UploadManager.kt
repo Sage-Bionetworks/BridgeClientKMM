@@ -105,7 +105,7 @@ class UploadManager(
             remoteLoad = {loadRemoteUploadSession(uploadFile.getUploadRequest())}
         )
         //TODO: Need to think through error handling if we are unable to get an UploadSession -nbrown 12/16/20
-        return updatedResource.loadResource<UploadSession>()
+        return updatedResource.loadResource()
     }
 
     private suspend fun loadRemoteUploadSession(uploadRequest: UploadRequest): String {

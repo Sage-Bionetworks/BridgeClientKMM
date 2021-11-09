@@ -25,7 +25,7 @@ internal class UploadsApi(basePath: String = BASE_PATH, httpClient: HttpClient):
     * @return UploadSession
     */
     suspend fun requestUploadSession(uploadRequest: UploadRequest) : UploadSession {
-        return postData<UploadRequest, UploadSession>(uploadRequest, "v3/uploads")
+        return postData(uploadRequest, "v3/uploads")
     }
 
     /**

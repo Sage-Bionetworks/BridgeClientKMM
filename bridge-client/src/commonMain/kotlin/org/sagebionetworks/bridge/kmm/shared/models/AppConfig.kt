@@ -51,7 +51,7 @@ data class AppConfig (
     val criteria: Criteria? = null,
     /* An arbitrary object that will be serialized and stored as JSON using the GSON serialization mechanisms. In Java this field is an Object; since the type of the object is not known, the rest-client includes a utility method: ``` MyCustomObject data = RestUtils.toType(     activity.getClientData(), MyCustomObject.class); ```  */
     @SerialName("clientData")
-    val clientData: kotlinx.serialization.json.JsonElement? = null,
+    val clientData: JsonElement? = null,
     @SerialName("surveyReferences")
     val surveyReferences: List<SurveyReference>? = null,
     @SerialName("schemaReferences")

@@ -28,7 +28,7 @@ import java.io.PrintWriter
 import kotlin.test.*
 
 
-public class UploadManagerTest {
+class UploadManagerTest {
 
     @get:Rule
     var tempFolder = TemporaryFolder()

@@ -12,7 +12,7 @@ import org.sagebionetworks.bridge.kmm.shared.models.Study
 import org.sagebionetworks.bridge.kmm.shared.models.StudyInfo
 import org.sagebionetworks.bridge.kmm.shared.repo.StudyRepo
 
-class NativeStudyInfoManager() : KoinComponent {
+class NativeStudyInfoManager : KoinComponent {
 
     private val repo : StudyRepo by inject(mode = LazyThreadSafetyMode.NONE)
 

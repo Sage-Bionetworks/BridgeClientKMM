@@ -52,7 +52,7 @@ internal data class PlatformConfigImpl(
     override val appName: String = "Sage Assessment Test",
     override val appVersion: Int = 99,
     override val appVersionName: String = "Unknown",
-    override val bridgeEnvironment: PlatformConfig.BridgeEnvironment = PlatformConfig.BridgeEnvironment.production,
+    override val bridgeEnvironment: PlatformConfig.BridgeEnvironment = PlatformConfig.BridgeEnvironment.PRODUCTION,
     override val osVersion: String = "Unknown",
     override val deviceName: String = "Unknown",
     override val osName: String = "iOS") : IOSPlatformConfig

@@ -3,7 +3,6 @@ package org.sagebionetworks.bridge.kmm.presentation.auth
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.sagebionetworks.bridge.kmm.presentation.databinding.ExternalIdSignInActivityBinding
 
@@ -19,7 +18,7 @@ class ExternalIdSignInActivity : AppCompatActivity() {
         binding = ExternalIdSignInActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        viewModel.signInResult.observe(this, Observer {
+        viewModel.signInResult.observe(this, {
             binding.progressBar.visibility = View.GONE
             when(it) {
                 is SignInResult.Success -> {

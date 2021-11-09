@@ -96,7 +96,7 @@ class AdherenceRecordRepo(httpClient: HttpClient, databaseHelper: ResourceDataba
      */
     fun createUpdateAdherenceRecord(adherenceRecord: AdherenceRecord, studyId: String) {
         insertUpdate(adherenceRecord, studyId)
-        backgroundScope.launch() {
+        backgroundScope.launch {
             processUpdates(studyId)
         }
 

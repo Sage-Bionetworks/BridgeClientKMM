@@ -4,16 +4,16 @@ import org.sagebionetworks.bridge.kmm.shared.models.ClientInfo
 
 interface PlatformConfig {
     enum class BridgeEnvironment {
-        production {
+        PRODUCTION {
             override fun domainSuffix() = ""
         },
-        staging {
+        STAGING {
             override fun domainSuffix() = "-staging"
         },
-        development {
+        DEVELOPMENT {
             override fun domainSuffix() = "-develop"
         },
-        custom {
+        CUSTOM {
             override fun domainSuffix() = "-custom"
         };
 

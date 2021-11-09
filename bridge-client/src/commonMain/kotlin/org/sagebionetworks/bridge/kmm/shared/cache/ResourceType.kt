@@ -3,7 +3,7 @@ package org.sagebionetworks.bridge.kmm.shared.cache
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
-enum class ResourceType() {
+enum class ResourceType {
     ASSESSMENT_CONFIG,
     APP_CONFIG,
     UPLOAD_SESSION,

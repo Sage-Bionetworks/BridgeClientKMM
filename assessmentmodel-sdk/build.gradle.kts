@@ -35,12 +35,12 @@ android {
 
 
 dependencies {
-        val assessment_version = "0.4.6"
+        val assessmentVersion = "0.4.6"
         api(project(":bridge-client"))
-        api("org.sagebionetworks.assessmentmodel:assessmentModel:$assessment_version")
+        api("org.sagebionetworks.assessmentmodel:assessmentModel:$assessmentVersion")
 
         implementation(project(":bridge-client-presentation"))
-        implementation("org.sagebionetworks.assessmentmodel:presentation:$assessment_version")
+        implementation("org.sagebionetworks.assessmentmodel:presentation:$assessmentVersion")
 
         api(Deps.Koin.android)
 

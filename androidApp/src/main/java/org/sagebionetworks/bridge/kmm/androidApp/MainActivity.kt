@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import androidx.lifecycle.asLiveData
 import org.koin.android.ext.android.inject
 import org.sagebionetworks.bridge.kmm.presentation.auth.ExternalIdSignInActivity
@@ -37,7 +36,7 @@ class MainActivity : AppCompatActivity() {
 
         if (authenticationRepository.isAuthenticated()) {
             assessmentConfigRepo.getAssessmentById("eGhiQTT2a6SCCmjTod6CDb0t").asLiveData()
-                .observe(this, Observer { t ->
+                .observe(this, { t ->
                     when (t) {
                         is ResourceResult.Success -> {tv.text = t.data.config.toString()}
                         is ResourceResult.InProgress -> {tv.text = "loading..."}

@@ -6,9 +6,9 @@
 #import <Foundation/NSString.h>
 #import <Foundation/NSValue.h>
 
-@class BridgeClientCriteria, BridgeClientKotlinx_serialization_jsonJsonElement, BridgeClientSurveyReference, BridgeClientSchemaReference, BridgeClientConfigReference, BridgeClientFileReference, BridgeClientAppConfigCompanion, BridgeClientAppConfig, BridgeClientConfigReferenceCompanion, BridgeClientFileReferenceCompanion, BridgeClientSchemaReferenceCompanion, BridgeClientSurveyReferenceCompanion, BridgeClientClientInfo, BridgeClientPlatformConfigBridgeEnvironment, BridgeClientIOSBridgeConfig, NSData, BridgeClientAdherenceRecord, BridgeClientStudy, BridgeClientUserSessionInfo, NSDate, BridgeClientNativeAdherenceRecord, BridgeClientKoin_coreKoin, BridgeClientResourceStatus, BridgeClientKtor_httpHttpStatusCode, BridgeClientKotlinError, BridgeClientNativeScheduledSessionTimelineSlice, BridgeClientAssessmentInfo, BridgeClientNativeScheduledAssessment, NSDateComponents, BridgeClientNotificationMessage, BridgeClientNativeScheduledNotification, NSTimeZone, BridgeClientNativeScheduledSessionWindow, BridgeClientSessionInfo, BridgeClientKotlinEnumCompanion, BridgeClientKotlinEnum<E>, BridgeClientKotlinArray<T>, BridgeClientAccountStatusCompanion, BridgeClientAccountStatus, BridgeClientAddressCompanion, BridgeClientAddress, BridgeClientKotlinx_datetimeInstant, BridgeClientAdherenceRecordCompanion, BridgeClientAdherenceRecordTypeCompanion, BridgeClientAdherenceRecordType, BridgeClientAdherenceRecordUpdatesCompanion, BridgeClientAdherenceRecordUpdates, BridgeClientSortOrder, BridgeClientAdherenceRecordsSearchCompanion, BridgeClientAdherenceRecordsSearch, BridgeClientAssessmentConfigCompanion, BridgeClientAssessmentConfig, BridgeClientColorScheme, BridgeClientAssessmentInfoCompanion, BridgeClientClientInfoCompanion, BridgeClientColorSchemeCompanion, BridgeClientConsentStatusCompanion, BridgeClientConsentStatus, BridgeClientContactRole, BridgeClientPhone, BridgeClientContactCompanion, BridgeClientContact, BridgeClientContactRoleCompanion, BridgeClientCriteriaCompanion, BridgeClientEnvironmentCompanion, BridgeClientEnvironment, BridgeClientIrbDecisionTypeCompanion, BridgeClientIrbDecisionType, BridgeClientNotificationType, BridgeClientNotificationInfoCompanion, BridgeClientNotificationInfo, BridgeClientNotificationMessageCompanion, BridgeClientNotificationTypeCompanion, BridgeClientPerformanceOrderCompanion, BridgeClientPerformanceOrder, BridgeClientPhoneCompanion, BridgeClientReminderTypeCompanion, BridgeClientReminderType, BridgeClientRoleCompanion, BridgeClientRole, BridgeClientScheduledAssessmentCompanion, BridgeClientScheduledAssessment, BridgeClientKotlinx_datetimeDateTimePeriod, BridgeClientScheduledSessionCompanion, BridgeClientScheduledSession, BridgeClientSessionInfoCompanion, BridgeClientSharingScopeCompanion, BridgeClientSharingScope, BridgeClientSignInTypeCompanion, BridgeClientSignInType, BridgeClientSortOrderCompanion, BridgeClientStudyPhase, BridgeClientStudyCompanion, BridgeClientStudyActivityEventCompanion, BridgeClientStudyActivityEvent, BridgeClientStudyActivityEventListCompanion, BridgeClientStudyActivityEventList, BridgeClientStudyInfoCompanion, BridgeClientStudyInfo, BridgeClientStudyPhaseCompanion, BridgeClientTimelineCompanion, BridgeClientTimeline, BridgeClientUserSessionInfoCompanion, BridgeClientKtor_client_coreHttpClient, BridgeClientAbstractApiCompanion, BridgeClientRefreshTokenFeatureFeature, BridgeClientRefreshTokenFeature, BridgeClientKtor_utilsAttributeKey<T>, BridgeClientRefreshTokenFeatureConfig, BridgeClientSessionTokenFeatureFeature, BridgeClientSessionTokenFeature, BridgeClientSessionTokenFeatureConfig, BridgeClientBridgeResourceDatabaseCompanion, BridgeClientResourceAdapter, BridgeClientResourceType, BridgeClientResource, BridgeClientRuntimeQuery<__covariant RowType>, BridgeClientResourceDatabaseHelperCompanion, BridgeClientResourceResult<__covariant T>, BridgeClientResourceResultFailed, BridgeClientKotlinNothing, BridgeClientResourceResultInProgress, BridgeClientResourceResultSuccess<__covariant T>, BridgeClientResourceDatabaseHelper, BridgeClientAbstractResourceRepoCompanion, BridgeClientAbstractResourceRepo, BridgeClientActivityEventsRepoCompanion, BridgeClientAssessmentHistoryRecord, BridgeClientAuthenticationRepositoryCompanion, BridgeClientKotlinUnit, BridgeClientAdherenceRecordRepo, BridgeClientActivityEventsRepo, BridgeClientScheduleTimelineRepoCompanion, BridgeClientScheduledAssessmentReference, BridgeClientKotlinx_datetimeLocalDateTime, BridgeClientScheduledNotificationCompanion, BridgeClientScheduledNotification, BridgeClientKotlinx_datetimeTimeZone, BridgeClientScheduledSessionWindow, BridgeClientScheduledSessionTimelineSlice, BridgeClientKoin_coreModule, BridgeClientKoin_coreKoinApplication, BridgeClientKotlinx_serialization_jsonJsonElementCompanion, BridgeClientKotlinThrowable, BridgeClientKoin_coreScope, BridgeClientKoin_coreParametersHolder, BridgeClientKotlinLazyThreadSafetyMode, BridgeClientKoin_coreLogger, BridgeClientKoin_coreInstanceRegistry, BridgeClientKoin_corePropertyRegistry, BridgeClientKoin_coreScopeRegistry, BridgeClientKtor_httpHttpStatusCodeCompanion, BridgeClientKotlinx_datetimeInstantCompanion, BridgeClientKotlinx_datetimeDateTimePeriodCompanion, BridgeClientKtor_client_coreHttpClientEngineConfig, BridgeClientKtor_client_coreHttpClientConfig<T>, BridgeClientKtor_client_coreHttpRequestBuilder, BridgeClientKtor_client_coreHttpClientCall, BridgeClientKotlinx_coroutines_coreCoroutineDispatcher, BridgeClientKtor_client_coreHttpReceivePipeline, BridgeClientKtor_client_coreHttpRequestPipeline, BridgeClientKtor_client_coreHttpResponsePipeline, BridgeClientKtor_client_coreHttpSendPipeline, BridgeClientKotlinException, BridgeClientKotlinRuntimeException, BridgeClientKotlinIllegalStateException, BridgeClientKtor_httpOutgoingContent, BridgeClientKtor_httpHttpMethod, BridgeClientKtor_httpUrl, BridgeClientRuntimeTransacterTransaction, BridgeClientKotlinx_datetimeMonth, BridgeClientKotlinx_datetimeLocalDateTimeCompanion, BridgeClientKotlinx_datetimeLocalDate, BridgeClientKotlinx_datetimeDayOfWeek, BridgeClientKotlinx_datetimeTimeZoneCompanion, BridgeClientKoin_coreInstanceFactory<T>, BridgeClientKotlinPair<__covariant A, __covariant B>, BridgeClientKoin_coreScopeDSL, BridgeClientKoin_coreSingleInstanceFactory<T>, BridgeClientKoin_coreKoinApplicationCompanion, BridgeClientKoin_coreLevel, BridgeClientKotlinx_serialization_coreSerializersModule, BridgeClientKotlinx_serialization_coreSerialKind, BridgeClientKoin_coreParametersHolderCompanion, BridgeClientKoin_coreScopeRegistryCompanion, BridgeClientKtor_client_coreHttpRequestData, BridgeClientKtor_client_coreHttpResponseData, BridgeClientKtor_client_coreProxyConfig, BridgeClientKtor_httpHeadersBuilder, BridgeClientKtor_client_coreHttpRequestBuilderCompanion, BridgeClientKtor_httpURLBuilder, BridgeClientKtor_client_coreHttpClientCallCompanion, BridgeClientKtor_client_coreTypeInfo, BridgeClientKtor_client_coreHttpResponse, BridgeClientKotlinAbstractCoroutineContextElement, BridgeClientKotlinx_coroutines_coreCoroutineDispatcherKey, BridgeClientKtor_utilsPipelinePhase, BridgeClientKtor_utilsPipeline<TSubject, TContext>, BridgeClientKtor_client_coreHttpReceivePipelinePhases, BridgeClientKtor_client_coreHttpRequestPipelinePhases, BridgeClientKtor_client_coreHttpResponsePipelinePhases, BridgeClientKtor_client_coreHttpResponseContainer, BridgeClientKtor_client_coreHttpSendPipelinePhases, BridgeClientKtor_httpContentType, BridgeClientKtor_httpHttpMethodCompanion, BridgeClientKtor_httpURLProtocol, BridgeClientKtor_httpUrlCompanion, BridgeClientKotlinByteArray, BridgeClientKotlinx_datetimeLocalDateCompanion, BridgeClientKotlinx_datetimeFixedOffsetTimeZone, BridgeClientKoin_coreBeanDefinition<T>, BridgeClientKoin_coreInstanceFactoryCompanion, BridgeClientKoin_coreInstanceContext, BridgeClientKtor_utilsGMTDate, BridgeClientKtor_httpHttpProtocolVersion, BridgeClientKtor_utilsStringValuesBuilder, BridgeClientKtor_httpParametersBuilder, BridgeClientKtor_httpURLBuilderCompanion, BridgeClientKotlinCancellationException, BridgeClientKtor_ioMemory, BridgeClientKtor_ioIoBuffer, BridgeClientKtor_ioByteReadPacket, BridgeClientKtor_ioByteOrder, BridgeClientKotlinAbstractCoroutineContextKey<B, E>, BridgeClientKtor_httpHeaderValueParam, BridgeClientKtor_httpHeaderValueWithParametersCompanion, BridgeClientKtor_httpHeaderValueWithParameters, BridgeClientKtor_httpContentTypeCompanion, BridgeClientKtor_httpURLProtocolCompanion, BridgeClientKtor_httpUrlEncodingOption, BridgeClientKotlinByteIterator, BridgeClientKotlinx_datetimeUtcOffset, BridgeClientKotlinx_datetimeFixedOffsetTimeZoneCompanion, BridgeClientKoin_coreKind, BridgeClientKoin_coreCallbacks<T>, BridgeClientKtor_utilsGMTDateCompanion, BridgeClientKtor_utilsWeekDay, BridgeClientKtor_utilsMonth, BridgeClientKtor_httpHttpProtocolVersionCompanion, BridgeClientKtor_ioMemoryCompanion, BridgeClientKtor_ioBufferCompanion, BridgeClientKtor_ioBuffer, BridgeClientKtor_ioChunkBuffer, BridgeClientKtor_ioChunkBufferCompanion, BridgeClientKotlinCharArray, BridgeClientKtor_ioIoBufferCompanion, BridgeClientKtor_ioAbstractInputCompanion, BridgeClientKtor_ioAbstractInput, BridgeClientKtor_ioByteReadPacketBaseCompanion, BridgeClientKtor_ioByteReadPacketBase, BridgeClientKtor_ioByteReadPacketPlatformBase, BridgeClientKtor_ioByteReadPacketCompanion, BridgeClientKtor_ioByteOrderCompanion, BridgeClientKotlinKTypeProjection, BridgeClientKotlinx_datetimeUtcOffsetCompanion, BridgeClientKtor_utilsWeekDayCompanion, BridgeClientKtor_utilsMonthCompanion, BridgeClientKotlinx_coroutines_coreAtomicDesc, BridgeClientKotlinx_coroutines_coreLockFreeLinkedListNodePrepareOp, BridgeClientKotlinCharIterator, BridgeClientKotlinKVariance, BridgeClientKotlinKTypeProjectionCompanion, BridgeClientKotlinx_coroutines_coreAtomicOp<__contravariant T>, BridgeClientKotlinx_coroutines_coreOpDescriptor, BridgeClientKotlinx_coroutines_coreLockFreeLinkedListNode, BridgeClientKotlinx_coroutines_coreLockFreeLinkedListNodeAbstractAtomicDesc, BridgeClientKotlinx_coroutines_coreLockFreeLinkedListNodeAddLastDesc<T>, BridgeClientKotlinx_coroutines_coreLockFreeLinkedListNodeRemoveFirstDesc<T>;
+@class BridgeClientClientInfo, BridgeClientPlatformConfigBridgeEnvironment, BridgeClientIOSBridgeConfig, NSData, BridgeClientAdherenceRecord, BridgeClientAppConfig, BridgeClientKotlinx_serialization_jsonJsonElement, BridgeClientStudy, BridgeClientUserSessionInfo, NSDate, BridgeClientNativeAdherenceRecord, BridgeClientKoin_coreKoin, BridgeClientResourceStatus, BridgeClientKtor_httpHttpStatusCode, BridgeClientKotlinError, BridgeClientNativeScheduledSessionTimelineSlice, BridgeClientAssessmentInfo, BridgeClientNativeScheduledAssessment, NSDateComponents, BridgeClientNotificationMessage, BridgeClientNativeScheduledNotification, NSTimeZone, BridgeClientNativeScheduledSessionWindow, BridgeClientSessionInfo, BridgeClientStudyInfo, BridgeClientKotlinEnumCompanion, BridgeClientKotlinEnum<E>, BridgeClientKotlinArray<T>, BridgeClientAccountStatusCompanion, BridgeClientAccountStatus, BridgeClientAddressCompanion, BridgeClientAddress, BridgeClientKotlinx_datetimeInstant, BridgeClientAdherenceRecordCompanion, BridgeClientAdherenceRecordTypeCompanion, BridgeClientAdherenceRecordType, BridgeClientAdherenceRecordUpdatesCompanion, BridgeClientAdherenceRecordUpdates, BridgeClientSortOrder, BridgeClientAdherenceRecordsSearchCompanion, BridgeClientAdherenceRecordsSearch, BridgeClientCriteria, BridgeClientSurveyReference, BridgeClientSchemaReference, BridgeClientConfigReference, BridgeClientFileReference, BridgeClientAppConfigCompanion, BridgeClientAssessmentConfigCompanion, BridgeClientAssessmentConfig, BridgeClientColorScheme, BridgeClientAssessmentInfoCompanion, BridgeClientClientInfoCompanion, BridgeClientColorSchemeCompanion, BridgeClientConfigReferenceCompanion, BridgeClientConsentStatusCompanion, BridgeClientConsentStatus, BridgeClientContactRole, BridgeClientPhone, BridgeClientContactCompanion, BridgeClientContact, BridgeClientContactRoleCompanion, BridgeClientCriteriaCompanion, BridgeClientEnvironmentCompanion, BridgeClientEnvironment, BridgeClientFileReferenceCompanion, BridgeClientIrbDecisionTypeCompanion, BridgeClientIrbDecisionType, BridgeClientNotificationType, BridgeClientNotificationInfoCompanion, BridgeClientNotificationInfo, BridgeClientNotificationMessageCompanion, BridgeClientNotificationTypeCompanion, BridgeClientPerformanceOrderCompanion, BridgeClientPerformanceOrder, BridgeClientPhoneCompanion, BridgeClientReminderTypeCompanion, BridgeClientReminderType, BridgeClientRoleCompanion, BridgeClientRole, BridgeClientScheduledAssessmentCompanion, BridgeClientScheduledAssessment, BridgeClientKotlinx_datetimeDateTimePeriod, BridgeClientScheduledSessionCompanion, BridgeClientScheduledSession, BridgeClientSchemaReferenceCompanion, BridgeClientSessionInfoCompanion, BridgeClientSharingScopeCompanion, BridgeClientSharingScope, BridgeClientSignInTypeCompanion, BridgeClientSignInType, BridgeClientSortOrderCompanion, BridgeClientStudyPhase, BridgeClientStudyCompanion, BridgeClientStudyActivityEventCompanion, BridgeClientStudyActivityEvent, BridgeClientStudyActivityEventListCompanion, BridgeClientStudyActivityEventList, BridgeClientStudyInfoCompanion, BridgeClientStudyPhaseCompanion, BridgeClientSurveyReferenceCompanion, BridgeClientTimelineCompanion, BridgeClientTimeline, BridgeClientUserSessionInfoCompanion, BridgeClientKtor_client_coreHttpClient, BridgeClientAbstractApiCompanion, BridgeClientIosHttpClient, BridgeClientRefreshTokenFeatureFeature, BridgeClientRefreshTokenFeature, BridgeClientKtor_utilsAttributeKey<T>, BridgeClientRefreshTokenFeatureConfig, BridgeClientSessionTokenFeatureFeature, BridgeClientSessionTokenFeature, BridgeClientSessionTokenFeatureConfig, BridgeClientBridgeResourceDatabaseCompanion, BridgeClientResourceAdapter, BridgeClientResourceType, BridgeClientResource, BridgeClientRuntimeQuery<__covariant RowType>, BridgeClientResourceDatabaseHelperCompanion, BridgeClientResourceResult<__covariant T>, BridgeClientResourceResultFailed, BridgeClientKotlinNothing, BridgeClientResourceResultInProgress, BridgeClientResourceResultSuccess<__covariant T>, BridgeClientResourceDatabaseHelper, BridgeClientAbstractResourceRepoCompanion, BridgeClientAbstractResourceRepo, BridgeClientActivityEventsRepoCompanion, BridgeClientAssessmentHistoryRecord, BridgeClientAuthenticationRepositoryCompanion, BridgeClientKotlinUnit, BridgeClientAdherenceRecordRepo, BridgeClientActivityEventsRepo, BridgeClientScheduleTimelineRepoCompanion, BridgeClientScheduledAssessmentReference, BridgeClientKotlinx_datetimeLocalDateTime, BridgeClientScheduledNotificationCompanion, BridgeClientScheduledNotification, BridgeClientKotlinx_datetimeTimeZone, BridgeClientScheduledSessionWindow, BridgeClientScheduledSessionTimelineSlice, BridgeClientKoin_coreModule, BridgeClientKoin_coreKoinApplication, BridgeClientKotlinThrowable, BridgeClientKotlinx_serialization_jsonJsonElementCompanion, BridgeClientKoin_coreScope, BridgeClientKoin_coreParametersHolder, BridgeClientKotlinLazyThreadSafetyMode, BridgeClientKoin_coreLogger, BridgeClientKoin_coreInstanceRegistry, BridgeClientKoin_corePropertyRegistry, BridgeClientKoin_coreScopeRegistry, BridgeClientKtor_httpHttpStatusCodeCompanion, BridgeClientKotlinx_datetimeInstantCompanion, BridgeClientKotlinx_datetimeDateTimePeriodCompanion, BridgeClientKtor_client_coreHttpClientEngineConfig, BridgeClientKtor_client_coreHttpClientConfig<T>, BridgeClientKtor_client_coreHttpRequestBuilder, BridgeClientKtor_client_coreHttpClientCall, BridgeClientKotlinx_coroutines_coreCoroutineDispatcher, BridgeClientKtor_client_coreHttpReceivePipeline, BridgeClientKtor_client_coreHttpRequestPipeline, BridgeClientKtor_client_coreHttpResponsePipeline, BridgeClientKtor_client_coreHttpSendPipeline, BridgeClientKotlinException, BridgeClientKotlinRuntimeException, BridgeClientKotlinIllegalStateException, BridgeClientKtor_httpOutgoingContent, BridgeClientKtor_httpHttpMethod, BridgeClientKtor_httpUrl, BridgeClientRuntimeTransacterTransaction, BridgeClientKotlinx_datetimeMonth, BridgeClientKotlinx_datetimeLocalDateTimeCompanion, BridgeClientKotlinx_datetimeLocalDate, BridgeClientKotlinx_datetimeDayOfWeek, BridgeClientKotlinx_datetimeTimeZoneCompanion, BridgeClientKoin_coreInstanceFactory<T>, BridgeClientKotlinPair<__covariant A, __covariant B>, BridgeClientKoin_coreScopeDSL, BridgeClientKoin_coreSingleInstanceFactory<T>, BridgeClientKoin_coreKoinApplicationCompanion, BridgeClientKoin_coreLevel, BridgeClientKoin_coreParametersHolderCompanion, BridgeClientKoin_coreScopeRegistryCompanion, BridgeClientKotlinx_serialization_coreSerializersModule, BridgeClientKotlinx_serialization_coreSerialKind, BridgeClientKtor_client_coreHttpRequestData, BridgeClientKtor_client_coreHttpResponseData, BridgeClientKtor_client_coreProxyConfig, BridgeClientKtor_httpHeadersBuilder, BridgeClientKtor_client_coreHttpRequestBuilderCompanion, BridgeClientKtor_httpURLBuilder, BridgeClientKtor_client_coreHttpClientCallCompanion, BridgeClientKtor_client_coreTypeInfo, BridgeClientKtor_client_coreHttpResponse, BridgeClientKotlinAbstractCoroutineContextElement, BridgeClientKotlinx_coroutines_coreCoroutineDispatcherKey, BridgeClientKtor_utilsPipelinePhase, BridgeClientKtor_utilsPipeline<TSubject, TContext>, BridgeClientKtor_client_coreHttpReceivePipelinePhases, BridgeClientKtor_client_coreHttpRequestPipelinePhases, BridgeClientKtor_client_coreHttpResponsePipelinePhases, BridgeClientKtor_client_coreHttpResponseContainer, BridgeClientKtor_client_coreHttpSendPipelinePhases, BridgeClientKtor_httpContentType, BridgeClientKtor_httpHttpMethodCompanion, BridgeClientKtor_httpURLProtocol, BridgeClientKtor_httpUrlCompanion, BridgeClientKotlinByteArray, BridgeClientKotlinx_datetimeLocalDateCompanion, BridgeClientKotlinx_datetimeFixedOffsetTimeZone, BridgeClientKoin_coreBeanDefinition<T>, BridgeClientKoin_coreInstanceFactoryCompanion, BridgeClientKoin_coreInstanceContext, BridgeClientKtor_utilsGMTDate, BridgeClientKtor_httpHttpProtocolVersion, BridgeClientKtor_utilsStringValuesBuilder, BridgeClientKtor_httpParametersBuilder, BridgeClientKtor_httpURLBuilderCompanion, BridgeClientKotlinCancellationException, BridgeClientKtor_ioMemory, BridgeClientKtor_ioIoBuffer, BridgeClientKtor_ioByteReadPacket, BridgeClientKtor_ioByteOrder, BridgeClientKotlinAbstractCoroutineContextKey<B, E>, BridgeClientKtor_httpHeaderValueParam, BridgeClientKtor_httpHeaderValueWithParametersCompanion, BridgeClientKtor_httpHeaderValueWithParameters, BridgeClientKtor_httpContentTypeCompanion, BridgeClientKtor_httpURLProtocolCompanion, BridgeClientKtor_httpUrlEncodingOption, BridgeClientKotlinByteIterator, BridgeClientKotlinx_datetimeUtcOffset, BridgeClientKotlinx_datetimeFixedOffsetTimeZoneCompanion, BridgeClientKoin_coreKind, BridgeClientKoin_coreCallbacks<T>, BridgeClientKtor_utilsGMTDateCompanion, BridgeClientKtor_utilsWeekDay, BridgeClientKtor_utilsMonth, BridgeClientKtor_httpHttpProtocolVersionCompanion, BridgeClientKtor_ioMemoryCompanion, BridgeClientKtor_ioBufferCompanion, BridgeClientKtor_ioBuffer, BridgeClientKtor_ioChunkBuffer, BridgeClientKtor_ioChunkBufferCompanion, BridgeClientKotlinCharArray, BridgeClientKtor_ioIoBufferCompanion, BridgeClientKtor_ioAbstractInputCompanion, BridgeClientKtor_ioAbstractInput, BridgeClientKtor_ioByteReadPacketBaseCompanion, BridgeClientKtor_ioByteReadPacketBase, BridgeClientKtor_ioByteReadPacketPlatformBase, BridgeClientKtor_ioByteReadPacketCompanion, BridgeClientKtor_ioByteOrderCompanion, BridgeClientKotlinKTypeProjection, BridgeClientKotlinx_datetimeUtcOffsetCompanion, BridgeClientKtor_utilsWeekDayCompanion, BridgeClientKtor_utilsMonthCompanion, BridgeClientKotlinx_coroutines_coreAtomicDesc, BridgeClientKotlinx_coroutines_coreLockFreeLinkedListNodePrepareOp, BridgeClientKotlinCharIterator, BridgeClientKotlinKVariance, BridgeClientKotlinKTypeProjectionCompanion, BridgeClientKotlinx_coroutines_coreAtomicOp<__contravariant T>, BridgeClientKotlinx_coroutines_coreOpDescriptor, BridgeClientKotlinx_coroutines_coreLockFreeLinkedListNode, BridgeClientKotlinx_coroutines_coreLockFreeLinkedListNodeAbstractAtomicDesc, BridgeClientKotlinx_coroutines_coreLockFreeLinkedListNodeAddLastDesc<T>, BridgeClientKotlinx_coroutines_coreLockFreeLinkedListNodeRemoveFirstDesc<T>;
 
-@protocol BridgeClientKotlinx_serialization_coreKSerializer, BridgeClientPlatformConfig, BridgeClientBridgeConfig, BridgeClientIOSPlatformConfig, BridgeClientKoin_coreKoinComponent, BridgeClientKotlinComparable, BridgeClientKotlinSuspendFunction0, BridgeClientKtor_client_coreHttpRequest, BridgeClientKtor_client_coreHttpClientFeature, BridgeClientSessionTokenFeatureSessionTokenProvider, BridgeClientBridgeResourceDatabaseQueries, BridgeClientRuntimeTransactionWithoutReturn, BridgeClientRuntimeTransactionWithReturn, BridgeClientRuntimeTransacter, BridgeClientBridgeResourceDatabase, BridgeClientRuntimeSqlDriver, BridgeClientRuntimeSqlDriverSchema, BridgeClientDbDriverFactory, BridgeClientRuntimeColumnAdapter, BridgeClientKotlinx_coroutines_coreCoroutineScope, BridgeClientKotlinx_coroutines_coreFlow, BridgeClientKotlinx_serialization_coreEncoder, BridgeClientKotlinx_serialization_coreSerialDescriptor, BridgeClientKotlinx_serialization_coreSerializationStrategy, BridgeClientKotlinx_serialization_coreDecoder, BridgeClientKotlinx_serialization_coreDeserializationStrategy, BridgeClientKoin_coreKoinScopeComponent, BridgeClientKoin_coreQualifier, BridgeClientKotlinKClass, BridgeClientKotlinLazy, BridgeClientKotlinIterator, BridgeClientKotlinCoroutineContext, BridgeClientKtor_ioCloseable, BridgeClientKtor_client_coreHttpClientEngine, BridgeClientKtor_client_coreHttpClientEngineCapability, BridgeClientKtor_utilsAttributes, BridgeClientKotlinFunction, BridgeClientKtor_httpHeaders, BridgeClientKtor_httpHttpMessage, BridgeClientRuntimeTransactionCallbacks, BridgeClientRuntimeSqlPreparedStatement, BridgeClientRuntimeSqlCursor, BridgeClientRuntimeCloseable, BridgeClientRuntimeQueryListener, BridgeClientKotlinx_coroutines_coreFlowCollector, BridgeClientKotlinx_serialization_coreCompositeEncoder, BridgeClientKotlinAnnotation, BridgeClientKotlinx_serialization_coreCompositeDecoder, BridgeClientKoin_coreScopeCallback, BridgeClientKotlinKDeclarationContainer, BridgeClientKotlinKAnnotatedElement, BridgeClientKotlinKClassifier, BridgeClientKotlinCoroutineContextElement, BridgeClientKotlinCoroutineContextKey, BridgeClientKtor_httpHttpMessageBuilder, BridgeClientKotlinx_coroutines_coreJob, BridgeClientKtor_ioByteReadChannel, BridgeClientKtor_utilsTypeInfo, BridgeClientKotlinContinuation, BridgeClientKotlinContinuationInterceptor, BridgeClientKotlinx_coroutines_coreRunnable, BridgeClientKotlinSuspendFunction2, BridgeClientKtor_httpParameters, BridgeClientKotlinMapEntry, BridgeClientKtor_utilsStringValues, BridgeClientKotlinx_serialization_coreSerializersModuleCollector, BridgeClientKotlinx_coroutines_coreChildHandle, BridgeClientKotlinx_coroutines_coreChildJob, BridgeClientKotlinx_coroutines_coreDisposableHandle, BridgeClientKotlinSequence, BridgeClientKotlinx_coroutines_coreSelectClause0, BridgeClientKtor_ioReadSession, BridgeClientKotlinSuspendFunction1, BridgeClientKotlinAppendable, BridgeClientKotlinKType, BridgeClientKotlinx_coroutines_coreParentJob, BridgeClientKotlinx_coroutines_coreSelectInstance, BridgeClientKtor_ioObjectPool, BridgeClientKtor_ioInput, BridgeClientKtor_ioOutput;
+@protocol BridgeClientPlatformConfig, BridgeClientBridgeConfig, BridgeClientIOSPlatformConfig, BridgeClientKoin_coreKoinComponent, BridgeClientKotlinComparable, BridgeClientKotlinx_serialization_coreKSerializer, BridgeClientKotlinSuspendFunction0, BridgeClientKtor_client_coreHttpRequest, BridgeClientKtor_client_coreHttpClientFeature, BridgeClientSessionTokenFeatureSessionTokenProvider, BridgeClientBridgeResourceDatabaseQueries, BridgeClientRuntimeTransactionWithoutReturn, BridgeClientRuntimeTransactionWithReturn, BridgeClientRuntimeTransacter, BridgeClientBridgeResourceDatabase, BridgeClientRuntimeSqlDriver, BridgeClientRuntimeSqlDriverSchema, BridgeClientDbDriverFactory, BridgeClientRuntimeColumnAdapter, BridgeClientKotlinx_coroutines_coreCoroutineScope, BridgeClientKotlinx_coroutines_coreFlow, BridgeClientKoin_coreKoinScopeComponent, BridgeClientKoin_coreQualifier, BridgeClientKotlinKClass, BridgeClientKotlinLazy, BridgeClientKotlinIterator, BridgeClientKotlinx_serialization_coreEncoder, BridgeClientKotlinx_serialization_coreSerialDescriptor, BridgeClientKotlinx_serialization_coreSerializationStrategy, BridgeClientKotlinx_serialization_coreDecoder, BridgeClientKotlinx_serialization_coreDeserializationStrategy, BridgeClientKotlinCoroutineContext, BridgeClientKtor_ioCloseable, BridgeClientKtor_client_coreHttpClientEngine, BridgeClientKtor_client_coreHttpClientEngineCapability, BridgeClientKtor_utilsAttributes, BridgeClientKotlinFunction, BridgeClientKtor_httpHeaders, BridgeClientKtor_httpHttpMessage, BridgeClientRuntimeTransactionCallbacks, BridgeClientRuntimeSqlPreparedStatement, BridgeClientRuntimeSqlCursor, BridgeClientRuntimeCloseable, BridgeClientRuntimeQueryListener, BridgeClientKotlinx_coroutines_coreFlowCollector, BridgeClientKoin_coreScopeCallback, BridgeClientKotlinKDeclarationContainer, BridgeClientKotlinKAnnotatedElement, BridgeClientKotlinKClassifier, BridgeClientKotlinx_serialization_coreCompositeEncoder, BridgeClientKotlinAnnotation, BridgeClientKotlinx_serialization_coreCompositeDecoder, BridgeClientKotlinCoroutineContextElement, BridgeClientKotlinCoroutineContextKey, BridgeClientKtor_httpHttpMessageBuilder, BridgeClientKotlinx_coroutines_coreJob, BridgeClientKtor_ioByteReadChannel, BridgeClientKtor_utilsTypeInfo, BridgeClientKotlinContinuation, BridgeClientKotlinContinuationInterceptor, BridgeClientKotlinx_coroutines_coreRunnable, BridgeClientKotlinSuspendFunction2, BridgeClientKtor_httpParameters, BridgeClientKotlinMapEntry, BridgeClientKtor_utilsStringValues, BridgeClientKotlinx_serialization_coreSerializersModuleCollector, BridgeClientKotlinx_coroutines_coreChildHandle, BridgeClientKotlinx_coroutines_coreChildJob, BridgeClientKotlinx_coroutines_coreDisposableHandle, BridgeClientKotlinSequence, BridgeClientKotlinx_coroutines_coreSelectClause0, BridgeClientKtor_ioReadSession, BridgeClientKotlinSuspendFunction1, BridgeClientKotlinAppendable, BridgeClientKotlinKType, BridgeClientKotlinx_coroutines_coreParentJob, BridgeClientKotlinx_coroutines_coreSelectInstance, BridgeClientKtor_ioObjectPool, BridgeClientKtor_ioInput, BridgeClientKtor_ioOutput;
 
 NS_ASSUME_NONNULL_BEGIN
 #pragma clang diagnostic push
@@ -142,169 +142,6 @@ __attribute__((swift_name("KotlinBoolean")))
 @interface BridgeClientBoolean : BridgeClientNumber
 - (instancetype)initWithBool:(BOOL)value;
 + (instancetype)numberWithBool:(BOOL)value;
-@end;
-
-__attribute__((objc_subclassing_restricted))
-__attribute__((swift_name("AppConfig")))
-@interface BridgeClientAppConfig : BridgeClientBase
-- (instancetype)initWithLabel:(NSString *)label createdOn:(NSString * _Nullable)createdOn modifiedOn:(NSString * _Nullable)modifiedOn guid:(NSString * _Nullable)guid deleted:(BridgeClientBoolean * _Nullable)deleted criteria:(BridgeClientCriteria * _Nullable)criteria clientData:(BridgeClientKotlinx_serialization_jsonJsonElement * _Nullable)clientData surveyReferences:(NSArray<BridgeClientSurveyReference *> * _Nullable)surveyReferences schemaReferences:(NSArray<BridgeClientSchemaReference *> * _Nullable)schemaReferences configReferences:(NSArray<BridgeClientConfigReference *> * _Nullable)configReferences fileReferences:(NSArray<BridgeClientFileReference *> * _Nullable)fileReferences configElements:(NSDictionary<NSString *, BridgeClientKotlinx_serialization_jsonJsonElement *> * _Nullable)configElements version:(BridgeClientLong * _Nullable)version type:(NSString * _Nullable)type __attribute__((swift_name("init(label:createdOn:modifiedOn:guid:deleted:criteria:clientData:surveyReferences:schemaReferences:configReferences:fileReferences:configElements:version:type:)"))) __attribute__((objc_designated_initializer));
-@property (class, readonly, getter=companion) BridgeClientAppConfigCompanion *companion __attribute__((swift_name("companion")));
-- (NSString *)component1 __attribute__((swift_name("component1()")));
-- (NSArray<BridgeClientConfigReference *> * _Nullable)component10 __attribute__((swift_name("component10()")));
-- (NSArray<BridgeClientFileReference *> * _Nullable)component11 __attribute__((swift_name("component11()")));
-- (NSDictionary<NSString *, BridgeClientKotlinx_serialization_jsonJsonElement *> * _Nullable)component12 __attribute__((swift_name("component12()")));
-- (BridgeClientLong * _Nullable)component13 __attribute__((swift_name("component13()")));
-- (NSString * _Nullable)component14 __attribute__((swift_name("component14()")));
-- (NSString * _Nullable)component2 __attribute__((swift_name("component2()")));
-- (NSString * _Nullable)component3 __attribute__((swift_name("component3()")));
-- (NSString * _Nullable)component4 __attribute__((swift_name("component4()")));
-- (BridgeClientBoolean * _Nullable)component5 __attribute__((swift_name("component5()")));
-- (BridgeClientCriteria * _Nullable)component6 __attribute__((swift_name("component6()")));
-- (BridgeClientKotlinx_serialization_jsonJsonElement * _Nullable)component7 __attribute__((swift_name("component7()")));
-- (NSArray<BridgeClientSurveyReference *> * _Nullable)component8 __attribute__((swift_name("component8()")));
-- (NSArray<BridgeClientSchemaReference *> * _Nullable)component9 __attribute__((swift_name("component9()")));
-- (BridgeClientAppConfig *)doCopyLabel:(NSString *)label createdOn:(NSString * _Nullable)createdOn modifiedOn:(NSString * _Nullable)modifiedOn guid:(NSString * _Nullable)guid deleted:(BridgeClientBoolean * _Nullable)deleted criteria:(BridgeClientCriteria * _Nullable)criteria clientData:(BridgeClientKotlinx_serialization_jsonJsonElement * _Nullable)clientData surveyReferences:(NSArray<BridgeClientSurveyReference *> * _Nullable)surveyReferences schemaReferences:(NSArray<BridgeClientSchemaReference *> * _Nullable)schemaReferences configReferences:(NSArray<BridgeClientConfigReference *> * _Nullable)configReferences fileReferences:(NSArray<BridgeClientFileReference *> * _Nullable)fileReferences configElements:(NSDictionary<NSString *, BridgeClientKotlinx_serialization_jsonJsonElement *> * _Nullable)configElements version:(BridgeClientLong * _Nullable)version type:(NSString * _Nullable)type __attribute__((swift_name("doCopy(label:createdOn:modifiedOn:guid:deleted:criteria:clientData:surveyReferences:schemaReferences:configReferences:fileReferences:configElements:version:type:)")));
-- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
-- (NSUInteger)hash __attribute__((swift_name("hash()")));
-- (NSString *)description __attribute__((swift_name("description()")));
-@property (readonly) BridgeClientKotlinx_serialization_jsonJsonElement * _Nullable clientData __attribute__((swift_name("clientData")));
-@property (readonly) NSDictionary<NSString *, BridgeClientKotlinx_serialization_jsonJsonElement *> * _Nullable configElements __attribute__((swift_name("configElements")));
-@property (readonly) NSArray<BridgeClientConfigReference *> * _Nullable configReferences __attribute__((swift_name("configReferences")));
-@property (readonly) NSString * _Nullable createdOn __attribute__((swift_name("createdOn")));
-@property (readonly) BridgeClientCriteria * _Nullable criteria __attribute__((swift_name("criteria")));
-@property (readonly) BridgeClientBoolean * _Nullable deleted __attribute__((swift_name("deleted")));
-@property (readonly) NSArray<BridgeClientFileReference *> * _Nullable fileReferences __attribute__((swift_name("fileReferences")));
-@property (readonly) NSString * _Nullable guid __attribute__((swift_name("guid")));
-@property (readonly) NSString *label __attribute__((swift_name("label")));
-@property (readonly) NSString * _Nullable modifiedOn __attribute__((swift_name("modifiedOn")));
-@property (readonly) NSArray<BridgeClientSchemaReference *> * _Nullable schemaReferences __attribute__((swift_name("schemaReferences")));
-@property (readonly) NSArray<BridgeClientSurveyReference *> * _Nullable surveyReferences __attribute__((swift_name("surveyReferences")));
-@property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
-@property (readonly) BridgeClientLong * _Nullable version __attribute__((swift_name("version")));
-@end;
-
-__attribute__((objc_subclassing_restricted))
-__attribute__((swift_name("AppConfig.Companion")))
-@interface BridgeClientAppConfigCompanion : BridgeClientBase
-+ (instancetype)alloc __attribute__((unavailable));
-+ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
-+ (instancetype)companion __attribute__((swift_name("init()")));
-@property (class, readonly, getter=shared) BridgeClientAppConfigCompanion *shared __attribute__((swift_name("shared")));
-- (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
-@end;
-
-__attribute__((objc_subclassing_restricted))
-__attribute__((swift_name("ConfigReference")))
-@interface BridgeClientConfigReference : BridgeClientBase
-- (instancetype)initWithId:(NSString *)id revision:(int64_t)revision type:(NSString * _Nullable)type __attribute__((swift_name("init(id:revision:type:)"))) __attribute__((objc_designated_initializer));
-@property (class, readonly, getter=companion) BridgeClientConfigReferenceCompanion *companion __attribute__((swift_name("companion")));
-- (NSString *)component1 __attribute__((swift_name("component1()")));
-- (int64_t)component2 __attribute__((swift_name("component2()")));
-- (NSString * _Nullable)component3 __attribute__((swift_name("component3()")));
-- (BridgeClientConfigReference *)doCopyId:(NSString *)id revision:(int64_t)revision type:(NSString * _Nullable)type __attribute__((swift_name("doCopy(id:revision:type:)")));
-- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
-- (NSUInteger)hash __attribute__((swift_name("hash()")));
-- (NSString *)description __attribute__((swift_name("description()")));
-@property (readonly) NSString *id __attribute__((swift_name("id")));
-@property (readonly) int64_t revision __attribute__((swift_name("revision")));
-@property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
-@end;
-
-__attribute__((objc_subclassing_restricted))
-__attribute__((swift_name("ConfigReference.Companion")))
-@interface BridgeClientConfigReferenceCompanion : BridgeClientBase
-+ (instancetype)alloc __attribute__((unavailable));
-+ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
-+ (instancetype)companion __attribute__((swift_name("init()")));
-@property (class, readonly, getter=shared) BridgeClientConfigReferenceCompanion *shared __attribute__((swift_name("shared")));
-- (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
-@end;
-
-__attribute__((objc_subclassing_restricted))
-__attribute__((swift_name("FileReference")))
-@interface BridgeClientFileReference : BridgeClientBase
-- (instancetype)initWithGuid:(NSString *)guid createdOn:(NSString *)createdOn href:(NSString * _Nullable)href type:(NSString * _Nullable)type __attribute__((swift_name("init(guid:createdOn:href:type:)"))) __attribute__((objc_designated_initializer));
-@property (class, readonly, getter=companion) BridgeClientFileReferenceCompanion *companion __attribute__((swift_name("companion")));
-- (NSString *)component1 __attribute__((swift_name("component1()")));
-- (NSString *)component2 __attribute__((swift_name("component2()")));
-- (NSString * _Nullable)component3 __attribute__((swift_name("component3()")));
-- (NSString * _Nullable)component4 __attribute__((swift_name("component4()")));
-- (BridgeClientFileReference *)doCopyGuid:(NSString *)guid createdOn:(NSString *)createdOn href:(NSString * _Nullable)href type:(NSString * _Nullable)type __attribute__((swift_name("doCopy(guid:createdOn:href:type:)")));
-- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
-- (NSUInteger)hash __attribute__((swift_name("hash()")));
-- (NSString *)description __attribute__((swift_name("description()")));
-@property (readonly) NSString *createdOn __attribute__((swift_name("createdOn")));
-@property (readonly) NSString *guid __attribute__((swift_name("guid")));
-@property (readonly) NSString * _Nullable href __attribute__((swift_name("href")));
-@property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
-@end;
-
-__attribute__((objc_subclassing_restricted))
-__attribute__((swift_name("FileReference.Companion")))
-@interface BridgeClientFileReferenceCompanion : BridgeClientBase
-+ (instancetype)alloc __attribute__((unavailable));
-+ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
-+ (instancetype)companion __attribute__((swift_name("init()")));
-@property (class, readonly, getter=shared) BridgeClientFileReferenceCompanion *shared __attribute__((swift_name("shared")));
-- (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
-@end;
-
-__attribute__((objc_subclassing_restricted))
-__attribute__((swift_name("SchemaReference")))
-@interface BridgeClientSchemaReference : BridgeClientBase
-- (instancetype)initWithId:(NSString *)id revision:(BridgeClientLong * _Nullable)revision type:(NSString * _Nullable)type __attribute__((swift_name("init(id:revision:type:)"))) __attribute__((objc_designated_initializer));
-@property (class, readonly, getter=companion) BridgeClientSchemaReferenceCompanion *companion __attribute__((swift_name("companion")));
-- (NSString *)component1 __attribute__((swift_name("component1()")));
-- (BridgeClientLong * _Nullable)component2 __attribute__((swift_name("component2()")));
-- (NSString * _Nullable)component3 __attribute__((swift_name("component3()")));
-- (BridgeClientSchemaReference *)doCopyId:(NSString *)id revision:(BridgeClientLong * _Nullable)revision type:(NSString * _Nullable)type __attribute__((swift_name("doCopy(id:revision:type:)")));
-- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
-- (NSUInteger)hash __attribute__((swift_name("hash()")));
-- (NSString *)description __attribute__((swift_name("description()")));
-@property (readonly) NSString *id __attribute__((swift_name("id")));
-@property (readonly) BridgeClientLong * _Nullable revision __attribute__((swift_name("revision")));
-@property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
-@end;
-
-__attribute__((objc_subclassing_restricted))
-__attribute__((swift_name("SchemaReference.Companion")))
-@interface BridgeClientSchemaReferenceCompanion : BridgeClientBase
-+ (instancetype)alloc __attribute__((unavailable));
-+ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
-+ (instancetype)companion __attribute__((swift_name("init()")));
-@property (class, readonly, getter=shared) BridgeClientSchemaReferenceCompanion *shared __attribute__((swift_name("shared")));
-- (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
-@end;
-
-__attribute__((objc_subclassing_restricted))
-__attribute__((swift_name("SurveyReference")))
-@interface BridgeClientSurveyReference : BridgeClientBase
-- (instancetype)initWithGuid:(NSString *)guid identifier:(NSString * _Nullable)identifier createdOn:(NSString * _Nullable)createdOn href:(NSString * _Nullable)href type:(NSString * _Nullable)type __attribute__((swift_name("init(guid:identifier:createdOn:href:type:)"))) __attribute__((objc_designated_initializer));
-@property (class, readonly, getter=companion) BridgeClientSurveyReferenceCompanion *companion __attribute__((swift_name("companion")));
-- (NSString *)component1 __attribute__((swift_name("component1()")));
-- (NSString * _Nullable)component2 __attribute__((swift_name("component2()")));
-- (NSString * _Nullable)component3 __attribute__((swift_name("component3()")));
-- (NSString * _Nullable)component4 __attribute__((swift_name("component4()")));
-- (NSString * _Nullable)component5 __attribute__((swift_name("component5()")));
-- (BridgeClientSurveyReference *)doCopyGuid:(NSString *)guid identifier:(NSString * _Nullable)identifier createdOn:(NSString * _Nullable)createdOn href:(NSString * _Nullable)href type:(NSString * _Nullable)type __attribute__((swift_name("doCopy(guid:identifier:createdOn:href:type:)")));
-- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
-- (NSUInteger)hash __attribute__((swift_name("hash()")));
-- (NSString *)description __attribute__((swift_name("description()")));
-@property (readonly) NSString * _Nullable createdOn __attribute__((swift_name("createdOn")));
-@property (readonly) NSString *guid __attribute__((swift_name("guid")));
-@property (readonly) NSString * _Nullable href __attribute__((swift_name("href")));
-@property (readonly) NSString * _Nullable identifier __attribute__((swift_name("identifier")));
-@property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
-@end;
-
-__attribute__((objc_subclassing_restricted))
-__attribute__((swift_name("SurveyReference.Companion")))
-@interface BridgeClientSurveyReferenceCompanion : BridgeClientBase
-+ (instancetype)alloc __attribute__((unavailable));
-+ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
-+ (instancetype)companion __attribute__((swift_name("init()")));
-@property (class, readonly, getter=shared) BridgeClientSurveyReferenceCompanion *shared __attribute__((swift_name("shared")));
-- (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end;
 
 __attribute__((swift_name("PlatformConfig")))
@@ -559,6 +396,26 @@ __attribute__((swift_name("NativeScheduledSessionWindow")))
 @end;
 
 __attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("NativeStudyInfoManager")))
+@interface BridgeClientNativeStudyInfoManager : BridgeClientBase <BridgeClientKoin_coreKoinComponent>
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+- (void)fetchStudyInfoStudyId:(NSString *)studyId callBack:(void (^)(BridgeClientStudyInfo * _Nullable, BridgeClientResourceStatus *))callBack __attribute__((swift_name("fetchStudyInfo(studyId:callBack:)")));
+@end;
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("NativeStudyManager")))
+@interface BridgeClientNativeStudyManager : BridgeClientBase <BridgeClientKoin_coreKoinComponent>
+- (instancetype)initWithStudyId:(NSString *)studyId viewUpdate:(void (^)(BridgeClientStudy *))viewUpdate __attribute__((swift_name("init(studyId:viewUpdate:)"))) __attribute__((objc_designated_initializer));
+- (void)observeStudy __attribute__((swift_name("observeStudy()")));
+
+/**
+ @note This method converts all Kotlin exceptions to errors.
+*/
+- (BOOL)onClearedAndReturnError:(NSError * _Nullable * _Nullable)error __attribute__((swift_name("onCleared()")));
+@end;
+
+__attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("NativeTimelineManager")))
 @interface BridgeClientNativeTimelineManager : BridgeClientBase <BridgeClientKoin_coreKoinComponent>
 - (instancetype)initWithStudyId:(NSString *)studyId includeAllNotifications:(BOOL)includeAllNotifications alwaysIncludeNextDay:(BOOL)alwaysIncludeNextDay viewUpdate:(void (^)(BridgeClientNativeScheduledSessionTimelineSlice *))viewUpdate __attribute__((swift_name("init(studyId:includeAllNotifications:alwaysIncludeNextDay:viewUpdate:)"))) __attribute__((objc_designated_initializer));
@@ -803,6 +660,55 @@ __attribute__((swift_name("AdherenceRecordsSearch.Companion")))
 @end;
 
 __attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("AppConfig")))
+@interface BridgeClientAppConfig : BridgeClientBase
+- (instancetype)initWithLabel:(NSString *)label createdOn:(NSString * _Nullable)createdOn modifiedOn:(NSString * _Nullable)modifiedOn guid:(NSString * _Nullable)guid deleted:(BridgeClientBoolean * _Nullable)deleted criteria:(BridgeClientCriteria * _Nullable)criteria clientData:(BridgeClientKotlinx_serialization_jsonJsonElement * _Nullable)clientData surveyReferences:(NSArray<BridgeClientSurveyReference *> * _Nullable)surveyReferences schemaReferences:(NSArray<BridgeClientSchemaReference *> * _Nullable)schemaReferences configReferences:(NSArray<BridgeClientConfigReference *> * _Nullable)configReferences fileReferences:(NSArray<BridgeClientFileReference *> * _Nullable)fileReferences configElements:(NSDictionary<NSString *, BridgeClientKotlinx_serialization_jsonJsonElement *> * _Nullable)configElements version:(BridgeClientLong * _Nullable)version type:(NSString * _Nullable)type __attribute__((swift_name("init(label:createdOn:modifiedOn:guid:deleted:criteria:clientData:surveyReferences:schemaReferences:configReferences:fileReferences:configElements:version:type:)"))) __attribute__((objc_designated_initializer));
+@property (class, readonly, getter=companion) BridgeClientAppConfigCompanion *companion __attribute__((swift_name("companion")));
+- (NSString *)component1 __attribute__((swift_name("component1()")));
+- (NSArray<BridgeClientConfigReference *> * _Nullable)component10 __attribute__((swift_name("component10()")));
+- (NSArray<BridgeClientFileReference *> * _Nullable)component11 __attribute__((swift_name("component11()")));
+- (NSDictionary<NSString *, BridgeClientKotlinx_serialization_jsonJsonElement *> * _Nullable)component12 __attribute__((swift_name("component12()")));
+- (BridgeClientLong * _Nullable)component13 __attribute__((swift_name("component13()")));
+- (NSString * _Nullable)component14 __attribute__((swift_name("component14()")));
+- (NSString * _Nullable)component2 __attribute__((swift_name("component2()")));
+- (NSString * _Nullable)component3 __attribute__((swift_name("component3()")));
+- (NSString * _Nullable)component4 __attribute__((swift_name("component4()")));
+- (BridgeClientBoolean * _Nullable)component5 __attribute__((swift_name("component5()")));
+- (BridgeClientCriteria * _Nullable)component6 __attribute__((swift_name("component6()")));
+- (BridgeClientKotlinx_serialization_jsonJsonElement * _Nullable)component7 __attribute__((swift_name("component7()")));
+- (NSArray<BridgeClientSurveyReference *> * _Nullable)component8 __attribute__((swift_name("component8()")));
+- (NSArray<BridgeClientSchemaReference *> * _Nullable)component9 __attribute__((swift_name("component9()")));
+- (BridgeClientAppConfig *)doCopyLabel:(NSString *)label createdOn:(NSString * _Nullable)createdOn modifiedOn:(NSString * _Nullable)modifiedOn guid:(NSString * _Nullable)guid deleted:(BridgeClientBoolean * _Nullable)deleted criteria:(BridgeClientCriteria * _Nullable)criteria clientData:(BridgeClientKotlinx_serialization_jsonJsonElement * _Nullable)clientData surveyReferences:(NSArray<BridgeClientSurveyReference *> * _Nullable)surveyReferences schemaReferences:(NSArray<BridgeClientSchemaReference *> * _Nullable)schemaReferences configReferences:(NSArray<BridgeClientConfigReference *> * _Nullable)configReferences fileReferences:(NSArray<BridgeClientFileReference *> * _Nullable)fileReferences configElements:(NSDictionary<NSString *, BridgeClientKotlinx_serialization_jsonJsonElement *> * _Nullable)configElements version:(BridgeClientLong * _Nullable)version type:(NSString * _Nullable)type __attribute__((swift_name("doCopy(label:createdOn:modifiedOn:guid:deleted:criteria:clientData:surveyReferences:schemaReferences:configReferences:fileReferences:configElements:version:type:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) BridgeClientKotlinx_serialization_jsonJsonElement * _Nullable clientData __attribute__((swift_name("clientData")));
+@property (readonly) NSDictionary<NSString *, BridgeClientKotlinx_serialization_jsonJsonElement *> * _Nullable configElements __attribute__((swift_name("configElements")));
+@property (readonly) NSArray<BridgeClientConfigReference *> * _Nullable configReferences __attribute__((swift_name("configReferences")));
+@property (readonly) NSString * _Nullable createdOn __attribute__((swift_name("createdOn")));
+@property (readonly) BridgeClientCriteria * _Nullable criteria __attribute__((swift_name("criteria")));
+@property (readonly) BridgeClientBoolean * _Nullable deleted __attribute__((swift_name("deleted")));
+@property (readonly) NSArray<BridgeClientFileReference *> * _Nullable fileReferences __attribute__((swift_name("fileReferences")));
+@property (readonly) NSString * _Nullable guid __attribute__((swift_name("guid")));
+@property (readonly) NSString *label __attribute__((swift_name("label")));
+@property (readonly) NSString * _Nullable modifiedOn __attribute__((swift_name("modifiedOn")));
+@property (readonly) NSArray<BridgeClientSchemaReference *> * _Nullable schemaReferences __attribute__((swift_name("schemaReferences")));
+@property (readonly) NSArray<BridgeClientSurveyReference *> * _Nullable surveyReferences __attribute__((swift_name("surveyReferences")));
+@property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
+@property (readonly) BridgeClientLong * _Nullable version __attribute__((swift_name("version")));
+@end;
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("AppConfig.Companion")))
+@interface BridgeClientAppConfigCompanion : BridgeClientBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) BridgeClientAppConfigCompanion *shared __attribute__((swift_name("shared")));
+- (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+@end;
+
+__attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("AssessmentConfig")))
 @interface BridgeClientAssessmentConfig : BridgeClientBase
 - (instancetype)initWithConfig:(BridgeClientKotlinx_serialization_jsonJsonElement *)config createdOn:(NSString * _Nullable)createdOn modifiedOn:(NSString * _Nullable)modifiedOn version:(BridgeClientLong * _Nullable)version type:(NSString * _Nullable)type __attribute__((swift_name("init(config:createdOn:modifiedOn:version:type:)"))) __attribute__((objc_designated_initializer));
@@ -937,6 +843,33 @@ __attribute__((swift_name("ColorScheme.Companion")))
 + (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
 + (instancetype)companion __attribute__((swift_name("init()")));
 @property (class, readonly, getter=shared) BridgeClientColorSchemeCompanion *shared __attribute__((swift_name("shared")));
+- (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+@end;
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("ConfigReference")))
+@interface BridgeClientConfigReference : BridgeClientBase
+- (instancetype)initWithId:(NSString *)id revision:(int64_t)revision type:(NSString * _Nullable)type __attribute__((swift_name("init(id:revision:type:)"))) __attribute__((objc_designated_initializer));
+@property (class, readonly, getter=companion) BridgeClientConfigReferenceCompanion *companion __attribute__((swift_name("companion")));
+- (NSString *)component1 __attribute__((swift_name("component1()")));
+- (int64_t)component2 __attribute__((swift_name("component2()")));
+- (NSString * _Nullable)component3 __attribute__((swift_name("component3()")));
+- (BridgeClientConfigReference *)doCopyId:(NSString *)id revision:(int64_t)revision type:(NSString * _Nullable)type __attribute__((swift_name("doCopy(id:revision:type:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString *id __attribute__((swift_name("id")));
+@property (readonly) int64_t revision __attribute__((swift_name("revision")));
+@property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
+@end;
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("ConfigReference.Companion")))
+@interface BridgeClientConfigReferenceCompanion : BridgeClientBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) BridgeClientConfigReferenceCompanion *shared __attribute__((swift_name("shared")));
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end;
 
@@ -1100,6 +1033,35 @@ __attribute__((swift_name("Environment.Companion")))
 + (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
 + (instancetype)companion __attribute__((swift_name("init()")));
 @property (class, readonly, getter=shared) BridgeClientEnvironmentCompanion *shared __attribute__((swift_name("shared")));
+- (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+@end;
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("FileReference")))
+@interface BridgeClientFileReference : BridgeClientBase
+- (instancetype)initWithGuid:(NSString *)guid createdOn:(NSString *)createdOn href:(NSString * _Nullable)href type:(NSString * _Nullable)type __attribute__((swift_name("init(guid:createdOn:href:type:)"))) __attribute__((objc_designated_initializer));
+@property (class, readonly, getter=companion) BridgeClientFileReferenceCompanion *companion __attribute__((swift_name("companion")));
+- (NSString *)component1 __attribute__((swift_name("component1()")));
+- (NSString *)component2 __attribute__((swift_name("component2()")));
+- (NSString * _Nullable)component3 __attribute__((swift_name("component3()")));
+- (NSString * _Nullable)component4 __attribute__((swift_name("component4()")));
+- (BridgeClientFileReference *)doCopyGuid:(NSString *)guid createdOn:(NSString *)createdOn href:(NSString * _Nullable)href type:(NSString * _Nullable)type __attribute__((swift_name("doCopy(guid:createdOn:href:type:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString *createdOn __attribute__((swift_name("createdOn")));
+@property (readonly) NSString *guid __attribute__((swift_name("guid")));
+@property (readonly) NSString * _Nullable href __attribute__((swift_name("href")));
+@property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
+@end;
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("FileReference.Companion")))
+@interface BridgeClientFileReferenceCompanion : BridgeClientBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) BridgeClientFileReferenceCompanion *shared __attribute__((swift_name("shared")));
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end;
 
@@ -1387,6 +1349,33 @@ __attribute__((swift_name("ScheduledSession.Companion")))
 + (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
 + (instancetype)companion __attribute__((swift_name("init()")));
 @property (class, readonly, getter=shared) BridgeClientScheduledSessionCompanion *shared __attribute__((swift_name("shared")));
+- (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+@end;
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SchemaReference")))
+@interface BridgeClientSchemaReference : BridgeClientBase
+- (instancetype)initWithId:(NSString *)id revision:(BridgeClientLong * _Nullable)revision type:(NSString * _Nullable)type __attribute__((swift_name("init(id:revision:type:)"))) __attribute__((objc_designated_initializer));
+@property (class, readonly, getter=companion) BridgeClientSchemaReferenceCompanion *companion __attribute__((swift_name("companion")));
+- (NSString *)component1 __attribute__((swift_name("component1()")));
+- (BridgeClientLong * _Nullable)component2 __attribute__((swift_name("component2()")));
+- (NSString * _Nullable)component3 __attribute__((swift_name("component3()")));
+- (BridgeClientSchemaReference *)doCopyId:(NSString *)id revision:(BridgeClientLong * _Nullable)revision type:(NSString * _Nullable)type __attribute__((swift_name("doCopy(id:revision:type:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString *id __attribute__((swift_name("id")));
+@property (readonly) BridgeClientLong * _Nullable revision __attribute__((swift_name("revision")));
+@property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
+@end;
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SchemaReference.Companion")))
+@interface BridgeClientSchemaReferenceCompanion : BridgeClientBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) BridgeClientSchemaReferenceCompanion *shared __attribute__((swift_name("shared")));
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end;
 
@@ -1695,6 +1684,37 @@ __attribute__((swift_name("StudyPhase.Companion")))
 @end;
 
 __attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SurveyReference")))
+@interface BridgeClientSurveyReference : BridgeClientBase
+- (instancetype)initWithGuid:(NSString *)guid identifier:(NSString * _Nullable)identifier createdOn:(NSString * _Nullable)createdOn href:(NSString * _Nullable)href type:(NSString * _Nullable)type __attribute__((swift_name("init(guid:identifier:createdOn:href:type:)"))) __attribute__((objc_designated_initializer));
+@property (class, readonly, getter=companion) BridgeClientSurveyReferenceCompanion *companion __attribute__((swift_name("companion")));
+- (NSString *)component1 __attribute__((swift_name("component1()")));
+- (NSString * _Nullable)component2 __attribute__((swift_name("component2()")));
+- (NSString * _Nullable)component3 __attribute__((swift_name("component3()")));
+- (NSString * _Nullable)component4 __attribute__((swift_name("component4()")));
+- (NSString * _Nullable)component5 __attribute__((swift_name("component5()")));
+- (BridgeClientSurveyReference *)doCopyGuid:(NSString *)guid identifier:(NSString * _Nullable)identifier createdOn:(NSString * _Nullable)createdOn href:(NSString * _Nullable)href type:(NSString * _Nullable)type __attribute__((swift_name("doCopy(guid:identifier:createdOn:href:type:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString * _Nullable createdOn __attribute__((swift_name("createdOn")));
+@property (readonly) NSString *guid __attribute__((swift_name("guid")));
+@property (readonly) NSString * _Nullable href __attribute__((swift_name("href")));
+@property (readonly) NSString * _Nullable identifier __attribute__((swift_name("identifier")));
+@property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
+@end;
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SurveyReference.Companion")))
+@interface BridgeClientSurveyReferenceCompanion : BridgeClientBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) BridgeClientSurveyReferenceCompanion *shared __attribute__((swift_name("shared")));
+- (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+@end;
+
+__attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("Timeline")))
 @interface BridgeClientTimeline : BridgeClientBase
 - (instancetype)initWithDuration:(BridgeClientKotlinx_datetimeDateTimePeriod *)duration schedule:(NSArray<BridgeClientScheduledSession *> * _Nullable)schedule assessments:(NSArray<BridgeClientAssessmentInfo *> * _Nullable)assessments sessions:(NSArray<BridgeClientSessionInfo *> * _Nullable)sessions type:(NSString * _Nullable)type __attribute__((swift_name("init(duration:schedule:assessments:sessions:type:)"))) __attribute__((objc_designated_initializer));
@@ -1835,6 +1855,16 @@ __attribute__((swift_name("AbstractApi.Companion")))
 @property (class, readonly, getter=shared) BridgeClientAbstractApiCompanion *shared __attribute__((swift_name("shared")));
 @property (readonly) NSString *BASE_PATH __attribute__((swift_name("BASE_PATH")));
 @property (readonly) NSString *BRIDGE_SERVER_CHECK __attribute__((swift_name("BRIDGE_SERVER_CHECK")));
+@end;
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("IosHttpClient")))
+@interface BridgeClientIosHttpClient : BridgeClientBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)iosHttpClient __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) BridgeClientIosHttpClient *shared __attribute__((swift_name("shared")));
+@property (readonly) BridgeClientKtor_client_coreHttpClient *httpClient __attribute__((swift_name("httpClient")));
 @end;
 
 __attribute__((objc_subclassing_restricted))
@@ -2393,26 +2423,6 @@ __attribute__((swift_name("StudyRepo")))
 - (void)getStudyInfoStudyId:(NSString *)studyId completionHandler:(void (^)(BridgeClientResourceResult<BridgeClientStudyInfo *> * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("getStudyInfo(studyId:completionHandler:)")));
 @end;
 
-__attribute__((objc_subclassing_restricted))
-__attribute__((swift_name("NativeStudyInfoManager")))
-@interface BridgeClientNativeStudyInfoManager : BridgeClientBase <BridgeClientKoin_coreKoinComponent>
-- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
-+ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
-- (void)fetchStudyInfoStudyId:(NSString *)studyId callBack:(void (^)(BridgeClientStudyInfo * _Nullable, BridgeClientResourceStatus *))callBack __attribute__((swift_name("fetchStudyInfo(studyId:callBack:)")));
-@end;
-
-__attribute__((objc_subclassing_restricted))
-__attribute__((swift_name("NativeStudyManager")))
-@interface BridgeClientNativeStudyManager : BridgeClientBase <BridgeClientKoin_coreKoinComponent>
-- (instancetype)initWithStudyId:(NSString *)studyId viewUpdate:(void (^)(BridgeClientStudy *))viewUpdate __attribute__((swift_name("init(studyId:viewUpdate:)"))) __attribute__((objc_designated_initializer));
-- (void)observeStudy __attribute__((swift_name("observeStudy()")));
-
-/**
- @note This method converts all Kotlin exceptions to errors.
-*/
-- (BOOL)onClearedAndReturnError:(NSError * _Nullable * _Nullable)error __attribute__((swift_name("onCleared()")));
-@end;
-
 @interface BridgeClientNativeAdherenceRecord (Extensions)
 - (NSData * _Nullable)clientDataJson __attribute__((swift_name("clientDataJson()")));
 @end;
@@ -2421,18 +2431,18 @@ __attribute__((swift_name("NativeStudyManager")))
 - (NSData * _Nullable)clientDataJson __attribute__((swift_name("clientDataJson()")));
 @end;
 
+@interface BridgeClientAppConfig (Extensions)
+- (NSData * _Nullable)clientDataJson __attribute__((swift_name("clientDataJson()")));
+- (NSData * _Nullable)configElementJsonIdentifier:(NSString *)identifier __attribute__((swift_name("configElementJson(identifier:)")));
+- (NSDictionary<NSString *, NSData *> * _Nullable)mapConfigElements __attribute__((swift_name("mapConfigElements()")));
+@end;
+
 @interface BridgeClientStudy (Extensions)
 - (NSData * _Nullable)clientDataJson __attribute__((swift_name("clientDataJson()")));
 @end;
 
 @interface BridgeClientUserSessionInfo (Extensions)
 - (NSData * _Nullable)clientDataJson __attribute__((swift_name("clientDataJson()")));
-@end;
-
-@interface BridgeClientAppConfig (Extensions)
-- (NSData * _Nullable)clientDataJson __attribute__((swift_name("clientDataJson()")));
-- (NSData * _Nullable)configElementJsonIdentifier:(NSString *)identifier __attribute__((swift_name("configElementJson(identifier:)")));
-- (NSDictionary<NSString *, NSData *> * _Nullable)mapConfigElements __attribute__((swift_name("mapConfigElements()")));
 @end;
 
 @interface BridgeClientResource (Extensions)
@@ -2460,32 +2470,6 @@ __attribute__((swift_name("HttpClientModuleKt")))
 + (BridgeClientKoin_coreModule *)httpClientModuleEnableNetworkLogs:(BOOL)enableNetworkLogs __attribute__((swift_name("httpClientModule(enableNetworkLogs:)")));
 @end;
 
-__attribute__((swift_name("Kotlinx_serialization_jsonJsonElement")))
-@interface BridgeClientKotlinx_serialization_jsonJsonElement : BridgeClientBase
-- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
-+ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
-@property (class, readonly, getter=companion) BridgeClientKotlinx_serialization_jsonJsonElementCompanion *companion __attribute__((swift_name("companion")));
-@end;
-
-__attribute__((swift_name("Kotlinx_serialization_coreSerializationStrategy")))
-@protocol BridgeClientKotlinx_serialization_coreSerializationStrategy
-@required
-- (void)serializeEncoder:(id<BridgeClientKotlinx_serialization_coreEncoder>)encoder value:(id _Nullable)value __attribute__((swift_name("serialize(encoder:value:)")));
-@property (readonly) id<BridgeClientKotlinx_serialization_coreSerialDescriptor> descriptor __attribute__((swift_name("descriptor")));
-@end;
-
-__attribute__((swift_name("Kotlinx_serialization_coreDeserializationStrategy")))
-@protocol BridgeClientKotlinx_serialization_coreDeserializationStrategy
-@required
-- (id _Nullable)deserializeDecoder:(id<BridgeClientKotlinx_serialization_coreDecoder>)decoder __attribute__((swift_name("deserialize(decoder:)")));
-@property (readonly) id<BridgeClientKotlinx_serialization_coreSerialDescriptor> descriptor __attribute__((swift_name("descriptor")));
-@end;
-
-__attribute__((swift_name("Kotlinx_serialization_coreKSerializer")))
-@protocol BridgeClientKotlinx_serialization_coreKSerializer <BridgeClientKotlinx_serialization_coreSerializationStrategy, BridgeClientKotlinx_serialization_coreDeserializationStrategy>
-@required
-@end;
-
 __attribute__((swift_name("KotlinThrowable")))
 @interface BridgeClientKotlinThrowable : BridgeClientBase
 - (instancetype)initWithMessage:(NSString * _Nullable)message __attribute__((swift_name("init(message:)"))) __attribute__((objc_designated_initializer));
@@ -2499,6 +2483,13 @@ __attribute__((swift_name("KotlinThrowable")))
 @property (readonly) BridgeClientKotlinThrowable * _Nullable cause __attribute__((swift_name("cause")));
 @property (readonly) NSString * _Nullable message __attribute__((swift_name("message")));
 - (NSError *)asError __attribute__((swift_name("asError()")));
+@end;
+
+__attribute__((swift_name("Kotlinx_serialization_jsonJsonElement")))
+@interface BridgeClientKotlinx_serialization_jsonJsonElement : BridgeClientBase
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+@property (class, readonly, getter=companion) BridgeClientKotlinx_serialization_jsonJsonElementCompanion *companion __attribute__((swift_name("companion")));
 @end;
 
 __attribute__((objc_subclassing_restricted))
@@ -2581,6 +2572,25 @@ __attribute__((swift_name("KotlinArray")))
 - (id<BridgeClientKotlinIterator>)iterator __attribute__((swift_name("iterator()")));
 - (void)setIndex:(int32_t)index value:(T _Nullable)value __attribute__((swift_name("set(index:value:)")));
 @property (readonly) int32_t size __attribute__((swift_name("size")));
+@end;
+
+__attribute__((swift_name("Kotlinx_serialization_coreSerializationStrategy")))
+@protocol BridgeClientKotlinx_serialization_coreSerializationStrategy
+@required
+- (void)serializeEncoder:(id<BridgeClientKotlinx_serialization_coreEncoder>)encoder value:(id _Nullable)value __attribute__((swift_name("serialize(encoder:value:)")));
+@property (readonly) id<BridgeClientKotlinx_serialization_coreSerialDescriptor> descriptor __attribute__((swift_name("descriptor")));
+@end;
+
+__attribute__((swift_name("Kotlinx_serialization_coreDeserializationStrategy")))
+@protocol BridgeClientKotlinx_serialization_coreDeserializationStrategy
+@required
+- (id _Nullable)deserializeDecoder:(id<BridgeClientKotlinx_serialization_coreDecoder>)decoder __attribute__((swift_name("deserialize(decoder:)")));
+@property (readonly) id<BridgeClientKotlinx_serialization_coreSerialDescriptor> descriptor __attribute__((swift_name("descriptor")));
+@end;
+
+__attribute__((swift_name("Kotlinx_serialization_coreKSerializer")))
+@protocol BridgeClientKotlinx_serialization_coreKSerializer <BridgeClientKotlinx_serialization_coreSerializationStrategy, BridgeClientKotlinx_serialization_coreDeserializationStrategy>
+@required
 @end;
 
 __attribute__((objc_subclassing_restricted))
@@ -2895,67 +2905,6 @@ __attribute__((swift_name("Kotlinx_serialization_jsonJsonElement.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end;
 
-__attribute__((swift_name("Kotlinx_serialization_coreEncoder")))
-@protocol BridgeClientKotlinx_serialization_coreEncoder
-@required
-- (id<BridgeClientKotlinx_serialization_coreCompositeEncoder>)beginCollectionDescriptor:(id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)descriptor collectionSize:(int32_t)collectionSize __attribute__((swift_name("beginCollection(descriptor:collectionSize:)")));
-- (id<BridgeClientKotlinx_serialization_coreCompositeEncoder>)beginStructureDescriptor:(id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)descriptor __attribute__((swift_name("beginStructure(descriptor:)")));
-- (void)encodeBooleanValue:(BOOL)value __attribute__((swift_name("encodeBoolean(value:)")));
-- (void)encodeByteValue:(int8_t)value __attribute__((swift_name("encodeByte(value:)")));
-- (void)encodeCharValue:(unichar)value __attribute__((swift_name("encodeChar(value:)")));
-- (void)encodeDoubleValue:(double)value __attribute__((swift_name("encodeDouble(value:)")));
-- (void)encodeEnumEnumDescriptor:(id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)enumDescriptor index:(int32_t)index __attribute__((swift_name("encodeEnum(enumDescriptor:index:)")));
-- (void)encodeFloatValue:(float)value __attribute__((swift_name("encodeFloat(value:)")));
-- (id<BridgeClientKotlinx_serialization_coreEncoder>)encodeInlineInlineDescriptor:(id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)inlineDescriptor __attribute__((swift_name("encodeInline(inlineDescriptor:)")));
-- (void)encodeIntValue:(int32_t)value __attribute__((swift_name("encodeInt(value:)")));
-- (void)encodeLongValue:(int64_t)value __attribute__((swift_name("encodeLong(value:)")));
-- (void)encodeNotNullMark __attribute__((swift_name("encodeNotNullMark()")));
-- (void)encodeNull __attribute__((swift_name("encodeNull()")));
-- (void)encodeNullableSerializableValueSerializer:(id<BridgeClientKotlinx_serialization_coreSerializationStrategy>)serializer value:(id _Nullable)value __attribute__((swift_name("encodeNullableSerializableValue(serializer:value:)")));
-- (void)encodeSerializableValueSerializer:(id<BridgeClientKotlinx_serialization_coreSerializationStrategy>)serializer value:(id _Nullable)value __attribute__((swift_name("encodeSerializableValue(serializer:value:)")));
-- (void)encodeShortValue:(int16_t)value __attribute__((swift_name("encodeShort(value:)")));
-- (void)encodeStringValue:(NSString *)value __attribute__((swift_name("encodeString(value:)")));
-@property (readonly) BridgeClientKotlinx_serialization_coreSerializersModule *serializersModule __attribute__((swift_name("serializersModule")));
-@end;
-
-__attribute__((swift_name("Kotlinx_serialization_coreSerialDescriptor")))
-@protocol BridgeClientKotlinx_serialization_coreSerialDescriptor
-@required
-- (NSArray<id<BridgeClientKotlinAnnotation>> *)getElementAnnotationsIndex:(int32_t)index __attribute__((swift_name("getElementAnnotations(index:)")));
-- (id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)getElementDescriptorIndex:(int32_t)index __attribute__((swift_name("getElementDescriptor(index:)")));
-- (int32_t)getElementIndexName:(NSString *)name __attribute__((swift_name("getElementIndex(name:)")));
-- (NSString *)getElementNameIndex:(int32_t)index __attribute__((swift_name("getElementName(index:)")));
-- (BOOL)isElementOptionalIndex:(int32_t)index __attribute__((swift_name("isElementOptional(index:)")));
-@property (readonly) NSArray<id<BridgeClientKotlinAnnotation>> *annotations __attribute__((swift_name("annotations")));
-@property (readonly) int32_t elementsCount __attribute__((swift_name("elementsCount")));
-@property (readonly) BOOL isInline __attribute__((swift_name("isInline")));
-@property (readonly) BOOL isNullable __attribute__((swift_name("isNullable")));
-@property (readonly) BridgeClientKotlinx_serialization_coreSerialKind *kind __attribute__((swift_name("kind")));
-@property (readonly) NSString *serialName __attribute__((swift_name("serialName")));
-@end;
-
-__attribute__((swift_name("Kotlinx_serialization_coreDecoder")))
-@protocol BridgeClientKotlinx_serialization_coreDecoder
-@required
-- (id<BridgeClientKotlinx_serialization_coreCompositeDecoder>)beginStructureDescriptor:(id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)descriptor __attribute__((swift_name("beginStructure(descriptor:)")));
-- (BOOL)decodeBoolean __attribute__((swift_name("decodeBoolean()")));
-- (int8_t)decodeByte __attribute__((swift_name("decodeByte()")));
-- (unichar)decodeChar __attribute__((swift_name("decodeChar()")));
-- (double)decodeDouble __attribute__((swift_name("decodeDouble()")));
-- (int32_t)decodeEnumEnumDescriptor:(id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)enumDescriptor __attribute__((swift_name("decodeEnum(enumDescriptor:)")));
-- (float)decodeFloat __attribute__((swift_name("decodeFloat()")));
-- (id<BridgeClientKotlinx_serialization_coreDecoder>)decodeInlineInlineDescriptor:(id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)inlineDescriptor __attribute__((swift_name("decodeInline(inlineDescriptor:)")));
-- (int32_t)decodeInt __attribute__((swift_name("decodeInt()")));
-- (int64_t)decodeLong __attribute__((swift_name("decodeLong()")));
-- (BOOL)decodeNotNullMark __attribute__((swift_name("decodeNotNullMark()")));
-- (BridgeClientKotlinNothing * _Nullable)decodeNull __attribute__((swift_name("decodeNull()")));
-- (id _Nullable)decodeNullableSerializableValueDeserializer:(id<BridgeClientKotlinx_serialization_coreDeserializationStrategy>)deserializer __attribute__((swift_name("decodeNullableSerializableValue(deserializer:)")));
-- (id _Nullable)decodeSerializableValueDeserializer:(id<BridgeClientKotlinx_serialization_coreDeserializationStrategy>)deserializer __attribute__((swift_name("decodeSerializableValue(deserializer:)")));
-- (int16_t)decodeShort __attribute__((swift_name("decodeShort()")));
-- (NSString *)decodeString __attribute__((swift_name("decodeString()")));
-@property (readonly) BridgeClientKotlinx_serialization_coreSerializersModule *serializersModule __attribute__((swift_name("serializersModule")));
-@end;
-
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("Koin_coreScope")))
 @interface BridgeClientKoin_coreScope : BridgeClientBase
@@ -3184,6 +3133,67 @@ __attribute__((swift_name("KotlinIterator")))
 @required
 - (BOOL)hasNext __attribute__((swift_name("hasNext()")));
 - (id _Nullable)next __attribute__((swift_name("next()")));
+@end;
+
+__attribute__((swift_name("Kotlinx_serialization_coreEncoder")))
+@protocol BridgeClientKotlinx_serialization_coreEncoder
+@required
+- (id<BridgeClientKotlinx_serialization_coreCompositeEncoder>)beginCollectionDescriptor:(id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)descriptor collectionSize:(int32_t)collectionSize __attribute__((swift_name("beginCollection(descriptor:collectionSize:)")));
+- (id<BridgeClientKotlinx_serialization_coreCompositeEncoder>)beginStructureDescriptor:(id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)descriptor __attribute__((swift_name("beginStructure(descriptor:)")));
+- (void)encodeBooleanValue:(BOOL)value __attribute__((swift_name("encodeBoolean(value:)")));
+- (void)encodeByteValue:(int8_t)value __attribute__((swift_name("encodeByte(value:)")));
+- (void)encodeCharValue:(unichar)value __attribute__((swift_name("encodeChar(value:)")));
+- (void)encodeDoubleValue:(double)value __attribute__((swift_name("encodeDouble(value:)")));
+- (void)encodeEnumEnumDescriptor:(id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)enumDescriptor index:(int32_t)index __attribute__((swift_name("encodeEnum(enumDescriptor:index:)")));
+- (void)encodeFloatValue:(float)value __attribute__((swift_name("encodeFloat(value:)")));
+- (id<BridgeClientKotlinx_serialization_coreEncoder>)encodeInlineInlineDescriptor:(id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)inlineDescriptor __attribute__((swift_name("encodeInline(inlineDescriptor:)")));
+- (void)encodeIntValue:(int32_t)value __attribute__((swift_name("encodeInt(value:)")));
+- (void)encodeLongValue:(int64_t)value __attribute__((swift_name("encodeLong(value:)")));
+- (void)encodeNotNullMark __attribute__((swift_name("encodeNotNullMark()")));
+- (void)encodeNull __attribute__((swift_name("encodeNull()")));
+- (void)encodeNullableSerializableValueSerializer:(id<BridgeClientKotlinx_serialization_coreSerializationStrategy>)serializer value:(id _Nullable)value __attribute__((swift_name("encodeNullableSerializableValue(serializer:value:)")));
+- (void)encodeSerializableValueSerializer:(id<BridgeClientKotlinx_serialization_coreSerializationStrategy>)serializer value:(id _Nullable)value __attribute__((swift_name("encodeSerializableValue(serializer:value:)")));
+- (void)encodeShortValue:(int16_t)value __attribute__((swift_name("encodeShort(value:)")));
+- (void)encodeStringValue:(NSString *)value __attribute__((swift_name("encodeString(value:)")));
+@property (readonly) BridgeClientKotlinx_serialization_coreSerializersModule *serializersModule __attribute__((swift_name("serializersModule")));
+@end;
+
+__attribute__((swift_name("Kotlinx_serialization_coreSerialDescriptor")))
+@protocol BridgeClientKotlinx_serialization_coreSerialDescriptor
+@required
+- (NSArray<id<BridgeClientKotlinAnnotation>> *)getElementAnnotationsIndex:(int32_t)index __attribute__((swift_name("getElementAnnotations(index:)")));
+- (id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)getElementDescriptorIndex:(int32_t)index __attribute__((swift_name("getElementDescriptor(index:)")));
+- (int32_t)getElementIndexName:(NSString *)name __attribute__((swift_name("getElementIndex(name:)")));
+- (NSString *)getElementNameIndex:(int32_t)index __attribute__((swift_name("getElementName(index:)")));
+- (BOOL)isElementOptionalIndex:(int32_t)index __attribute__((swift_name("isElementOptional(index:)")));
+@property (readonly) NSArray<id<BridgeClientKotlinAnnotation>> *annotations __attribute__((swift_name("annotations")));
+@property (readonly) int32_t elementsCount __attribute__((swift_name("elementsCount")));
+@property (readonly) BOOL isInline __attribute__((swift_name("isInline")));
+@property (readonly) BOOL isNullable __attribute__((swift_name("isNullable")));
+@property (readonly) BridgeClientKotlinx_serialization_coreSerialKind *kind __attribute__((swift_name("kind")));
+@property (readonly) NSString *serialName __attribute__((swift_name("serialName")));
+@end;
+
+__attribute__((swift_name("Kotlinx_serialization_coreDecoder")))
+@protocol BridgeClientKotlinx_serialization_coreDecoder
+@required
+- (id<BridgeClientKotlinx_serialization_coreCompositeDecoder>)beginStructureDescriptor:(id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)descriptor __attribute__((swift_name("beginStructure(descriptor:)")));
+- (BOOL)decodeBoolean __attribute__((swift_name("decodeBoolean()")));
+- (int8_t)decodeByte __attribute__((swift_name("decodeByte()")));
+- (unichar)decodeChar __attribute__((swift_name("decodeChar()")));
+- (double)decodeDouble __attribute__((swift_name("decodeDouble()")));
+- (int32_t)decodeEnumEnumDescriptor:(id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)enumDescriptor __attribute__((swift_name("decodeEnum(enumDescriptor:)")));
+- (float)decodeFloat __attribute__((swift_name("decodeFloat()")));
+- (id<BridgeClientKotlinx_serialization_coreDecoder>)decodeInlineInlineDescriptor:(id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)inlineDescriptor __attribute__((swift_name("decodeInline(inlineDescriptor:)")));
+- (int32_t)decodeInt __attribute__((swift_name("decodeInt()")));
+- (int64_t)decodeLong __attribute__((swift_name("decodeLong()")));
+- (BOOL)decodeNotNullMark __attribute__((swift_name("decodeNotNullMark()")));
+- (BridgeClientKotlinNothing * _Nullable)decodeNull __attribute__((swift_name("decodeNull()")));
+- (id _Nullable)decodeNullableSerializableValueDeserializer:(id<BridgeClientKotlinx_serialization_coreDeserializationStrategy>)deserializer __attribute__((swift_name("decodeNullableSerializableValue(deserializer:)")));
+- (id _Nullable)decodeSerializableValueDeserializer:(id<BridgeClientKotlinx_serialization_coreDeserializationStrategy>)deserializer __attribute__((swift_name("decodeSerializableValue(deserializer:)")));
+- (int16_t)decodeShort __attribute__((swift_name("decodeShort()")));
+- (NSString *)decodeString __attribute__((swift_name("decodeString()")));
+@property (readonly) BridgeClientKotlinx_serialization_coreSerializersModule *serializersModule __attribute__((swift_name("serializersModule")));
 @end;
 
 __attribute__((objc_subclassing_restricted))
@@ -3708,6 +3718,31 @@ __attribute__((swift_name("Koin_coreLevel")))
 + (BridgeClientKotlinArray<BridgeClientKoin_coreLevel *> *)values __attribute__((swift_name("values()")));
 @end;
 
+__attribute__((swift_name("Koin_coreScopeCallback")))
+@protocol BridgeClientKoin_coreScopeCallback
+@required
+- (void)onScopeCloseScope:(BridgeClientKoin_coreScope *)scope __attribute__((swift_name("onScopeClose(scope:)")));
+@end;
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Koin_coreParametersHolder.Companion")))
+@interface BridgeClientKoin_coreParametersHolderCompanion : BridgeClientBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) BridgeClientKoin_coreParametersHolderCompanion *shared __attribute__((swift_name("shared")));
+@property (readonly) int32_t MAX_PARAMS __attribute__((swift_name("MAX_PARAMS")));
+@end;
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Koin_coreScopeRegistry.Companion")))
+@interface BridgeClientKoin_coreScopeRegistryCompanion : BridgeClientBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) BridgeClientKoin_coreScopeRegistryCompanion *shared __attribute__((swift_name("shared")));
+@end;
+
 __attribute__((swift_name("Kotlinx_serialization_coreCompositeEncoder")))
 @protocol BridgeClientKotlinx_serialization_coreCompositeEncoder
 @required
@@ -3771,31 +3806,6 @@ __attribute__((swift_name("Kotlinx_serialization_coreCompositeDecoder")))
 - (NSString *)decodeStringElementDescriptor:(id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index __attribute__((swift_name("decodeStringElement(descriptor:index:)")));
 - (void)endStructureDescriptor:(id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)descriptor __attribute__((swift_name("endStructure(descriptor:)")));
 @property (readonly) BridgeClientKotlinx_serialization_coreSerializersModule *serializersModule __attribute__((swift_name("serializersModule")));
-@end;
-
-__attribute__((swift_name("Koin_coreScopeCallback")))
-@protocol BridgeClientKoin_coreScopeCallback
-@required
-- (void)onScopeCloseScope:(BridgeClientKoin_coreScope *)scope __attribute__((swift_name("onScopeClose(scope:)")));
-@end;
-
-__attribute__((objc_subclassing_restricted))
-__attribute__((swift_name("Koin_coreParametersHolder.Companion")))
-@interface BridgeClientKoin_coreParametersHolderCompanion : BridgeClientBase
-+ (instancetype)alloc __attribute__((unavailable));
-+ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
-+ (instancetype)companion __attribute__((swift_name("init()")));
-@property (class, readonly, getter=shared) BridgeClientKoin_coreParametersHolderCompanion *shared __attribute__((swift_name("shared")));
-@property (readonly) int32_t MAX_PARAMS __attribute__((swift_name("MAX_PARAMS")));
-@end;
-
-__attribute__((objc_subclassing_restricted))
-__attribute__((swift_name("Koin_coreScopeRegistry.Companion")))
-@interface BridgeClientKoin_coreScopeRegistryCompanion : BridgeClientBase
-+ (instancetype)alloc __attribute__((unavailable));
-+ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
-+ (instancetype)companion __attribute__((swift_name("init()")));
-@property (class, readonly, getter=shared) BridgeClientKoin_coreScopeRegistryCompanion *shared __attribute__((swift_name("shared")));
 @end;
 
 __attribute__((swift_name("KotlinCoroutineContextKey")))

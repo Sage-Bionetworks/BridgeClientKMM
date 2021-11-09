@@ -15,8 +15,8 @@ import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper.Compan
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
 import org.sagebionetworks.bridge.kmm.shared.cache.loadResource
 import org.sagebionetworks.bridge.kmm.shared.repo.AbstractResourceRepo
-import org.sagebionetworks.bridge.mpp.network.generated.models.UploadRequest
-import org.sagebionetworks.bridge.mpp.network.generated.models.UploadSession
+import org.sagebionetworks.bridge.kmm.shared.models.UploadRequest
+import org.sagebionetworks.bridge.kmm.shared.models.UploadSession
 
 class UploadManager(
     httpClient: HttpClient,

@@ -13,7 +13,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import org.sagebionetworks.bridge.kmm.shared.cache.Resource
-import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper.Companion.APP_WIDE_STUDY_ID
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper.Companion.DEFAULT_SECONDARY_ID
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus
@@ -23,7 +22,7 @@ import org.sagebionetworks.bridge.kmm.shared.getTestClient
 import org.sagebionetworks.bridge.kmm.shared.models.UploadStatus
 import org.sagebionetworks.bridge.kmm.shared.models.UploadValidationStatus
 import org.sagebionetworks.bridge.kmm.shared.testDatabaseDriver
-import org.sagebionetworks.bridge.mpp.network.generated.models.UploadSession
+import org.sagebionetworks.bridge.kmm.shared.models.UploadSession
 import java.io.File
 import java.io.PrintWriter
 import kotlin.test.*

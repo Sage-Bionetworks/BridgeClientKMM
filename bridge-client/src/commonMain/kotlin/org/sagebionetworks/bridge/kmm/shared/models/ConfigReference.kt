@@ -9,7 +9,7 @@
 * https://github.com/swagger-api/swagger-codegen.git
 * Do not edit the class manually.
 */
-package org.sagebionetworks.bridge.mpp.network.generated.models
+package org.sagebionetworks.bridge.kmm.shared.models
 
 import kotlinx.serialization.Serializable
 

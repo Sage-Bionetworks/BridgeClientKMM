@@ -2,7 +2,7 @@ package org.sagebionetworks.bridge.kmm.shared.upload
 
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
-import org.sagebionetworks.bridge.mpp.network.generated.models.UploadRequest
+import org.sagebionetworks.bridge.kmm.shared.models.UploadRequest
 
 @Serializable
 data class UploadFile (

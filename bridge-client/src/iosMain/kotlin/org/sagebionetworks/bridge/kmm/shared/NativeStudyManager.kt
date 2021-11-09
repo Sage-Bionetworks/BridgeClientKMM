@@ -1,4 +1,4 @@
-package kotlin.org.sagebionetworks.bridge.kmm.shared
+package org.sagebionetworks.bridge.kmm.shared
 
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel

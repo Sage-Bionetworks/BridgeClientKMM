@@ -6,7 +6,6 @@ import io.ktor.client.*
 import kotlinx.datetime.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import okio.ExperimentalFileSystem
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
@@ -115,7 +114,6 @@ class UploadManager(
         return Json.encodeToString(uploadsApi.requestUploadSession(uploadRequest))
     }
 
-    @OptIn(ExperimentalFileSystem::class)
     private suspend fun uploadToS3(uploadFile: UploadFile, uploadSession: UploadSession) {
         //Make call to S3 using url from UploadSession
         try {

@@ -34,7 +34,6 @@ class UploadRequester(
      * to create the UploadFile. Once this method returns, the UploadManager is now responsible
      * for deleting the specified UploadFile after a successful upload.
      */
-    @OptIn(ExperimentalFileSystem::class)
     fun queueAndRequestUpload(context: Context, uploadFile: UploadFile, assessmentInstanceId: String) {
         val pendingUploads = database.getResourcesBySecondaryId(assessmentInstanceId, ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID)
         if (pendingUploads.isNotEmpty()) {
@@ -104,7 +103,6 @@ class UploadRequester(
 
     // This is a temporary helper method for testing upload with Bridge -nbrown 01/08/21
     // This utilizes the new multiplatform FileSystem api from Okio
-    @OptIn(ExperimentalFileSystem::class)
     fun generateTestUploadFile(filename: String): UploadFile? {
         val filePath = getFile(filename)
 
@@ -128,7 +126,6 @@ class UploadRequester(
         return uploadFile
     }
 
-    @OptIn(ExperimentalFileSystem::class)
     private fun getFile(filename: String): Path {
         val pathString = context.filesDir.absolutePath + Path.DIRECTORY_SEPARATOR + filename
         return pathString.toPath()

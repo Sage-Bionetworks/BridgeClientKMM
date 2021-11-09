@@ -11,8 +11,8 @@ object Versions {
     const val kotlinxDateTime = "0.3.0"
     const val multiplatformSettings = "0.7.1"
     const val koin = "3.1.1"
-    const val sqlDelight = "1.5.1"
-    const val okio = "3.0.0-alpha.4"
+    const val sqlDelight = "1.5.2"
+    const val okio = "3.0.0"
     const val stately = "1.1.1"
 
     object AndroidX {
@@ -37,7 +37,7 @@ object Versions {
 object Deps {
 
     val kotlinxDateTime = "org.jetbrains.kotlinx:kotlinx-datetime:${Versions.kotlinxDateTime}"
-    val okio = "com.squareup.okio:okio-multiplatform:${Versions.okio}"
+    val okio = "com.squareup.okio:okio:${Versions.okio}"
     val stately = "co.touchlab:stately-common:${Versions.stately}"
 
     object AndroidX {

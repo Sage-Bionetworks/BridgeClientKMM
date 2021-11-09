@@ -91,7 +91,7 @@ interface BridgeConfig : PlatformConfig {
             }
             if (info.appVersion != null) {
                 sb.append("/")
-                sb.append(info.appVersion ?: 0)
+                sb.append(info.appVersion)
             }
         }
         if (isNotBlank(info.deviceName) || isNotBlank(info.osName) || isNotBlank(info.osVersion)) {
@@ -126,6 +126,6 @@ interface BridgeConfig : PlatformConfig {
     }
 
     private fun isNotBlank(string: String?): Boolean {
-        return string != null && string.length > 0
+        return string != null && string.isNotEmpty()
     }
 }

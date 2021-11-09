@@ -43,7 +43,7 @@ internal class SchedulesV2Api(basePath: String = BASE_PATH, httpClient: HttpClie
      * Create or update one or more adherence records.
      *
      * @param studyId Study identifier
-     * @param adherenceRecord One ore more adherence records
+     * @param records One ore more adherence records
      * @return Message
      */
     suspend fun updateAdherenceRecords(studyId: String, records: List<AdherenceRecord>) : Message {

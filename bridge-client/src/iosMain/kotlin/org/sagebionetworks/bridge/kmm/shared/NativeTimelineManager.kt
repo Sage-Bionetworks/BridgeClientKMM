@@ -93,7 +93,7 @@ internal fun ScheduledAssessmentReference.toNative()  =
         assessmentInfo = assessmentInfo,
         isCompleted = isCompleted,
         isDeclined = isDeclined,
-        adherenceRecords = this.adherenceRecordList?.map { it.toNative() },
+        adherenceRecords = this.adherenceRecordList.map { it.toNative() },
     )
 
 internal fun AdherenceRecord.toNative()  =

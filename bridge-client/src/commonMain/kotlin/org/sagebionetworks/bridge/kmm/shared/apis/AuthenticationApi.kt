@@ -54,7 +54,7 @@ internal class AuthenticationApi(basePath: String = BASE_PATH, httpClient: HttpC
         with(builder.headers) {
             append("Accept", "application/json")
             append("Content-Type", "application/json; charset=UTF-8")
-            sessionInfo.sessionToken?.let { append("Bridge-Session", it) }
+            sessionInfo.sessionToken.let { append("Bridge-Session", it) }
         }
 
         try {

@@ -133,9 +133,9 @@ abstract class AssessmentResultArchiveUploader(
 
             val digest = md5.digest()
             val digestEnc = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                Base64.getEncoder().encodeToString(digest);
+                Base64.getEncoder().encodeToString(digest)
             } else {
-                android.util.Base64.encodeToString(digest, android.util.Base64.DEFAULT);
+                android.util.Base64.encodeToString(digest, android.util.Base64.DEFAULT)
             }
 
             return UploadFile(

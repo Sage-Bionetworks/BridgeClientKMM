@@ -424,7 +424,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
             event = event,
             startDateTime = startDateTime,
             endDateTime = endDateTime,
-            notifications = if (notifications.isNullOrEmpty()) null else notifications!!.sortedBy { it.scheduleOn }
+            notifications = if (notifications.isNullOrEmpty()) null else notifications.sortedBy { it.scheduleOn }
         )
     }
 

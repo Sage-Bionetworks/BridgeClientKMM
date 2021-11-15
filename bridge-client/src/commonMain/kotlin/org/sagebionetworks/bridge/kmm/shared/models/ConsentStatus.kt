@@ -29,26 +29,24 @@ import kotlinx.serialization.SerialName
 data class ConsentStatus (
     /* The name of the subpopulation. */
     @SerialName("name")
-    val name: kotlin.String? = null,
+    val name: String? = null,
     /* The GUID for the subpopulation of this consent. */
     @SerialName("subpopulationGuid")
-    val subpopulationGuid: kotlin.String? = null,
+    val subpopulationGuid: String? = null,
     /* Is this consent required? If required, the user must consent to it before being given access to the server (until signed, a 412 response is returned for most participant endpoints).  */
     @SerialName("required")
-    val required: kotlin.Boolean? = null,
+    val required: Boolean? = null,
     /* The date and time the referenced consent was signed and agreed to by the participant. If there is a signedOn value, consented will be equal to true. */
     @SerialName("signedOn")
-    val signedOn: kotlin.String? = null,
+    val signedOn: String? = null,
     /* Has the participant consented to this consent agreement? If the user has signed this consent, there should be a signedOn timestamp value. */
     @SerialName("consented")
-    val consented: kotlin.Boolean? = null,
+    val consented: Boolean? = null,
     /* Was the consent to participate made against the most recently published version of this consent? If there's no signature this will be false (not null).  */
     @SerialName("signedMostRecentConsent")
-    val signedMostRecentConsent: kotlin.Boolean? = null,
+    val signedMostRecentConsent: Boolean? = null,
     /* ConsentStatus */
     @SerialName("type")
-    val type: kotlin.String? = null
-) {
-
-}
+    val type: String? = null
+)
 

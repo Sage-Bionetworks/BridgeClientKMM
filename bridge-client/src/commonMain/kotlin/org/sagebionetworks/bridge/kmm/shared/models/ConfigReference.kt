@@ -9,7 +9,7 @@
 * https://github.com/swagger-api/swagger-codegen.git
 * Do not edit the class manually.
 */
-package org.sagebionetworks.bridge.mpp.network.generated.models
+package org.sagebionetworks.bridge.kmm.shared.models
 
 import kotlinx.serialization.Serializable
 
@@ -25,14 +25,12 @@ import kotlinx.serialization.SerialName
 data class ConfigReference (
     /* Schema ID */
     @SerialName("id")
-    val id: kotlin.String,
+    val id: String,
     /* Revision number */
     @SerialName("revision")
-    val revision: kotlin.Long,
+    val revision: Long,
     /* ConfigReference */
     @SerialName("type")
-    val type: kotlin.String? = null
-) {
-
-}
+    val type: String? = null
+)
 

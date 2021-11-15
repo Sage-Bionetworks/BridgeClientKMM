@@ -31,29 +31,27 @@ import kotlinx.serialization.SerialName
 data class AssessmentInfo (
     /* Because assessments can be configured with different display information, they are not referenced in the schedule portion of a timeline by their GUIDs. Instead they are given a unique string key that is used to look up the assessment. */
     @SerialName("key")
-    val key: kotlin.String? = null,
+    val key: String? = null,
     /* Each assessment revision is assigned a unique GUID which can be used to retrieve it through the API. Assessments will also have a unique combination of an identifier and a revision, and can be retrieved as a set of revisions under a given identifier. */
     @SerialName("guid")
-    val guid: kotlin.String? = null,
+    val guid: String? = null,
     @SerialName("appId")
-    val appId: kotlin.String? = null,
+    val appId: String? = null,
     /* A human-readable identifier for an assessment, which can have one or more revisions. */
     @SerialName("identifier")
-    val identifier: kotlin.String? = null,
+    val identifier: String? = null,
     /* The revision of the assessment under the given identifier (the identifier and the revision together are mapped to a single GUID which can be used to reference the assessment; only the GUID is required in this object). */
     @SerialName("revision")
-    val revision: kotlin.Int? = null,
+    val revision: Int? = null,
     @SerialName("label")
-    val label: kotlin.String? = null,
+    val label: String? = null,
     /* The number of minutes it takes for a participant to complete this assessment. */
     @SerialName("minutesToComplete")
-    val minutesToComplete: kotlin.Int? = null,
+    val minutesToComplete: Int? = null,
     @SerialName("colorScheme")
     val colorScheme: ColorScheme? = null,
     /* AssessmentInfo */
     @SerialName("type")
-    val type: kotlin.String? = null
-) {
-
-}
+    val type: String? = null
+)
 

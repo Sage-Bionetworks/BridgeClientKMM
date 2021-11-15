@@ -16,7 +16,7 @@ import org.sagebionetworks.bridge.kmm.shared.models.Message
 import org.sagebionetworks.bridge.kmm.shared.models.SignIn
 import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
 
-internal class AuthenticationApi(basePath: kotlin.String = BASE_PATH, httpClient: HttpClient) : AbstractApi(basePath, httpClient) {
+internal class AuthenticationApi(basePath: String = BASE_PATH, httpClient: HttpClient) : AbstractApi(basePath, httpClient) {
 
     /**
     * 
@@ -54,7 +54,7 @@ internal class AuthenticationApi(basePath: kotlin.String = BASE_PATH, httpClient
         with(builder.headers) {
             append("Accept", "application/json")
             append("Content-Type", "application/json; charset=UTF-8")
-            sessionInfo.sessionToken?.let { append("Bridge-Session", it) }
+            append("Bridge-Session", sessionInfo.sessionToken)
         }
 
         try {

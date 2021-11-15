@@ -23,8 +23,8 @@ abstract class AbstractBaseIntegrationTest: BaseTest(), KoinTest {
 
 
     val testModule = module {
-        single () { ResourceDatabaseHelper(testDatabaseDriver()) }
-        single<BridgeConfig>() { TestBridgeConfig() }
+        single { ResourceDatabaseHelper(testDatabaseDriver()) }
+        single<BridgeConfig> { TestBridgeConfig() }
 
     }
 
@@ -40,7 +40,7 @@ abstract class AbstractBaseIntegrationTest: BaseTest(), KoinTest {
         override val appVersionName: String
             get() = "Android Integration Test"
         override val bridgeEnvironment: PlatformConfig.BridgeEnvironment
-            get() = PlatformConfig.BridgeEnvironment.production
+            get() = PlatformConfig.BridgeEnvironment.PRODUCTION
         override val osName: String
             get() = "Android Integration Test"
         override val osVersion: String

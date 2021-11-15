@@ -5,7 +5,7 @@
     <key>CFBundleExecutable</key>
     <string>BridgeClient</string>
     <key>CFBundleIdentifier</key>
-    <string>BridgeClient</string>
+    <string>org.sagebionetworks.bridge.kmm.shared.BridgeClient</string>
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>

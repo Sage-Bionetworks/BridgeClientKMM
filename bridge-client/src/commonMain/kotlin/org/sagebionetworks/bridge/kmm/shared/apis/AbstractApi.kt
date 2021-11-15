@@ -8,8 +8,8 @@ import io.ktor.http.*
 abstract class AbstractApi(protected val basePath: String, protected val httpClient: HttpClient) {
 
     companion object {
-        public const val BASE_PATH = "https://webservices.sagebridge.org"
-        public const val BRIDGE_SERVER_CHECK = "webservices.sagebridge"
+        const val BASE_PATH = "https://webservices.sagebridge.org"
+        const val BRIDGE_SERVER_CHECK = "webservices.sagebridge"
     }
 
     protected suspend inline fun <T, reified S: Any> postData(model: T, path: String) : S {

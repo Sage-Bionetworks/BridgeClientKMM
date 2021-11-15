@@ -7,18 +7,16 @@ import kotlinx.datetime.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okio.FileSystem
-import okio.Path
 import okio.Path.Companion.toPath
 import org.sagebionetworks.bridge.kmm.shared.apis.S3UploadApi
 import org.sagebionetworks.bridge.kmm.shared.apis.UploadsApi
-import org.sagebionetworks.bridge.kmm.shared.cache.DbDriverFactory
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper.Companion.APP_WIDE_STUDY_ID
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
 import org.sagebionetworks.bridge.kmm.shared.cache.loadResource
 import org.sagebionetworks.bridge.kmm.shared.repo.AbstractResourceRepo
-import org.sagebionetworks.bridge.mpp.network.generated.models.UploadRequest
-import org.sagebionetworks.bridge.mpp.network.generated.models.UploadSession
+import org.sagebionetworks.bridge.kmm.shared.models.UploadRequest
+import org.sagebionetworks.bridge.kmm.shared.models.UploadSession
 
 class UploadManager(
     httpClient: HttpClient,
@@ -107,7 +105,7 @@ class UploadManager(
             remoteLoad = {loadRemoteUploadSession(uploadFile.getUploadRequest())}
         )
         //TODO: Need to think through error handling if we are unable to get an UploadSession -nbrown 12/16/20
-        return updatedResource.loadResource<UploadSession>()
+        return updatedResource.loadResource()
     }
 
     private suspend fun loadRemoteUploadSession(uploadRequest: UploadRequest): String {

@@ -11,7 +11,7 @@ import org.sagebionetworks.bridge.kmm.shared.apis.PublicApi
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
-import org.sagebionetworks.bridge.mpp.network.generated.models.AppConfig
+import org.sagebionetworks.bridge.kmm.shared.models.AppConfig
 
 class AppConfigRepo(httpClient: HttpClient,
                     databaseHelper: ResourceDatabaseHelper,

@@ -1,11 +1,7 @@
 package org.sagebionetworks.bridge.kmm.androidApp.ui.login
 
 import android.app.Activity
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
-import androidx.annotation.StringRes
-import androidx.appcompat.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -14,8 +10,10 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.annotation.StringRes
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import org.koin.androidx.viewmodel.ext.android.viewModel
-
 import org.sagebionetworks.bridge.kmm.androidApp.R
 
 class LoginActivity : AppCompatActivity() {

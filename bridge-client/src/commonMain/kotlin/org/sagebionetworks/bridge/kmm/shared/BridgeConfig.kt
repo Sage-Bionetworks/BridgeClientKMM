@@ -4,16 +4,16 @@ import org.sagebionetworks.bridge.kmm.shared.models.ClientInfo
 
 interface PlatformConfig {
     enum class BridgeEnvironment {
-        production {
+        PRODUCTION {
             override fun domainSuffix() = ""
         },
-        staging {
+        STAGING {
             override fun domainSuffix() = "-staging"
         },
-        development {
+        DEVELOPMENT {
             override fun domainSuffix() = "-develop"
         },
-        custom {
+        CUSTOM {
             override fun domainSuffix() = "-custom"
         };
 
@@ -80,18 +80,15 @@ interface BridgeConfig : PlatformConfig {
      * string User-Agent header value
      */
     fun getUserAgent(info: ClientInfo): String? {
-        if (info == null) {
-            return null
-        }
         // Send what is available. The server can handle all meaningful combinations.
-        val sb: StringBuilder = StringBuilder()
+        val sb = StringBuilder()
         if (isNotBlank(info.appName) || info.appName != null) {
             if (isNotBlank(info.appName)) {
                 sb.append(info.appName)
             }
             if (info.appVersion != null) {
                 sb.append("/")
-                sb.append(info.appVersion ?: 0)
+                sb.append(info.appVersion)
             }
         }
         if (isNotBlank(info.deviceName) || isNotBlank(info.osName) || isNotBlank(info.osVersion)) {
@@ -126,6 +123,6 @@ interface BridgeConfig : PlatformConfig {
     }
 
     private fun isNotBlank(string: String?): Boolean {
-        return string != null && string.length > 0
+        return string != null && string.isNotEmpty()
     }
 }

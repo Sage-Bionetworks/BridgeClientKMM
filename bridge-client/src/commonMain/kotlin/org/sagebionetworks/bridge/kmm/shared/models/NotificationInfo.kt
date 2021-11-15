@@ -30,19 +30,17 @@ data class NotificationInfo (
     val notifyAt: NotificationType,
     /* The time after a window starts or before it ends (based on the `notifyAt` property) when a notification should be shown to the user. */
     @SerialName("offset")
-    val offset: kotlin.String? = null,
+    val offset: String? = null,
     /* If a window lasts for more thatn twenty-four hours, a notification can be repeated on a daily repeat value. Only day values are allowed. */
     @SerialName("interval")
-    val interval: kotlin.String? = null,
+    val interval: String? = null,
     /* Allow the participant to “snooze” a notification or reminder (dismiss it with some amount of time before it occurs again). Cannot be true if `notifyAt` is null. */
     @SerialName("allowSnooze")
-    val allowSnooze: kotlin.Boolean? = null,
+    val allowSnooze: Boolean? = null,
     @SerialName("message")
     val message: NotificationMessage? = null,
     /* NotificationInfo */
     @SerialName("type")
-    val type: kotlin.String? = null
-) {
-
-}
+    val type: String? = null
+)
 

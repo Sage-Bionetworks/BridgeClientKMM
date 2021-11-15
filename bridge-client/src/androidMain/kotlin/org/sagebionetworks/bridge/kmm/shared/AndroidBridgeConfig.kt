@@ -23,8 +23,8 @@ class AndroidBridgeConfig(context: Context) : BridgeConfig {
     override val appVersion: Int
         get(){
             return try {
-                val pInfo: PackageInfo = applicationContext.getPackageManager()
-                    .getPackageInfo(applicationContext.getPackageName(), 0)
+                val pInfo: PackageInfo = applicationContext.packageManager
+                    .getPackageInfo(applicationContext.packageName, 0)
                 pInfo.versionCode
             } catch (e: PackageManager.NameNotFoundException) {
                 Log.e( javaClass.name, "Error retrieving application's version code, using SDK's", e)
@@ -35,8 +35,8 @@ class AndroidBridgeConfig(context: Context) : BridgeConfig {
     override val appVersionName: String
         get() {
             return try {
-                val pInfo: PackageInfo = applicationContext.getPackageManager()
-                    .getPackageInfo(applicationContext.getPackageName(), 0)
+                val pInfo: PackageInfo = applicationContext.packageManager
+                    .getPackageInfo(applicationContext.packageName, 0)
                 pInfo.versionName
             } catch (e: PackageManager.NameNotFoundException) {
                 Log.e(javaClass.name, "Error retrieving application's version name, using SDK's", e)
@@ -45,7 +45,7 @@ class AndroidBridgeConfig(context: Context) : BridgeConfig {
         }
 
     // TODO: emm 2021-08-18 Where should this value come from?
-    override val bridgeEnvironment: PlatformConfig.BridgeEnvironment = PlatformConfig.BridgeEnvironment.production
+    override val bridgeEnvironment: PlatformConfig.BridgeEnvironment = PlatformConfig.BridgeEnvironment.PRODUCTION
 
     override val osName: String = "Android"
 
@@ -69,7 +69,7 @@ class AndroidBridgeConfig(context: Context) : BridgeConfig {
         }
 
     fun capitalize(s: String?): String {
-        if (s == null || s.length == 0) {
+        if (s == null || s.isEmpty()) {
             return ""
         }
         val first = s[0]

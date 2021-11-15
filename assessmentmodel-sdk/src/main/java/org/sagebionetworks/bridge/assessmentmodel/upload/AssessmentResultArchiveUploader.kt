@@ -10,7 +10,6 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
-import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.joda.time.Instant
 import org.sagebionetworks.assessmentmodel.AssessmentResult
@@ -134,9 +133,9 @@ abstract class AssessmentResultArchiveUploader(
 
             val digest = md5.digest()
             val digestEnc = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                Base64.getEncoder().encodeToString(digest);
+                Base64.getEncoder().encodeToString(digest)
             } else {
-                android.util.Base64.encodeToString(digest, android.util.Base64.DEFAULT);
+                android.util.Base64.encodeToString(digest, android.util.Base64.DEFAULT)
             }
 
             return UploadFile(

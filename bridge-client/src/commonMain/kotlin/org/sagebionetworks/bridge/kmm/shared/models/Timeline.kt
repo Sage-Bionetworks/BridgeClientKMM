@@ -30,15 +30,13 @@ data class Timeline (
     @SerialName("duration")
     val duration: DateTimePeriod,
     @SerialName("schedule")
-    val schedule: kotlin.collections.List<ScheduledSession>? = null,
+    val schedule: List<ScheduledSession>? = null,
     @SerialName("assessments")
-    val assessments: kotlin.collections.List<AssessmentInfo>? = null,
+    val assessments: List<AssessmentInfo>? = null,
     @SerialName("sessions")
-    val sessions: kotlin.collections.List<SessionInfo>? = null,
+    val sessions: List<SessionInfo>? = null,
     /* Timeline */
     @SerialName("type")
-    val type: kotlin.String? = null
-) {
-
-}
+    val type: String? = null
+)
 

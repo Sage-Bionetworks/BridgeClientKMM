@@ -10,6 +10,7 @@ buildscript {
         classpath("com.android.tools.build:gradle:7.0.3")
         classpath("com.squareup.sqldelight:gradle-plugin:${Versions.sqlDelight}")
         classpath("org.jetbrains.kotlin:kotlin-serialization:${Versions.kotlin}")
+        classpath("dev.icerock.moko:network-generator:0.16.0")
     }
 
 }

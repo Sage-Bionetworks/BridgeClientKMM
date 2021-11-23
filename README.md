@@ -19,14 +19,14 @@ dependencies {
 
 BridgeClientKMM uses Koin for dependency injection and should be initialized as shown below:
 ```kotlin
-class Application : MultiDexApplication(), KoinComponent {
+class ExampleApplication : MultiDexApplication(), KoinComponent {
 
     override fun onCreate() {
         super.onCreate()
 
         initKoin (enableNetworkLogs = BuildConfig.DEBUG){
             androidLogger(Level.ERROR)
-            androidContext(this@MtbApplication)
+            androidContext(this@ExampleApplication)
             workManagerFactory()
             //Add any addition Koin modules here
             //modules(appModule)

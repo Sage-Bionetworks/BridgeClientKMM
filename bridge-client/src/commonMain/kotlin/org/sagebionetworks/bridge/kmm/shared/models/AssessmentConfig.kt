@@ -11,10 +11,9 @@
 */
 package org.sagebionetworks.bridge.kmm.shared.models
 
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.Serializable
-
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 
 /**
  * 
@@ -28,18 +27,18 @@ import kotlinx.serialization.SerialName
 data class AssessmentConfig (
     /* The JSON configuration for this assessment. */
     @SerialName("config")
-    val config: kotlinx.serialization.json.JsonElement,
+    val config: JsonElement,
     /* The date and time the app config was created. */
     @SerialName("createdOn")
-    val createdOn: kotlin.String? = null,
+    val createdOn: String? = null,
     /* The date and time the app config was last modified. */
     @SerialName("modifiedOn")
-    val modifiedOn: kotlin.String? = null,
+    val modifiedOn: String? = null,
     /* The optimistic locking version of the assessment config. This value must be submitted as part of the next update of the model. If it does not match the value on the server, a 409 error (Conflict) will prevent the update from occurring. It can also serve as a key to determine if a local cache of this `AssessmentConfig` revision needs to be updated.  */
     @SerialName("version")
-    val version: kotlin.Long? = null,
+    val version: Long? = null,
     /* AssessmentConfig */
     @SerialName("type")
-    val type: kotlin.String? = null
+    val type: String? = null
 )
 

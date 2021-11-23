@@ -26,15 +26,15 @@ import kotlinx.serialization.SerialName
 data class Phone (
     /* The phone number (can be formatted in any way that's useful for end users). */
     @SerialName("number")
-    val number: kotlin.String,
+    val number: String,
     /* CLDR two-letter region code describing the region in which the phone number was issued. */
     @SerialName("regionCode")
-    val regionCode: kotlin.String,
+    val regionCode: String,
     /* The phone number formatted in the commonly accepted national format of the region code. This value is read-only.  */
     @SerialName("nationalFormat")
-    val nationalFormat: kotlin.String? = null,
+    val nationalFormat: String? = null,
     /* Phone */
     @SerialName("type")
-    val type: kotlin.String? = null
+    val type: String? = null
 )
 

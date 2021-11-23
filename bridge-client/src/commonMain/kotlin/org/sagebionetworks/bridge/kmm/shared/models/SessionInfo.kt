@@ -11,12 +11,8 @@
  */
 package org.sagebionetworks.bridge.kmm.shared.models
 
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.Serializable
-
 import kotlinx.serialization.SerialName
-import org.sagebionetworks.bridge.kmm.shared.models.NotificationInfo
-import org.sagebionetworks.bridge.kmm.shared.models.PerformanceOrder
+import kotlinx.serialization.Serializable
 
 /**
  * Information about a session in order to render it in a UI prior to execution.
@@ -33,30 +29,28 @@ data class SessionInfo (
     /* The unique identifier for this model. */
 
     @SerialName("guid")
-    val guid: kotlin.String,
+    val guid: String,
 
     /* A required name for this session that will be shown to schedule authors, and can be used as a label for participants if no label can be found. */
     @SerialName("label")
-    val label: kotlin.String,
+    val label: String,
 
     @SerialName("performanceOrder")
     val performanceOrder: PerformanceOrder,
     /* A list of all the time window GUIDs for this session. The number of time windows in a session can be useful information for some UI grouping tasks. */
 
     @SerialName("timeWindowGuids")
-    val timeWindowGuids: kotlin.collections.List<kotlin.String>? = null,
+    val timeWindowGuids: List<String>? = null,
 
     @SerialName("minutesToComplete")
-    val minutesToComplete: kotlin.Int? = null,
+    val minutesToComplete: Int? = null,
 
     @SerialName("notifications")
-    val notifications: kotlin.collections.List<NotificationInfo>? = null,
+    val notifications: List<NotificationInfo>? = null,
     /* SessionInfo */
 
     @SerialName("type")
-    val type: kotlin.String? = null
+    val type: String? = null
 
-) {
-
-}
+)
 

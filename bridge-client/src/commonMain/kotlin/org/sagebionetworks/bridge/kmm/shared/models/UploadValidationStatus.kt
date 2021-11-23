@@ -27,18 +27,16 @@ import kotlinx.serialization.SerialName
 internal data class UploadValidationStatus (
     /* The identifier for this upload. */
     @SerialName("id")
-    val id: kotlin.String? = null,
+    val id: String? = null,
     /* An array of error messages if failures occurred during validation. */
     @SerialName("messageList")
-    val messageList: kotlin.collections.List<kotlin.String>? = null,
+    val messageList: List<String>? = null,
     @SerialName("status")
     val status: UploadStatus? = null,
     @SerialName("record")
     val record: HealthDataRecord? = null,
     /* UploadValidationStatus */
     @SerialName("type")
-    val type: kotlin.String? = null
-) {
-
-}
+    val type: String? = null
+)
 

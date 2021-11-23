@@ -9,7 +9,7 @@
 * https://github.com/swagger-api/swagger-codegen.git
 * Do not edit the class manually.
 */
-package org.sagebionetworks.bridge.mpp.network.generated.models
+package org.sagebionetworks.bridge.kmm.shared.models
 
 import kotlinx.serialization.Serializable
 
@@ -25,14 +25,12 @@ import kotlinx.serialization.SerialName
 data class SchemaReference (
     /* Schema ID */
     @SerialName("id")
-    val id: kotlin.String,
+    val id: String,
     /* Schema revision number. Can be blank in a Schedule Plan if you want the Scheduler to automatically resolve to the latest revision for the user's app version.  */
     @SerialName("revision")
-    val revision: kotlin.Long? = null,
+    val revision: Long? = null,
     /* SchemaReference */
     @SerialName("type")
-    val type: kotlin.String? = null
-) {
-
-}
+    val type: String? = null
+)
 

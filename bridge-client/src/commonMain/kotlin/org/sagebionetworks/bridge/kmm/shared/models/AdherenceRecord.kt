@@ -12,10 +12,9 @@
 package org.sagebionetworks.bridge.kmm.shared.models
 
 import kotlinx.datetime.Instant
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.Serializable
-
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 
 /**
  * A record describing the performance state of a scheduled session or assessment, as requested in a `Timeline`. Each record describes the state of a session or an assessment.
@@ -32,10 +31,10 @@ import kotlinx.serialization.SerialName
 data class AdherenceRecord (
 /* The session or assessment instance GUID from the timeline that led to the generation of this record. There can be more than one record under a given instance GUID if that guid is for a persistent assessment, which can be performed more than once. In this case, each record must have a unique `startedOn` timestamp (time zone differences are not enough to make it unique, it must be a unique instant in time). */
     @SerialName("instanceGuid")
-    val instanceGuid: kotlin.String,
+    val instanceGuid: String,
     /* The event timestamp (at the time of recording this record) that triggered the sequence of sessions and assessments which includes the scheduling item for this record. For mutable event IDs, this timestamp can change, and each time value groups a separate series of instance GUID records. */
     @SerialName("eventTimestamp")
-    val eventTimestamp: kotlin.String,
+    val eventTimestamp: String,
     /* The client-supplied time when the activity was started (this time comes from the client and is not validated by the server). This value is normally set, but could be null if a participant declines a session or assessment. */
     @SerialName("startedOn")
     val startedOn: Instant? = null,
@@ -44,20 +43,18 @@ data class AdherenceRecord (
     val finishedOn: Instant? = null,
     /* An IANA Time Zone Database (TZDB) name for the participant’s time zone at the time the record is submitted. If present, this field will be validated to be a valid time zone name. */
     @SerialName("clientTimeZone")
-    val clientTimeZone: kotlin.String? = null,
+    val clientTimeZone: String? = null,
     /* The timestamp when an uploaded was recorded as successfully uploaded. If this timestamp is missing, the upload has not yet reached the server. */
     @SerialName("uploadedOn")
-    val uploadedOn: kotlin.String? = null,
+    val uploadedOn: String? = null,
     /* If the participant explicitly decides to skip a session or an assessment, this can be indicated by the mobile app by setting this flag to true. This can then used when considering adherence to the protocol. */
     @SerialName("declined")
-    val declined: kotlin.Boolean = false,
+    val declined: Boolean = false,
     /* An arbitrary JSON structure that the client can use to record information about this schedule item (maximum size 65k). */
     @SerialName("clientData")
-    val clientData: kotlinx.serialization.json.JsonElement? = null,
+    val clientData: JsonElement? = null,
     /* AdherenceRecord */
     @SerialName("type")
-    val type: kotlin.String = "AdherenceRecord"
-) {
-
-}
+    val type: String = "AdherenceRecord"
+)
 

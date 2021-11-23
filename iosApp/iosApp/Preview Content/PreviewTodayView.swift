@@ -32,7 +32,7 @@
 
 import SwiftUI
 import BridgeClient
-import BridgeClientUI
+@testable import BridgeClientUI
 
 struct PreviewTodayView: View {
     @StateObject var bridgeManager: SingleStudyAppManager = .init(appId: kPreviewStudyId)

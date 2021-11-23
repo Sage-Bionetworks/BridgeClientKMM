@@ -4,7 +4,7 @@ import com.squareup.sqldelight.db.SqlDriver
 import com.squareup.sqldelight.drivers.native.NativeSqliteDriver
 
 actual class DatabaseDriverFactory: DbDriverFactory {
-    override actual fun createDriver(): SqlDriver {
+    actual override fun createDriver(): SqlDriver {
         return NativeSqliteDriver(BridgeResourceDatabase.Schema, "resource.db")
     }
 }

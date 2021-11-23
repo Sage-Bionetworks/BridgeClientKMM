@@ -9,7 +9,7 @@
 * https://github.com/swagger-api/swagger-codegen.git
 * Do not edit the class manually.
 */
-package org.sagebionetworks.bridge.mpp.network.generated.models
+package org.sagebionetworks.bridge.kmm.shared.models
 
 import kotlinx.serialization.Serializable
 
@@ -26,17 +26,15 @@ import kotlinx.serialization.SerialName
 internal data class UploadSession (
     /* The upload ID. The client needs to use this ID to call Bridge when the upload is complete.  */
     @SerialName("id")
-    val id: kotlin.String? = null,
+    val id: String? = null,
     /* A pre-signed URL for doing a PUT upload of the data. The URL will remain valid for 24 hours once created on the Bridge side.  */
     @SerialName("url")
-    val url: kotlin.String,
+    val url: String,
     /* The ISO 8601 date and time stamp at which this session will expire.  */
     @SerialName("expires")
-    val expires: kotlin.String? = null,
+    val expires: String? = null,
     /* UploadSession */
     @SerialName("type")
-    val type: kotlin.String? = null
-) {
-
-}
+    val type: String? = null
+)
 

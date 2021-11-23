@@ -23,11 +23,9 @@ import kotlinx.serialization.SerialName
 @Serializable
 internal data class Message (
     @SerialName("message")
-    val message: kotlin.String? = null,
+    val message: String? = null,
     /* StatusMessage */
     @SerialName("type")
-    val type: kotlin.String? = null
-) {
-
-}
+    val type: String? = null
+)
 

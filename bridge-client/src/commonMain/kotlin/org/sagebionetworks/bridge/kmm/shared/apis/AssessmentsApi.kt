@@ -7,7 +7,7 @@ package org.sagebionetworks.bridge.kmm.shared.apis
 import io.ktor.client.*
 import org.sagebionetworks.bridge.kmm.shared.models.AssessmentConfig
 
-internal class AssessmentsApi(basePath: kotlin.String = BASE_PATH, httpClient: HttpClient) : AbstractApi(basePath, httpClient) {
+internal class AssessmentsApi(basePath: String = BASE_PATH, httpClient: HttpClient) : AbstractApi(basePath, httpClient) {
 
     /**
     * Get the JSON config for this assessment
@@ -15,7 +15,7 @@ internal class AssessmentsApi(basePath: kotlin.String = BASE_PATH, httpClient: H
     * @param guid A guid 
     * @return AssessmentConfig
     */
-    suspend fun getAssessmentConfig(guid: kotlin.String) : AssessmentConfig {
+    suspend fun getAssessmentConfig(guid: String) : AssessmentConfig {
         return getData("v1/assessments/$guid/config")
     }
 

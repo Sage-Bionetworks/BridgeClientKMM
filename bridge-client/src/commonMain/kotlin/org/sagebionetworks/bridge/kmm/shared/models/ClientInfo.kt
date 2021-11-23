@@ -30,26 +30,26 @@ import kotlinx.serialization.SerialName
 data class ClientInfo (
     /* The name of the application (e.g. \"Cardio Health\"). */
     @SerialName("appName")
-    val appName: kotlin.String? = null,
+    val appName: String? = null,
     /* The version of the application (must be a number, and should increase with every new release of the application).  */
     @SerialName("appVersion")
-    val appVersion: kotlin.Int? = null,
+    val appVersion: Int? = null,
     /* Information about the device (e.g. \"Unknown iPhone\"). */
     @SerialName("deviceName")
-    val deviceName: kotlin.String? = null,
+    val deviceName: String? = null,
     /* The name of the operating system (conventional names are \"Android\" and \"iPhone OS\").  */
     @SerialName("osName")
-    val osName: kotlin.String? = null,
+    val osName: String? = null,
     /* The version of the operating system (e.g. \"10.0.3\"). */
     @SerialName("osVersion")
-    val osVersion: kotlin.String? = null,
+    val osVersion: String? = null,
     /* The name of the SDK being used (e.g. \"BridgeJavaSDK\"). */
     @SerialName("sdkName")
-    val sdkName: kotlin.String? = null,
+    val sdkName: String? = null,
     /* The version of the SDK being used (e.g. \"4\"). */
     @SerialName("sdkVersion")
-    val sdkVersion: kotlin.Int? = null,
+    val sdkVersion: Int? = null,
     /* ClientInfo */
     @SerialName("type")
-    val type: kotlin.String? = null
+    val type: String? = null
 )

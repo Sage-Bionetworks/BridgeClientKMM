@@ -5,11 +5,10 @@ package org.sagebionetworks.bridge.kmm.shared.apis
 
 
 import io.ktor.client.*
-import org.sagebionetworks.bridge.kmm.shared.models.AssessmentConfig
 import org.sagebionetworks.bridge.kmm.shared.models.Study
 import org.sagebionetworks.bridge.kmm.shared.models.StudyInfo
 
-internal class StudyApi(basePath: kotlin.String = BASE_PATH, httpClient: HttpClient) : AbstractApi(basePath, httpClient) {
+internal class StudyApi(basePath: String = BASE_PATH, httpClient: HttpClient) : AbstractApi(basePath, httpClient) {
 
     /**
      * Get the information on a study that is useful for displaying, selecting, and signing into the study.
@@ -18,7 +17,7 @@ internal class StudyApi(basePath: kotlin.String = BASE_PATH, httpClient: HttpCli
      * @param studyId Study identifier
      * @return StudyInfo
      */
-    suspend fun getStudyInfo(appId: kotlin.String, studyId: kotlin.String) : StudyInfo {
+    suspend fun getStudyInfo(appId: String, studyId: String) : StudyInfo {
         return getData("v1/apps/$appId/studies/$studyId")
     }
 
@@ -29,7 +28,7 @@ internal class StudyApi(basePath: kotlin.String = BASE_PATH, httpClient: HttpCli
      * @return Study
      */
     @Suppress("UNCHECKED_CAST")
-    suspend fun getStudy(studyId: kotlin.String) : Study {
+    suspend fun getStudy(studyId: String) : Study {
         return getData("v5/studies/$studyId")
 
     }

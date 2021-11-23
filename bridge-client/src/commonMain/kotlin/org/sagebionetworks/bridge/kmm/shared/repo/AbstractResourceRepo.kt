@@ -28,7 +28,7 @@ abstract class AbstractResourceRepo(val database: ResourceDatabaseHelper, protec
                 filterResource = false // don't return current item since we are going to update it
 
                 //Need to load resource from Bridge
-                backgroundScope.launch() {
+                backgroundScope.launch {
                     remoteLoadResource(database, identifier, resourceType, studyId, curResource, remoteLoad)
                 }
             }
@@ -136,7 +136,7 @@ abstract class AbstractResourceRepo(val database: ResourceDatabaseHelper, protec
 
 
             }
-            val resource = Resource(
+            return Resource(
                 identifier = identifier,
                 secondaryId = ResourceDatabaseHelper.DEFAULT_SECONDARY_ID,
                 type = resourceType,
@@ -146,7 +146,6 @@ abstract class AbstractResourceRepo(val database: ResourceDatabaseHelper, protec
                 status = status,
                 needSave = false
             )
-            return resource
         }
 
 

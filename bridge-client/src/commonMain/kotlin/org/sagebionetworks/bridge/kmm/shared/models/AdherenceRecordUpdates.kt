@@ -26,8 +26,6 @@ data class AdherenceRecordUpdates (
     val records: List<AdherenceRecord>,
     /* AdherenceRecordUpdates */
     @SerialName("type")
-    val type: kotlin.String = "AdherenceRecordUpdates"
-) {
-
-}
+    val type: String = "AdherenceRecordUpdates"
+)
 

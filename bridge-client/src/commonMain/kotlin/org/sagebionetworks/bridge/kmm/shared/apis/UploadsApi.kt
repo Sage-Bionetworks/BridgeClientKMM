@@ -13,8 +13,8 @@ package org.sagebionetworks.bridge.kmm.shared.apis
 
 import io.ktor.client.*
 import org.sagebionetworks.bridge.kmm.shared.models.UploadValidationStatus
-import org.sagebionetworks.bridge.mpp.network.generated.models.UploadRequest
-import org.sagebionetworks.bridge.mpp.network.generated.models.UploadSession
+import org.sagebionetworks.bridge.kmm.shared.models.UploadRequest
+import org.sagebionetworks.bridge.kmm.shared.models.UploadSession
 
 internal class UploadsApi(basePath: String = BASE_PATH, httpClient: HttpClient): AbstractApi(basePath, httpClient)  {
 
@@ -25,7 +25,7 @@ internal class UploadsApi(basePath: String = BASE_PATH, httpClient: HttpClient):
     * @return UploadSession
     */
     suspend fun requestUploadSession(uploadRequest: UploadRequest) : UploadSession {
-        return postData<UploadRequest, UploadSession>(uploadRequest, "v3/uploads")
+        return postData(uploadRequest, "v3/uploads")
     }
 
     /**

@@ -414,7 +414,7 @@ extension BridgeFileUploadAPITyped {
 
         // throw this over to the main queue so we can access Kotlin stuff
         OperationQueue.main.addOperation {
-            guard let sessionToken = uploadManager.appManager.userSessionInfo?.sessionToken else {
+            guard let sessionToken = uploadManager.appManager.session?.sessionToken else {
                 debugPrint("Unable to request an upload URL from Bridge--not logged in to an account.")
                 return
             }
@@ -438,7 +438,7 @@ extension BridgeFileUploadAPITyped {
         
         // throw this over to the main queue so we can access Kotlin stuff
         OperationQueue.main.addOperation {
-            guard let sessionToken = uploadManager.appManager.userSessionInfo?.sessionToken else {
+            guard let sessionToken = uploadManager.appManager.session?.sessionToken else {
                 debugPrint("Unable to notify Bridge of upload success--not logged in to an account.")
                 return
             }

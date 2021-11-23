@@ -30,29 +30,27 @@ import kotlinx.serialization.SerialName
 data class Criteria (
     /* A two-letter language code. The the must declare an `Accept-Language` header with this language in order to match this object.  */
     @SerialName("language")
-    val language: kotlin.String? = null,
+    val language: String? = null,
     /* One or more data groups; the user must have all these data groups to match. */
     @SerialName("allOfGroups")
-    val allOfGroups: kotlin.collections.List<kotlin.String>? = null,
+    val allOfGroups: List<String>? = null,
     /* One or more data groups; the user must have none of these data groups to match. */
     @SerialName("noneOfGroups")
-    val noneOfGroups: kotlin.collections.List<kotlin.String>? = null,
+    val noneOfGroups: List<String>? = null,
     /* One or more substudy IDs; the user must be assigned to all these substudies to match. */
     @SerialName("allOfSubstudyIds")
-    val allOfSubstudyIds: kotlin.collections.List<kotlin.String>? = null,
+    val allOfSubstudyIds: List<String>? = null,
     /* One or more substudy IDs; the user cannot be assigned to any of these substudies for the associated object to match. */
     @SerialName("noneOfSubstudyIds")
-    val noneOfSubstudyIds: kotlin.collections.List<kotlin.String>? = null,
+    val noneOfSubstudyIds: List<String>? = null,
     /* A map of operating system names to minimum app versions. The user must send a `User-Agent` header in a prescribed format, that declares the app version to be equal to or greater than this version number, in order to match.  */
     @SerialName("minAppVersions")
-    val minAppVersions: kotlin.collections.Map<kotlin.String, kotlin.Int>? = null,
+    val minAppVersions: Map<String, Int>? = null,
     /* A map of operating system names to minimum app versions. The user must send a `User-Agent` header in a prescribed format, that declares the app version to be equal to or less than this version number, in order to match.  */
     @SerialName("maxAppVersions")
-    val maxAppVersions: kotlin.collections.Map<kotlin.String, kotlin.Int>? = null,
+    val maxAppVersions: Map<String, Int>? = null,
     /* Criteria */
     @SerialName("type")
-    val type: kotlin.String? = null
-) {
-
-}
+    val type: String? = null
+)
 

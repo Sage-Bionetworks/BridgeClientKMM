@@ -39,37 +39,128 @@ fileprivate let kOnboardingStateKey = "isOnboardingFinished"
 
 public let kPreviewStudyId = "xcode_preview"
 
+/// This class is intended to be used as the `BridgeClient` app singleton. It manages login, app state,
+/// app configuration, user configuration, notifications, and uploading files to Bridge services. It is intended
+/// to be used in conjunction with a `UIApplicationDelegate` to handle start up and background
+/// uploading.
+///
+/// At a minimum, the app must implement the following methods in the app delegate:
+/// ```
+/// class AppDelegate: UIResponder, UIApplicationDelegate {
+///     let bridgeManager = BridgeClientAppManager(appId: PrivateKeys.shared.appId, pemPath: PrivateKeys.shared.pemPath)
+///
+///     func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]?) -> Bool {
+///         bridgeManager.appWillFinishLaunching(launchOptions)
+///         return super.application(application, willFinishLaunchingWithOptions: launchOptions)
+///     }
+///
+///     func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String,
+///        completionHandler: @escaping () -> Void) {
+///         bridgeManager.handleEvents(for: identifier, completionHandler: completionHandler)
+///     }
+/// }
+/// ```
+///
+/// - SeeAlso: ``SingleStudyAppManager`` which subclasses ``BridgeClientAppManager``
+///             to support features of a single study sign-in that is required to get a timeline for the participant.
+/// 
 open class BridgeClientAppManager : ObservableObject {
     
+    /// The  "state" of the app. SwiftUI relies upon observance patterns that do not work with Kotlin classes
+    /// because those classes are not threadsafe. The state handling of SwiftUI relies upon being able to
+    /// process observed changes on a background thread so the Kotlin classes must be wrapped. This
+    /// state enum is used to allow the app content view to change the UI to match the login state.
+    ///
+    /// - Example:
+    /// ```
+    ///    struct ContentView: View {
+    ///        @EnvironmentObject var bridgeManager: SingleStudyAppManager
+    ///        @StateObject var todayViewModel: TodayTimelineViewModel = .init()
+    ///
+    ///        var body: some View {
+    ///            switch bridgeManager.appState {
+    ///            case .launching:
+    ///                LaunchView()
+    ///            case .login:
+    ///                LoginView()
+    ///            case .onboarding:
+    ///                OnboardingView()
+    ///            case .main:
+    ///                MainView()
+    ///                    .environmentObject(todayViewModel)
+    ///                    .assessmentInfoMap(.init(extensions: MTBIdentifier.allCases))
+    ///                    .fullScreenCover(isPresented: $todayViewModel.isPresentingAssessment) {
+    ///                        MTBAssessmentView(todayViewModel)
+    ///                            .edgesIgnoringSafeArea(.all)
+    ///                    }
+    ///                    .statusBar(hidden: todayViewModel.isPresentingAssessment)
+    ///            }
+    ///        }
+    ///    }
+    /// ```
     public enum AppState : String {
         case launching, login, onboarding, main
     }
 
+    /// Is this manager used for previewing the app? (Unit tests, SwiftUI Preview, etc.)
     public let isPreview: Bool
+    
+    /// The configuration bits that need to be set on the 'BridgeClient.xcframework' in order to connect to
+    /// Bridge services.
     public let platformConfig: IOSPlatformConfig
+    
+    /// The path to the pem file that is used to encrypt data being uploaded to Bridge.
+    ///
+    /// - Note: Data should be encrypted so that it is not stored insecurely on the phone (while waiting
+    ///         for an upload connection).
     public let pemPath: String?
         
+    /// The title of the app to display. By default, this is the localized display name of the app that is shown
+    /// to the participant in their phone home screen.
     @Published public var title: String
+    
+    /// The "state" of the app.
     @Published public var appState: AppState = .launching
+    
+    /// Is the app currently uploading results?
+    /// TODO: syoung 10/27/2021 This flag is currently never being reset. https://sagebionetworks.jira.com/browse/BMC-244
     @Published public var isUploadingResults: Bool = false
     
-    @Published public var appConfig: AppConfig? {
+    /// A threadsafe observer for the `BridgeClient.UserSessionInfo` for the current user.
+    public let appConfig: AppConfigObserver = .init()
+    
+    // Do not expose publicly. This class is not threadsafe.
+    var config: AppConfig? {
         didSet {
+            appConfig.appConfig = config
+            didUpdateAppConfig()
             updateAppState()
         }
     }
     
-    @Published public var userSessionInfo: UserSessionInfo? {
+    /// Called when the `BridgeClient.AppConfig` is updated.
+    func didUpdateAppConfig() {
+        // Do nothing. Allows subclass override of `config.didSet`.
+    }
+    
+    /// A threadsafe observer for the `BridgeClient.UserSessionInfo` for the current user.
+    public let userSessionInfo: UserSessionInfoObserver = .init()
+    
+    // Do not expose publicly. This class is not threadsafe.
+    var session: UserSessionInfo? {
         didSet {
-            didSetUserSessionInfo(oldValue: oldValue)
+            userSessionInfo.userSessionInfo = session
+            didUpdateUserSessionInfo()
             updateAppState()
         }
     }
     
-    open func didSetUserSessionInfo(oldValue: UserSessionInfo?) {
-        // Do nothing. Allows subclass override of `userSessionInfo.didSet`.
+    /// Called when the `BridgeClient.UserSessionInfo` is updated.
+    func didUpdateUserSessionInfo() {
+        // Do nothing. Allows subclass override of `session.didSet`.
     }
     
+    /// Has the participant been shown the onboarding flow?
     @Published public var isOnboardingFinished: Bool = UserDefaults.standard.bool(forKey: kOnboardingStateKey) {
         didSet {
             UserDefaults.standard.set(isOnboardingFinished, forKey: kOnboardingStateKey)
@@ -78,15 +169,30 @@ open class BridgeClientAppManager : ObservableObject {
     }
     
     private var appConfigManager: NativeAppConfigManager!
-    public private(set) var authManager: NativeAuthenticationManager!
+    internal private(set) var authManager: NativeAuthenticationManager!
     
-    /// The local notification manager is a singleton that can be set up as the notification delegate (to handle snoozing)
+    /// The local notification manager is a singleton that can be set up as the notification delegate (to handle snoozing).
     lazy public var localNotificationManager : LocalNotificationManager = LocalNotificationManager()
     
+    /// Convenience initializer for intializing a bridge manager with just an app id and pem file.
+    ///
+    /// Both the APP ID and the CMS Public Key (ie. pem file) are accessible through the [Bridge Study Manager](https://research.sagebridge.org).
+    /// Once logged into an "app" (which can host multiple "studies"), select "Server Config -> Settings" from the menu.
+    ///
+    /// - Parameters:
+    ///   - appId: The "APP ID" is shown in the upper right corner of the [Bridge Study Manager](https://research.sagebridge.org).
+    ///   - pemPath: The path to the pem file (as an embedded resource) to use for encrypting uploads. The pem file can be downloaded
+    ///     from the [Bridge Study Manager](https://research.sagebridge.org) by going "Server Settings -> Settings"
+    ///     and tapping on the button labeled "Download CMS Public Key..." and saving the file to a secure location.
     public convenience init(appId: String, pemPath: String? = nil) {
         self.init(platformConfig: PlatformConfigImpl(appId: appId), pemPath: pemPath)
     }
     
+    /// Initialize the bridge manager with a custom platform config.
+    ///
+    /// - Parameters:
+    ///   - platformConfig: The platform config to use to set up the connection to Bridge.
+    ///   - pemPath: The path to the location of the pem file to use when encrypting uploads.
     public init(platformConfig: IOSPlatformConfig, pemPath: String? = nil) {
         self.pemPath = pemPath ?? Bundle.main.path(forResource: platformConfig.appId, ofType: "pem")
         self.platformConfig = platformConfig
@@ -103,9 +209,10 @@ open class BridgeClientAppManager : ObservableObject {
         // Register the file upload APIs so that retries can happen
         let _ = ParticipantFileUploadAPI.shared
         let _ = StudyDataUploadAPI.shared
-}
+    }
     
-    public func appWillFinishLaunching(_ launchOptions: [UIApplication.LaunchOptionsKey : Any]? ) {
+    /// **Required:** This method should be called by the app delegate when the app is launching in either `willLaunch` or `didLaunch`.
+    open func appWillFinishLaunching(_ launchOptions: [UIApplication.LaunchOptionsKey : Any]? ) {
 
         // Initialize koin
         #if DEBUG
@@ -117,46 +224,57 @@ open class BridgeClientAppManager : ObservableObject {
         
         // Hook up app config
         self.appConfigManager = NativeAppConfigManager() { appConfig, _ in
-            self.appConfig = appConfig ?? self.appConfig
+            self.config = appConfig ?? self.config
         }
         self.appConfigManager.observeAppConfig()
         
         // Hook up user session info
         self.authManager = NativeAuthenticationManager() { userSessionInfo in
             guard userSessionInfo == nil || !userSessionInfo!.isEqual(userSessionInfo) else { return }
-            self.userSessionInfo = userSessionInfo
+            self.session = userSessionInfo
         }
-        self.userSessionInfo = self.authManager.session()
+        self.session = self.authManager.session()
         self.authManager.observeUserSessionInfo()
         
         // Update the app state
         updateAppState()
     }
     
-    public func handleEvents(for backgroundSession: String, completionHandler: @escaping () -> Void) {
+    /// **Required:** This method should be called by the app delegate in the implementation of
+    /// `application(:, handleEventsForBackgroundURLSession:, completionHandler:)` and is used to
+    /// restore a background upload session.
+    public final func handleEvents(for backgroundSession: String, completionHandler: @escaping () -> Void) {
         BackgroundNetworkManager.shared.restore(backgroundSession: backgroundSession, completionHandler: completionHandler)
     }
     
-    public func loginWithExternalId(_ externalId: String, password: String, completion: @escaping ((BridgeClient.ResourceStatus) -> Void)) {
+    /// Login with the given external ID and password.
+    ///
+    /// - Parameters:
+    ///   - externalId: The external ID to use as the signin credentials.
+    ///   - password: The password to use as the signin credentials.
+    ///   - completion: The completion handler that is called with the server response.
+    public final func loginWithExternalId(_ externalId: String, password: String, completion: @escaping ((BridgeClient.ResourceStatus) -> Void)) {
         self.authManager.signInExternalId(externalId: externalId, password: password) { (userSessionInfo, status) in
             guard status == ResourceStatus.success || status == ResourceStatus.failed else { return }
-            self.userSessionInfo = userSessionInfo
+            self.session = userSessionInfo
             completion(status)
         }
     }
     
-    public func signOut() {
+    /// Sign out the current user.
+    open func signOut() {
         localNotificationManager.clearAll()
         authManager.signOut()
         isOnboardingFinished = false
-        userSessionInfo = nil
+        self.session = nil
     }
     
+    // @Protected - Only this class should call this method and only subclasses should implement.
     func updateAppState() {
-        if appConfig == nil {
+        if appConfig.isLaunching {
             appState = .launching
         }
-        else if userSessionInfo == nil {
+        else if !userSessionInfo.isAuthenticated {
             appState = .login
         }
         else if !isOnboardingFinished {
@@ -167,7 +285,10 @@ open class BridgeClientAppManager : ObservableObject {
         }
     }
     
-    public func encryptAndUpload(_ archives: [DataArchive]) {
+    /// Encrypt and upload the given data archives.
+    ///
+    /// - Parameter archives: The archives to encrypt and upload.
+    public final func encryptAndUpload(_ archives: [DataArchive]) {
         DispatchQueue.global().async {
 
             // Encrypt the files.

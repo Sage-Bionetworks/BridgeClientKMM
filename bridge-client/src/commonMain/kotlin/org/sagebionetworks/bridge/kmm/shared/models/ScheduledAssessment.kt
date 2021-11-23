@@ -24,13 +24,11 @@ import kotlinx.serialization.SerialName
 @Serializable
 data class ScheduledAssessment (
     @SerialName("refKey")
-    val refKey: kotlin.String,
+    val refKey: String,
     @SerialName("instanceGuid")
-    val instanceGuid: kotlin.String,
+    val instanceGuid: String,
     /* ScheduledAssessment */
     @SerialName("type")
-    val type: kotlin.String? = null
-) {
-
-}
+    val type: String? = null
+)
 

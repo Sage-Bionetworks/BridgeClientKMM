@@ -38,24 +38,10 @@ kotlin {
         }
     }
 
-    // syoung 09/13/2021 If this is building for XCFramework, then build both
-    // binaries, otherwise, just build for simulator.
-    // https://github.com/cashapp/sqldelight/issues/2044#issuecomment-721299517.
-    if (project.findProperty("XCFRAMEWORK") == "true") {
-        ios {
-            binaries {
-                framework {
-                    baseName = iosFrameworkName
-                }
-            }
-        }
-    }
-    else {
-        iosX64("ios") {
-            binaries {
-                framework {
-                    baseName = iosFrameworkName
-                }
+    ios {
+        binaries {
+            framework {
+                baseName = iosFrameworkName
             }
         }
     }
@@ -83,6 +69,7 @@ kotlin {
                 api(Deps.Koin.core)
             }
         }
+
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test-common"))
@@ -124,11 +111,12 @@ android {
     compileSdkVersion(Versions.compile_sdk)
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].res.srcDirs("src/androidMain/res")
+    sourceSets["main"].java.srcDirs("src/androidMain/kotlin")
     defaultConfig {
         minSdkVersion(Versions.min_sdk)
         targetSdkVersion(Versions.target_sdk)
-        versionCode = 1
-        versionName = "android-sdk v${version}"
+        val versionCode = extra["sdkVersionCode"]
+        val versionName = extra["versionName"]
         buildConfigField("int", "VERSION_CODE", "${versionCode}")
         buildConfigField("String", "VERSION_NAME", "\"${versionName}\"")
     }

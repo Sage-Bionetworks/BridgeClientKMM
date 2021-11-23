@@ -27,20 +27,18 @@ import kotlinx.serialization.SerialName
 data class ColorScheme (
     /* A color value (in hex color triplet  or */
     @SerialName("foreground")
-    val foreground: kotlin.String? = null,
+    val foreground: String? = null,
     /* A color value (in hex color triplet  or */
     @SerialName("background")
-    val background: kotlin.String? = null,
+    val background: String? = null,
     /* A color value (in hex color triplet  or */
     @SerialName("activated")
-    val activated: kotlin.String? = null,
+    val activated: String? = null,
     /* A color value (in hex color triplet  or */
     @SerialName("inactivated")
-    val inactivated: kotlin.String? = null,
+    val inactivated: String? = null,
     /* ColorScheme */
     @SerialName("type")
-    val type: kotlin.String? = null
-) {
-
-}
+    val type: String? = null
+)
 

@@ -30,26 +30,24 @@ import kotlinx.serialization.SerialName
 data class StudyInfo (
     /* The identifier for this study. */
     @SerialName("identifier")
-    val identifier: kotlin.String? = null,
+    val identifier: String? = null,
     /* The name of the study. */
     @SerialName("name")
-    val name: kotlin.String? = null,
+    val name: String? = null,
     /* An in-depth description of this study for prospective participants, or to show participants after they have joined a study (the “about” screen for the study). */
     @SerialName("details")
-    val details: kotlin.String? = null,
+    val details: String? = null,
     @SerialName("phase")
     val phase: StudyPhase? = null,
     /* An URL to a logo for the study. */
     @SerialName("studyLogoUrl")
-    val studyLogoUrl: kotlin.String? = null,
+    val studyLogoUrl: String? = null,
     @SerialName("colorScheme")
     val colorScheme: ColorScheme? = null,
     @SerialName("signInTypes")
-    val signInTypes: kotlin.collections.List<SignInType>? = null,
+    val signInTypes: List<SignInType>? = null,
     /* StudyInfo */
     @SerialName("type")
-    val type: kotlin.String? = null
-) {
-
-}
+    val type: String? = null
+)
 

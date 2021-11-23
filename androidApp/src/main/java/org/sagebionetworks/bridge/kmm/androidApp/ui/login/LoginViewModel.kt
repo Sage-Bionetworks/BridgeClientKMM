@@ -1,13 +1,11 @@
 package org.sagebionetworks.bridge.kmm.androidApp.ui.login
 
-import android.util.Log
+import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import android.util.Patterns
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-
 import org.sagebionetworks.bridge.kmm.androidApp.R
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
 import org.sagebionetworks.bridge.kmm.shared.repo.AuthenticationRepository

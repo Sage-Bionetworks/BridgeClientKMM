@@ -155,17 +155,17 @@ extension WKInterfaceDevice {
         var systemInfo = utsname()
         uname(&systemInfo)
         let machineMirror = Mirror(reflecting: systemInfo.machine)
-        let identifier = machineMirror.children.reduce("") { identifier, element in
-            guard let value = element.value as? Int8, value != 0 else { return identifier }
-            return identifier + String(UnicodeScalar(UInt8(value)))
+        let id = machineMirror.children.reduce("") { id, element in
+            guard let value = element.value as? Int8, value != 0 else { return id }
+            return id + String(UnicodeScalar(UInt8(value)))
         }
-        return identifier
+        return id
     }
     
     /// A human-readable mapped name for a given device type.
     fileprivate var machineName: String {
-        let identifier = deviceTypeIdentifier
-        switch identifier {
+        let id = deviceTypeIdentifier
+        switch id {
         case "Watch1":                                      return "Apple Watch Series 1"
         case "Watch2,6","Watch2,7","Watch2,3","Watch2,4":   return "Apple Watch Series 2"
         case "Watch3,1","Watch3,2","Watch3,3","Watch3,4":   return "Apple Watch Series 3"
@@ -173,7 +173,7 @@ extension WKInterfaceDevice {
         case "Watch5,1","Watch5,2","Watch5,3","Watch5,4":   return "Apple Watch Series 5"
         case "i386", "x86_64":                              return "Apple Watch Simulator"
             
-        default:                                            return identifier
+        default:                                            return id
         }
     }
 }
@@ -191,17 +191,17 @@ extension UIDevice {
         var systemInfo = utsname()
         uname(&systemInfo)
         let machineMirror = Mirror(reflecting: systemInfo.machine)
-        let identifier = machineMirror.children.reduce("") { identifier, element in
-            guard let value = element.value as? Int8, value != 0 else { return identifier }
-            return identifier + String(UnicodeScalar(UInt8(value)))
+        let id = machineMirror.children.reduce("") { id, element in
+            guard let value = element.value as? Int8, value != 0 else { return id }
+            return id + String(UnicodeScalar(UInt8(value)))
         }
-        return identifier
+        return id
     }
     
     /// A human-readable mapped name for a given device type.
     fileprivate var machineName: String {
-        let identifier = deviceTypeIdentifier
-        switch identifier {
+        let id = deviceTypeIdentifier
+        switch id {
         case "iPod5,1":                                     return "iPod Touch 5"
         case "iPod7,1":                                     return "iPod Touch 6"
         case "iPod9,1":                                     return "iPod Touch 7"
@@ -257,7 +257,7 @@ extension UIDevice {
             
         case "i386", "x86_64":                              return "Simulator"
             
-        default:                                            return identifier
+        default:                                            return id
         }
     }
 }

@@ -5,15 +5,9 @@ package org.sagebionetworks.bridge.kmm.shared.apis
 
 
 import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.request.*
-import io.ktor.http.*
 import org.sagebionetworks.bridge.kmm.shared.models.*
-import org.sagebionetworks.bridge.kmm.shared.models.AdherenceRecordList
-import org.sagebionetworks.bridge.kmm.shared.models.AdherenceRecordUpdates
-import org.sagebionetworks.bridge.kmm.shared.models.Message
 
-internal class SchedulesV2Api(basePath: kotlin.String = BASE_PATH, httpClient: HttpClient) : AbstractApi(basePath, httpClient) {
+internal class SchedulesV2Api(basePath: String = BASE_PATH, httpClient: HttpClient) : AbstractApi(basePath, httpClient) {
 
     /**
      * Get the caller’s timeline of scheduled assessments in this study.
@@ -43,7 +37,7 @@ internal class SchedulesV2Api(basePath: kotlin.String = BASE_PATH, httpClient: H
      * Create or update one or more adherence records.
      *
      * @param studyId Study identifier
-     * @param adherenceRecord One ore more adherence records
+     * @param records One ore more adherence records
      * @return Message
      */
     suspend fun updateAdherenceRecords(studyId: String, records: List<AdherenceRecord>) : Message {

@@ -255,6 +255,6 @@ extension Button where Label == Text {
 // for this element is in iosApp.
 struct CustomScrollView_Previews: PreviewProvider {
     static var previews: some View {
-        Text("Hello, World")
+        Text("Hello, World!")
     }
 }

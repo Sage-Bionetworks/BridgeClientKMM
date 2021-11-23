@@ -14,12 +14,6 @@ import okio.*
 import okio.Path.Companion.toPath
 import org.sagebionetworks.bridge.kmm.shared.cache.*
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper.Companion.APP_WIDE_STUDY_ID
-import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper.Companion.DEFAULT_SECONDARY_ID
-import java.io.IOException
-import java.io.OutputStream
-import java.nio.charset.StandardCharsets
-import java.util.zip.ZipEntry
-import java.util.zip.ZipOutputStream
 
 class UploadRequester(
     val database: ResourceDatabaseHelper,
@@ -34,18 +28,17 @@ class UploadRequester(
      * to create the UploadFile. Once this method returns, the UploadManager is now responsible
      * for deleting the specified UploadFile after a successful upload.
      */
-    @OptIn(ExperimentalFileSystem::class)
     fun queueAndRequestUpload(context: Context, uploadFile: UploadFile, assessmentInstanceId: String) {
         val pendingUploads = database.getResourcesBySecondaryId(assessmentInstanceId, ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID)
         if (pendingUploads.isNotEmpty()) {
             for (uploadResource in pendingUploads) {
-                uploadResource.loadResource<UploadFile>()?.let { uploadFile ->
-                    if (uploadFile.sessionExpires != null) {
+                uploadResource.loadResource<UploadFile>()?.let { pendingUploadFile ->
+                    if (pendingUploadFile.sessionExpires != null) {
                         //We already have pending upload for this assessmentInstanceID waiting for
                         //the scheduled session to expire before uploading. It will be replaced
                         //with the new one.
-                        FileSystem.SYSTEM.delete(uploadFile.filePath.toPath())
-                        database.removeResource(uploadFile.getUploadFileResourceId(), ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID)
+                        FileSystem.SYSTEM.delete(pendingUploadFile.filePath.toPath())
+                        database.removeResource(pendingUploadFile.getUploadFileResourceId(), ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID)
                     }
                 }
             }
@@ -81,54 +74,6 @@ class UploadRequester(
     val pendingUploads = database.getResources(ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID).isNotEmpty()
             || database.getResources(ResourceType.UPLOAD_SESSION, APP_WIDE_STUDY_ID).isNotEmpty()
 
-    // This is a temporary helper method for testing upload with Bridge -nbrown 01/08/21
-    @Throws(IOException::class)
-    private fun writeTestZipFileTo(os: OutputStream?): ZipOutputStream {
-        val zos = ZipOutputStream(os)
-        try {
-//            for (dataFile in dataFiles) {
-//                val entry: ZipEntry = ZipEntry(dataFile.getFilename())
-//                zos.putNextEntry(entry)
-//                zos.write(dataFile.getByteSource().read())
-//                zos.closeEntry()
-//            }
-            val infoFileEntry: ZipEntry = ZipEntry("testFile")
-            zos.putNextEntry(infoFileEntry)
-            zos.write("testString".toByteArray(StandardCharsets.UTF_8))
-            zos.closeEntry()
-        } finally {
-            zos.close()
-        }
-        return zos
-    }
-
-    // This is a temporary helper method for testing upload with Bridge -nbrown 01/08/21
-    // This utilizes the new multiplatform FileSystem api from Okio
-    @OptIn(ExperimentalFileSystem::class)
-    fun generateTestUploadFile(filename: String): UploadFile? {
-        val filePath = getFile(filename)
-
-
-        val sink = FileSystem.SYSTEM.sink(filePath)
-        val md5Sink = HashingSink.md5(sink);
-        val bufferedSink = md5Sink.buffer();
-
-        writeTestZipFileTo(bufferedSink.outputStream())
-
-
-        val md5Hash: String = md5Sink.hash.base64()
-        val uploadFile = UploadFile(
-            filePath = filePath.toString(),
-            contentType = "application/zip",
-            fileLength = FileSystem.SYSTEM.metadata(filePath).size!!,
-            md5Hash = md5Hash,
-            encrypted = false
-        )
-
-        return uploadFile
-    }
-
-    @OptIn(ExperimentalFileSystem::class)
     private fun getFile(filename: String): Path {
         val pathString = context.filesDir.absolutePath + Path.DIRECTORY_SEPARATOR + filename
         return pathString.toPath()

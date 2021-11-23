@@ -11,8 +11,8 @@ repositories {
 
 dependencies {
     //Core library
-    implementation("org.sagebionetworks.bridge.kmm:bridge-client:0.3.1")
+    implementation("org.sagebionetworks.bridge.kmm:bridge-client:0.3.2")
     //Support for archiving results from AssessmentModelKMM
-    implementation("org.sagebionetworks.bridge.kmm:assessmentmodel-sdk:0.3.1")
+    implementation("org.sagebionetworks.bridge.kmm:assessmentmodel-sdk:0.3.2")
 }
 ```

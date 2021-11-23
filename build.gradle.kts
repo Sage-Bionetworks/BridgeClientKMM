@@ -21,7 +21,7 @@ plugins {
 allprojects {
     group = "org.sagebionetworks.bridge.kmm"
     extra["sdkVersionCode"] = 1
-    version = "0.3.1"
+    version = "0.3.2"
     extra["versionName"] = "android-sdk v${version}"
 
     repositories {

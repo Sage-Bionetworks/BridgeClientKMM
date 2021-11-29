@@ -1,5 +1,5 @@
 # BridgeClientKMM
-A Kotlin Multiplatform Mobile [Bridge](https://developer.sagebridge.org/index.html) client built using Kotlin Serialization, Ktor, and Sqldelight.
+A Kotlin Multiplatform Mobile [Bridge](https://developer.sagebridge.org/index.html) client based on a repository design pattern, built using Kotlin Serialization, Ktor, and Sqldelight.
 #### Android
 
 Kotlin DSL:
@@ -28,7 +28,7 @@ class ExampleApplication : MultiDexApplication(), KoinComponent {
             androidLogger(Level.ERROR)
             androidContext(this@ExampleApplication)
             workManagerFactory()
-            //Add any addition Koin modules here
+            //Add any additional Koin modules here
             //modules(appModule)
         }
     }

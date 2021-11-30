@@ -5,7 +5,6 @@ module:assessmentmodel-sdk
 org.sagebionetworks.bridge.assessmentmodel.upload
 module:bridge-client
 org.sagebionetworks.bridge.kmm.shared
-org.sagebionetworks.bridge.kmm.shared.apis
 org.sagebionetworks.bridge.kmm.shared.cache
 org.sagebionetworks.bridge.kmm.shared.di
 org.sagebionetworks.bridge.kmm.shared.models

@@ -15,7 +15,12 @@ buildscript {
 }
 
 plugins {
+    id("org.jetbrains.dokka") version "1.6.0"
     id("maven-publish")
+}
+
+tasks.dokkaHtmlMultiModule {
+    outputDirectory.set(rootDir.resolve("build/dokka"))
 }
 
 allprojects {

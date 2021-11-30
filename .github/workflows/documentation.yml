@@ -2,7 +2,9 @@ name: Dokka
 
 on:
   push:
-    branches: [ dokka ]
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0
 
 jobs:
   build:

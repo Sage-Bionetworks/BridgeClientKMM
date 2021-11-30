@@ -1,0 +1,253 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>ScheduledSession</title>
+</head><body><link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>
+    <script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script><link href="../../../styles/style.css" rel="Stylesheet"><link href="../../../styles/jetbrains-mono.css" rel="Stylesheet"><link href="../../../styles/main.css" rel="Stylesheet"><link href="../../../styles/prism.css" rel="Stylesheet"><link href="../../../styles/logo-styles.css" rel="Stylesheet"><script type="text/javascript" src="../../../scripts/clipboard.js" async></script><script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script><script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script><script type="text/javascript" src="../../../scripts/main.js" async></script><script type="text/javascript" src="../../../scripts/prism.js" async></script><script>const storage = localStorage.getItem("dokka-dark-mode")
+const savedDarkMode = storage ? JSON.parse(storage) : false
+if(savedDarkMode === true){
+    document.getElementsByTagName("html")[0].classList.add("theme-dark")
+}</script>
+
+  
+    <div class="navigation-wrapper" id="navigation-wrapper">
+      <div id="leftToggler"><span class="icon-toggler"></span></div>
+      <div class="library-name"><a href="../../../index.html"><span>BridgeClientKMM</span></a></div>
+      <div>0.3.2</div>
+      <div class="pull-right d-flex">
+        <div class="filter-section" id="filter-section"><button class="platform-tag platform-selector common-like" data-active="" data-filter=":bridge-client:dokkaHtmlPartial/commonMain">common</button></div>
+<button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+      </div>
+    </div>
+    <div id="container">
+      <div id="leftColumn">
+        <div id="sideMenu"></div>
+      </div>
+      <div id="main"><script type="text/javascript" src="../../../scripts/main.js"></script>
+        <div class="main-content" id="content" pageids="bridge-client::org.sagebionetworks.bridge.kmm.shared.models/ScheduledSession///PointingToDeclaration//-202008714">
+          <div class="breadcrumbs"><a href="../../index.html">bridge-client</a>/<a href="../index.html">org.sagebionetworks.bridge.kmm.shared.models</a>/<a href="index.html">ScheduledSession</a></div>
+          <div class="cover ">
+            <h1 class="cover"><span>Scheduled</span><wbr><span><span>Session</span></span></h1>
+            <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+              <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/commonMain">common</button></div>
+<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="index.html">ScheduledSession</a><span class="token punctuation">(</span>refGuid<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span>instanceGuid<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span>startEventId<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token punctuation">, </span>startDay<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span>endDay<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span>startTime<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span>delayTime<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token punctuation">, </span>expiration<span class="token operator">: </span><span data-unresolved-link="kotlinx.datetime/DateTimePeriod///PointingToDeclaration/">DateTimePeriod</span><span class="token punctuation">, </span>persistent<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span>timeWindowGuid<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token punctuation">, </span>assessments<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../-scheduled-assessment/index.html">ScheduledAssessment</a><span class="token operator">&gt;</span><span class="token punctuation">, </span>type<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">An individual session instance the participant should perform as part of the study. The <code class="lang-kotlin">refGuid</code> property will refer to a session in the list of sessions in this timeline. The <code class="lang-kotlin">instanceGuid</code> is a unique GUID to identify any data that is generated from the execution of this scheduled session. This allows scientists to contextualize data based on when it was gathered in the execution of the study’s schedule. Further details about how a client should interpret a timeline can be found at the Bridge developer portal.</p></div>            </div>
+          </div>
+          <div class="tabbedcontent">
+            <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Constructors">Constructors</button><button class="section-tab" data-togglable="Properties">Properties</button><button class="section-tab" data-togglable="Parameters">Parameters</button></div>
+            <div class="tabs-section-body">
+              <h2 class="">Parameters</h2>
+              <div data-togglable="Parameters">
+                <div class="platform-hinted WithExtraAttributes with-platform-tabs" data-platform-hinted="data-platform-hinted" data-togglable="Parameters">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/commonMain">common</button></div>
+<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><div data-togglable="Parameters"><div class="table" data-togglable="Parameters"><div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><span>ref</span><wbr><span><span>Guid</span></span></span></div><div><div class="title"><div data-togglable="Parameters"></div></div></div></div></div><div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><span>instance</span><wbr><span><span>Guid</span></span></span></div><div><div class="title"><div data-togglable="Parameters"></div></div></div></div></div><div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><span>start</span><wbr><span>Event</span><wbr><span><span>Id</span></span></span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">An event ID for this scheduled session. The event ID may be mapped to a timestamp for a user. If the event ID does not exist for the user, the client should ignore this scheduled session. Otherwise, it should be shown to the user according to the scheduling information.</p></div></div></div></div></div><div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><span>start</span><wbr><span><span>Day</span></span></span></div><div><div class="title"><div data-togglable="Parameters"></div></div></div></div></div><div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><span>end</span><wbr><span><span>Day</span></span></span></div><div><div class="title"><div data-togglable="Parameters"></div></div></div></div></div><div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><span>start</span><wbr><span><span>Time</span></span></span></div><div><div class="title"><div data-togglable="Parameters"></div></div></div></div></div><div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><span>delay</span><wbr><span><span>Time</span></span></span></div><div><div class="title"><div data-togglable="Parameters"></div></div></div></div></div><div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><span><span>expiration</span></span></span></div><div><div class="title"><div data-togglable="Parameters"></div></div></div></div></div><div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><span><span>persistent</span></span></span></div><div><div class="title"><div data-togglable="Parameters"></div></div></div></div></div><div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><span>time</span><wbr><span>Window</span><wbr><span><span>Guid</span></span></span></div><div><div class="title"><div data-togglable="Parameters"></div></div></div></div></div><div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><span><span>assessments</span></span></span></div><div><div class="title"><div data-togglable="Parameters"></div></div></div></div></div><div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><span><span>type</span></span></span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">ScheduledSession</p></div></div></div></div></div></div></div></div>                </div>
+              </div>
+              <h2 class="tabbedcontent">Constructors</h2>
+              <div class="table" data-togglable="Constructors"><a data-name="-1860626288%2FConstructors%2F-202008714" anchor-label="ScheduledSession" id="-1860626288%2FConstructors%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a>
+                <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain">
+                  <div class="main-subrow keyValue TabbedContent">
+                    <div class=""><span class="inline-flex"><a href="-scheduled-session.html">ScheduledSession</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1860626288%2FConstructors%2F-202008714"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/commonMain">common</button></div>
+<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="-scheduled-session.html"><span class="token function">ScheduledSession</span></a><span class="token punctuation">(</span>refGuid<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span>instanceGuid<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span>startEventId<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span>startDay<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span>endDay<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span>startTime<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span>delayTime<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span>expiration<span class="token operator">: </span><span data-unresolved-link="kotlinx.datetime/DateTimePeriod///PointingToDeclaration/">DateTimePeriod</span><span class="token punctuation">, </span>persistent<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span><span class="token punctuation">, </span>timeWindowGuid<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span>assessments<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../-scheduled-assessment/index.html">ScheduledAssessment</a><span class="token operator">&gt;</span><span class="token punctuation">, </span>type<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <h2 class="">Properties</h2>
+              <div class="table" data-togglable="Properties"><a data-name="-934882203%2FProperties%2F-202008714" anchor-label="assessments" id="-934882203%2FProperties%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a>
+                <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="assessments.html">assessments</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-934882203%2FProperties%2F-202008714"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted" data-togglable="Properties">
+                          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/commonMain">common</button></div>
+<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><a data-name="-934882203%2FProperties%2F-202008714" anchor-label="assessments" id="-934882203%2FProperties%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="assessments.html">assessments</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../-scheduled-assessment/index.html">ScheduledAssessment</a><span class="token operator">&gt;</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-1204631930%2FProperties%2F-202008714" anchor-label="delayTime" id="-1204631930%2FProperties%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a>
+                <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="delay-time.html">delayTime</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1204631930%2FProperties%2F-202008714"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted" data-togglable="Properties">
+                          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/commonMain">common</button></div>
+<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><a data-name="-1204631930%2FProperties%2F-202008714" anchor-label="delayTime" id="-1204631930%2FProperties%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="delay-time.html">delayTime</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="2101478659%2FProperties%2F-202008714" anchor-label="endDay" id="2101478659%2FProperties%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a>
+                <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="end-day.html">endDay</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2101478659%2FProperties%2F-202008714"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted" data-togglable="Properties">
+                          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/commonMain">common</button></div>
+<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><a data-name="2101478659%2FProperties%2F-202008714" anchor-label="endDay" id="2101478659%2FProperties%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="end-day.html">endDay</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-2112592043%2FProperties%2F-202008714" anchor-label="expiration" id="-2112592043%2FProperties%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a>
+                <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="expiration.html">expiration</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2112592043%2FProperties%2F-202008714"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted" data-togglable="Properties">
+                          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/commonMain">common</button></div>
+<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><a data-name="-2112592043%2FProperties%2F-202008714" anchor-label="expiration" id="-2112592043%2FProperties%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="expiration.html">expiration</a><span class="token operator">: </span><span data-unresolved-link="kotlinx.datetime/DateTimePeriod///PointingToDeclaration/">DateTimePeriod</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-2074589594%2FProperties%2F-202008714" anchor-label="instanceGuid" id="-2074589594%2FProperties%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a>
+                <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="instance-guid.html">instanceGuid</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2074589594%2FProperties%2F-202008714"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted" data-togglable="Properties">
+                          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/commonMain">common</button></div>
+<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><a data-name="-2074589594%2FProperties%2F-202008714" anchor-label="instanceGuid" id="-2074589594%2FProperties%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="instance-guid.html">instanceGuid</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="269670509%2FProperties%2F-202008714" anchor-label="persistent" id="269670509%2FProperties%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a>
+                <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="persistent.html">persistent</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="269670509%2FProperties%2F-202008714"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted" data-togglable="Properties">
+                          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/commonMain">common</button></div>
+<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><a data-name="269670509%2FProperties%2F-202008714" anchor-label="persistent" id="269670509%2FProperties%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="persistent.html">persistent</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="1399759738%2FProperties%2F-202008714" anchor-label="refGuid" id="1399759738%2FProperties%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a>
+                <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="ref-guid.html">refGuid</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1399759738%2FProperties%2F-202008714"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted" data-togglable="Properties">
+                          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/commonMain">common</button></div>
+<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><a data-name="1399759738%2FProperties%2F-202008714" anchor-label="refGuid" id="1399759738%2FProperties%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="ref-guid.html">refGuid</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="209723978%2FProperties%2F-202008714" anchor-label="startDay" id="209723978%2FProperties%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a>
+                <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="start-day.html">startDay</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="209723978%2FProperties%2F-202008714"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted" data-togglable="Properties">
+                          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/commonMain">common</button></div>
+<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><a data-name="209723978%2FProperties%2F-202008714" anchor-label="startDay" id="209723978%2FProperties%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="start-day.html">startDay</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-1850925519%2FProperties%2F-202008714" anchor-label="startEventId" id="-1850925519%2FProperties%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a>
+                <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="start-event-id.html">startEventId</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1850925519%2FProperties%2F-202008714"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted" data-togglable="Properties">
+                          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/commonMain">common</button></div>
+<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><a data-name="-1850925519%2FProperties%2F-202008714" anchor-label="startEventId" id="-1850925519%2FProperties%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="start-event-id.html">startEventId</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="850820103%2FProperties%2F-202008714" anchor-label="startTime" id="850820103%2FProperties%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a>
+                <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="start-time.html">startTime</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="850820103%2FProperties%2F-202008714"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted" data-togglable="Properties">
+                          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/commonMain">common</button></div>
+<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><a data-name="850820103%2FProperties%2F-202008714" anchor-label="startTime" id="850820103%2FProperties%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="start-time.html">startTime</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="161819934%2FProperties%2F-202008714" anchor-label="timeWindowGuid" id="161819934%2FProperties%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a>
+                <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="time-window-guid.html">timeWindowGuid</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="161819934%2FProperties%2F-202008714"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted" data-togglable="Properties">
+                          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/commonMain">common</button></div>
+<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><a data-name="161819934%2FProperties%2F-202008714" anchor-label="timeWindowGuid" id="161819934%2FProperties%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="time-window-guid.html">timeWindowGuid</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-1018814870%2FProperties%2F-202008714" anchor-label="type" id="-1018814870%2FProperties%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a>
+                <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="type.html">type</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1018814870%2FProperties%2F-202008714"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted" data-togglable="Properties">
+                          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/commonMain">common</button></div>
+<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><a data-name="-1018814870%2FProperties%2F-202008714" anchor-label="type" id="-1018814870%2FProperties%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="type.html">type</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2021 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
+      </div>
+    </div>
+  
+</body></html>
+
+

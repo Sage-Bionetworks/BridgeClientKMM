@@ -34,3 +34,4 @@ class ExampleApplication : MultiDexApplication(), KoinComponent {
     }
 }
 ```
+To support encrypting uploads, place your study_public_key.pem in your app's assets directory.

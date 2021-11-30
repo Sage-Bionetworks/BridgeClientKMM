@@ -5,7 +5,7 @@ import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 
-abstract class AbstractApi(protected val basePath: String, protected val httpClient: HttpClient) {
+internal abstract class AbstractApi(protected val basePath: String, protected val httpClient: HttpClient) {
 
     companion object {
         const val BASE_PATH = "https://webservices.sagebridge.org"

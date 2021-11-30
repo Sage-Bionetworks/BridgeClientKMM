@@ -17,7 +17,7 @@ import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
 
 class AuthenticationRepository(httpClient: HttpClient, val bridgeConfig: BridgeConfig, val database: ResourceDatabaseHelper) {
 
-    companion object {
+    internal companion object {
         const val USER_SESSION_ID = "UserSessionId"
     }
 

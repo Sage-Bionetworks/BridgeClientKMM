@@ -11,7 +11,7 @@ import io.ktor.client.request.header
 import io.ktor.util.AttributeKey
 import org.sagebionetworks.bridge.kmm.shared.apis.AbstractApi.Companion.BRIDGE_SERVER_CHECK
 
-class SessionTokenFeature constructor(
+internal class SessionTokenFeature constructor(
     private val sessionTokenHeaderName: String,
     val sessionTokenProvider: SessionTokenProvider
 ) {

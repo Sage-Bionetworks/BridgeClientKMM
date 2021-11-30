@@ -25,7 +25,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
                            backgroundScope: CoroutineScope) :
     AbstractResourceRepo(databaseHelper, backgroundScope) {
 
-    companion object {
+    internal companion object {
         const val SCHEDULE_TIMELINE_ID = "ScheduleTimelineId"
     }
 

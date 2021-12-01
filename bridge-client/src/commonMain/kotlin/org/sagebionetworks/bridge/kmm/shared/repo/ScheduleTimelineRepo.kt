@@ -52,6 +52,9 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
 
     /**
      * Get all the scheduled sessions for today that have not expired.
+     * @param studyId Study identifier
+     * @param includeAllNotifications Include all [ScheduledNotification]s
+     * @param alwaysIncludeNextDay Include the next day containing a [ScheduledSessionWindow]
      */
     fun getSessionsForToday(studyId: String,
                             includeAllNotifications: Boolean = false,

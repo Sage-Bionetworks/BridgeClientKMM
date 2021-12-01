@@ -1,5 +1,7 @@
 # BridgeClientKMM
 A Kotlin Multiplatform Mobile [Bridge](https://developer.sagebridge.org/index.html) client based on a repository design pattern, built using Kotlin Serialization, Ktor, and Sqldelight.
+
+[Class Documentation](https://sage-bionetworks.github.io/BridgeClientKMM/)
 #### Android
 
 Kotlin DSL:

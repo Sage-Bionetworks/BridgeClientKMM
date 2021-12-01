@@ -12,8 +12,8 @@ import org.sagebionetworks.bridge.kmm.shared.BridgeConfig
 import org.sagebionetworks.bridge.kmm.shared.apis.AuthenticationApi
 import org.sagebionetworks.bridge.kmm.shared.cache.*
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper.Companion.APP_WIDE_STUDY_ID
+import org.sagebionetworks.bridge.kmm.shared.models.*
 import org.sagebionetworks.bridge.kmm.shared.models.SignIn
-import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
 
 class AuthenticationRepository(httpClient: HttpClient, val bridgeConfig: BridgeConfig, val database: ResourceDatabaseHelper) {
 
@@ -56,6 +56,65 @@ class AuthenticationRepository(httpClient: HttpClient, val bridgeConfig: BridgeC
             }
             database.clearDatabase()
         }
+    }
+
+    /**
+     *
+     * Will send an SMS message with a code that can be used to call the server and generate a session.
+     * @param number Phone number of participant.
+     * @param regionCode CLDR two-letter region code describing the region in which the phone number was issued.
+     * @return Boolean
+     */
+    suspend fun requestPhoneSignIn(number: String, regionCode: String) : Boolean {
+        try {
+            val phone = Phone(number, regionCode)
+            val phoneSignInRequest = PhoneSignInRequest(bridgeConfig.appId, phone)
+            authenticationApi.requestPhoneSignIn(phoneSignInRequest)
+            return true
+        } catch (err: Throwable) {
+            println(err)
+        }
+        return false
+    }
+
+    /**
+     *
+     * Resend an SMS message to the provided phone number asking the recipient to verify their  phone number.
+     * Whether the phone has been registered or not through sign up, this method will return 200 in order to prevent \&quot;account enumeration\&quot; security breaches.
+     * @param number Phone number of participant.
+     * @param regionCode CLDR two-letter region code describing the region in which the phone number was issued.
+     * @return Message
+     */
+    suspend fun resendPhoneVerification(number: String, regionCode: String) : Boolean {
+        try {
+            val phone = Phone(number, regionCode)
+            val identifier = Identifier(bridgeConfig.appId, phone=phone)
+            authenticationApi.resendPhoneVerification(identifier)
+            return true
+        } catch (err: Throwable) {
+            println(err)
+        }
+        return false
+    }
+
+    /**
+     *
+     * Using the token supplied via an SMS message sent to the user, request a session from the server.
+     * @param phoneSignIn
+     * @return ResourceResult<UserSessionInfo>
+     */
+    suspend fun signInPhone(token: String, number: String, regionCode: String) : ResourceResult<UserSessionInfo> {
+        try {
+            val phone = Phone(number, regionCode)
+            val phoneSignin = PhoneSignin(bridgeConfig.appId, phone, token)
+            val userSession = authenticationApi.signInViaPhone(phoneSignin)
+            updateCachedSession(null, userSession)
+            return ResourceResult.Success(userSession, ResourceStatus.SUCCESS)
+        } catch (err: Throwable) {
+            database.removeResource(USER_SESSION_ID, ResourceType.USER_SESSION_INFO, APP_WIDE_STUDY_ID)
+            println(err)
+        }
+        return ResourceResult.Failed(ResourceStatus.FAILED)
     }
 
     suspend fun signInExternalId(externalId: String, password: String) : ResourceResult<UserSessionInfo> {

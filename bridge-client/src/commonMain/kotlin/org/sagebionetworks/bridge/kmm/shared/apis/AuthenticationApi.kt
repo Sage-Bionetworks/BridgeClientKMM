@@ -12,9 +12,9 @@ import io.ktor.client.features.logging.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import org.sagebionetworks.bridge.kmm.shared.models.*
 import org.sagebionetworks.bridge.kmm.shared.models.Message
 import org.sagebionetworks.bridge.kmm.shared.models.SignIn
-import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
 
 internal class AuthenticationApi(basePath: String = BASE_PATH, httpClient: HttpClient) : AbstractApi(basePath, httpClient) {
 
@@ -28,6 +28,35 @@ internal class AuthenticationApi(basePath: String = BASE_PATH, httpClient: HttpC
         return postData(signIn, "v3/auth/reauth")
     }
 
+    /**
+     *
+     * Does not require authentication. Will send an SMS message with a code that can be used to  call the server and generate a session.
+     * @param phoneSignInRequest Information to trigger an SMS message for sign in.
+     * @return Message
+     */
+    suspend fun requestPhoneSignIn(phoneSignInRequest: PhoneSignInRequest) : Message {
+        return postData(phoneSignInRequest, "v3/auth/phone")
+    }
+
+    /**
+     *
+     * Resend an SMS message to the provided phone number asking the recipient to verify their  phone number. Whether the phone has been registered or not through sign up, this method will return 200 in order to prevent \&quot;account enumeration\&quot; security breaches.
+     * @param identifier Phone number of participant (email address is ignored).
+     * @return Message
+     */
+    suspend fun resendPhoneVerification(identifier: Identifier) : Message {
+        return postData(identifier, "v3/auth/resendPhoneVerification")
+    }
+
+    /**
+     *
+     * Does not require authentication. Using the token supplied via an SMS message sent to the user, request a session from the server.
+     * @param phoneSignIn
+     * @return UserSessionInfoComposed
+     */
+    suspend fun signInViaPhone(phoneSignIn: PhoneSignin) : UserSessionInfo {
+        return postData(phoneSignIn, "v3/auth/phone/signIn")
+    }
 
     /**
     * 

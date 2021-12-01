@@ -39,4 +39,12 @@ allprojects {
 
         maven(url = "https://sagebionetworks.jfrog.io/artifactory/mobile-sdks/")
     }
+
+    tasks.withType<org.jetbrains.dokka.gradle.DokkaTaskPartial>().configureEach {
+        dokkaSourceSets {
+            configureEach {
+                includes.from(rootProject.file("dokka/moduledoc.md").path)
+            }
+        }
+    }
 }

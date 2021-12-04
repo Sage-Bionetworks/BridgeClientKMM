@@ -10,7 +10,8 @@ plugins {
     kotlin("plugin.serialization")
     id("com.squareup.sqldelight")
     id("maven-publish")
-    id("dev.icerock.mobile.multiplatform-network-generator")
+    //Uncomment to enable model generation from swagger file
+    //id("dev.icerock.mobile.multiplatform-network-generator")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
@@ -150,22 +151,23 @@ publishing {
 
 /**
  * To generate client models:
- *  1. Copy latest Bridge swagger file to: bridge-client/src/spec/swagger.json
- *  2. Run gradle openApiGenerate
- *  3. Resulting files will be in build/generated/moko-network/bridge/src/main/kotlin
+ *  1. Uncomment the following and the plugin definition above
+ *  2. Copy latest Bridge swagger file to: bridge-client/src/spec/swagger.json
+ *  3. Run gradle openApiGenerate
+ *  4. Resulting files will be in build/generated/moko-network/bridge/src/main/kotlin
  */
-mokoNetwork {
-    spec("bridge") {
-        inputSpec = file("$rootDir/bridge-client/src/spec/swagger.json")
-        packageName = "org.sagebionetworks.bridge.kmm.shared"
-        isInternal = false
-        isOpen = true
-        configureTask {
-            // here can be configuration of https://github.com/OpenAPITools/openapi-generator GenerateTask
-        }
-        enumFallbackNull = false
-    }
-}
+//mokoNetwork {
+//    spec("bridge") {
+//        inputSpec = file("$rootDir/bridge-client/src/spec/swagger.json")
+//        packageName = "org.sagebionetworks.bridge.kmm.shared"
+//        isInternal = false
+//        isOpen = true
+//        configureTask {
+//            // here can be configuration of https://github.com/OpenAPITools/openapi-generator GenerateTask
+//        }
+//        enumFallbackNull = false
+//    }
+//}
 
 //region XcFramework tasks
 val swiftPMPath = "${project.rootDir}/SwiftPackage/Binaries/$iosFrameworkName.xcframework"

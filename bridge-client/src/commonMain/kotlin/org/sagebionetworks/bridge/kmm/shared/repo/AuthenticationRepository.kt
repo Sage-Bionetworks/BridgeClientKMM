@@ -17,7 +17,7 @@ import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
 
 class AuthenticationRepository(httpClient: HttpClient, val bridgeConfig: BridgeConfig, val database: ResourceDatabaseHelper) {
 
-    companion object {
+    internal companion object {
         const val USER_SESSION_ID = "UserSessionId"
     }
 
@@ -39,14 +39,24 @@ class AuthenticationRepository(httpClient: HttpClient, val bridgeConfig: BridgeC
         return database.getResource(USER_SESSION_ID, ResourceType.USER_SESSION_INFO, APP_WIDE_STUDY_ID)?.loadResource()
     }
 
+
+    /**
+     * Get the ID of the current study.
+     */
     fun currentStudyId() : String? {
         return session()?.studyIds?.get(0)
     }
 
+    /**
+     * Is the current session authenticated.
+     */
     fun isAuthenticated() : Boolean {
         return session()?.authenticated ?: false
     }
 
+    /**
+     * Calls the sign out api and then clears the local database cache.
+     */
     suspend fun signOut() {
         session()?.let {
             try {

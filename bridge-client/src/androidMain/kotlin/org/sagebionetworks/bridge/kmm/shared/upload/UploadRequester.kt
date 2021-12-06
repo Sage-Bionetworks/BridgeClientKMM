@@ -81,7 +81,7 @@ class UploadRequester(
 
 }
 
-class CoroutineUploadWorker(
+internal class CoroutineUploadWorker(
     context: Context,
     params: WorkerParameters,
     private val httpClient: HttpClient,

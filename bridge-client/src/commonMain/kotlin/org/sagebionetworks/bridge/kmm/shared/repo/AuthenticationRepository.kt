@@ -61,7 +61,7 @@ class AuthenticationRepository(httpClient: HttpClient, val bridgeConfig: BridgeC
     /**
      *
      * Will send an SMS message with a code that can be used to call the server and generate a session.
-     * @param number Phone number of participant.
+     * @param number The phone number (can be formatted in any way that's useful for end users).
      * @param regionCode CLDR two-letter region code describing the region in which the phone number was issued.
      * @return Boolean
      */
@@ -81,7 +81,7 @@ class AuthenticationRepository(httpClient: HttpClient, val bridgeConfig: BridgeC
      *
      * Resend an SMS message to the provided phone number asking the recipient to verify their  phone number.
      * Whether the phone has been registered or not through sign up, this method will return 200 in order to prevent \&quot;account enumeration\&quot; security breaches.
-     * @param number Phone number of participant.
+     * @param number The phone number (can be formatted in any way that's useful for end users).
      * @param regionCode CLDR two-letter region code describing the region in which the phone number was issued.
      * @return Message
      */
@@ -100,7 +100,9 @@ class AuthenticationRepository(httpClient: HttpClient, val bridgeConfig: BridgeC
     /**
      *
      * Using the token supplied via an SMS message sent to the user, request a session from the server.
-     * @param phoneSignIn
+     * @param token The token that was sent to the user via SMS, that needs to be entered into the application so it can be sent back to authenticate.
+     * @param number The phone number (can be formatted in any way that's useful for end users).
+     * @param regionCode CLDR two-letter region code describing the region in which the phone number was issued.
      * @return ResourceResult<UserSessionInfo>
      */
     suspend fun signInPhone(token: String, number: String, regionCode: String) : ResourceResult<UserSessionInfo> {

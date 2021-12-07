@@ -8,7 +8,7 @@ import io.ktor.http.*
 import org.sagebionetworks.bridge.kmm.shared.upload.UploadFile
 import java.io.File
 
-class S3UploadApi(private val httpClient: HttpClient) {
+internal class S3UploadApi(private val httpClient: HttpClient) {
 
     suspend fun uploadFile(url: String, uploadFile: UploadFile) {
         // LocalFileContent is jvm only, we could probably write our own using Okio if we need

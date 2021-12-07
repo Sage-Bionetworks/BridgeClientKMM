@@ -15,7 +15,7 @@ import org.sagebionetworks.bridge.kmm.shared.models.StudyActivityEventList
 class ActivityEventsRepo(httpClient: HttpClient, databaseHelper: ResourceDatabaseHelper, backgroundScope: CoroutineScope) :
     AbstractResourceRepo(databaseHelper, backgroundScope) {
 
-    companion object {
+    internal companion object {
         const val ACTIVITY_EVENTS_LIST_ID = "ActivityEventsListId"
     }
 

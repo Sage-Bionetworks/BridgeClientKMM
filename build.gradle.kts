@@ -16,13 +16,18 @@ buildscript {
 }
 
 plugins {
+    id("org.jetbrains.dokka") version "1.6.0"
     id("maven-publish")
+}
+
+tasks.dokkaHtmlMultiModule {
+    outputDirectory.set(rootDir.resolve("build/dokka"))
 }
 
 allprojects {
     group = "org.sagebionetworks.bridge.kmm"
     extra["sdkVersionCode"] = 1
-    version = "0.3.1"
+    version = "0.3.2"
     extra["versionName"] = "android-sdk v${version}"
 
     repositories {
@@ -34,5 +39,13 @@ allprojects {
         }
 
         maven(url = "https://sagebionetworks.jfrog.io/artifactory/mobile-sdks/")
+    }
+
+    tasks.withType<org.jetbrains.dokka.gradle.DokkaTaskPartial>().configureEach {
+        dokkaSourceSets {
+            configureEach {
+                includes.from(rootProject.file("dokka/moduledoc.md").path)
+            }
+        }
     }
 }

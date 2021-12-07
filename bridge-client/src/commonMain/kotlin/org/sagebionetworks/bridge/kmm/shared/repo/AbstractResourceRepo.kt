@@ -39,7 +39,7 @@ abstract class AbstractResourceRepo(val database: ResourceDatabaseHelper, protec
 
     }
 
-    companion object {
+    internal companion object {
 
         const val defaultUpdateFrequency = 60000// 1 minute
 

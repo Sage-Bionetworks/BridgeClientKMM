@@ -12,6 +12,7 @@ plugins {
     id("maven-publish")
     //Uncomment to enable model generation from swagger file
     //id("dev.icerock.mobile.multiplatform-network-generator")
+    id("org.jetbrains.dokka")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {

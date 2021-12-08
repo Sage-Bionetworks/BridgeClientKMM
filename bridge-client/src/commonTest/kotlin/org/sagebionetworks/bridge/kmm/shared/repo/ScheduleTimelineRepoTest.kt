@@ -16,6 +16,7 @@ import kotlin.test.*
 
 class ScheduleTimelineRepoTest: BaseTest() {
 
+    private val databaseHelper = ResourceDatabaseHelper(testDatabaseDriver())
     private val testHour = 12//Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).hour
     private val lastHourString = (testHour - 1).toString().padStart(2,'0')
     private val currentHourString = testHour.toString().padStart(2,'0')
@@ -403,11 +404,15 @@ class ScheduleTimelineRepoTest: BaseTest() {
     }
 
     private fun getTestScheduleTimelineRepo(adherenceRecordJson: String = "", timeStamp: Instant, timelineJson: String = scheduleJson ) : ScheduleTimelineRepo {
-        val databaseHelper = ResourceDatabaseHelper(testDatabaseDriver())
         val adherenceRecordRepo = AdherenceRecordRepo(getTestClient(adherenceRecordJson), databaseHelper, MainScope())
         val eventJson = Json.encodeToString(getActivityEventList(timeStamp))
         val activityEventsRepo = ActivityEventsRepo(getTestClient(eventJson), databaseHelper, MainScope())
         return ScheduleTimelineRepo(adherenceRecordRepo, activityEventsRepo, getTestClient(timelineJson), databaseHelper, MainScope())
+    }
+
+    @AfterTest
+    fun clearDatabase() {
+        databaseHelper.clearDatabase()
     }
 
     @Test

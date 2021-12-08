@@ -421,7 +421,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val eventTimeStamp = Clock.System.now().minus(DateTimeUnit.DAY, TimeZone.currentSystemDefault())
             val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
 
-            val resourceResult = repo.getSessionsForDay("sage-assessment-test", getTodayInstant()).firstOrNull { it is ResourceResult.Success }
+            val resourceResult = repo.getSessionsForDay("testScheduledSessionsDay1", getTodayInstant()).firstOrNull { it is ResourceResult.Success }
 
             assertTrue(resourceResult is ResourceResult.Success)
             val sessionList = resourceResult.data.scheduledSessionWindows
@@ -460,7 +460,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
 
             val resourceResult = repo.getSessionsForDay(
-                "sage-assessment-test",
+                "testScheduledSessionsDay1TodayAndNotifications",
                 getTodayInstant(),
                 true
             ).firstOrNull { it is ResourceResult.Success }
@@ -497,7 +497,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
 
             val resourceResult = repo.getSessionsForDay(
-                "sage-assessment-test",
+                "testScheduledSessionsDay1TodayAndTomorrow",
                 getTodayInstant(),
                 includeAllNotifications = true,
                 alwaysIncludeNextDay = true
@@ -549,7 +549,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
 
             val resourceResult = repo.getSessionsForDay(
-                "sage-assessment-test",
+                "testScheduledSessionsDay1TodayAndTomorrow_NoNotifications",
                 getTodayInstant(),
                 includeAllNotifications = false,
                 alwaysIncludeNextDay = true
@@ -597,7 +597,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
 
             val todayInstant = getTodayInstant().plus(90, DateTimeUnit.MINUTE, TimeZone.currentSystemDefault())
-            val resourceResult = repo.getSessionsForDay("sage-assessment-test", todayInstant).firstOrNull { it is ResourceResult.Success }
+            val resourceResult = repo.getSessionsForDay("testScheduledSessionsDay1NoUpNextOnToday", todayInstant).firstOrNull { it is ResourceResult.Success }
 
             assertTrue(resourceResult is ResourceResult.Success)
             val sessionList = resourceResult.data.scheduledSessionWindows
@@ -634,7 +634,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
     @Test
     fun testScheduledSessionsDay2WithCompletion() {
         runTest {
-            val studyId = "sage-assessment-test"
+            val studyId = "testScheduledSessionsDay2WithCompletiont"
             val eventTimeStamp = Clock.System.now().minus(2, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
             val repo = getTestScheduleTimelineRepo(adherenceRecordDay2json, timeStamp = eventTimeStamp)
             repo.adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)
@@ -687,7 +687,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
         runTest {
             val eventTimeStamp = Clock.System.now().minus(3, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
             val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
-            val resourceResult = repo.getSessionsForDay("sage-assessment-test", getTodayInstant()).firstOrNull { it is ResourceResult.Success }
+            val resourceResult = repo.getSessionsForDay("testScheduledSessionsDay3", getTodayInstant()).firstOrNull { it is ResourceResult.Success }
 
             assertTrue(resourceResult is ResourceResult.Success)
             val sessionList = resourceResult.data.scheduledSessionWindows
@@ -711,7 +711,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
     @Test
     fun testScheduledSessionsDay3WithCompletion() {
         runTest {
-            val studyId = "sage-assessment-test"
+            val studyId = "testScheduledSessionsDay3WithCompletion"
             val eventTimeStamp = Clock.System.now().minus(3, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
             val repo = getTestScheduleTimelineRepo(adherenceRecordjson, timeStamp = eventTimeStamp)
             repo.adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)
@@ -740,7 +740,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
         runTest {
             val eventTimeStamp = Clock.System.now().minus(4, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
             val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
-            val resourceResult = repo.getSessionsForDay("sage-assessment-test", getTodayInstant()).firstOrNull { it is ResourceResult.Success }
+            val resourceResult = repo.getSessionsForDay("testScheduledSessionsDay4", getTodayInstant()).firstOrNull { it is ResourceResult.Success }
 
             assertTrue(resourceResult is ResourceResult.Success)
             val sessionList = resourceResult.data.scheduledSessionWindows
@@ -755,7 +755,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val eventTimeStamp = Clock.System.now()
             //         Clock.System.now().minus(DateTimeUnit.DAY, TimeZone.currentSystemDefault())
             val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
-            val resourceResult = repo.getPastSessions("sage-assessment-test", getTodayInstant())
+            val resourceResult = repo.getPastSessions("testPastSessionsDay0", getTodayInstant())
                 .firstOrNull { it is ResourceResult.Success }
 
             assertTrue(resourceResult is ResourceResult.Success)
@@ -771,7 +771,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val eventTimeStamp =
                 Clock.System.now().minus(1, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
             val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
-            val resourceResult = repo.getPastSessions("sage-assessment-test", getTodayInstant())
+            val resourceResult = repo.getPastSessions("testPastSessionsDay1", getTodayInstant())
                 .firstOrNull { it is ResourceResult.Success }
 
             assertTrue(resourceResult is ResourceResult.Success)
@@ -784,7 +784,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
     @Test
     fun testPastSessionsDay2WithCompletion() {
         runTest {
-            val studyId = "sage-assessment-test"
+            val studyId = "testPastSessionsDay2WithCompletion"
             val eventTimeStamp =
                 Clock.System.now().minus(2, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
             val repo =
@@ -819,7 +819,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val eventTimeStamp =
                 Clock.System.now().minus(4, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
             val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
-            val resourceResult = repo.getPastSessions("sage-assessment-test", getTodayInstant())
+            val resourceResult = repo.getPastSessions("testPastSessionsDay4", getTodayInstant())
                 .firstOrNull { it is ResourceResult.Success }
 
             assertTrue(resourceResult is ResourceResult.Success)

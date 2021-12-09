@@ -47,7 +47,12 @@ open class NativeAuthenticationManager(
     }
 
     open fun session() : UserSessionInfo? {
-        return authManager.session()
+        return try {
+            authManager.session()
+        } catch (err: Exception) {
+            println("Failed to retrieve session: ${err.message}")
+            null
+        }
     }
 
     fun signInEmail(userName: String, password: String, callBack: (UserSessionInfo?, ResourceStatus) -> Unit) {

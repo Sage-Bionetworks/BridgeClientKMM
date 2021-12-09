@@ -30,7 +30,7 @@ sealed class ResourceResult<out T : Any> {
     object InProgress : ResourceResult<Nothing>()
 }
 
-inline fun <reified T: Any> Resource.loadResource(): T? {
+internal inline fun <reified T: Any> Resource.loadResource(): T? {
     json?.let {
         val jsonCoder = Json {ignoreUnknownKeys = true }
         return jsonCoder.decodeFromString(it)

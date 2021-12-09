@@ -3,6 +3,7 @@ plugins {
     kotlin("android")
     id("kotlin-android")
     id ("maven-publish")
+    id("org.jetbrains.dokka")
 }
 
 android {

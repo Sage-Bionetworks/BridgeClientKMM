@@ -16,7 +16,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.util.AttributeKey
 import kotlinx.coroutines.sync.Mutex
 
-class RefreshTokenFeature(
+internal class RefreshTokenFeature(
     private val updateTokenHandler: suspend () -> Boolean,
     private val isCredentialsActual: (HttpRequest) -> Boolean
 ) {

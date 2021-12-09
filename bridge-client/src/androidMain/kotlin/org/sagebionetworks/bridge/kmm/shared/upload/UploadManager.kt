@@ -18,7 +18,7 @@ import org.sagebionetworks.bridge.kmm.shared.repo.AbstractResourceRepo
 import org.sagebionetworks.bridge.kmm.shared.models.UploadRequest
 import org.sagebionetworks.bridge.kmm.shared.models.UploadSession
 
-class UploadManager(
+internal class UploadManager(
     httpClient: HttpClient,
     sqlDriver: SqlDriver
 ) {

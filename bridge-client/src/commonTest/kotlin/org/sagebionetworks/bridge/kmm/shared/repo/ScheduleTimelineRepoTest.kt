@@ -410,7 +410,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
         return ScheduleTimelineRepo(adherenceRecordRepo, activityEventsRepo, getTestClient(timelineJson), databaseHelper, MainScope())
     }
 
-    @AfterTest
+    @BeforeTest
     fun clearDatabase() {
         databaseHelper.clearDatabase()
     }

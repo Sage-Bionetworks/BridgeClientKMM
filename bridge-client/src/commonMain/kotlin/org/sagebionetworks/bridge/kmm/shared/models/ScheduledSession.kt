@@ -27,6 +27,8 @@ import kotlinx.serialization.SerialName
  * @param delayTime
  * @param expiration
  * @param persistent
+ * @param studyBurstId
+ * @param studyBurstNum
  * @param timeWindowGuid
  * @param assessments
  * @param type ScheduledSession
@@ -63,6 +65,12 @@ data class ScheduledSession (
 
     @SerialName("persistent")
     val persistent: Boolean = false,
+
+    @SerialName("studyBurstId")
+    val studyBurstId: kotlin.String? = null,
+
+    @SerialName("studyBurstNum")
+    val studyBurstNum: kotlin.Int? = null,
 
     @SerialName("timeWindowGuid")
     val timeWindowGuid: String? = null,

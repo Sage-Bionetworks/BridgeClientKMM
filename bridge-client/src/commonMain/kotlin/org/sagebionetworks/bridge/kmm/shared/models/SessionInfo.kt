@@ -18,6 +18,7 @@ import kotlinx.serialization.Serializable
  * Information about a session in order to render it in a UI prior to execution.
  * @param guid The unique identifier for this model.
  * @param label A required name for this session that will be shown to schedule authors, and can be used as a label for participants if no label can be found.
+ * @param symbol A unicode symbol or token identifier (32 characters or less) for a compact/symbolic representation of a session in UI tools.
  * @param performanceOrder
  * @param timeWindowGuids A list of all the time window GUIDs for this session. The number of time windows in a session can be useful information for some UI grouping tasks.
  * @param minutesToComplete
@@ -34,6 +35,9 @@ data class SessionInfo (
     /* A required name for this session that will be shown to schedule authors, and can be used as a label for participants if no label can be found. */
     @SerialName("label")
     val label: String,
+
+    @SerialName("symbol")
+    val symbol: kotlin.String? = null,
 
     @SerialName("performanceOrder")
     val performanceOrder: PerformanceOrder,

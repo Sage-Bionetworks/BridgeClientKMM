@@ -19,12 +19,13 @@ import kotlinx.serialization.SerialName
  * Information about an assessment in order to render it in a UI prior to execution.
  * @param key Because assessments can be configured with different display information, they are not referenced in the schedule portion of a timeline by their GUIDs. Instead they are given a unique string key that is used to look up the assessment.
  * @param guid Each assessment revision is assigned a unique GUID which can be used to retrieve it through the API. Assessments will also have a unique combination of an identifier and a revision, and can be retrieved as a set of revisions under a given identifier.
- * @param appId 
+ * @param appId
  * @param identifier A human-readable identifier for an assessment, which can have one or more revisions.
  * @param revision The revision of the assessment under the given identifier (the identifier and the revision together are mapped to a single GUID which can be used to reference the assessment; only the GUID is required in this object).
- * @param label 
+ * @param label
  * @param minutesToComplete The number of minutes it takes for a participant to complete this assessment.
- * @param colorScheme 
+ * @param colorScheme
+ * @param configUrl The URL to download the configuration associated with this assessment.
  * @param type AssessmentInfo
  */
 @Serializable
@@ -50,6 +51,9 @@ data class AssessmentInfo (
     val minutesToComplete: Int? = null,
     @SerialName("colorScheme")
     val colorScheme: ColorScheme? = null,
+    /* The URL to download the configuration associated with this assessment. */
+    @SerialName("configUrl")
+    val configUrl: kotlin.String? = null,
     /* AssessmentInfo */
     @SerialName("type")
     val type: String? = null

@@ -79,6 +79,10 @@ public final class StudyObserver : ObservableObject, Identifiable {
     /// administration tools that is not part of the Bridge data model.
     @Published public var clientData: Data?
     
+    /// Has all the study information been loaded? Since this same observer is used for both a signed in and
+    /// *not* signed in study, we may need additional info after signin before continuing to onboarding.
+    @Published public var allLoaded: Bool = false
+    
     public init(identifier: String) {
         self.identifier = identifier
     }
@@ -102,6 +106,7 @@ public final class StudyObserver : ObservableObject, Identifiable {
             self.studyLogoUrl = study.studyLogoUrl
             self.updateColors(study.colorScheme)
             self.clientData = study.clientDataJson()
+            self.allLoaded = true
             
             self.contacts = study.contacts?.map { .init($0) } ?? []
             if let irbContact = findIRBContact(study) {
@@ -225,7 +230,7 @@ public struct StudyContact : Hashable, Identifiable {
         case .investigator:
             return Text("Investigator", bundle: .module)
         case .irb:
-            return Text("Investigator", bundle: .module)
+            return Text("IRB/Board of Ethics", bundle: .module)
         case .principalInvestigator:
             return Text("Principal Investigator", bundle: .module)
         case .sponsor:

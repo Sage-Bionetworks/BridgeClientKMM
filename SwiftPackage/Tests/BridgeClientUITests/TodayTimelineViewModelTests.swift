@@ -104,6 +104,100 @@ final class TodayTimelineViewModelTests: XCTestCase {
         session.updateState(previewSessionBEnd.addingTimeInterval(5))
         XCTAssertEqual(session.state, .expired)
     }
+    
+    func testUpdateSessionState_Declined() {
+        let window = previewSchedulesA[0]
+        let session = TodayTimelineSession(window)
+        XCTAssertEqual(session.state, .availableNow)
+        
+        guard session.assessments.count >= 2 else {
+            XCTFail("Assessments have been editted and no longer meet initial assumptions.")
+            return
+        }
+        
+        // Check initial assumptions
+        let assessmentA = session.assessments[0]
+        XCTAssertTrue(assessmentA.isEnabled)
+        XCTAssertFalse(assessmentA.isDeclined)
+        XCTAssertFalse(assessmentA.isCompleted)
+        let assessmentB = session.assessments[1]
+        XCTAssertFalse(assessmentB.isEnabled)
+        XCTAssertFalse(assessmentB.isDeclined)
+        XCTAssertFalse(assessmentB.isCompleted)
+        
+        assessmentA.isDeclined = true
+        session.updateState()
+        
+        // Check new state
+        XCTAssertTrue(assessmentB.isEnabled)
+    }
+    
+    func testUpdateSessionState_Completed() {
+        let window = previewSchedulesA[0]
+        let session = TodayTimelineSession(window)
+        XCTAssertEqual(session.state, .availableNow)
+        
+        guard session.assessments.count >= 2 else {
+            XCTFail("Assessments have been editted and no longer meet initial assumptions.")
+            return
+        }
+        
+        // Check initial assumptions
+        let assessmentA = session.assessments[0]
+        XCTAssertTrue(assessmentA.isEnabled)
+        XCTAssertFalse(assessmentA.isDeclined)
+        XCTAssertFalse(assessmentA.isCompleted)
+        let assessmentB = session.assessments[1]
+        XCTAssertFalse(assessmentB.isEnabled)
+        XCTAssertFalse(assessmentB.isDeclined)
+        XCTAssertFalse(assessmentB.isCompleted)
+        
+        assessmentA.isCompleted = true
+        session.updateState()
+        
+        // Check new state
+        XCTAssertTrue(assessmentB.isEnabled)
+    }
+    
+    func testUpdateAdherenceRecord_Declined() {
+        guard previewSessionBEnd.isToday else {
+            debugPrint("WARNING! Unit test will not work near midnight.")
+            return
+        }
+        
+        let bridgeManager = SingleStudyAppManager(appId: kPreviewStudyId)
+        let todayManager = TodayTimelineViewModel()
+        todayManager.onAppear(bridgeManager: bridgeManager, previewSchedules: previewSchedulesA)
+        
+        let sessions = todayManager.sessions
+        let session = sessions[0]
+        XCTAssertEqual(session.state, .availableNow)
+        
+        // Check initial assumptions
+        guard session.assessments.count >= 2 else {
+            XCTFail("Assessments have been editted and no longer meet initial assumptions.")
+            return
+        }
+
+        let assessmentA = session.assessments[0]
+        XCTAssertTrue(assessmentA.isEnabled)
+        XCTAssertFalse(assessmentA.isDeclined)
+        XCTAssertFalse(assessmentA.isCompleted)
+        let assessmentB = session.assessments[1]
+        XCTAssertFalse(assessmentB.isEnabled)
+        XCTAssertFalse(assessmentB.isDeclined)
+        XCTAssertFalse(assessmentB.isCompleted)
+        
+        todayManager.updateAdherenceRecord(scheduleInfo: assessmentA.assessmentScheduleInfo,
+                                           startedOn: Date(),
+                                           endedOn: nil,
+                                           declined: true,
+                                           clientData: nil)
+        
+        // Check new state
+        XCTAssertTrue(assessmentA.isDeclined)
+        XCTAssertTrue(assessmentB.isEnabled)
+    }
 }
 
 let previewAssessments = assessmentLabels.map {

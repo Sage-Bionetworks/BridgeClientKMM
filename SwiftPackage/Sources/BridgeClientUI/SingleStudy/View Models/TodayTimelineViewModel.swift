@@ -180,7 +180,7 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
                                            finishedOn: endedOn,
                                            declined: .init(booleanLiteral: declined),
                                            clientData: clientData?.toBridgeClientJsonElement())
-        self.timelineManager.updateAdherenceRecord(record: record)
+        self.timelineManager?.updateAdherenceRecord(record: record)
         
         // Look for a view model to update so that the completion status is updated immediately upon
         // dismissing the view instead of whenever the bridge repos get updated.
@@ -191,8 +191,9 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
             return
         }
 
-        if endedOn != nil && !declined && !session.window.persistent {
-            assessment.isCompleted = true
+        if (endedOn != nil || declined) && !session.window.persistent {
+            assessment.isCompleted = (endedOn != nil)
+            assessment.isDeclined = declined
             session.updateState()
         }
     }
@@ -304,7 +305,7 @@ public final class TodayTimelineSession : ObservableObject, Identifiable {
         var found = false
         var finishedOn: Date?
         let isCompleted = self.assessments.reduce(true) { (initial, assessment) in
-            let isNext = !found && !assessment.isCompleted
+            let isNext = !found && !(assessment.isCompleted || assessment.isDeclined)
             assessment.isEnabled = availableNow && (!performInOrder || isNext)
             assessment.assessmentScheduleInfo = .init(session: self.window, assessment: assessment.assessment)
             if isNext { found = true }

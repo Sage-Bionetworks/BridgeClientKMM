@@ -17,8 +17,20 @@ internal class SchedulesV2Api(basePath: String = BASE_PATH, httpClient: HttpClie
      * @param studyId Study identifier
      * @return Timeline
      */
-    suspend fun getTimelineForUser(studyId: String) : Timeline {
+    suspend fun getTimelineForUser(studyId: String): Timeline {
         return getData("/v5/studies/$studyId/participants/self/timeline")
+    }
+
+    /**
+     * Get the caller’s scheduled assessments in this study.
+     *
+     * @param studyId Study identifier
+     * @param clientTimeZone An IANA time zone name that should be used to calculate this schedule (the participant’s local time zone). This value will be persisted for the participant if it differs from the participant’s currently set time zone. (optional)
+     * @return ParticipantSchedule
+     */
+    suspend fun getParticipantScheduleForSelf(studyId: String, clientTimeZone: String? = null): ParticipantSchedule {
+        val params = clientTimeZone?.let{mapOf("clientTimeZone" to clientTimeZone)}
+        return getData("v5/studies/$studyId/participants/self/schedule", queryParams = params)
     }
 
     /**

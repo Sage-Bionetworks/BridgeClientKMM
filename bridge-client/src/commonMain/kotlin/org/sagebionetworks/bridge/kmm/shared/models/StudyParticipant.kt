@@ -18,7 +18,7 @@ import kotlinx.serialization.Serializable
 
 
 /**
- * StudyParticipant payload. The Participant API supports sparse updates, so all fields in this class are marked
+ * StudyParticipant payload. The Participant API supports sparse updates, so most fields in this class are marked
  * as EncodeDefault.Mode.NEVER.
  * @param firstName First name (given name) of the user.
  * @param lastName Last name (family name) of the user.
@@ -116,8 +116,7 @@ data class StudyParticipant (
 
     /* Client data for a user should be in a syntactically valid JSON format. It will be returned as is to the client (as JSON).  */
     @SerialName("clientData")
-    @EncodeDefault(EncodeDefault.Mode.NEVER)
-    val clientData: kotlinx.serialization.json.JsonObject? = null,
+    val clientData: kotlinx.serialization.json.JsonElement? = null,
 
     /* Two letter language codes to assign to this user (these are initially retrieved from the user's `Accept-Language` header and then persisted as part of account configuration).   */
     @SerialName("languages")

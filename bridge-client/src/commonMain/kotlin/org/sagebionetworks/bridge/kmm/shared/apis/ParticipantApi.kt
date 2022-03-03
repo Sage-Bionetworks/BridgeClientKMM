@@ -5,8 +5,10 @@ package org.sagebionetworks.bridge.kmm.shared.apis
 
 
 import io.ktor.client.*
-import org.sagebionetworks.bridge.kmm.shared.models.*
 import org.sagebionetworks.bridge.kmm.shared.models.Message
+import org.sagebionetworks.bridge.kmm.shared.models.ParticipantData
+import org.sagebionetworks.bridge.kmm.shared.models.StudyParticipant
+import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
 
 internal class ParticipantApi(basePath: String = BASE_PATH, httpClient: HttpClient) : AbstractApi(basePath, httpClient) {
 
@@ -32,6 +34,8 @@ internal class ParticipantApi(basePath: String = BASE_PATH, httpClient: HttpClie
         return getData("v3/users/self/data/$identifier")
     }
 
+    //This endpoint is probably not needed as the UserSessionInfo object returned as part of sign-in
+    //has almost all the data found in a StudyParticipant
     /**
      * Get user's participant record
      * Get the current user's participant record. Any authenticated user may call this endpoint. **The user does not need to have consented a study in the app in order to access their participant record.**
@@ -54,3 +58,4 @@ internal class ParticipantApi(basePath: String = BASE_PATH, httpClient: HttpClie
     }
 
 }
+

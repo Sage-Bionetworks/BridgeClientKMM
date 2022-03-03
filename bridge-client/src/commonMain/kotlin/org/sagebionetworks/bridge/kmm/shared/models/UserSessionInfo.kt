@@ -32,7 +32,7 @@ data class UserSessionInfo (
     val externalId: String? = null,
     /* An ID assigned to this account by Bridge system. This ID is exposed in the API and is different from the health code assigned to the user's anonymized data. Bridge never exports this ID along with the health code from Bridge.    */
     @SerialName("id")
-    val id: String? = null,
+    val id: String,
     /* True if the user has consented to be contacted via email outside the application, false otherwise.  */
     @SerialName("notifyByEmail")
     val notifyByEmail: Boolean? = null,

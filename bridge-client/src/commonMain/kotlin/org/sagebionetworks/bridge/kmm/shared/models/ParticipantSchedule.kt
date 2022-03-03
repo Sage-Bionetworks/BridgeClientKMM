@@ -28,7 +28,7 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class ParticipantSchedule (
-    
+
     /* The date and time this schedule was calculated. */
     @SerialName("createdOn")
     val createdOn: String,
@@ -47,6 +47,9 @@ data class ParticipantSchedule (
     
     @SerialName("studyBursts")
     val studyBursts: List<StudyBurstInfo>? = null,
+
+    @SerialName("eventTimestamps")
+    val eventTimestamps: Map<String, String>? = null,
 
     /* ParticipantSchedule */
     @SerialName("type")

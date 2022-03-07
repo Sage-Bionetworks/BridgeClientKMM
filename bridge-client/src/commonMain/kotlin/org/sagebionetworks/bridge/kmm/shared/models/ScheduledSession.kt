@@ -78,6 +78,14 @@ data class ScheduledSession (
     @SerialName("assessments")
     val assessments: List<ScheduledAssessment>,
 
+    /* Only set for the participant schedule. */
+    @SerialName("startDate")
+    val startDate: kotlin.String? = null,
+
+    /* Only set for the participant schedule. */
+    @SerialName("endDate")
+    val endDate: kotlin.String? = null,
+
     /* ScheduledSession */
     @SerialName("type")
     val type: String? = null

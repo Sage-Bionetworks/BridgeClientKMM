@@ -38,7 +38,11 @@ internal abstract class AbstractApi(protected val basePath: String, protected va
         }
     }
 
-    protected suspend inline fun <reified S: Any> getData(path: String, modifiedDateTimeString: String? = null) : S {
+    protected suspend inline fun <reified S : Any> getData(
+        path: String,
+        modifiedDateTimeString: String? = null,
+        queryParams: Map<String, String>? = null,
+    ): S {
         val builder = HttpRequestBuilder()
 
         builder.method = HttpMethod.Get
@@ -47,6 +51,13 @@ internal abstract class AbstractApi(protected val basePath: String, protected va
             encodedPath = encodedPath.let { startingPath ->
                 path(path)
                 return@let startingPath + encodedPath.substring(1)
+            }
+            with(parameters) {
+                queryParams?.let {
+                    it.entries.forEach { entry ->
+                        append(entry.key, entry.value)
+                    }
+                }
             }
         }
 

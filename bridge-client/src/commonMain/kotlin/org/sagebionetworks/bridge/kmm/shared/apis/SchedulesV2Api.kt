@@ -5,6 +5,7 @@ package org.sagebionetworks.bridge.kmm.shared.apis
 
 
 import io.ktor.client.*
+import kotlinx.datetime.TimeZone
 import org.sagebionetworks.bridge.kmm.shared.models.*
 
 internal class SchedulesV2Api(basePath: String = BASE_PATH, httpClient: HttpClient) : AbstractApi(basePath, httpClient) {
@@ -28,7 +29,7 @@ internal class SchedulesV2Api(basePath: String = BASE_PATH, httpClient: HttpClie
      * @param clientTimeZone An IANA time zone name that should be used to calculate this schedule (the participant’s local time zone). This value will be persisted for the participant if it differs from the participant’s currently set time zone. (optional)
      * @return ParticipantSchedule
      */
-    suspend fun getParticipantScheduleForSelf(studyId: String, clientTimeZone: String? = null): ParticipantSchedule {
+    suspend fun getParticipantScheduleForSelf(studyId: String, clientTimeZone: String = TimeZone.currentSystemDefault().toString()): ParticipantSchedule {
         val params = clientTimeZone?.let{mapOf("clientTimeZone" to clientTimeZone)}
         return getData("v5/studies/$studyId/participants/self/schedule", queryParams = params)
     }

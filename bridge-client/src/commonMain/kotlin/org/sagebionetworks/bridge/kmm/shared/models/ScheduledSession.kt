@@ -49,11 +49,11 @@ data class ScheduledSession (
     @SerialName("startEventId")
     val startEventId: String? = null,
 
-    @SerialName("startDay")
-    val startDay: Int,
-
-    @SerialName("endDay")
-    val endDay: Int,
+//    @SerialName("startDay")
+//    val startDay: Int,
+//
+//    @SerialName("endDay")
+//    val endDay: Int,
 
     @SerialName("startTime")
     val startTime: String,
@@ -81,11 +81,11 @@ data class ScheduledSession (
 
     /* Only set for the participant schedule. */
     @SerialName("startDate")
-    val startDate: LocalDate? = null,
+    val startDate: LocalDate,
 
     /* Only set for the participant schedule. */
     @SerialName("endDate")
-    val endDate: LocalDate? = null,
+    val endDate: LocalDate,
 
     /* ScheduledSession */
     @SerialName("type")

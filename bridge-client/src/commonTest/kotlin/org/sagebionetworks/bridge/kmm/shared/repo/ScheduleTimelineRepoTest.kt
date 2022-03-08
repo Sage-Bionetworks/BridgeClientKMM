@@ -21,8 +21,15 @@ class ScheduleTimelineRepoTest: BaseTest() {
     private val currentHourString = testHour.toString().padStart(2,'0')
     private val nextHourString = (testHour + 1).toString().padStart(2,'0')
 
-    private val scheduleJson = """{
+    private fun getScheduleJson(eventTimestamp: Instant) : String {
+        val localDate = eventTimestamp.toLocalDateTime(TimeZone.currentSystemDefault()).date
+        return """{
   "duration": "P4D",
+  "createdOn" : "2021-05-12T23:44:54.319Z",
+  "dateRange": {
+    "startDate": "2021-04-31",
+    "endDate": "2021-04-31"
+  },
   "assessments": [
     {
       "key": "711cde8b711cde8b",
@@ -109,6 +116,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
     {
       "instanceGuid": "mvhyXpjhxHDp7R9fyH02SA",
       "startEventId": "timeline_retrieved",
+      "startDate": "${localDate.plus(0, DateTimeUnit.DAY).toString()}",
+      "endDate": "${localDate.plus(0, DateTimeUnit.DAY).toString()}",
       "startDay": 0,
       "endDay": 0,
       "startTime": "$lastHourString:00",
@@ -128,6 +137,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
     {
       "instanceGuid": "QaqwdxDjRc5FzUIAhBHRwA",
       "startEventId": "timeline_retrieved",
+      "startDate": "${localDate.plus(0, DateTimeUnit.DAY).toString()}",
+      "endDate": "${localDate.plus(0, DateTimeUnit.DAY).toString()}",
       "startDay": 0,
       "endDay": 0,
       "startTime": "$currentHourString:00",
@@ -146,6 +157,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
     {
       "instanceGuid": "SL97UWo1ZQEA1tQKKVFkUA",
       "startEventId": "timeline_retrieved",
+      "startDate": "${localDate.plus(0, DateTimeUnit.DAY).toString()}",
+      "endDate": "${localDate.plus(0, DateTimeUnit.DAY).toString()}",
       "startDay": 0,
       "endDay": 0,
       "startTime": "$nextHourString:00",
@@ -164,6 +177,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
     {
       "instanceGuid": "GMJvrk1HuOmw7Uote5J4sw",
       "startEventId": "timeline_retrieved",
+      "startDate": "${localDate.plus(0, DateTimeUnit.DAY).toString()}",
+      "endDate": "${localDate.plus(2, DateTimeUnit.DAY).toString()}",
       "startDay": 0,
       "endDay": 2,
       "startTime": "00:00",
@@ -182,6 +197,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
     {
       "instanceGuid": "lVJ-cmbE3cxDWvXcc61tWw",
       "startEventId": "timeline_retrieved",
+      "startDate": "${localDate.plus(1, DateTimeUnit.DAY).toString()}",
+      "endDate": "${localDate.plus(1, DateTimeUnit.DAY).toString()}",
       "startDay": 1,
       "endDay": 1,
       "startTime": "$lastHourString:00",
@@ -201,6 +218,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
     {
       "instanceGuid": "XlZ3SrLpmEQ2E8PuUUcs7g",
       "startEventId": "timeline_retrieved",
+      "startDate": "${localDate.plus(1, DateTimeUnit.DAY).toString()}",
+      "endDate": "${localDate.plus(1, DateTimeUnit.DAY).toString()}",
       "startDay": 1,
       "endDay": 1,
       "startTime": "$currentHourString:00",
@@ -219,6 +238,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
     {
       "instanceGuid": "-B_yTKp8eTGK7NY_qJ0UTA",
       "startEventId": "timeline_retrieved",
+      "startDate": "${localDate.plus(1, DateTimeUnit.DAY).toString()}",
+      "endDate": "${localDate.plus(1, DateTimeUnit.DAY).toString()}",
       "startDay": 1,
       "endDay": 1,
       "startTime": "$nextHourString:00",
@@ -237,6 +258,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
     {
       "instanceGuid": "6YyBNuEPir0Vkd3a-crQbA",
       "startEventId": "timeline_retrieved",
+      "startDate": "${localDate.plus(2, DateTimeUnit.DAY).toString()}",
+      "endDate": "${localDate.plus(2, DateTimeUnit.DAY).toString()}",
       "startDay": 2,
       "endDay": 2,
       "startTime": "$lastHourString:00",
@@ -256,6 +279,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
     {
       "instanceGuid": "CDWlxjraDB_yn_jUl0YagA",
       "startEventId": "timeline_retrieved",
+      "startDate": "${localDate.plus(2, DateTimeUnit.DAY).toString()}",
+      "endDate": "${localDate.plus(2, DateTimeUnit.DAY).toString()}",
       "startDay": 2,
       "endDay": 2,
       "startTime": "$currentHourString:00",
@@ -274,6 +299,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
     {
       "instanceGuid": "wSFtq35JbCog5s4TXXMNRw",
       "startEventId": "timeline_retrieved",
+      "startDate": "${localDate.plus(2, DateTimeUnit.DAY).toString()}",
+      "endDate": "${localDate.plus(2, DateTimeUnit.DAY).toString()}",
       "startDay": 2,
       "endDay": 2,
       "startTime": "$nextHourString:00",
@@ -292,6 +319,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
     {
       "instanceGuid": "T8X0XUUwUwcr3k6zEh7cBw",
       "startEventId": "timeline_retrieved",
+      "startDate": "${localDate.plus(3, DateTimeUnit.DAY).toString()}",
+      "endDate": "${localDate.plus(3, DateTimeUnit.DAY).toString()}",
       "startDay": 3,
       "endDay": 3,
       "startTime": "$lastHourString:00",
@@ -311,6 +340,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
     {
       "instanceGuid": "ud-UBuDNBFHDtDrx9YodFA",
       "startEventId": "timeline_retrieved",
+      "startDate": "${localDate.plus(3, DateTimeUnit.DAY).toString()}",
+      "endDate": "${localDate.plus(3, DateTimeUnit.DAY).toString()}",
       "startDay": 3,
       "endDay": 3,
       "startTime": "$currentHourString:00",
@@ -329,6 +360,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
     {
       "instanceGuid": "CukddPZ9eXREe7lxuL0cXQ",
       "startEventId": "timeline_retrieved",
+      "startDate": "${localDate.plus(3, DateTimeUnit.DAY).toString()}",
+      "endDate": "${localDate.plus(3, DateTimeUnit.DAY).toString()}",
       "startDay": 3,
       "endDay": 3,
       "startTime": "$nextHourString:00",
@@ -345,8 +378,12 @@ class ScheduleTimelineRepoTest: BaseTest() {
       "type": "ScheduledSession"
     }
   ],
-  "type": "Timeline"
+  "eventTimestamps": {
+    "timeline_retrieved" : "${eventTimestamp.toString()}"
+  }
+  "type": "ParticipantSchedule"
 }"""
+    }
     
     private val assessmentInstanceGuid = "oJp7v2cGXZHVZlLhy1lLuw"
 
@@ -402,7 +439,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
         return LocalDateTime(year = nowDateTime.year, month = nowDateTime.month, dayOfMonth = nowDateTime.dayOfMonth, hour = hour, minute = 0, second = 0)
     }
 
-    private fun getTestScheduleTimelineRepo(adherenceRecordJson: String = "", timeStamp: Instant, timelineJson: String = scheduleJson ) : ScheduleTimelineRepo {
+    private fun getTestScheduleTimelineRepo(adherenceRecordJson: String = "", timeStamp: Instant, timelineJson: String = getScheduleJson(timeStamp) ) : ScheduleTimelineRepo {
         val databaseHelper = ResourceDatabaseHelper(testDatabaseDriver())
         val adherenceRecordRepo = AdherenceRecordRepo(getTestClient(adherenceRecordJson), databaseHelper, MainScope())
         val eventJson = Json.encodeToString(getActivityEventList(timeStamp))
@@ -824,9 +861,16 @@ class ScheduleTimelineRepoTest: BaseTest() {
         }
     }
 
-    val anotherTimelineJson = """
+    private fun getAnotherTimelineJson(eventTimestamp: Instant) : String {
+        val localDate = eventTimestamp.toLocalDateTime(TimeZone.currentSystemDefault()).date
+        return """
         {
           "duration": "P14D",
+            "createdOn" : "2021-05-12T23:44:54.319Z",
+            "dateRange": {
+              "startDate": "2021-04-31",
+              "endDate": "2021-04-31"
+            },
           "assessments": [
             {
               "key": "dc1233b8dc1233b8",
@@ -953,6 +997,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "nOxPwjY7NHUT3TTycwKEBA",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(0, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(0, DateTimeUnit.DAY)}",
               "startDay": 0,
               "endDay": 0,
               "startTime": "00:00",
@@ -976,6 +1022,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "ThAm_QQhXzmDTSqZvwId9w",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(0, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(13, DateTimeUnit.DAY)}",
               "startDay": 0,
               "endDay": 13,
               "startTime": "08:00",
@@ -994,6 +1042,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "dZgGdCY1yGjgEsR_2dCpDw",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(1, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(1, DateTimeUnit.DAY)}",              
               "startDay": 1,
               "endDay": 1,
               "startTime": "08:00",
@@ -1017,6 +1067,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "X6EZVkCKn2IAxCH2IjtAOg",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(1, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(1, DateTimeUnit.DAY)}",              
               "startDay": 1,
               "endDay": 1,
               "startTime": "12:00",
@@ -1040,6 +1092,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "VrHccNtXWCYCF6HevtugoA",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(1, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(1, DateTimeUnit.DAY)}",              
               "startDay": 1,
               "endDay": 1,
               "startTime": "16:00",
@@ -1063,6 +1117,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "OKqyj8n5JS9sUJulgkV1NA",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(1, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(1, DateTimeUnit.DAY)}",              
               "startDay": 1,
               "endDay": 1,
               "startTime": "20:00",
@@ -1086,6 +1142,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "DniX7C5U0B4xypVYye86KQ",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(2, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(2, DateTimeUnit.DAY)}",              
               "startDay": 2,
               "endDay": 2,
               "startTime": "08:00",
@@ -1109,6 +1167,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "uHHW76vdPKXE5Lq0gwFbUg",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(2, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(2, DateTimeUnit.DAY)}",               
               "startDay": 2,
               "endDay": 2,
               "startTime": "12:00",
@@ -1132,6 +1192,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "TwPdGgYbWFjEgokjLq9VzQ",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(2, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(2, DateTimeUnit.DAY)}",               
               "startDay": 2,
               "endDay": 2,
               "startTime": "16:00",
@@ -1155,6 +1217,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "lwD2tuHL4JepunrK9zQE_w",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(2, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(2, DateTimeUnit.DAY)}", 
               "startDay": 2,
               "endDay": 2,
               "startTime": "20:00",
@@ -1178,6 +1242,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "kyPblY4nsFlEAqul-WelaA",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(3, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(3, DateTimeUnit.DAY)}", 
               "startDay": 3,
               "endDay": 3,
               "startTime": "08:00",
@@ -1201,6 +1267,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "j1bTWsXY7QhNfSl6w-GEcQ",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(3, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(3, DateTimeUnit.DAY)}",              
               "startDay": 3,
               "endDay": 3,
               "startTime": "12:00",
@@ -1224,6 +1292,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "MA0SvIZ4vR2izxAYtUJk7Q",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(3, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(3, DateTimeUnit.DAY)}",              
               "startDay": 3,
               "endDay": 3,
               "startTime": "16:00",
@@ -1247,6 +1317,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "6rBTmQ9FW9eWS7FNo5Oj1g",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(3, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(3, DateTimeUnit.DAY)}",                
               "startDay": 3,
               "endDay": 3,
               "startTime": "20:00",
@@ -1270,6 +1342,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "l6SlqzbU0AXVmnwBux6TIQ",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(4, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(4, DateTimeUnit.DAY)}",                
               "startDay": 4,
               "endDay": 4,
               "startTime": "08:00",
@@ -1293,6 +1367,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "P5EI9DMKQ82nC3MOB3eNiw",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(4, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(4, DateTimeUnit.DAY)}",               
               "startDay": 4,
               "endDay": 4,
               "startTime": "12:00",
@@ -1316,6 +1392,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "giGvPYyUMuwRskfpdMYn8A",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(4, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(4, DateTimeUnit.DAY)}",               
               "startDay": 4,
               "endDay": 4,
               "startTime": "16:00",
@@ -1339,6 +1417,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "uD0_MjFe1wzOnyx5cQH0xQ",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(4, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(4, DateTimeUnit.DAY)}",               
               "startDay": 4,
               "endDay": 4,
               "startTime": "20:00",
@@ -1362,6 +1442,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "rFjZK6ochbO1sw9X6d0enA",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(5, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(5, DateTimeUnit.DAY)}",               
               "startDay": 5,
               "endDay": 5,
               "startTime": "08:00",
@@ -1385,6 +1467,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "Jw70ZIG0qScw9MLff8ZInw",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(5, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(5, DateTimeUnit.DAY)}",               
               "startDay": 5,
               "endDay": 5,
               "startTime": "12:00",
@@ -1408,6 +1492,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "iOWd51qEH5zcr1PuCfQyZg",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(5, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(5, DateTimeUnit.DAY)}",               
               "startDay": 5,
               "endDay": 5,
               "startTime": "16:00",
@@ -1431,6 +1517,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "NLTGtgQpLhle2vfAqGvRCw",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(5, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(5, DateTimeUnit.DAY)}",               
               "startDay": 5,
               "endDay": 5,
               "startTime": "20:00",
@@ -1454,6 +1542,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "vdJZbg_euSqgq6tngiPgew",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(6, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(6, DateTimeUnit.DAY)}",               
               "startDay": 6,
               "endDay": 6,
               "startTime": "08:00",
@@ -1477,6 +1567,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "pwkI7DwAg0Q6JCODdAvhAA",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(6, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(6, DateTimeUnit.DAY)}",               
               "startDay": 6,
               "endDay": 6,
               "startTime": "12:00",
@@ -1500,6 +1592,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "aWPy6fkzC5dgZuvCWT959g",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(6, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(6, DateTimeUnit.DAY)}",               
               "startDay": 6,
               "endDay": 6,
               "startTime": "16:00",
@@ -1523,6 +1617,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "W3KoWzXOblPaMgdx2wQ4nA",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(6, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(6, DateTimeUnit.DAY)}",               
               "startDay": 6,
               "endDay": 6,
               "startTime": "20:00",
@@ -1546,6 +1642,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "ZQsM6-v0EdAo48LzWcmSLw",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(7, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(7, DateTimeUnit.DAY)}",               
               "startDay": 7,
               "endDay": 7,
               "startTime": "08:00",
@@ -1569,6 +1667,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "yNQL_AbVhm2vZ_IApPqC1A",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(7, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(7, DateTimeUnit.DAY)}",                
               "startDay": 7,
               "endDay": 7,
               "startTime": "12:00",
@@ -1592,6 +1692,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "SD4ShKOLpViV_bJ1FLXR5g",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(7, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(7, DateTimeUnit.DAY)}",                
               "startDay": 7,
               "endDay": 7,
               "startTime": "16:00",
@@ -1615,6 +1717,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "-CrkR8n59kdiafSm0BWK1g",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(7, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(7, DateTimeUnit.DAY)}",                
               "startDay": 7,
               "endDay": 7,
               "startTime": "20:00",
@@ -1638,6 +1742,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "NQMZjXUJMs0FrIsDInfOVQ",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(8, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(8, DateTimeUnit.DAY)}",                
               "startDay": 8,
               "endDay": 8,
               "startTime": "08:00",
@@ -1661,6 +1767,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "GNOfp11mqzcRZSRWumyGeg",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(8, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(8, DateTimeUnit.DAY)}",               
               "startDay": 8,
               "endDay": 8,
               "startTime": "12:00",
@@ -1684,6 +1792,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "QM9ByC-ShFk_cOxB4JRT3A",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(8, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(8, DateTimeUnit.DAY)}",               
               "startDay": 8,
               "endDay": 8,
               "startTime": "16:00",
@@ -1707,6 +1817,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "g9Oah5HWUEjl16MAm4b6Ww",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(8, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(8, DateTimeUnit.DAY)}",               
               "startDay": 8,
               "endDay": 8,
               "startTime": "20:00",
@@ -1730,6 +1842,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "Qf3NqFMI56a5NE-vKHnVKQ",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(9, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(9, DateTimeUnit.DAY)}",               
               "startDay": 9,
               "endDay": 9,
               "startTime": "08:00",
@@ -1753,6 +1867,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "Vnp-eZGLbhid4jj6-f_jMg",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(9, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(9, DateTimeUnit.DAY)}",              
               "startDay": 9,
               "endDay": 9,
               "startTime": "12:00",
@@ -1776,6 +1892,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "jMXilzbGJ1ZTybKNktikGw",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(9, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(9, DateTimeUnit.DAY)}",              
               "startDay": 9,
               "endDay": 9,
               "startTime": "16:00",
@@ -1799,6 +1917,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "U1e_gR8nKJlGdt242jRPzQ",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(9, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(9, DateTimeUnit.DAY)}",              
               "startDay": 9,
               "endDay": 9,
               "startTime": "20:00",
@@ -1822,6 +1942,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "MQgwjGGZ8P0iSdDBrjTs7w",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(10, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(10, DateTimeUnit.DAY)}",              
               "startDay": 10,
               "endDay": 10,
               "startTime": "08:00",
@@ -1845,6 +1967,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "A9rn_uuoALJJN8NePWX79w",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(10, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(10, DateTimeUnit.DAY)}",                
               "startDay": 10,
               "endDay": 10,
               "startTime": "12:00",
@@ -1868,6 +1992,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "QNTCjA8neW1a6XLcYXCMBA",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(10, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(10, DateTimeUnit.DAY)}",                
               "startDay": 10,
               "endDay": 10,
               "startTime": "16:00",
@@ -1891,6 +2017,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "I4VqNO8pxDTJP-y_MdVMxw",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(10, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(10, DateTimeUnit.DAY)}",                
               "startDay": 10,
               "endDay": 10,
               "startTime": "20:00",
@@ -1914,6 +2042,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "FaXKUDUzfOa7K8enQziSXg",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(11, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(11, DateTimeUnit.DAY)}",                
               "startDay": 11,
               "endDay": 11,
               "startTime": "08:00",
@@ -1937,6 +2067,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "syA10fqf9pC9yFH2v_-Jog",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(11, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(11, DateTimeUnit.DAY)}",                  
               "startDay": 11,
               "endDay": 11,
               "startTime": "12:00",
@@ -1960,6 +2092,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "OnJfYYJWOdDo1kB8a_cwGg",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(11, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(11, DateTimeUnit.DAY)}",                  
               "startDay": 11,
               "endDay": 11,
               "startTime": "16:00",
@@ -1983,6 +2117,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "pUHJMB8me5RZSwBvh0aVRQ",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(11, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(11, DateTimeUnit.DAY)}",                  
               "startDay": 11,
               "endDay": 11,
               "startTime": "20:00",
@@ -2006,6 +2142,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "05yo3I9_J0JXoRyDnK9ozg",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(12, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(12, DateTimeUnit.DAY)}",                  
               "startDay": 12,
               "endDay": 12,
               "startTime": "08:00",
@@ -2029,6 +2167,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "yU8j4qPFXzzmYftY4wXAjg",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(12, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(12, DateTimeUnit.DAY)}",                
               "startDay": 12,
               "endDay": 12,
               "startTime": "12:00",
@@ -2052,6 +2192,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "KabvPi8pVsxCYcgms6TAtQ",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(12, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(12, DateTimeUnit.DAY)}",                
               "startDay": 12,
               "endDay": 12,
               "startTime": "16:00",
@@ -2075,6 +2217,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "wNocyu1jziUvzMMw_hdlUA",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(12, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(12, DateTimeUnit.DAY)}",                
               "startDay": 12,
               "endDay": 12,
               "startTime": "20:00",
@@ -2098,6 +2242,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "OwSRw6xhV6DGe4spox1Clg",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(13, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(13, DateTimeUnit.DAY)}",                
               "startDay": 13,
               "endDay": 13,
               "startTime": "08:00",
@@ -2121,6 +2267,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "00BFDR2exM4DOndrFuEpvg",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(13, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(13, DateTimeUnit.DAY)}",               
               "startDay": 13,
               "endDay": 13,
               "startTime": "12:00",
@@ -2144,6 +2292,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "2ncJd1Uv2XTEfuZ5CvzBTg",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(13, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(13, DateTimeUnit.DAY)}",               
               "startDay": 13,
               "endDay": 13,
               "startTime": "16:00",
@@ -2167,6 +2317,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             {
               "instanceGuid": "susczRAQQeGx4g5zmpmZlw",
               "startEventId": "timeline_retrieved",
+              "startDate": "${localDate.plus(13, DateTimeUnit.DAY)}",
+              "endDate": "${localDate.plus(13, DateTimeUnit.DAY)}",               
               "startDay": 13,
               "endDay": 13,
               "startTime": "20:00",
@@ -2188,15 +2340,19 @@ class ScheduleTimelineRepoTest: BaseTest() {
               "type": "ScheduledSession"
             }
           ],
-          "type": "Timeline"
+            "eventTimestamps": {
+              "timeline_retrieved" : "${eventTimestamp.toString()}"
+            }
+          "type": "ParticipantSchedule"
         }
     """.trimIndent()
+    }
 
     @Test
     fun testAnotherScheduleDay0() {
         runTest {
             val eventTimeStamp = Clock.System.now()
-            val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp, timelineJson = anotherTimelineJson)
+            val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp, timelineJson = getAnotherTimelineJson(eventTimeStamp))
 
             val now = getTodayInstant(17)
             val resourceResult = repo.getSessionsForDay("sage-assessment-test", now).firstOrNull { it is ResourceResult.Success }

@@ -331,41 +331,30 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
     ): ScheduledSessionWindow? {
         val eventTimestamp = eventMap?.get(scheduledSession.startEventId) ?: return null
 
-        // Convert the event timestamp to a LocalDate
-        val eventLocalDate = eventTimestamp.toLocalDateTime(timezone).date
-        // Get number of days since the event date
-        val daysSince = eventLocalDate.daysUntil(day)
-
-
         fun rulesForNotifications() =
-            scheduledSession.startDay >= daysSince && !session.notifications.isNullOrEmpty()
+            scheduledSession.startDate >= day && !session.notifications.isNullOrEmpty()
         fun rulesForAvailableToday() =
-            (daysSince in scheduledSession.startDay..scheduledSession.endDay)
+            (scheduledSession.startDate <= day && scheduledSession.endDate >= day)
         fun rulesForToday(startDate: LocalDate? = null) = when {
             foundState.foundToday && !alwaysIncludeNextDay -> rulesForAvailableToday()
             startDate != null && foundState.nextDay != null -> startDate <= foundState.nextDay!!
-            else -> scheduledSession.endDay >= daysSince
+            else -> scheduledSession.endDate >= day
         }
         // Exit early if this schedule is not in the range that we are looking for
         if (!when (filterType) {
             WindowFilterType.Notifications -> rulesForNotifications()
-            WindowFilterType.Future -> scheduledSession.startDay > daysSince
-            WindowFilterType.Past -> scheduledSession.startDay <= daysSince
+            WindowFilterType.Future -> scheduledSession.startDate > day
+            WindowFilterType.Past -> scheduledSession.startDate <= day
             WindowFilterType.Today -> rulesForToday()
             WindowFilterType.TodayAndNotifications -> rulesForToday() || rulesForNotifications()
         }) {
             return null
         }
 
-        //Used for sorting when sessions span multiple days
-        val startDaysFromDay = scheduledSession.startDay - daysSince
-        val startDate = day.plus(startDaysFromDay.toLong(), DateTimeUnit.DayBased(1))
-
         // LocalTime support is hopefully coming: https://github.com/Kotlin/kotlinx-datetime/issues/57#issuecomment-800287971
         // Construct a startDateTime from today and startTime
-
         val startDateTimeString =
-            startDate.toString() + "T" + scheduledSession.startTime
+            scheduledSession.startDate.toString() + "T" + scheduledSession.startTime
         val startDateTime = LocalDateTime.parse(startDateTimeString)
 
         val startInstant = startDateTime.toInstant(timezone)
@@ -391,9 +380,9 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         // but *not* available NOW then track that.
         if (rulesForAvailableToday() && startInstant > instantInDay) {
             foundState.foundToday = true
-        } else if (alwaysIncludeNextDay && startDate > day &&
-            (foundState.nextDay == null || foundState.nextDay!! > startDate)) {
-            foundState.nextDay = startDate
+        } else if (alwaysIncludeNextDay && scheduledSession.startDate > day &&
+            (foundState.nextDay == null || foundState.nextDay!! > scheduledSession.startDate)) {
+            foundState.nextDay = scheduledSession.startDate
         }
 
         // Convert notifications
@@ -403,7 +392,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         // Exit early if this is only getting future notifications and there aren't any.
         if (notifications.isNullOrEmpty() &&
             filterType.isNotifications() &&
-            (!filterType.isToday() || !rulesForToday(startDate))) {
+            (!filterType.isToday() || !rulesForToday(scheduledSession.startDate))) {
             return null
         }
 

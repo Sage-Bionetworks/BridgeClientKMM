@@ -35,7 +35,7 @@ data class ParticipantSchedule (
     val createdOn: String,
 
     @SerialName("dateRange")
-    val dateRange: DateRange,
+    val dateRange: DateRange? = null,
 
     @SerialName("schedule")
     val schedule: List<ScheduledSession>? = null,

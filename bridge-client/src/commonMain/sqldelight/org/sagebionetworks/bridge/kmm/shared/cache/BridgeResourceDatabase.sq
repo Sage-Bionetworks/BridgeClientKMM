@@ -13,6 +13,12 @@ needSave INTEGER AS Boolean NOT NULL DEFAULT 0,
 PRIMARY KEY (identifier, secondaryId, type, studyId)
 );
 
+CREATE TABLE EtagCache (
+url TEXT NOT NULL,
+etag TEXT NOT NULL,
+PRIMARY KEY (url)
+);
+
 insertUpdateResource:
 INSERT OR REPLACE INTO Resource(identifier, secondaryId, type, studyId, json, lastUpdate, status, needSave)
 VALUES(?, ?,?, ?, ?, ?, ?, ?);
@@ -47,3 +53,18 @@ WHERE identifier IN ? AND type = ? AND studyId = ?;
 selectResourceNeedSave:
 SELECT * FROM Resource
 WHERE needSave = 1 AND type = ? AND studyId = ?;
+
+selectEtag:
+SELECT * FROM EtagCache
+WHERE url = ?;
+
+insertUpdateEtag:
+INSERT OR REPLACE INTO EtagCache(url, etag)
+VALUES(?, ?);
+
+removeEtag:
+DELETE FROM EtagCache
+WHERE url = ? ;
+
+removeAllEtags:
+DELETE FROM EtagCache;

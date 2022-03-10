@@ -1,7 +1,6 @@
 package org.sagebionetworks.bridge.kmm.shared.di
 
 import io.ktor.client.*
-import io.ktor.client.call.*
 import io.ktor.client.features.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
@@ -11,13 +10,15 @@ import io.ktor.client.statement.*
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import org.sagebionetworks.bridge.kmm.shared.BridgeConfig
+import org.sagebionetworks.bridge.kmm.shared.apis.EtagFeature
 import org.sagebionetworks.bridge.kmm.shared.apis.RefreshTokenFeature
 import org.sagebionetworks.bridge.kmm.shared.apis.SessionTokenFeature
+import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
 import org.sagebionetworks.bridge.kmm.shared.repo.AuthenticationRepository
 
 fun httpClientModule(enableNetworkLogs: Boolean) = module {
     //HttpClient configured with session token and refresh token features for Bridge calls
-    single { createBridgeHttpClient(enableNetworkLogs, get(), get()) }
+    single { createBridgeHttpClient(enableNetworkLogs, get(), get(), get()) }
 
     //HttpClient configured for use with AuthenticationAPI, it needs its own HttpClient so as not to
     // include the re-authentication feature found in DefaultHttpClient, which would cause a dependency loop
@@ -32,7 +33,8 @@ fun httpClientModule(enableNetworkLogs: Boolean) = module {
 private fun createBridgeHttpClient(
     enableNetworkLogs: Boolean,
     bridgeConfig: BridgeConfig,
-    authenticationRepository: AuthenticationRepository
+    authenticationRepository: AuthenticationRepository,
+    etagStorageCache: ResourceDatabaseHelper
 ) = HttpClient {
     val sessionTokenHeaderKey = "Bridge-Session"
 
@@ -44,6 +46,9 @@ private fun createBridgeHttpClient(
         serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
             ignoreUnknownKeys = true
         })
+    }
+    install(EtagFeature) {
+        storageCache = etagStorageCache
     }
 
     if (enableNetworkLogs) {

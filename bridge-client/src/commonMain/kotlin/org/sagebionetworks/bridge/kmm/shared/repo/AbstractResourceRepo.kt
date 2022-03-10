@@ -78,13 +78,14 @@ abstract class AbstractResourceRepo(val database: ResourceDatabaseHelper, protec
                 )
                 database.insertUpdateResource(resource)
             } catch (err: Throwable) {
-                resource = processResponseException(identifier, resourceType, studyId, curResource, err)
+                resource = processResponseException(database, identifier, resourceType, studyId, curResource, err)
                 database.insertUpdateResource(resource)
             }
             return resource
         }
 
         private fun processResponseException(
+            database: ResourceDatabaseHelper,
             identifier: String,
             resourceType: ResourceType,
             studyId: String,
@@ -101,8 +102,15 @@ abstract class AbstractResourceRepo(val database: ResourceDatabaseHelper, protec
                         HttpStatusCode.NotModified -> {
                             // 304 not modified
                             // Update last modified time.
-                            status = ResourceStatus.SUCCESS
-                            lastUpdate = Clock.System.now().toEpochMilliseconds()
+                            if (json.isNullOrEmpty()) {
+                                //Shouldn't ever get here, but just in case.
+                                //Don't actually have resource loaded, even though we got a 304
+                                database.putEtag(throwable.response.call.request.url.toString(), null)
+                                status = ResourceStatus.RETRY
+                            } else {
+                                status = ResourceStatus.SUCCESS
+                                lastUpdate = Clock.System.now().toEpochMilliseconds()
+                            }
                         }
 
                         HttpStatusCode.Unauthorized -> {

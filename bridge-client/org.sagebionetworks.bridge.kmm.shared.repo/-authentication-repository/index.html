@@ -13,7 +13,7 @@ if(savedDarkMode === true){
     <div class="navigation-wrapper" id="navigation-wrapper">
       <div id="leftToggler"><span class="icon-toggler"></span></div>
       <div class="library-name"><a href="../../../index.html"><span>BridgeClientKMM</span></a></div>
-      <div>0.3.2</div>
+      <div>0.3.4</div>
       <div class="pull-right d-flex">
         <div class="filter-section" id="filter-section"><button class="platform-tag platform-selector common-like" data-active="" data-filter=":bridge-client:dokkaHtmlPartial/commonMain">common</button></div>
 <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
@@ -31,7 +31,7 @@ if(savedDarkMode === true){
             <h1 class="cover"><span>Authentication</span><wbr><span><span>Repository</span></span></h1>
             <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
               <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/commonMain">common</button></div>
-<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">AuthenticationRepository</a><span class="token punctuation">(</span>httpClient<span class="token operator">: </span><span data-unresolved-link="io.ktor.client/HttpClient///PointingToDeclaration/">HttpClient</span><span class="token punctuation">, </span>bridgeConfig<span class="token operator">: </span><a href="../../org.sagebionetworks.bridge.kmm.shared/-bridge-config/index.html">BridgeConfig</a><span class="token punctuation">, </span>database<span class="token operator">: </span><a href="../../org.sagebionetworks.bridge.kmm.shared.cache/-resource-database-helper/index.html">ResourceDatabaseHelper</a><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>            </div>
+<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">AuthenticationRepository</a><span class="token punctuation">(</span>authHttpClient<span class="token operator">: </span><span data-unresolved-link="io.ktor.client/HttpClient///PointingToDeclaration/">HttpClient</span><span class="token punctuation">, </span>bridgeConfig<span class="token operator">: </span><a href="../../org.sagebionetworks.bridge.kmm.shared/-bridge-config/index.html">BridgeConfig</a><span class="token punctuation">, </span>database<span class="token operator">: </span><a href="../../org.sagebionetworks.bridge.kmm.shared.cache/-resource-database-helper/index.html">ResourceDatabaseHelper</a><span class="token punctuation">, </span>backgroundScope<span class="token operator">: </span><span data-unresolved-link="kotlinx.coroutines/CoroutineScope///PointingToDeclaration/">CoroutineScope</span><span class="token punctuation">)</span> : <span data-unresolved-link="org.koin.core.component/KoinComponent///PointingToDeclaration/">KoinComponent</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>            </div>
           </div>
           <div class="tabbedcontent">
             <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Functions">Functions</button><button class="section-tab" data-togglable="Properties">Properties</button></div>
@@ -47,7 +47,22 @@ if(savedDarkMode === true){
                       <div class="title">
                         <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
                           <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/commonMain">common</button></div>
-<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="current-study-id.html"><span class="token function">currentStudyId</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>                        </div>
+<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="current-study-id.html"><span class="token function">currentStudyId</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Get the ID of the current study.</p></div></div>                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="894441567%2FFunctions%2F-202008714" anchor-label="getKoin" id="894441567%2FFunctions%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a>
+                <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="index.html#894441567%2FFunctions%2F-202008714"><span>get</span><wbr><span><span>Koin</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="894441567%2FFunctions%2F-202008714"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/commonMain">common</button></div>
+<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html#894441567%2FFunctions%2F-202008714"><span class="token function">getKoin</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="org.koin.core/Koin///PointingToDeclaration/">Koin</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>                        </div>
                       </div>
                     </div>
                   </div>
@@ -62,7 +77,7 @@ if(savedDarkMode === true){
                       <div class="title">
                         <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
                           <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/commonMain">common</button></div>
-<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="is-authenticated.html"><span class="token function">isAuthenticated</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>                        </div>
+<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="is-authenticated.html"><span class="token function">isAuthenticated</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Is the current session authenticated.</p></div></div>                        </div>
                       </div>
                     </div>
                   </div>
@@ -93,6 +108,36 @@ if(savedDarkMode === true){
                         <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
                           <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/commonMain">common</button></div>
 <div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="re-auth.html"><span class="token function">reAuth</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="629428661%2FFunctions%2F-202008714" anchor-label="requestPhoneSignIn" id="629428661%2FFunctions%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a>
+                <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="request-phone-sign-in.html"><span>request</span><wbr><span>Phone</span><wbr><span>Sign</span><wbr><span><span>In</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="629428661%2FFunctions%2F-202008714"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/commonMain">common</button></div>
+<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="request-phone-sign-in.html"><span class="token function">requestPhoneSignIn</span></a><span class="token punctuation">(</span>number<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span>regionCode<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Will send an SMS message with a code that can be used to call the server and generate a session.</p></div></div>                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-423617454%2FFunctions%2F-202008714" anchor-label="resendPhoneVerification" id="-423617454%2FFunctions%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a>
+                <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="resend-phone-verification.html"><span>resend</span><wbr><span>Phone</span><wbr><span><span>Verification</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-423617454%2FFunctions%2F-202008714"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/commonMain">common</button></div>
+<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="resend-phone-verification.html"><span class="token function">resendPhoneVerification</span></a><span class="token punctuation">(</span>number<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span>regionCode<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Resend an SMS message to the provided phone number asking the recipient to verify their  phone number. Whether the phone has been registered or not through sign up, this method will return 200 in order to prevent \"account enumeration\" security breaches.</p></div></div>                        </div>
                       </div>
                     </div>
                   </div>
@@ -157,6 +202,21 @@ if(savedDarkMode === true){
                     </div>
                   </div>
                 </div>
+<a data-name="1571967317%2FFunctions%2F-202008714" anchor-label="signInPhone" id="1571967317%2FFunctions%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a>
+                <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="sign-in-phone.html"><span>sign</span><wbr><span>In</span><wbr><span><span>Phone</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1571967317%2FFunctions%2F-202008714"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/commonMain">common</button></div>
+<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="sign-in-phone.html"><span class="token function">signInPhone</span></a><span class="token punctuation">(</span>token<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span>number<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span>regionCode<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../org.sagebionetworks.bridge.kmm.shared.cache/-resource-result/index.html">ResourceResult</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../org.sagebionetworks.bridge.kmm.shared.models/-user-session-info/index.html">UserSessionInfo</a><span class="token operator">&gt;</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Using the token supplied via an SMS message sent to the user, request a session from the server.</p></div></div>                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 <a data-name="121106676%2FFunctions%2F-202008714" anchor-label="signOut" id="121106676%2FFunctions%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a>
                 <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain">
                   <div class="main-subrow keyValue ">
@@ -167,7 +227,7 @@ if(savedDarkMode === true){
                       <div class="title">
                         <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
                           <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/commonMain">common</button></div>
-<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="sign-out.html"><span class="token function">signOut</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>                        </div>
+<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="sign-out.html"><span class="token function">signOut</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Calls the sign out api and then clears the local database cache.</p></div></div>                        </div>
                       </div>
                     </div>
                   </div>
@@ -208,7 +268,7 @@ if(savedDarkMode === true){
             </div>
           </div>
         </div>
-        <div class="footer"><span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2021 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
+        <div class="footer"><span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2022 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
       </div>
     </div>
   

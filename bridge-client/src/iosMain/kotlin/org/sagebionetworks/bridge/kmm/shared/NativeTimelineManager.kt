@@ -77,7 +77,7 @@ internal fun ScheduledSessionTimelineSlice.toNaive() =
 internal fun ScheduledSessionWindow.toNative() =
     NativeScheduledSessionWindow(
         instanceGuid = instanceGuid,
-        eventTimestamp = eventTimeStamp.toString(),
+        eventTimestamp = eventTimestamp.toString(),
         startDateTime = startDateTime.toInstant(TimeZone.currentSystemDefault()).toNSDate(),
         endDateTime = endDateTime.toInstant(TimeZone.currentSystemDefault()).toNSDate(),
         persistent = persistent,

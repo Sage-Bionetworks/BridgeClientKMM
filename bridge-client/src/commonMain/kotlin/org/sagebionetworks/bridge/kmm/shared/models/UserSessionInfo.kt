@@ -32,7 +32,7 @@ data class UserSessionInfo (
     val externalId: String? = null,
     /* An ID assigned to this account by Bridge system. This ID is exposed in the API and is different from the health code assigned to the user's anonymized data. Bridge never exports this ID along with the health code from Bridge.    */
     @SerialName("id")
-    val id: String? = null,
+    val id: String,
     /* True if the user has consented to be contacted via email outside the application, false otherwise.  */
     @SerialName("notifyByEmail")
     val notifyByEmail: Boolean? = null,
@@ -100,6 +100,9 @@ data class UserSessionInfo (
     /* A mapping from a subpopulation GUID to information about the participant's consent status in that subpopulation (whether consented or not). Only the subpopulations that currently apply to this user will have a ConsentStatus object in the map.  */
     @SerialName("consentStatuses")
     val consentStatuses: Map<String, ConsentStatus>? = null,
+    /* Records of every enrollment (whether withdrawn or not) in every study for this participant. The key of this mapping is the studyId, and the value is the record of the enrollment. */
+    @SerialName("enrollments")
+    val enrollments: kotlin.collections.Map<kotlin.String, EnrollmentInfo>? = null,
     /* The identifier of the organization this account is a member of (this will be an administrative account and not a study participant). */
     @SerialName("orgMembership")
     val orgMembership: String? = null,

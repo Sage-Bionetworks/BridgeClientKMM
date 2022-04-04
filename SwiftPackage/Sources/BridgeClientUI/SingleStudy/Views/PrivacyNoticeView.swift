@@ -33,6 +33,7 @@
 import SwiftUI
 import BridgeClient
 import SharedMobileUI
+import WebKit
 
 public struct PrivacyNoticeView: View {
     @EnvironmentObject private var bridgeManager: SingleStudyAppManager
@@ -90,9 +91,10 @@ public struct PrivacyNoticeView: View {
             }
             .disabled(self.showFullNotice)
             .buttonStyle(RoundedButtonStyle())
-            
-            DocumentPreview($showFullNotice, url: url)
-                .accentColor(.init("LinkColor"))
+            .fullScreenCover(isPresented: $showFullNotice) {
+                PDFShareView(url: url, done: { self.showFullNotice = false })
+                    .accentColor(.init("LinkColor"))
+            }
         }
         else {
             EmptyView()
@@ -150,52 +152,87 @@ public struct PrivacyNoticeView: View {
     }
 }
 
-// syoung 09/17/2021 Showing the share sheet for sharing the PDF (as the button suggests)
-// is mad slow and can take *several* seconds to load. This is a work-around intended to
-// show a preview of the PDF document and gives them the option to print, save to file,
-// air drop, etc.
-// https://stackoverflow.com/questions/60354684/presenting-uidocumentinteractioncontroller-with-uiviewcontrollerrepresentable-in
-
-struct DocumentPreview: UIViewControllerRepresentable {
-    private var isActive: Binding<Bool>
-    private let viewController = UIViewController()
-    private let docController: UIDocumentInteractionController
-
-    init(_ isActive: Binding<Bool>, url: URL) {
-        self.isActive = isActive
-        self.docController = UIDocumentInteractionController(url: url)
+struct PDFShareView: View {
+    let url: URL
+    let done: (() -> Void)
+    let shareView: PDFViewRepresentable
+    
+    init(url: URL, done: @escaping (() -> Void)) {
+        self.url = url
+        self.done = done
+        self.shareView = .init(url: url)
     }
 
-    func makeUIViewController(context: UIViewControllerRepresentableContext<DocumentPreview>) -> UIViewController {
-        return viewController
-    }
-
-    func updateUIViewController(_ uiViewController: UIViewController, context: UIViewControllerRepresentableContext<DocumentPreview>) {
-        if self.isActive.wrappedValue && docController.delegate == nil { // to not show twice
-            docController.delegate = context.coordinator
-            self.docController.presentPreview(animated: true)
+    var body: some View {
+        NavigationView {
+            ZStack {
+                shareView
+            }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: done) {
+                        Text("Done")
+                    }
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: shareView.share) {
+                        Image(systemName: "square.and.arrow.up")
+                    }
+                }
+            }
         }
     }
+    
+    struct PDFViewRepresentable : UIViewControllerRepresentable {
 
-    func makeCoordinator() -> Coordinator {
-        return Coordinator(owner: self)
-    }
+        let viewController: PDFViewController
+        
+        init(url: URL) {
+            self.viewController = .init(url: url)
+        }
 
-    final class Coordinator: NSObject, UIDocumentInteractionControllerDelegate { // works as delegate
-        let owner: DocumentPreview
-        init(owner: DocumentPreview) {
-            self.owner = owner
+        func makeUIViewController(context: Context) -> PDFViewController {
+            viewController
         }
         
-        func documentInteractionControllerViewControllerForPreview(_ controller: UIDocumentInteractionController) -> UIViewController {
-            return owner.viewController
+        func updateUIViewController(_ uiViewController: PDFViewController, context: Context) {
+            //
         }
+        
+        func share() {
+            viewController.shareURL()
+        }
+        
+        class PDFViewController : UIViewController, WKNavigationDelegate {
+            
+            let url: URL
+            var webView: WKWebView!
+            
+            init(url: URL) {
+                self.url = url
+                super.init(nibName: nil, bundle: nil)
+            }
+            
+            required init?(coder: NSCoder) {
+                fatalError("init(coder:) has not been implemented")
+            }
+            
+            override func loadView() {
+                webView = WKWebView()
+                webView.navigationDelegate = self
+                view = webView
+            }
+            
+            override func viewDidLoad() {
+                super.viewDidLoad()
+                webView.load(.init(url: url))
+            }
 
-        func documentInteractionControllerDidEndPreview(_ controller: UIDocumentInteractionController) {
-            // Unlink on next run loop.
-            DispatchQueue.main.async {
-                self.owner.isActive.wrappedValue = false
-                controller.delegate = nil
+            @objc func shareURL() {
+                let vc = UIActivityViewController(activityItems: [url], applicationActivities: [])
+                present(vc,
+                        animated: true,
+                        completion: nil)
             }
         }
     }

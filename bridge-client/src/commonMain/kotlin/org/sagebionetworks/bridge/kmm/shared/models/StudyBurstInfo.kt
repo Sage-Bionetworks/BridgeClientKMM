@@ -31,6 +31,10 @@ data class StudyBurstInfo (
     @SerialName("identifier")
     val identifier: String,
 
+    /* The event ID that triggered the generation of these study burst events */
+    @SerialName("originEventId")
+    val originEventId: String,
+
     /* ISO 8601 duration between the origin event timestamp and the first burst in the study burst sequence (days or weeks) */
     @SerialName("delay")
     val delay: DateTimePeriod,

@@ -57,6 +57,13 @@ class UploadRequester(
         )
         database.insertUpdateResource(resource)
 
+        queueUploadWorker()
+    }
+
+    /**
+     * Enqueue a WorkManager work request to process uploads.
+     */
+    fun queueUploadWorker() {
         //Make a WorkManager request to enqueueUniqueWork to processUploads
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -66,7 +73,7 @@ class UploadRequester(
             .build()
         WorkManager.getInstance(context).beginUniqueWork(
             "ResultUpload",
-            ExistingWorkPolicy.APPEND,
+            ExistingWorkPolicy.APPEND_OR_REPLACE, //this will restart a worker chain after a failure
             workRequest
         ).enqueue()
     }
@@ -106,7 +113,7 @@ internal class CoroutineUploadWorker(
                 }
             } catch (t: Throwable) {
                 Log.e(TAG, "Error calling uploadManager.ProcessUploads", t)
-                Result.failure()
+                Result.retry()
             }
         }
 

@@ -3,25 +3,37 @@ package org.sagebionetworks.bridge.kmm.shared.repo
 import io.ktor.client.*
 import io.ktor.client.features.*
 import io.ktor.http.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.sagebionetworks.bridge.kmm.shared.BridgeConfig
 import org.sagebionetworks.bridge.kmm.shared.apis.AuthenticationApi
 import org.sagebionetworks.bridge.kmm.shared.cache.*
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper.Companion.APP_WIDE_STUDY_ID
 import org.sagebionetworks.bridge.kmm.shared.models.*
-import org.sagebionetworks.bridge.kmm.shared.models.SignIn
 
-class AuthenticationRepository(httpClient: HttpClient, val bridgeConfig: BridgeConfig, val database: ResourceDatabaseHelper) {
+class AuthenticationRepository(
+    authHttpClient: HttpClient,
+    val bridgeConfig: BridgeConfig,
+    val database: ResourceDatabaseHelper,
+    private val backgroundScope: CoroutineScope
+) : KoinComponent {
 
     internal companion object {
         const val USER_SESSION_ID = "UserSessionId"
     }
 
-    private val authenticationApi = AuthenticationApi(httpClient = httpClient)
+    private val authenticationApi = AuthenticationApi(httpClient = authHttpClient)
+
+    // Lazy inject the ParticipantRepo so we don't have a dependency loop.
+    // This is here so we can check for offline updates that need to be saved to bridge.
+    private val participantRepo: ParticipantRepo by inject()
 
     /**
      * Get the current [UserSessionInfo] object as a Flow. The flow will emit a new value whenever
@@ -36,7 +48,11 @@ class AuthenticationRepository(httpClient: HttpClient, val bridgeConfig: BridgeC
      * Get the current [UserSessionInfo] object.
      */
     fun session() : UserSessionInfo? {
-        return database.getResource(USER_SESSION_ID, ResourceType.USER_SESSION_INFO, APP_WIDE_STUDY_ID)?.loadResource()
+        return sessionResource()?.loadResource()
+    }
+
+    internal fun sessionResource() : Resource? {
+        return database.getResource(USER_SESSION_ID, ResourceType.USER_SESSION_INFO, APP_WIDE_STUDY_ID)
     }
 
 
@@ -191,12 +207,27 @@ class AuthenticationRepository(httpClient: HttpClient, val bridgeConfig: BridgeC
         // TODO: emm 2021-08-17 pass 410 (app version not supported) and 412 (not consented) Bridge errors along to the UI to deal with.
     }
 
+
     private fun updateCachedSession(oldUserSessionInfo: UserSessionInfo?, newUserSession: UserSessionInfo) {
+        val oldSessionResource = sessionResource()
         var toCacheSession = newUserSession
-        if (newUserSession.reauthToken == null && oldUserSessionInfo?.reauthToken != null) {
+        var needSave = false
+        if (oldUserSessionInfo != null && oldSessionResource?.needSave == true && oldSessionResource.status != ResourceStatus.FAILED) {
+            //We have local changes that need be saved to bridge that we don't want to overwrite
+            toCacheSession = oldUserSessionInfo
+            if (newUserSession.reauthToken != null) {
+                // Just need to update with the new auth tokens
+                toCacheSession = oldUserSessionInfo.copy(
+                    sessionToken = newUserSession.sessionToken,
+                    reauthToken = newUserSession.reauthToken
+                )
+            }
+            needSave = true
+        } else if (newUserSession.reauthToken == null && oldUserSessionInfo?.reauthToken != null) {
+            //New session doesn't have re-auth token, so keep old one
             toCacheSession = newUserSession.copy(reauthToken = oldUserSessionInfo.reauthToken)
         }
-        var resource = Resource(
+        val resource = Resource(
             identifier = USER_SESSION_ID,
             secondaryId = ResourceDatabaseHelper.DEFAULT_SECONDARY_ID,
             type = ResourceType.USER_SESSION_INFO,
@@ -204,9 +235,16 @@ class AuthenticationRepository(httpClient: HttpClient, val bridgeConfig: BridgeC
             json = Json.encodeToString(toCacheSession),
             lastUpdate = Clock.System.now().toEpochMilliseconds(),
             status = ResourceStatus.SUCCESS,
-            needSave = false
+            needSave = needSave
         )
         database.insertUpdateResource(resource)
+        if (needSave) {
+            backgroundScope.launch {
+                participantRepo.processLocalUpdates()
+            }
+        }
     }
 
+
 }
+

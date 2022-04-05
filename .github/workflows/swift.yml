@@ -8,12 +8,10 @@ on:
 
 jobs:
   unit_tests:
-    runs-on: macos-11
+    runs-on: macos-latest
     steps:
     - name: Repository checkout
       uses: actions/checkout@v2
-    - name: Force Xcode 13.0
-      run: sudo xcode-select -switch /Applications/Xcode_13.0.app
     - name: Build for iOS
       run: set -o pipefail && env NSUnbufferedIO=YES xcodebuild build-for-testing -scheme BridgeClient -destination "platform=iOS Simulator,OS=15.0,name=iPhone 12" | xcpretty
     - name: Run iOS tests

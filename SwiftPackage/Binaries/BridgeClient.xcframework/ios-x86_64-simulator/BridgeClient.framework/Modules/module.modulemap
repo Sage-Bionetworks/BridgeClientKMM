@@ -1,6 +1,0 @@
-framework module BridgeClient {
-    umbrella header "BridgeClient.h"
-
-    export *
-    module * { export * }
-}

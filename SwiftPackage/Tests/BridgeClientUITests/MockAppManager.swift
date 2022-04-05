@@ -36,7 +36,7 @@
 
 // MARK: MockAuthManager
 class MockAuthManager : NativeAuthenticationManager {
-    fileprivate var mockUserSessionInfo: UserSessionInfo? = UserSessionInfo(firstName: nil, lastName: nil, externalId: nil, id: nil, notifyByEmail: nil, attributes: nil, sharingScope: nil, createdOn: nil, emailVerified: nil, phoneVerified: nil, status: nil, roles: nil, dataGroups: nil, clientData: nil, languages: nil, studyIds: ["not-a-real-study-id"], externalIds: nil, authenticated: true, sessionToken: "not-a-real-session-token", reauthToken: nil, environment: nil, email: nil, phone: nil, dataSharing: nil, signedMostRecentConsent: nil, synapseUserId: nil, consented: true, consentStatuses: nil, orgMembership: nil, type: "UserSessionInfo")
+    fileprivate var mockUserSessionInfo: UserSessionInfo? = UserSessionInfo(firstName: nil, lastName: nil, externalId: nil, id: "not-a-real-user-id", notifyByEmail: nil, attributes: nil, sharingScope: nil, createdOn: nil, emailVerified: nil, phoneVerified: nil, status: nil, roles: nil, dataGroups: nil, clientData: nil, languages: nil, studyIds: ["not-a-real-study-id"], externalIds: nil, authenticated: true, sessionToken: "not-a-real-session-token", reauthToken: nil, environment: nil, email: nil, phone: nil, dataSharing: nil, signedMostRecentConsent: nil, synapseUserId: nil, consented: true, consentStatuses: nil, enrollments: nil, orgMembership: nil, type: "UserSessionInfo")
     
     override func session() -> UserSessionInfo? {
         return mockUserSessionInfo

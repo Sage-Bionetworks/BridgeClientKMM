@@ -13,6 +13,6 @@ jobs:
     - name: Repository checkout
       uses: actions/checkout@v2
     - name: Build for iOS
-      run: set -o pipefail && env NSUnbufferedIO=YES xcodebuild build-for-testing -scheme BridgeClient -destination "platform=iOS Simulator,OS=15.0,name=iPhone 12" | xcpretty
+      run: set -o pipefail && env NSUnbufferedIO=YES xcodebuild build-for-testing -scheme BridgeClient -destination "platform=iOS Simulator,OS=15.2,name=iPhone 12" | xcpretty
     - name: Run iOS tests
-      run: set -o pipefail && env NSUnbufferedIO=YES xcodebuild test-without-building -scheme BridgeClient -destination "platform=iOS Simulator,OS=15.0,name=iPhone 12" | xcpretty
+      run: set -o pipefail && env NSUnbufferedIO=YES xcodebuild test-without-building -scheme BridgeClient -destination "platform=iOS Simulator,OS=15.2,name=iPhone 12" | xcpretty

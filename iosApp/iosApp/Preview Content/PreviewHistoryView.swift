@@ -57,7 +57,7 @@ let historyPreviews: [AssessmentRecord] = [
 
 extension AssessmentInfo {
     convenience init(identifier: MTBIdentifier) {
-        self.init(key: identifier.rawValue, guid: UUID().uuidString, appId: kPreviewStudyId, identifier: identifier.rawValue, revision: nil, label: identifier.label(), minutesToComplete: 3, colorScheme: nil, type: "AssessmentInfo")
+        self.init(key: identifier.rawValue, guid: UUID().uuidString, appId: kPreviewStudyId, identifier: identifier.rawValue, revision: nil, label: identifier.label(), minutesToComplete: 3, colorScheme: nil, configUrl: nil, type: "AssessmentInfo")
     }
 }
 

@@ -419,7 +419,7 @@ __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("NativeTimelineManager")))
 @interface BridgeClientNativeTimelineManager : BridgeClientBase <BridgeClientKoin_coreKoinComponent>
 - (instancetype)initWithStudyId:(NSString *)studyId includeAllNotifications:(BOOL)includeAllNotifications alwaysIncludeNextDay:(BOOL)alwaysIncludeNextDay viewUpdate:(void (^)(BridgeClientNativeScheduledSessionTimelineSlice *))viewUpdate __attribute__((swift_name("init(studyId:includeAllNotifications:alwaysIncludeNextDay:viewUpdate:)"))) __attribute__((objc_designated_initializer));
-- (void)observeTodaySchedule __attribute__((swift_name("observeTodaySchedule()")));
+- (void)observeTodayScheduleIsNewLogin:(BOOL)isNewLogin __attribute__((swift_name("observeTodaySchedule(isNewLogin:)")));
 
 /**
  @note This method converts all Kotlin exceptions to errors.

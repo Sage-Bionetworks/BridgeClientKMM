@@ -34,6 +34,8 @@ import SwiftUI
 import BridgeClient
 import JsonModel
 
+fileprivate let kUserSessionIdKey = "userSessionId"
+
 /// This is a view model that can be used to back the data presented to the user for a schedule timeline.
 ///
 /// The default view implementation is the ``TodayView``. That design supports *either* permanently
@@ -129,8 +131,23 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
     /// 
     /// - Parameter bridgeManager: The bridge manager for this app.
     open func onAppear(bridgeManager: SingleStudyAppManager, previewSchedules: [NativeScheduledSessionWindow] = []) {
+        // Exit early if nothing has changed.
+        guard self.bridgeManager == nil ||
+              self.studyId != bridgeManager.studyId ||
+              self.userSessionId != bridgeManager.userSessionInfo.identifier
+        else {
+            return
+        }
+        
+        // Store whether or not this is a new login
+        let isNewLogin = self.userSessionId != bridgeManager.userSessionInfo.identifier
+        
+        // Set new values
         self.bridgeManager = bridgeManager
         self.studyId = bridgeManager.studyId ?? kPreviewStudyId
+        self.userSessionId = bridgeManager.userSessionInfo.identifier
+        
+        // Update views
         if !bridgeManager.isPreview {
             self.timelineManager = NativeTimelineManager(studyId: studyId!, includeAllNotifications: true, alwaysIncludeNextDay: true) { timelineSlice in
                 DispatchQueue.main.async {
@@ -143,11 +160,16 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
                     self.bridgeManager.localNotificationManager.setupNotifications(timelineSlice.notifications)
                 }
             }
-            self.timelineManager.observeTodaySchedule()
+            self.timelineManager.observeTodaySchedule(isNewLogin: isNewLogin)
         }
         else {
             self.schedules = previewSchedules
         }
+    }
+    
+    var userSessionId: String? {
+        get { UserDefaults.standard.string(forKey: kUserSessionIdKey) }
+        set { UserDefaults.standard.set(newValue, forKey: kUserSessionIdKey) }
     }
     
     private func updateSessionState() {

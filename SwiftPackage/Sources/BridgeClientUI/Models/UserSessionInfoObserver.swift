@@ -79,6 +79,8 @@ public final class UserSessionInfoObserver : ObservableObject {
 
     // MARK: Study and External ID
     
+    @Published var identifier: String?
+    
     /// The studies this participant is associated to.
     @Published public var studyIds: [String] = []
     
@@ -141,5 +143,6 @@ public final class UserSessionInfoObserver : ObservableObject {
         self.emailVerified = newValue?.emailVerified?.boolValue
         self.phoneVerified = newValue?.phoneVerified?.boolValue
         self.notifyByEmail = newValue?.notifyByEmail?.boolValue
+        self.identifier = newValue?.id
     }
 }

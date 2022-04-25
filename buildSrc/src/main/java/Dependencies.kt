@@ -1,7 +1,7 @@
 object Versions {
     const val min_sdk = 23
-    const val target_sdk = 31
-    const val compile_sdk = 31
+    const val target_sdk = 30
+    const val compile_sdk = 30
 
     //Kotlin
     const val kotlin = "1.5.30"
@@ -25,7 +25,7 @@ object Versions {
         val recyclerview = "1.1.0"
         val test = "1.3.0"
         val test_ext = "1.1.2"
-        val workManager = "2.5.0"
+        val workManager = "2.6.0"
     }
 
     const val slf4j = "1.7.30"

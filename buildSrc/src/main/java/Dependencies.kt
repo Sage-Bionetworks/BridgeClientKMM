@@ -14,7 +14,7 @@ object Versions {
     const val sqlDelight = "1.5.3"
     const val okio = "3.0.0"
     const val stately = "1.1.1"
-    const val kermit = "1.1.0"
+    const val kermit = "1.0.0"
 
     object AndroidX {
         val annotation = "1.1.0"

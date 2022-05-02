@@ -2409,5 +2409,355 @@ class ScheduleTimelineRepoTest: BaseTest() {
         }
     }
 
+    val bmc337TimelineJson = """
+    {
+        "duration": "P52W",
+        "totalMinutes": 36,
+        "totalNotifications": 22,
+        "schedule": [{
+            "instanceGuid": "h212qs9lG3WBVM3R0eT8qw",
+            "refGuid": "eDm2_hLcvWUgbzoA-ETgUKNa",
+            "timeWindowGuid": "AEAo0aP7WTCna6pk-zG3I0fF",
+            "startEventId": "timeline_retrieved",
+            "startDay": 0,
+            "endDay": 60,
+            "startTime": "06:00",
+            "expiration": "P60D",
+            "assessments": [{
+                "refKey": "a17c6070a17c6070",
+                "instanceGuid": "7vqjl1lVdgIfKtU3BPib_g",
+                "type": "ScheduledAssessment"
+            }, {
+                "refKey": "75a06a4d75a06a4d",
+                "instanceGuid": "oIm5mLqSwF4fQlofm3rbFw",
+                "type": "ScheduledAssessment"
+            }, {
+                "refKey": "149597ac149597ac",
+                "instanceGuid": "Sv-jB5GozKDrRmsl4TuYvA",
+                "type": "ScheduledAssessment"
+            }, {
+                "refKey": "bfa0e5e7bfa0e5e7",
+                "instanceGuid": "ybiyf0QNgYQ7DGdDETBQyA",
+                "type": "ScheduledAssessment"
+            }, {
+                "refKey": "d2858af3d2858af3",
+                "instanceGuid": "n7Avt7Zdc-cz6CZJOka62A",
+                "type": "ScheduledAssessment"
+            }, {
+                "refKey": "38ac318138ac3181",
+                "instanceGuid": "bGQ56Rkcwu8LRWeq8VOdmw",
+                "type": "ScheduledAssessment"
+            }, {
+                "refKey": "80b6884080b68840",
+                "instanceGuid": "fGJhaZEiKVDyGGBQLecqvQ",
+                "type": "ScheduledAssessment"
+            }, {
+                "refKey": "2049c6692049c669",
+                "instanceGuid": "1JYSF3JJ2OMHJm-1AhCOpg",
+                "type": "ScheduledAssessment"
+            }, {
+                "refKey": "28cfc19128cfc191",
+                "instanceGuid": "4Fg_m3MDLIS94YKQLHViEg",
+                "type": "ScheduledAssessment"
+            }],
+            "type": "ScheduledSession"
+        }],
+        "sessions": [{
+            "guid": "eDm2_hLcvWUgbzoA-ETgUKNa",
+            "label": "Session1",
+            "symbol": "Session1Circle",
+            "startEventId": "timeline_retrieved",
+            "performanceOrder": "sequential",
+            "minutesToComplete": 36,
+            "timeWindowGuids": ["AEAo0aP7WTCna6pk-zG3I0fF"],
+            "notifications": [{
+                "notifyAt": "after_window_start",
+                "allowSnooze": false,
+                "message": {
+                    "lang": "en",
+                    "subject": "You can start the tasks!",
+                    "message": "Please do all 8 tasks within 1 week.",
+                    "type": "NotificationMessage"
+                },
+                "type": "NotificationInfo"
+            }, {
+                "notifyAt": "after_window_start",
+                "offset": "P3D",
+                "interval": "P3D",
+                "allowSnooze": false,
+                "message": {
+                    "lang": "en",
+                    "subject": "Please complete all 8 MTB tasks",
+                    "message": "Please complete all 8 MTB tasks. ",
+                    "type": "NotificationMessage"
+                },
+                "type": "NotificationInfo"
+            }],
+            "type": "SessionInfo"
+        }],
+        "assessments": [{
+            "key": "75a06a4d75a06a4d",
+            "guid": "P6_85NRS0ak6fil-J1SKvWJT",
+            "appId": "shared",
+            "identifier": "memory-for-sequences",
+            "revision": 7,
+            "label": "Sequences",
+            "minutesToComplete": 5,
+            "colorScheme": {
+                "background": "#FFFFFF",
+                "foreground": "#ABBCE8",
+                "activated": "#ABBCE8",
+                "inactivated": "#C7D0E6",
+                "type": "ColorScheme"
+            },
+            "configUrl": "https://ws.sagebridge.org/v1/sharedassessments/P6_85NRS0ak6fil-J1SKvWJT/config",
+            "type": "AssessmentInfo"
+        }, {
+            "key": "80b6884080b68840",
+            "guid": "z0iTUF87JPqqklAOUW4fBwJt",
+            "appId": "shared",
+            "identifier": "dccs",
+            "revision": 6,
+            "label": "Shape-Color Sorting",
+            "minutesToComplete": 3,
+            "colorScheme": {
+                "background": "#FFFFFF",
+                "foreground": "#F4B795",
+                "activated": "#F4B795",
+                "inactivated": "#FCEDE4",
+                "type": "ColorScheme"
+            },
+            "configUrl": "https://ws.sagebridge.org/v1/sharedassessments/z0iTUF87JPqqklAOUW4fBwJt/config",
+            "type": "AssessmentInfo"
+        }, {
+            "key": "d2858af3d2858af3",
+            "guid": "HL8480_09Rixw87Yct2nwQpr",
+            "appId": "shared",
+            "identifier": "flanker",
+            "revision": 5,
+            "label": "Arrow Matching",
+            "minutesToComplete": 3,
+            "colorScheme": {
+                "background": "#FFFFFF",
+                "foreground": "#F4B795",
+                "activated": "#F4B795",
+                "inactivated": "#FCEDE4",
+                "type": "ColorScheme"
+            },
+            "configUrl": "https://ws.sagebridge.org/v1/sharedassessments/HL8480_09Rixw87Yct2nwQpr/config",
+            "type": "AssessmentInfo"
+        }, {
+            "key": "bfa0e5e7bfa0e5e7",
+            "guid": "3GtZ6s5iAcRNi9LmRx98XtKm",
+            "appId": "shared",
+            "identifier": "psm",
+            "revision": 6,
+            "label": "Arranging Pictures",
+            "minutesToComplete": 5,
+            "colorScheme": {
+                "background": "#FFFFFF",
+                "foreground": "#CCE5D5",
+                "activated": "#CCE5D5",
+                "inactivated": "#D8E4DC",
+                "type": "ColorScheme"
+            },
+            "configUrl": "https://ws.sagebridge.org/v1/sharedassessments/3GtZ6s5iAcRNi9LmRx98XtKm/config",
+            "type": "AssessmentInfo"
+        }, {
+            "key": "a17c6070a17c6070",
+            "guid": "NTw7c8qMcQyesehjpampZeTz",
+            "appId": "shared",
+            "identifier": "vocabulary",
+            "revision": 5,
+            "label": "Word Meaning",
+            "minutesToComplete": 2,
+            "colorScheme": {
+                "background": "#FFFFFF",
+                "foreground": "#95CFF4",
+                "activated": "#95CFF4",
+                "inactivated": "#BCD9EC",
+                "type": "ColorScheme"
+            },
+            "configUrl": "https://ws.sagebridge.org/v1/sharedassessments/NTw7c8qMcQyesehjpampZeTz/config",
+            "type": "AssessmentInfo"
+        }, {
+            "key": "2049c6692049c669",
+            "guid": "jRyhrUvjKn5cEPPG_OBmQRLW",
+            "appId": "shared",
+            "identifier": "number-match",
+            "revision": 4,
+            "label": "Number-Symbol Match",
+            "minutesToComplete": 2,
+            "colorScheme": {
+                "background": "#FFFFFF",
+                "foreground": "#D2CBE8",
+                "activated": "#D2CBE8",
+                "inactivated": "#DBD7E6",
+                "type": "ColorScheme"
+            },
+            "configUrl": "https://ws.sagebridge.org/v1/sharedassessments/jRyhrUvjKn5cEPPG_OBmQRLW/config",
+            "type": "AssessmentInfo"
+        }, {
+            "key": "28cfc19128cfc191",
+            "guid": "GuiBNp8_SInXtKJvC2cvb46O",
+            "appId": "shared",
+            "identifier": "fnameb",
+            "revision": 5,
+            "label": "Faces & Names B",
+            "minutesToComplete": 6,
+            "colorScheme": {
+                "background": "#FFFFFF",
+                "foreground": "#CCE5D5",
+                "activated": "#CCE5D5",
+                "inactivated": "#D8E4DC",
+                "type": "ColorScheme"
+            },
+            "configUrl": "https://ws.sagebridge.org/v1/sharedassessments/GuiBNp8_SInXtKJvC2cvb46O/config",
+            "type": "AssessmentInfo"
+        }, {
+            "key": "38ac318138ac3181",
+            "guid": "AGzr7HtHfVa7FSAFuBZ4pBnO",
+            "appId": "shared",
+            "identifier": "fnamea",
+            "revision": 5,
+            "label": "Faces & Names 1A",
+            "minutesToComplete": 6,
+            "colorScheme": {
+                "background": "#FFFFFF",
+                "foreground": "#CCE5D5",
+                "activated": "#CCE5D5",
+                "inactivated": "#D8E4DC",
+                "type": "ColorScheme"
+            },
+            "configUrl": "https://ws.sagebridge.org/v1/sharedassessments/AGzr7HtHfVa7FSAFuBZ4pBnO/config",
+            "type": "AssessmentInfo"
+        }, {
+            "key": "149597ac149597ac",
+            "guid": "v0a2lR0umI_-EypGK2R5bX49",
+            "appId": "shared",
+            "identifier": "spelling",
+            "revision": 5,
+            "label": "Spelling",
+            "minutesToComplete": 4,
+            "colorScheme": {
+                "background": "#FFFFFF",
+                "foreground": "#95CFF4",
+                "activated": "#95CFF4",
+                "inactivated": "#BCD9EC",
+                "type": "ColorScheme"
+            },
+            "configUrl": "https://ws.sagebridge.org/v1/sharedassessments/v0a2lR0umI_-EypGK2R5bX49/config",
+            "type": "AssessmentInfo"
+        }],
+        "studyBursts": [],
+        "type": "Timeline"
+    }
+    """.trimIndent()
+
+    private val bmc337AdherenceRecordJson = """
+    {
+        "total": 9,
+        "type": "PagedResourceList",
+        "items": [{
+                "instanceGuid": "7vqjl1lVdgIfKtU3BPib_g",
+                "eventTimestamp": "2022-04-08T19:54:36.184Z",
+                "startedOn": "2022-04-08T19:54:40.419Z",
+                "finishedOn": "2022-04-08T19:58:49.566Z",
+                "clientTimeZone": "America/Los_Angeles",
+                "type": "AdherenceRecord"
+            },
+            {
+                "instanceGuid": "oIm5mLqSwF4fQlofm3rbFw",
+                "eventTimestamp": "2022-04-08T19:54:36.184Z",
+                "startedOn": "2022-04-08T19:59:30.340Z",
+                "finishedOn": "2022-04-08T20:02:36.506Z",
+                "clientTimeZone": "America/Los_Angeles",
+                "type": "AdherenceRecord"
+            }, {
+                "instanceGuid": "Sv-jB5GozKDrRmsl4TuYvA",
+                "eventTimestamp": "2022-04-08T19:54:36.184Z",
+                "startedOn": "2022-04-08T20:02:48.165Z",
+                "finishedOn": "2022-04-08T20:06:05.677Z",
+                "clientTimeZone": "America/Los_Angeles",
+                "type": "AdherenceRecord"
+            },
+            {
+                "instanceGuid": "ybiyf0QNgYQ7DGdDETBQyA",
+                "eventTimestamp": "2022-04-08T19:54:36.184Z",
+                "startedOn": "2022-04-08T20:10:08.522Z",
+                "finishedOn": "2022-04-08T20:14:35.868Z",
+                "clientTimeZone": "America/Los_Angeles",
+                "type": "AdherenceRecord"
+            },
+            {
+                "instanceGuid": "n7Avt7Zdc-cz6CZJOka62A",
+                "eventTimestamp": "2022-04-08T19:54:36.184Z",
+                "startedOn": "2022-04-08T20:14:55.604Z",
+                "finishedOn": "2022-04-08T20:18:03.588Z",
+                "clientTimeZone": "America/Los_Angeles",
+                "type": "AdherenceRecord"
+            },
+            {
+                "instanceGuid": "bGQ56Rkcwu8LRWeq8VOdmw",
+                "eventTimestamp": "2022-04-08T19:54:36.184Z",
+                "startedOn": "2022-04-08T20:19:02.283Z",
+                "finishedOn": "2022-04-08T20:20:43.716Z",
+                "clientTimeZone": "America/Los_Angeles",
+                "type": "AdherenceRecord"
+            },
+            {
+                "instanceGuid": "fGJhaZEiKVDyGGBQLecqvQ",
+                "eventTimestamp": "2022-04-08T19:54:36.184Z",
+                "startedOn": "2022-04-08T20:20:47.711Z",
+                "finishedOn": "2022-04-08T20:22:54.061Z",
+                "clientTimeZone": "America/Los_Angeles",
+                "type": "AdherenceRecord"
+            },
+            {
+                "instanceGuid": "1JYSF3JJ2OMHJm-1AhCOpg",
+                "eventTimestamp": "2022-04-08T19:54:36.184Z",
+                "startedOn": "2022-04-08T20:23:02.794Z",
+                "finishedOn": "2022-04-08T20:24:49.492Z",
+                "clientTimeZone": "America/Los_Angeles",
+                "type": "AdherenceRecord"
+            },
+            {
+                "instanceGuid": "4Fg_m3MDLIS94YKQLHViEg",
+                "eventTimestamp": "2022-04-08T19:54:36.184Z",
+                "startedOn": "2022-04-08T20:27:44.123Z",
+                "finishedOn": "2022-04-08T20:30:03.790Z",
+                "clientTimeZone": "America/Los_Angeles",
+                "type": "AdherenceRecord"
+            }
+        ]
+    }
+    """.trimIndent()
+
+    @Test
+    fun testBMC337Notifications() {
+        // BMC-337 Participant is getting notifications after completing schedule.
+        // Via manual testing, I have verified even though no items are scheduled,
+        // the timeline is still returning a notification for this window. syoung 04/08/2022
+        runTest {
+
+            val studyId = "cxhnxd"
+            val eventTimeStamp = Instant.parse("2022-04-08T19:54:36.184Z")
+            val repo = getTestScheduleTimelineRepo(
+                adherenceRecordJson = bmc337AdherenceRecordJson,
+                timeStamp = eventTimeStamp,
+                timelineJson = bmc337TimelineJson)
+            repo.adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)
+            val todayInstant = Instant.parse("2022-04-08T20:31:03.790Z")
+            // get sessions using call that would be used on iOS
+            val resourceResult = repo.getSessionsForDay(studyId, todayInstant, includeAllNotifications = true, alwaysIncludeNextDay = true)
+                .firstOrNull { it is ResourceResult.Success }
+            assertTrue(resourceResult is ResourceResult.Success)
+
+            // All activities within the one session have been completed,
+            // so result should have nothing more to do and notifications empty.
+            assertEquals(0, resourceResult.data.notifications.count(), "notifications=${resourceResult.data.notifications}")
+        }
+    }
+
 }
 

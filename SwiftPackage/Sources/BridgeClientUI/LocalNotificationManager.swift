@@ -53,28 +53,38 @@ open class LocalNotificationManager : NSObject, UNUserNotificationCenterDelegate
     
     // Do not expose publicly. This class is not threadsafe.
     var notifications: [NativeScheduledNotification] = []
+    private var updatingNotifications = false
     
     func setupNotifications(_ notifications: [NativeScheduledNotification]) {
-        self.notifications = notifications
+        // Reset the icon badge.
         UIApplication.shared.applicationIconBadgeNumber = 0
-        UNUserNotificationCenter.current().getNotificationSettings { settings in
-            // Do nothing if the app did not ask or the participant did not provide
-            // permission to send notifications.
-            guard settings.authorizationStatus == .authorized else { return }
-            UNUserNotificationCenter.current().getPendingNotificationRequests { oldRequests in
-                // Use dispatch async to put this work on the next run loop and ensure that
-                // we are creating this on the main thread. Has to be the main thread b/c
-                // kotlin objects are not thread-safe.
-                DispatchQueue.main.async {
-                    // Just refresh everything by removing all pending requests.
-                    let requestIds: [String] = oldRequests.compactMap {
-                        $0.content.categoryIdentifier == self.scheduledNotificationCategory ? $0.identifier : nil
-                    }
-                    UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: requestIds)
-                    // and then re-adding or adding new.
-                    let requests = self.createRequests()
-                    requests[..<min(self.maxRequests, requests.count)].forEach {
-                        UNUserNotificationCenter.current().add($0)
+        
+        // Exit early if nothing has changed.
+        guard self.notifications != notifications else { return }
+        self.notifications = notifications
+        
+        UNUserNotificationCenter.current().getPendingNotificationRequests { oldRequests in
+            DispatchQueue.main.async {
+                // Remove all the old requests
+                let requestIds: [String] = oldRequests.compactMap {
+                    $0.content.categoryIdentifier == self.scheduledNotificationCategory ? $0.identifier : nil
+                }
+                UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: requestIds)
+        
+                // Do nothing if the app did not ask or the participant did not provide
+                // permission to send notifications.
+                UNUserNotificationCenter.current().getNotificationSettings { settings in
+                    guard settings.authorizationStatus == .authorized else { return }
+
+                    // Use dispatch async to put this work on the next run loop and ensure that
+                    // we are creating this on the main thread. Has to be the main thread b/c
+                    // kotlin objects are not thread-safe.
+                    DispatchQueue.main.async {
+                        // and then re-adding or adding new.
+                        let requests = self.createRequests()
+                        requests[..<min(self.maxRequests, requests.count)].forEach {
+                            UNUserNotificationCenter.current().add($0)
+                        }
                     }
                 }
             }

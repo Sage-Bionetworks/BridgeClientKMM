@@ -28,8 +28,11 @@ class NativeTimelineManager(
 
     private val scope = MainScope()
 
-    fun observeTodaySchedule() {
+    fun observeTodaySchedule(isNewLogin: Boolean) {
         scope.launch {
+            if (isNewLogin) {
+                adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)
+            }
             repo.getSessionsForToday(studyId, includeAllNotifications, alwaysIncludeNextDay).collect { timelineResource ->
                 (timelineResource as? ResourceResult.Success)?.data?.let { timelineSlice ->
                     viewUpdate(timelineSlice.toNaive())
@@ -39,8 +42,8 @@ class NativeTimelineManager(
     }
 
     fun refreshTodaySchedule() {
-        scope.cancel()
-        observeTodaySchedule()
+        runCatching { scope.cancel() }
+        observeTodaySchedule(false)
     }
 
     @Throws(Throwable::class)

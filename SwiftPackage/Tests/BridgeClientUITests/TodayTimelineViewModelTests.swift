@@ -268,13 +268,14 @@ extension NativeScheduledSessionWindow {
               hasStartTimeOfDay: hasStartTimeOfDay,
               hasEndTimeOfDay: hasEndTimeOfDay,
               assessments: assessments,
-              sessionInfo: SessionInfo(guid: guid,
-                                       label: "Some Activities",
-                                       performanceOrder: performanceOrder,
-                                       timeWindowGuids: nil,
-                                       minutesToComplete: nil,
-                                       notifications: nil,
-                                       type: "SessionInfo"))
+              sessionInfo: .init(guid: guid,
+                                 label: "Some Activities",
+                                 symbol: nil,
+                                 performanceOrder: performanceOrder,
+                                 timeWindowGuids: nil,
+                                 minutesToComplete: nil,
+                                 notifications: nil,
+                                 type: "SessionInfo"))
     }
 }
 
@@ -290,7 +291,16 @@ extension NativeScheduledAssessment {
 
 extension AssessmentInfo {
     fileprivate convenience init(identifier: String) {
-        self.init(key: identifier, guid: UUID().uuidString, appId: kPreviewStudyId, identifier: identifier, revision: nil, label: identifier, minutesToComplete: 3, colorScheme: nil, type: "AssessmentInfo")
+        self.init(key: identifier,
+                  guid: UUID().uuidString,
+                  appId: kPreviewStudyId,
+                  identifier: identifier,
+                  revision: nil,
+                  label: identifier,
+                  minutesToComplete: 3,
+                  colorScheme: nil,
+                  configUrl: nil,
+                  type: "AssessmentInfo")
     }
 }
 

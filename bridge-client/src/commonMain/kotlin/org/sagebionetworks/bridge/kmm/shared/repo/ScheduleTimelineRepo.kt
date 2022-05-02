@@ -403,7 +403,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
             eventTimestamp = eventTimestamp,
             startDateTime = startDateTime,
             endDateTime = endDateTime,
-            notifications = if (notifications.isNullOrEmpty()) null else notifications.sortedBy { it.scheduleOn }
+            notifications = if (notifications.isNullOrEmpty() || isCompleted) null else notifications.sortedBy { it.scheduleOn }
         )
     }
 
@@ -494,7 +494,7 @@ data class ScheduledSessionWindow (
     val hasStartTimeOfDay = startDateTime.let { it.hour > 0 || it.minute > 0 }
     val hasEndTimeOfDay = scheduledSession.expiration.let { it.hours > 0 || it.minutes > 0 }
     val persistent = scheduledSession.persistent
-    val isCompleted = assessments.all { it.isCompleted }
+    val isCompleted = assessments.all { it.isCompleted || it.isDeclined }
 
     fun isAvailableNow(now: Instant = Clock.System.now()): Boolean {
         val timeZone = TimeZone.currentSystemDefault()

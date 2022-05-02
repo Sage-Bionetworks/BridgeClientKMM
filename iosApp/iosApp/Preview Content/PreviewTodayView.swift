@@ -166,6 +166,7 @@ extension NativeScheduledSessionWindow {
                                  hasEndTimeOfDay: Bool,
                                  assessments: [NativeScheduledAssessment],
                                  performanceOrder: PerformanceOrder) {
+        
         self.init(instanceGuid: "guid_\(index)",
               eventTimestamp: previewTrigger,
               startDateTime: startDateTime,
@@ -176,7 +177,7 @@ extension NativeScheduledSessionWindow {
               assessments: assessments,
               sessionInfo: SessionInfo(guid: guid,
                                        label: "Some Activities",
-                                       startEventId: "foo",
+                                       symbol: nil,
                                        performanceOrder: performanceOrder,
                                        timeWindowGuids: nil,
                                        minutesToComplete: nil,
@@ -197,7 +198,7 @@ extension NativeScheduledAssessment {
 
 extension AssessmentInfo {
     fileprivate convenience init(identifier: String) {
-        self.init(key: identifier, guid: UUID().uuidString, appId: kPreviewStudyId, identifier: identifier, revision: nil, label: identifier, minutesToComplete: 3, colorScheme: assessmentColors[identifier], type: "AssessmentInfo")
+        self.init(key: identifier, guid: UUID().uuidString, appId: kPreviewStudyId, identifier: identifier, revision: nil, label: identifier, minutesToComplete: 3, colorScheme: assessmentColors[identifier], configUrl: nil, type: "AssessmentInfo")
     }
 }
 

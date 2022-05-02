@@ -41,11 +41,20 @@ kotlin {
         }
     }
 
+    val xcframework = XCFramework(iosFrameworkName)
+
+    // ios() includes x86 sim & arm64 device
     ios {
-        binaries {
-            framework {
-                baseName = iosFrameworkName
-            }
+        binaries.framework {
+            baseName = iosFrameworkName
+            xcframework.add(this)
+        }
+    }
+    // iosSimulatorArm64() adds Apple Silicon simulator support
+    iosSimulatorArm64 {
+        binaries.framework {
+            baseName = iosFrameworkName
+            xcframework.add(this)
         }
     }
 
@@ -108,6 +117,12 @@ kotlin {
         }
 
         val iosTest by getting
+
+        // Set up dependencies between the source sets for Mac Silicon
+        val iosSimulatorArm64Main by sourceSets.getting
+        val iosSimulatorArm64Test by sourceSets.getting
+        iosSimulatorArm64Main.dependsOn(iosMain)
+        iosSimulatorArm64Test.dependsOn(iosTest)
     }
 }
 android {
@@ -170,38 +185,4 @@ publishing {
 //    }
 //}
 
-//region XcFramework tasks
-val swiftPMPath = "${project.rootDir}/SwiftPackage/Binaries/$iosFrameworkName.xcframework"
-
-tasks.create<Delete>("deleteSwiftPMFramework") { delete = setOf(swiftPMPath) }
-
-val buildXcFramework by tasks.registering {
-    dependsOn("deleteSwiftPMFramework")
-    group = "build"
-    val mode = project.findProperty("XCODE_CONFIGURATION") as? String ?: "RELEASE"
-    val frameworks = arrayOf("iosArm64", "iosX64")
-        .map { kotlin.targets.getByName<KotlinNativeTarget>(it).binaries.getFramework(mode) }
-    inputs.property("mode", mode)
-    dependsOn(frameworks.map { it.linkTask })
-    doLast { buildXcFramework(frameworks) }
-}
-
-fun buildXcFramework(frameworks: List<Framework>) {
-    val buildArgs: () -> List<String> = {
-        val arguments = mutableListOf("-create-xcframework")
-        frameworks.forEach {
-            arguments += "-framework"
-            arguments += "${it.outputDirectory}/${it.baseName}.framework"
-            arguments += "-debug-symbols"
-            arguments += "${it.outputDirectory}/${it.baseName}.framework.dSYM"
-        }
-        arguments += "-output"
-        arguments += swiftPMPath
-        arguments
-    }
-    exec {
-        executable = "xcodebuild"
-        args = buildArgs()
-    }
-}
 //endregion

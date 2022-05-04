@@ -9,6 +9,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okio.FileSystem
 import okio.Path.Companion.toPath
+import org.koin.core.component.getScopeName
 import org.sagebionetworks.bridge.kmm.shared.apis.S3UploadApi
 import org.sagebionetworks.bridge.kmm.shared.apis.UploadsApi
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
@@ -45,7 +46,11 @@ internal class UploadManager(
     suspend fun processUploads(): Boolean {
         for (resource in database.getResources(ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID)) {
             resource.loadResource<UploadFile>()?.let {
-                processUploadFile(it)
+                try {
+                    processUploadFile(it)
+                } catch (error: Throwable) {
+                    Logger.e("Failed to process upload", error)
+                }
             }
         }
         //Check that all uploads succeeded and have been removed

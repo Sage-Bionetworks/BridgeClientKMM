@@ -11,9 +11,11 @@
 */
 package org.sagebionetworks.bridge.kmm.shared.models
 
+import io.ktor.http.*
 import kotlinx.serialization.Serializable
 
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Transient
 
 /**
  * Information about an assessment in order to render it in a UI prior to execution.
@@ -32,20 +34,20 @@ import kotlinx.serialization.SerialName
 data class AssessmentInfo (
     /* Because assessments can be configured with different display information, they are not referenced in the schedule portion of a timeline by their GUIDs. Instead they are given a unique string key that is used to look up the assessment. */
     @SerialName("key")
-    val key: String? = null,
+    val key: String,
     /* Each assessment revision is assigned a unique GUID which can be used to retrieve it through the API. Assessments will also have a unique combination of an identifier and a revision, and can be retrieved as a set of revisions under a given identifier. */
     @SerialName("guid")
-    val guid: String? = null,
+    val guid: String,
     @SerialName("appId")
-    val appId: String? = null,
+    val appId: String,
     /* A human-readable identifier for an assessment, which can have one or more revisions. */
     @SerialName("identifier")
-    val identifier: String? = null,
+    val identifier: String,
     /* The revision of the assessment under the given identifier (the identifier and the revision together are mapped to a single GUID which can be used to reference the assessment; only the GUID is required in this object). */
     @SerialName("revision")
     val revision: Int? = null,
     @SerialName("label")
-    val label: String? = null,
+    val label: String,
     /* The number of minutes it takes for a participant to complete this assessment. */
     @SerialName("minutesToComplete")
     val minutesToComplete: Int? = null,
@@ -53,9 +55,16 @@ data class AssessmentInfo (
     val colorScheme: ColorScheme? = null,
     /* The URL to download the configuration associated with this assessment. */
     @SerialName("configUrl")
-    val configUrl: kotlin.String? = null,
+    val configUrl: String,
     /* AssessmentInfo */
     @SerialName("type")
     val type: String? = null
-)
+) {
+
+    /** Path portion of config url */
+    @Transient
+    val configPath: String
+    get() = configUrl.let {Url(configUrl).encodedPath}
+
+}
 

@@ -12,6 +12,7 @@
 package org.sagebionetworks.bridge.kmm.shared.models
 
 import kotlinx.datetime.DateTimePeriod
+import kotlinx.datetime.LocalDate
 import kotlinx.serialization.Serializable
 
 import kotlinx.serialization.SerialName
@@ -48,11 +49,11 @@ data class ScheduledSession (
     @SerialName("startEventId")
     val startEventId: String? = null,
 
-    @SerialName("startDay")
-    val startDay: Int,
-
-    @SerialName("endDay")
-    val endDay: Int,
+//    @SerialName("startDay")
+//    val startDay: Int,
+//
+//    @SerialName("endDay")
+//    val endDay: Int,
 
     @SerialName("startTime")
     val startTime: String,
@@ -80,11 +81,11 @@ data class ScheduledSession (
 
     /* Only set for the participant schedule. */
     @SerialName("startDate")
-    val startDate: kotlin.String? = null,
+    val startDate: LocalDate,
 
     /* Only set for the participant schedule. */
     @SerialName("endDate")
-    val endDate: kotlin.String? = null,
+    val endDate: LocalDate,
 
     /* ScheduledSession */
     @SerialName("type")

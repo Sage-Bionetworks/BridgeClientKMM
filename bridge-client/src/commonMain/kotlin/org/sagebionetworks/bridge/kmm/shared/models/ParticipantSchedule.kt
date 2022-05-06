@@ -12,6 +12,7 @@
 package org.sagebionetworks.bridge.kmm.shared.models
 
 
+import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -32,24 +33,24 @@ data class ParticipantSchedule (
     /* The date and time this schedule was calculated. */
     @SerialName("createdOn")
     val createdOn: String,
-    
+
     @SerialName("dateRange")
-    val dateRange: DateRange,
-    
+    val dateRange: DateRange? = null,
+
     @SerialName("schedule")
     val schedule: List<ScheduledSession>? = null,
-    
+
     @SerialName("assessments")
     val assessments: List<AssessmentInfo>? = null,
-    
+
     @SerialName("sessions")
     val sessions: List<SessionInfo>? = null,
-    
+
     @SerialName("studyBursts")
     val studyBursts: List<StudyBurstInfo>? = null,
 
     @SerialName("eventTimestamps")
-    val eventTimestamps: Map<String, String>? = null,
+    val eventTimestamps: Map<String, Instant>? = null,
 
     /* ParticipantSchedule */
     @SerialName("type")

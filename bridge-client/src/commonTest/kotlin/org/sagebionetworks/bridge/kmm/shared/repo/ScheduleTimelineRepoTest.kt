@@ -2409,10 +2409,17 @@ class ScheduleTimelineRepoTest: BaseTest() {
         }
     }
 
-    val bmc337TimelineJson = """
+    private fun getbmc337TimelineJson(eventTimestamp: Instant) : String {
+        val localDate = eventTimestamp.toLocalDateTime(TimeZone.currentSystemDefault()).date
+        val bmc337TimelineJson = """
     {
         "duration": "P52W",
         "totalMinutes": 36,
+          "createdOn" : "2021-05-12T23:44:54.319Z",
+          "dateRange": {
+            "startDate": "2021-04-31",
+            "endDate": "2021-04-31"
+          },
         "totalNotifications": 22,
         "schedule": [{
             "instanceGuid": "h212qs9lG3WBVM3R0eT8qw",
@@ -2421,6 +2428,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
             "startEventId": "timeline_retrieved",
             "startDay": 0,
             "endDay": 60,
+            "startDate": "${localDate}",
+            "endDate": "${localDate.plus(60, DateTimeUnit.DAY)}",
             "startTime": "06:00",
             "expiration": "P60D",
             "assessments": [{
@@ -2650,9 +2659,14 @@ class ScheduleTimelineRepoTest: BaseTest() {
             "type": "AssessmentInfo"
         }],
         "studyBursts": [],
-        "type": "Timeline"
+        "eventTimestamps": {
+            "timeline_retrieved" : "${eventTimestamp.toString()}"
+        }
+      "type": "ParticipantSchedule"
     }
     """.trimIndent()
+        return bmc337TimelineJson
+    }
 
     private val bmc337AdherenceRecordJson = """
     {
@@ -2745,7 +2759,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val repo = getTestScheduleTimelineRepo(
                 adherenceRecordJson = bmc337AdherenceRecordJson,
                 timeStamp = eventTimeStamp,
-                timelineJson = bmc337TimelineJson)
+                timelineJson = getbmc337TimelineJson(eventTimeStamp))
             repo.adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)
             val todayInstant = Instant.parse("2022-04-08T20:31:03.790Z")
             // get sessions using call that would be used on iOS

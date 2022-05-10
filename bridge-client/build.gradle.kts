@@ -79,6 +79,8 @@ kotlin {
                 implementation(Deps.okio)
                 // koin
                 api(Deps.Koin.core)
+                // Kermit
+                implementation(Deps.Kermit.core)
             }
         }
 

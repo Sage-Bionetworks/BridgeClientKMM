@@ -106,8 +106,6 @@ object Deps {
 
     object Kermit {
         val core = "co.touchlab:kermit:${Versions.kermit}"
-        //val koin = "co.touchlab:kermit-koin:${Versions.kermit}"
-        //val crashlytics = "co.touchlab:kermit-crashlytics:${Versions.kermit}"
     }
 
     //Not currently using, but may be useful in the future

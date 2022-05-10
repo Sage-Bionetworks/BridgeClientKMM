@@ -7,8 +7,9 @@ import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.squareup.sqldelight.runtime.coroutines.mapToOneOrNull
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import org.sagebionetworks.bridge.kmm.shared.apis.EtagStorageCache
 
-class ResourceDatabaseHelper(sqlDriver: SqlDriver) {
+class ResourceDatabaseHelper(sqlDriver: SqlDriver) : EtagStorageCache {
     internal val database = BridgeResourceDatabase(
         sqlDriver,
         Resource.Adapter(EnumColumnAdapter(), EnumColumnAdapter())
@@ -19,6 +20,7 @@ class ResourceDatabaseHelper(sqlDriver: SqlDriver) {
     internal fun clearDatabase() {
         dbQuery.transaction {
             dbQuery.removeAllResources()
+            dbQuery.removeAllEtags()
         }
     }
 
@@ -97,6 +99,23 @@ class ResourceDatabaseHelper(sqlDriver: SqlDriver) {
          */
         const val DEFAULT_SECONDARY_ID = "DefaultSecondaryId"
 
+    }
+
+
+    override fun getEtag(url: String): String? {
+        return dbQuery.selectEtag(url).executeAsOneOrNull()?.etag
+    }
+
+    override fun putEtag(urlKey: String, etag: String?) {
+        if (etag != null) {
+            dbQuery.insertUpdateEtag(urlKey, etag)
+        } else {
+            dbQuery.removeEtag(urlKey)
+        }
+    }
+
+    fun removeAllEtags() {
+        dbQuery.removeAllEtags()
     }
 
 }

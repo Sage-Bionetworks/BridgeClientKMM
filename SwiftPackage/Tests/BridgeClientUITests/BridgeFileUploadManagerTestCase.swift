@@ -247,73 +247,74 @@ extension BridgeFileUploadManagerTestCaseTyped {
         }
         
         var retryRecoverable = true
-        let observer503NotRetried = NotificationCenter.default.addObserver(forName: .SBBParticipantFileUploadRequestFailed, object: nil, queue: nil) { notification in
+        let observer503NotRetried = NotificationCenter.default.addObserver(forName: uploadRequestFailedNotification, object: nil, queue: nil) { notification in
             XCTAssert(false, "initial 503 treated as unrecoverable, not retried")
             retryRecoverable = false
             expectRetried.fulfill()
         }
         
-        let observer503RetriedButS3Failed = NotificationCenter.default.addObserver(forName: .SBBParticipantFileUploadToS3Failed, object: nil, queue: nil) { notification in
+        let observer503RetriedButS3Failed = NotificationCenter.default.addObserver(forName: uploadToS3FailedNotification, object: nil, queue: nil) { notification in
             XCTAssert(false, "initial 503 retried, but mock upload to S3 failed")
             expectRetried.fulfill()
         }
         
+        // -- now set up the responses for the retry attempt so they're ready to go when it happens.
+        let s3url = "/not-a-real-pre-signed-S3-url"
+        guard let successResponseUrl = Bundle.module.url(forResource: self.uploadRequestSuccessResponseFile, withExtension: "json") else {
+            XCTAssert(false, "Unable to find test response file '\(self.uploadRequestSuccessResponseFile).json' for upload api \(self.uploadApi.apiString) upload failure tests")
+            return
+        }
+
+        self.mockURLSession.setJsonFromFile(named: self.uploadRequestSuccessResponseFile, responseCode: 201, for: endpoint, httpMethod: "POST")
+        self.mockURLSession.set(downloadFileUrl: successResponseUrl, error: nil, for: endpoint, httpMethod: "POST")
+        
+        // -- set up the S3 upload success response
+        self.mockURLSession.set(json: [:], responseCode: 200, for: s3url, httpMethod: "PUT")
+        
+        // -- set up the "upload completed" api call response
+        if self.uploadApi.notifiesBridgeWhenUploaded {
+            guard let uploadOnlyMetadata = self.uploadApi.uploadMetadata(for: self.testFileId, fileUrl: uploadFileUrl, mimeType: mimeType, extras: self.uploadExtras) else {
+                XCTAssert(false, "Failed to create test upload metadata for \(self.uploadApi.apiString) upload failure test retry attempt in order to get the notifyBridgeUrlString")
+                return
+            }
+            var jsonData: Data
+            do {
+                jsonData = try Data(contentsOf: successResponseUrl)
+            } catch let err {
+                XCTAssert(false, "Error getting contents of \(successResponseUrl) as Data: \(err)")
+                return
+            }
+            guard let uploadMetadata = self.uploadApi.update(metadata: uploadOnlyMetadata, with: jsonData) else {
+                XCTAssert(false, "Failed to update upload metadata with json from mock upload request response")
+                return
+            }
+            guard let uploadCompleteResponseUrl = Bundle.module.url(forResource: "upload-complete-response", withExtension: "json") else {
+                XCTAssert(false, "Unable to find upload complete response file 'upload-complete-response.json' for \(self.uploadApi.apiString) upload failure test retry attempt")
+                return
+            }
+            guard let notifyBridgeUrlString = self.uploadApi.notifyBridgeUrlString(for: uploadMetadata) else {
+                XCTAssert(false, "Unable to build notifyBridgeUrlString from uploadMetadata \(uploadMetadata)")
+                return
+            }
+            let notifyBridgeEndpoint = "/\(notifyBridgeUrlString)"
+            self.mockURLSession.set(json: [:], responseCode: 200, for: notifyBridgeEndpoint, httpMethod: "POST")
+            self.mockURLSession.set(downloadFileUrl: uploadCompleteResponseUrl, error: nil, for: notifyBridgeEndpoint, httpMethod: "POST")
+        }
+        
         // -- start the upload attempt. This should get a 503 Server Busy response initially and
-        //    queue up the file for 'later' retry.
+        //    queue up the file for 'later' retry. In the test environment, the delay is set to 0 so
+        //    it should happen immediately.
         tempCopyUrl = uploadApi.uploadInternal(fileId: testFileId, fileUrl: uploadFileUrl, contentType: mimeType, extras: uploadExtras)
         XCTAssertNotNil(tempCopyUrl, "Temp file url is nil when testing upload request retrying after initial 503 from upload api \(self.uploadApi.apiString)")
         guard let tempCopyUrl = tempCopyUrl else { return }
-
-        // -- now set up the responses for the retry attempt and then initiate it.
-        //    (queue up so this happens after the above has completed)
+        
+        // -- Check that a retry will indeed be attempted.
+        //    (queue up so this happens after the initial attempt has completed)
         OperationQueue.main.addOperation {
             self.mockURLSession.delegateQueue.addOperation {
                 guard retryRecoverable else { return }
-                // first, check that the file is indeed in the retry queue as expected
+                // check that the file is indeed in the retry queue as expected
                 self.check(file: tempCopyUrl, willRetry: true, stillExists: true, message: "Should retry after 503 from upload api \(self.uploadApi.apiString)", cleanUpAfter: false)
-                
-                // set up the responses for the retry
-                let s3url = "/not-a-real-pre-signed-S3-url"
-                guard let downloadFileUrl = Bundle.module.url(forResource: self.uploadRequestSuccessResponseFile, withExtension: "json") else {
-                    XCTAssert(false, "Unable to find test response file '\(self.uploadRequestSuccessResponseFile).json' for upload api \(self.uploadApi.apiString) upload failure tests")
-                    return
-                }
-
-                self.mockURLSession.setJsonFromFile(named: self.uploadRequestSuccessResponseFile, responseCode: 201, for: endpoint, httpMethod: "POST")
-                self.mockURLSession.set(downloadFileUrl: downloadFileUrl, error: nil, for: endpoint, httpMethod: "POST")
-                
-                // -- set up the S3 upload success response
-                self.mockURLSession.set(json: [:], responseCode: 200, for: s3url, httpMethod: "PUT")
-                
-                // -- set up the "upload completed" api call response
-                if self.uploadApi.notifiesBridgeWhenUploaded {
-                    guard let uploadOnlyMetadata = self.uploadApi.uploadMetadata(for: self.testFileId, fileUrl: uploadFileUrl, mimeType: mimeType, extras: self.uploadExtras) else {
-                        XCTAssert(false, "Failed to create test upload metadata for \(self.uploadApi.apiString) upload failure test retry attempt in order to get the notifyBridgeUrlString")
-                        return
-                    }
-                    var jsonData: Data
-                    do {
-                        jsonData = try Data(contentsOf: downloadFileUrl)
-                    } catch let err {
-                        XCTAssert(false, "Error getting contents of \(downloadFileUrl) as Data: \(err)")
-                        return
-                    }
-                    guard let uploadMetadata = self.uploadApi.update(metadata: uploadOnlyMetadata, with: jsonData) else {
-                        XCTAssert(false, "Failed to update upload metadata with json from mock upload request response")
-                        return
-                    }
-                    guard let emptyDownloadFileUrl = Bundle.module.url(forResource: "empty-response-body", withExtension: "json") else {
-                        XCTAssert(false, "Unable to find empty response file '\(self.uploadRequestSuccessResponseFile).json' for \(self.uploadApi.apiString) upload failure test retry attempt")
-                        return
-                    }
-                    guard let notifyBridgeUrlString = self.uploadApi.notifyBridgeUrlString(for: uploadMetadata) else {
-                        XCTAssert(false, "Unable to build notifyBridgeUrlString from uploadMetadata \(uploadMetadata)")
-                        return
-                    }
-                    let notifyBridgeEndpoint = "/\(notifyBridgeUrlString)"
-                    self.mockURLSession.set(json: [:], responseCode: 200, for: notifyBridgeEndpoint, httpMethod: "POST")
-                    self.mockURLSession.set(downloadFileUrl: emptyDownloadFileUrl, error: nil, for: notifyBridgeEndpoint, httpMethod: "POST")
-                }
                 
                 // -- do the retry
                 bfum.retryUploadsAfterDelay()
@@ -321,7 +322,7 @@ extension BridgeFileUploadManagerTestCaseTyped {
         }
         
         // -- wait here until everything above has worked its way through.
-        XCTWaiter(delegate: self).wait(for: [expectRetried], timeout: 5.0)
+        XCTWaiter(delegate: self).wait(for: [expectRetried], timeout: 500.0)
         NotificationCenter.default.removeObserver(observer503Retried)
         NotificationCenter.default.removeObserver(observer503NotRetried)
         NotificationCenter.default.removeObserver(observer503RetriedButS3Failed)
@@ -378,7 +379,7 @@ extension BridgeFileUploadManagerTestCaseTyped {
         XCTAssertNotNil(tempCopyUrl, "Temp file url is nil when testing upload api \(self.uploadApi.apiString) upload request with retryable S3 error response")
         guard let tempCopyUrl = tempCopyUrl else { return }
 
-        // queue up a couple of times to make sure the above stuff has actually completed before we check the retry queue
+        // queue up a bunch of times to make sure the above stuff has actually completed before we check the retry queue
         self.mockURLSession.delegateQueue.addOperation {
             print("testUploadFileToBridgeWhenS3Responds \(status): once through delegate queue")
             OperationQueue.main.addOperation {
@@ -387,7 +388,12 @@ extension BridgeFileUploadManagerTestCaseTyped {
                     OperationQueue.main.addOperation {
                         self.mockURLSession.delegateQueue.addOperation {
                             print("testUploadFileToBridgeWhenS3Responds \(status): thrice through delegate queue")
-                            expectStatus.fulfill()
+                            OperationQueue.main.addOperation {
+                                self.mockURLSession.delegateQueue.addOperation {
+                                    print("testUploadFileToBridgeWhenS3Responds \(status): fourth time through delegate queue")
+                                    expectStatus.fulfill()
+                                }
+                            }
                         }
                     }
                 }
@@ -440,8 +446,8 @@ extension BridgeFileUploadManagerTestCaseTyped {
                 XCTAssert(false, "Failed to update upload metadata with json from mock upload request response")
                 return
             }
-            guard let emptyDownloadFileUrl = Bundle.module.url(forResource: "empty-response-body", withExtension: "json") else {
-                XCTAssert(false, "Unable to find empty response file '\(self.uploadRequestSuccessResponseFile).json' for \(uploadApi.apiString) happy path test")
+            guard let uploadCompleteResponseUrl = Bundle.module.url(forResource: "upload-complete-response", withExtension: "json") else {
+                XCTAssert(false, "Unable to find upload complete response file 'upload-complete-response.json' for \(uploadApi.apiString) happy path test")
                 return
             }
             guard let notifyBridgeUrlString = self.uploadApi.notifyBridgeUrlString(for: uploadMetadata) else {
@@ -450,7 +456,7 @@ extension BridgeFileUploadManagerTestCaseTyped {
             }
             let notifyBridgeEndpoint = "/\(notifyBridgeUrlString)"
             self.mockURLSession.set(json: [:], responseCode: 200, for: notifyBridgeEndpoint, httpMethod: "POST")
-            self.mockURLSession.set(downloadFileUrl: emptyDownloadFileUrl, error: nil, for: notifyBridgeEndpoint, httpMethod: "POST")
+            self.mockURLSession.set(downloadFileUrl: uploadCompleteResponseUrl, error: nil, for: notifyBridgeEndpoint, httpMethod: "POST")
         }
 
         // -- try it

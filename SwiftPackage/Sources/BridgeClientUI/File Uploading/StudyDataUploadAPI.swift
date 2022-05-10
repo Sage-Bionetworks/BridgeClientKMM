@@ -290,7 +290,8 @@ public class StudyDataUploadAPI: BridgeFileUploadAPITyped {
         do {
             uploadMetadata.bridgeUploadTrackingObject.uploadSession = try self.uploadManager.netManager.jsonDecoder.decode(UploadRequestResponseType.self, from: jsonData)
         } catch let err {
-            debugPrint("Unexpected: Could not parse contents of downloaded file as a \(UploadRequestResponseType.self) object: \"\(String(describing: String(data: jsonData, encoding: .utf8)))\"\n\terror:\(err)")
+            // it's not an upload request response so log it (just in case it's something unexpected) and return nil
+            debugPrint("Could not parse contents of downloaded file as a \(UploadRequestResponseType.self) object, ignoring: \"\(String(describing: String(data: jsonData, encoding: .utf8)))\"\n\terror:\(err)")
             return nil
         }
         return uploadMetadata

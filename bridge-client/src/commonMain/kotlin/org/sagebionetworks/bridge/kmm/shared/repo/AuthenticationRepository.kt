@@ -1,5 +1,6 @@
 package org.sagebionetworks.bridge.kmm.shared.repo
 
+import co.touchlab.kermit.Logger
 import io.ktor.client.*
 import io.ktor.client.features.*
 import io.ktor.http.*
@@ -78,7 +79,7 @@ class AuthenticationRepository(
             try {
                 authenticationApi.signOut(it)
             } catch (error: Throwable) {
-                println(error)
+                Logger.e("Error signing out", error)
             }
             database.clearDatabase()
         }
@@ -98,7 +99,7 @@ class AuthenticationRepository(
             authenticationApi.requestPhoneSignIn(phoneSignInRequest)
             return true
         } catch (err: Throwable) {
-            println(err)
+            Logger.e("Error requesting phone sign-in", err)
         }
         return false
     }
@@ -118,6 +119,7 @@ class AuthenticationRepository(
             authenticationApi.resendPhoneVerification(identifier)
             return true
         } catch (err: Throwable) {
+            Logger.e("Error calling resendPhoneVerification", err)
             println(err)
         }
         return false
@@ -140,7 +142,7 @@ class AuthenticationRepository(
             return ResourceResult.Success(userSession, ResourceStatus.SUCCESS)
         } catch (err: Throwable) {
             database.removeResource(USER_SESSION_ID, ResourceType.USER_SESSION_INFO, APP_WIDE_STUDY_ID)
-            println(err)
+            Logger.e("Error signInPhone", err)
         }
         return ResourceResult.Failed(ResourceStatus.FAILED)
     }
@@ -170,7 +172,7 @@ class AuthenticationRepository(
             return ResourceResult.Success(userSession, ResourceStatus.SUCCESS)
         } catch (err: Throwable) {
             database.removeResource(USER_SESSION_ID, ResourceType.USER_SESSION_INFO, APP_WIDE_STUDY_ID)
-            println(err)
+            Logger.e("Error signIn", err)
         }
         return ResourceResult.Failed(ResourceStatus.FAILED)
     }
@@ -190,7 +192,7 @@ class AuthenticationRepository(
                 updateCachedSession(sessionInfo, userSession)
                 success = true
             } catch (err: Throwable) {
-                println(err)
+                Logger.e("Error requesting reAuth", err)
                 if (err is ResponseException) {
                     // We got a response from Bridge and it was an error.
                     // Clear the cached session

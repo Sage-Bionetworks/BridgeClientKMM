@@ -51,12 +51,12 @@ kotlin {
         }
     }
     // iosSimulatorArm64() adds Apple Silicon simulator support
-    iosSimulatorArm64 {
-        binaries.framework {
-            baseName = iosFrameworkName
-            xcframework.add(this)
-        }
-    }
+//    iosSimulatorArm64 {
+//        binaries.framework {
+//            baseName = iosFrameworkName
+//            xcframework.add(this)
+//        }
+//    }
 
     sourceSets {
         val commonMain by getting {
@@ -121,10 +121,10 @@ kotlin {
         val iosTest by getting
 
         // Set up dependencies between the source sets for Mac Silicon
-        val iosSimulatorArm64Main by sourceSets.getting
-        val iosSimulatorArm64Test by sourceSets.getting
-        iosSimulatorArm64Main.dependsOn(iosMain)
-        iosSimulatorArm64Test.dependsOn(iosTest)
+//        val iosSimulatorArm64Main by sourceSets.getting
+//        val iosSimulatorArm64Test by sourceSets.getting
+//        iosSimulatorArm64Main.dependsOn(iosMain)
+//        iosSimulatorArm64Test.dependsOn(iosTest)
     }
 }
 android {

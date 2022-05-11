@@ -122,9 +122,8 @@ open class BridgeClientAppManager : ObservableObject {
     /// The "state" of the app.
     @Published public var appState: AppState = .launching
     
-    /// Is the app currently uploading results?
-    /// TODO: syoung 10/27/2021 This flag is currently never being reset. https://sagebionetworks.jira.com/browse/BMC-244
-    @Published public var isUploadingResults: Bool = false
+    /// Is the app currently uploading results or user files? This status is maintained and updated by BridgeFileUploadManager.
+    @Published public var isUploading: Bool = false
     
     /// A threadsafe observer for the `BridgeClient.UserSessionInfo` for the current user.
     public let appConfig: AppConfigObserver = .init()
@@ -303,7 +302,6 @@ open class BridgeClientAppManager : ObservableObject {
             }
 
             DispatchQueue.main.async {
-                self.isUploadingResults = true
                 archives.forEach { archive in
                     var exporterV3Metadata: JsonElement? = nil
                     if let schedule = (archive as? AbstractResultArchive)?.schedule {

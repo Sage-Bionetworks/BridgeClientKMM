@@ -1,19 +1,20 @@
 object Versions {
     const val min_sdk = 23
-    const val target_sdk = 29
-    const val compile_sdk = 29
+    const val target_sdk = 30
+    const val compile_sdk = 30
 
     //Kotlin
     const val kotlin = "1.5.30"
-    const val kotlinCoroutines = "1.5.1-native-mt"
-    const val ktor = "1.6.4"
+    const val kotlinCoroutines = "1.5.2-native-mt"
+    const val ktor = "1.6.5"
     const val kotlinxSerialization = "1.3.0"
     const val kotlinxDateTime = "0.3.0"
     const val multiplatformSettings = "0.7.1"
-    const val koin = "3.1.1"
-    const val sqlDelight = "1.5.2"
+    const val koin = "3.1.5"
+    const val sqlDelight = "1.5.3"
     const val okio = "3.0.0"
     const val stately = "1.1.1"
+    const val kermit = "1.0.0"
 
     object AndroidX {
         val annotation = "1.1.0"
@@ -25,7 +26,7 @@ object Versions {
         val recyclerview = "1.1.0"
         val test = "1.3.0"
         val test_ext = "1.1.2"
-        val workManager = "2.5.0"
+        val workManager = "2.6.0"
     }
 
     const val slf4j = "1.7.30"
@@ -101,6 +102,10 @@ object Deps {
 
         val nativeDriver = "com.squareup.sqldelight:native-driver:${Versions.sqlDelight}"
         val sqlliteDriver = "com.squareup.sqldelight:sqlite-driver:${Versions.sqlDelight}"
+    }
+
+    object Kermit {
+        val core = "co.touchlab:kermit:${Versions.kermit}"
     }
 
     //Not currently using, but may be useful in the future

@@ -52,7 +52,7 @@ interface BridgeConfig : PlatformConfig {
      */
     val userAgent: String
         get() {
-            return "$appName/$appVersion ($deviceName; $osName/$osVersion) BridgeClientKMM/$sdkVersion"
+            return "$appId/$appVersion ($deviceName; $osName/$osVersion)"
         }
 
     /**

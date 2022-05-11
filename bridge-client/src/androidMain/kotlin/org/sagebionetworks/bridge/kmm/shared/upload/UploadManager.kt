@@ -1,6 +1,7 @@
 package org.sagebionetworks.bridge.kmm.shared.upload
 
 import android.util.Log
+import co.touchlab.kermit.Logger
 import com.squareup.sqldelight.db.SqlDriver
 import io.ktor.client.*
 import kotlinx.datetime.*
@@ -8,6 +9,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okio.FileSystem
 import okio.Path.Companion.toPath
+import org.koin.core.component.getScopeName
 import org.sagebionetworks.bridge.kmm.shared.apis.S3UploadApi
 import org.sagebionetworks.bridge.kmm.shared.apis.UploadsApi
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
@@ -44,7 +46,11 @@ internal class UploadManager(
     suspend fun processUploads(): Boolean {
         for (resource in database.getResources(ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID)) {
             resource.loadResource<UploadFile>()?.let {
-                processUploadFile(it)
+                try {
+                    processUploadFile(it)
+                } catch (error: Throwable) {
+                    Logger.e("Failed to process upload", error)
+                }
             }
         }
         //Check that all uploads succeeded and have been removed
@@ -115,12 +121,12 @@ internal class UploadManager(
     private suspend fun uploadToS3(uploadFile: UploadFile, uploadSession: UploadSession) {
         //Make call to S3 using url from UploadSession
         try {
-            Log.i("UploadManager", "uploadingToS3 $uploadFile")
+            Logger.d("uploadingToS3 $uploadFile")
             s3UploadApi.uploadFile(uploadSession.url, uploadFile) //TODO: Handle network exceptions -nbrown 4/26/21
             FileSystem.SYSTEM.delete(uploadFile.filePath.toPath()) //TODO: Handle delete failure -nbrown 12/16/20
             database.removeResource(uploadFile.getUploadFileResourceId(), ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID)
         } catch (error: Throwable) {
-            Log.w("UploadManager", "Error uploadingToS3 $uploadFile", error)
+            Logger.e("Error uploadingToS3 $uploadFile", error)
 
             //TODO: Handle failure cases -nbrown 12/16/20
             throw error

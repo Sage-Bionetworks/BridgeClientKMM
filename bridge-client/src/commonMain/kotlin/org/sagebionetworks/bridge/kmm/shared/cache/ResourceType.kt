@@ -9,8 +9,9 @@ enum class ResourceType {
     UPLOAD_SESSION,
     FILE_UPLOAD,
     USER_SESSION_INFO,
-    TIMELINE,
-    ACTIVITY_EVENTS_LIST,
+    TIMELINE, //Deprecated
+    PARTICIPANT_SCHEDULE,
+    ACTIVITY_EVENTS_LIST, //No longer needed
     ADHERENCE_RECORD,
     STUDY,
     STUDY_INFO

@@ -539,12 +539,10 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         // Set up a listener to retry temporarily-failed uploads whenever the app becomes active
         NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: nil) { notification in
             self.checkAndRetryOrphanedUploads()
-            self.retryUploadsAfterDelay()
         }
         
         // Also do it right away
         self.checkAndRetryOrphanedUploads()
-        self.retryUploadsAfterDelay()
     }
     
     fileprivate func touch(fileUrl: URL) {
@@ -618,8 +616,17 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         return tempFileURL
     }
     
+    fileprivate func runOnQueue(_ queue: OperationQueue, sync: Bool, block: @escaping ()->Void) {
+        if OperationQueue.current == queue {
+            block()
+        } else {
+            queue.addOperations([BlockOperation(block: block)], waitUntilFinished: sync)
+        }
+    }
+    
+    
     fileprivate func persistMapping<T>(from key: String, to value: T, defaultsKey: String) where T: Encodable {
-        let block = {
+        self.runOnQueue(self.uploadQueue, sync: false) {
             var mappings = self.userDefaults.dictionary(forKey: defaultsKey) ?? [String : Any]()
             var plistValue: Any
             do {
@@ -631,19 +638,12 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
             mappings[key] = plistValue
             self.userDefaults.setValue(mappings, forKey: defaultsKey)
         }
-        
-        if OperationQueue.current == self.uploadQueue {
-            block()
-        }
-        else {
-            self.uploadQueue.addOperation(block)
-        }
     }
     
     @discardableResult
     func removeMapping<T>(_ type: T.Type, from key: String, defaultsKey: String) -> T? where T: Decodable {
         var mapping: T?
-        let block = {
+        self.runOnQueue(self.uploadQueue, sync: true) {
             var mappings = self.userDefaults.dictionary(forKey: defaultsKey)
             if let mappingPlist = mappings?.removeValue(forKey: key) {
                 do {
@@ -656,19 +656,13 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
                 self.userDefaults.setValue(mappings, forKey: defaultsKey)
             }
         }
-        if OperationQueue.current == self.uploadQueue {
-            block()
-        }
-        else {
-            self.uploadQueue.addOperations( [BlockOperation(block: block)], waitUntilFinished: true)
-        }
         
         return mapping
     }
     
     fileprivate func retrieveMapping<T>(_ type: T.Type, from key: String, mappings: [String : Any]?) -> T? where T: Decodable {
         var mapping: T?
-        let block = {
+        self.runOnQueue(self.uploadQueue, sync: true) {
             if let mappingPlist = mappings?[key] {
                 do {
                     mapping = try DictionaryDecoder().decode(type, from: mappingPlist)
@@ -677,27 +671,14 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
                 }
             }
         }
-        if OperationQueue.current == self.uploadQueue {
-            block()
-        }
-        else {
-            self.uploadQueue.addOperations( [BlockOperation(block: block)], waitUntilFinished: true)
-        }
 
         return mapping
     }
 
     
     func resetMappings(for defaultsKey: String) {
-        let block = {
+        self.runOnQueue(self.uploadQueue, sync: false) {
             self.userDefaults.removeObject(forKey: defaultsKey)
-        }
-        
-        if OperationQueue.current == self.uploadQueue {
-            block()
-        }
-        else {
-            self.uploadQueue.addOperation(block)
         }
     }
     
@@ -707,7 +688,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
     // uploads, you should invalidate the URLSession associated with this manager, which will cause this
     // to get called.
     func reset() {
-        let block = {
+        self.runOnQueue(self.uploadQueue, sync: false) {
             // Go through and reset all the mappings, gathering up the temp files that are used as keys
             // so we can delete them afterward.
             var invariantFilePaths = Set<String>()
@@ -731,13 +712,6 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
             for invariantFilePath in invariantFilePaths {
                 self.cleanUpTempFile(filePath: invariantFilePath)
             }
-        }
-        
-        if OperationQueue.current == self.uploadQueue {
-            block()
-        }
-        else {
-            self.uploadQueue.addOperation(block)
         }
     }
     
@@ -971,7 +945,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
     }
     
     /// Call this function to check for and run any retries where the required delay has elapsed.
-    public func retryUploadsAfterDelay() {
+    func retryUploadsAfterDelay() {
         self.uploadQueue.addOperation {
             guard var retryUploads = self.userDefaults.dictionary(forKey: self.retryUploadsKey) else { return }
             for filePath in retryUploads.keys {
@@ -1001,14 +975,24 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         return notCanceledTasks
     }
     
-    /// Call this function to check for and retry any orphaned uploads.
-    public func checkAndRetryOrphanedUploads() {
+    fileprivate func fileIsADayOld(invariantFilePath: String, fileUrl: inout URL!) -> Bool {
+        let oneDay: TimeInterval = 60 * 60 * 24
+        let fullPath = self.fullyQualifiedPath(of: invariantFilePath)
+        fileUrl = URL(fileURLWithPath: fullPath)
+        guard let modDate = self.modificationDate(of: fileUrl) else { return false }
+        return Date().timeIntervalSince(modDate) > oneDay
+    }
+    
+    // Check for orphaned uploads and enqueue them for retry. This needs to *not* be run in the
+    // uploads queue (which is also the background session's delegate/completion handler queue)
+    // to avoid an EXC_BAD_ACCESS crash when invoking getAllTasks.
+    fileprivate func checkForOrphanedUploads() {
         // App extensions are severely memory constrained, so don't even try this if we're in one.
         guard !self.netManager.isRunningInAppExtension() else { return }
+        
         self.netManager.backgroundSession().getAllTasks { tasks in
             var tasks = tasks
             let defaults = self.userDefaults
-            let oneDay: TimeInterval = 60 * 60 * 24
             
             // Get the set of all temp files for which there is a currently-active background
             // URLSession task.
@@ -1028,10 +1012,8 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
                 guard let metadataBlob = api.retrieveMetadata(from: invariantFilePath, mappings: uploadURLsRequested) else { continue }
                 // Assume files with an active urlsession task are not (yet) orphaned, no matter how old.
                 guard !filesInFlight.contains(invariantFilePath) else { continue }
-                let fullPath = self.fullyQualifiedPath(of: invariantFilePath)
-                let fileUrl = URL(fileURLWithPath: fullPath)
-                guard let modDate = self.modificationDate(of: fileUrl) else { continue }
-                guard Date().timeIntervalSince(modDate) > oneDay else { continue }
+                var fileUrl: URL!
+                guard self.fileIsADayOld(invariantFilePath: invariantFilePath, fileUrl: &fileUrl) else { continue }
                 
                 // If we get all the way here, touch the file to reset the orphanage clock
                 // and then send the upload request again.
@@ -1068,10 +1050,8 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
                 guard let metadataBlob = api.retrieveMetadata(from: invariantFilePath, mappings: notifyingBridge) else { continue }
                 // Assume files with an active urlsession task are not (yet) orphaned, no matter how old.
                 guard !filesInFlight.contains(invariantFilePath) else { continue }
-                let fullPath = self.fullyQualifiedPath(of: invariantFilePath)
-                let fileUrl = URL(fileURLWithPath: fullPath)
-                guard let modDate = self.modificationDate(of: fileUrl) else { continue }
-                guard Date().timeIntervalSince(modDate) > oneDay else { continue }
+                var fileUrl: URL!
+                guard self.fileIsADayOld(invariantFilePath: invariantFilePath, fileUrl: &fileUrl) else { continue }
                 
                 // If we get all the way here, touch the file to reset the orphanage clock
                 // and then send the notify request again.
@@ -1080,17 +1060,17 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
             }
             
             // Assume any uploads in the bridgeFileUploads map which are not in any other map
-            // and have no in-flight tasks are orphaned.
+            // and have no in-flight tasks and are at least 24 hours old are orphaned.
             for invariantFilePath in fileUploads.keys {
                 guard !filesInFlight.contains(invariantFilePath) else { continue }
                 guard !uploadURLsRequested.keys.contains(invariantFilePath) else { continue }
                 guard !uploadingToS3.keys.contains(invariantFilePath) else { continue }
                 guard !notifyingBridge.keys.contains(invariantFilePath) else { continue }
+                var fileUrl: URL!
+                guard self.fileIsADayOld(invariantFilePath: invariantFilePath, fileUrl: &fileUrl) else { continue }
                 guard let originalFilePath = self.retrieveMapping(String.self, from: invariantFilePath, mappings: fileUploads) else { continue }
                 guard let (api, fileId, mimeType, extras) = self.apiInfoFromXAttrs(for: invariantFilePath) else { continue }
                 // get the upload metadata using the temp file URL (as the original file likely no longer exists)
-                let fullPath = self.fullyQualifiedPath(of: invariantFilePath)
-                let fileUrl = URL(fileURLWithPath: fullPath)
                 guard let metadataBlob = api.uploadMetadata(for: fileId, fileUrl: fileUrl, mimeType: mimeType, extras: extras) else { continue }
                 // touch the file to reset the orphanage clock and enqueue it for immediate retry.
                 self.touch(fileUrl: fileUrl)
@@ -1140,6 +1120,50 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         }
     }
     
+    /// Call this function to check for and retry any orphaned uploads, and update the app's isUploading state  accordingly.
+    public func checkAndRetryOrphanedUploads() {
+        // This needs to start out from the main queue to avoid an EXC_BAD_ACCESS crash in
+        // checkForOrphanedUploads(), but we also need that function to do its thing before
+        // continuing on here and we don't want to potentially deadlock by popping out
+        // synchronously to main in there. So we'll do it from here.
+        self.runOnQueue(OperationQueue.main, sync: false) {
+            self.checkForOrphanedUploads()
+            
+            self.runOnQueue(self.uploadQueue, sync: false) {
+                let uploading = self.uploadsStillInProgress()
+                
+                // Update the app manager's isUploading status. This needs to be done on the main queue.
+                self.runOnQueue(OperationQueue.main, sync: false) {
+                    self.appManager.isUploading = uploading
+                }
+            }
+            
+            self.retryUploadsAfterDelay()
+        }
+    }
+    
+    fileprivate func postAndUpdateUploadingStatus(_ notification: Notification) {
+        NotificationCenter.default.post(notification)
+        self.checkAndRetryOrphanedUploads()
+    }
+    
+    // The number of uploads still in progress is the total of the number of file uploads currently happening
+    // plus the number of previously failed uploads enqueued for retry. This just checks if that number is
+    // zero or non-zero.
+    //
+    // NOTE: This function should only be called on the upload queue.
+    fileprivate func uploadsStillInProgress() -> Bool {
+        var uploadsCount: Int = 0
+        if let fileUploads = self.userDefaults.dictionary(forKey: self.bridgeFileUploadsKey) {
+            uploadsCount = uploadsCount + fileUploads.count
+        }
+        if let retries = self.userDefaults.dictionary(forKey: self.retryUploadsKey) {
+            uploadsCount = uploadsCount + retries.count
+        }
+        
+        return uploadsCount != 0
+    }
+    
     // Put a file into the retry queue so we can try again later.
     func enqueueForRetry<T>(retryInfo: BridgeFileRetryInfo<T>, invariantFilePath: String, originalFilePath: String, uploadMetadata: BridgeFileUploadMetadata<T>) where T: Codable {
         self.persistMapping(from: invariantFilePath, to: retryInfo, defaultsKey: self.retryUploadsKey)
@@ -1173,7 +1197,10 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         // remove the file from the temp -> orig mappings, and retrieve the original file path
         guard let originalFilePath = removeMapping(String.self, from: invariantFilePath, defaultsKey: self.bridgeFileUploadsKey) else {
             debugPrint("Unexpected: No original file path found mapped from temp file path \(invariantFilePath)")
-            return
+            debugPrint(" Status Code: \(statusCode)")
+            debugPrint(" API: \(uploadApi.apiString)")
+            debugPrint(" Download task: \(downloadTask)")
+           return
         }
         
         // remove the file from the temp -> download error response body mappings,
@@ -1203,7 +1230,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
             failedNotification = uploadApi.uploadRequestFailedNotification(for: uploadMetadata, statusCode: statusCode, responseBody: responseBody)
         }
         cleanUpTempFile(filePath: invariantFilePath)
-        NotificationCenter.default.post(failedNotification)
+        self.postAndUpdateUploadingStatus(failedNotification)
     }
 
     // Helper for task delegate method in case of HTTP error on S3 upload.
@@ -1225,7 +1252,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
             // post a notification that the file upload to S3 failed unrecoverably
             let uploadFailedNotification = uploadApi.uploadToS3FailedNotification(for: uploadMetadata)
             cleanUpTempFile(filePath: tempFilePath)
-            NotificationCenter.default.post(uploadFailedNotification)
+            self.postAndUpdateUploadingStatus(uploadFailedNotification)
         }
     }
 
@@ -1272,6 +1299,9 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         // remove the file from the temp -> orig mappings, and retrieve the original file path
         guard let originalFilePath = removeMapping(String.self, from: invariantFilePath, defaultsKey: self.bridgeFileUploadsKey) else {
             debugPrint("Unexpected: No original file path found mapped from temp file path \(invariantFilePath)")
+            debugPrint(" Error: \(error)")
+            debugPrint(" Task: \(task)")
+            debugPrint(" Session: \(session)")
             return
         }
         
@@ -1287,7 +1317,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
             debugPrint("Error uploading file \(originalFilePath) to S3: \(error)")
             let uploadFailedNotification = uploadApi.uploadToS3FailedNotification(for: uploadMetadata)
             cleanUpTempFile(filePath: invariantFilePath)
-            NotificationCenter.default.post(uploadFailedNotification)
+            self.postAndUpdateUploadingStatus(uploadFailedNotification)
             return
         }
         
@@ -1313,7 +1343,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         
         // post a notification that the file uploaded
         let uploadedNotification = uploadApi.fileUploadedNotification(for: uploadMetadata)
-        NotificationCenter.default.post(uploadedNotification)
+        self.postAndUpdateUploadingStatus(uploadedNotification)
     }
     
     /// Session delegate method.
@@ -1331,7 +1361,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         // so we copy all incomplete uploads into the retry queue just to be sure. But we also
         // leave them in their current state in the mappings in case the error only broke it
         // on our end and iOS could still come through for us.
-        let block = {
+        self.runOnQueue(self.uploadQueue, sync: false) {
             guard let originalFilePaths = self.userDefaults.dictionary(forKey: self.bridgeFileUploadsKey) else {
                 // nothing to see here, move along
                 return
@@ -1355,13 +1385,6 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
                 }
                 uploadApi.enqueueForRetry(delay: self.delayForRetry, relativePath: invariantFilePath, originalFilePath: originalFilePath, uploadMetadata: uploadMetadata)
             }
-        }
-        
-        if OperationQueue.current == self.uploadQueue {
-            block()
-        }
-        else {
-            self.uploadQueue.addOperation(block)
         }
     }
 
@@ -1414,7 +1437,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
     }
     
     func cleanUpTempFile(filePath: String) {
-        let block = {
+        self.runOnQueue(self.uploadQueue, sync: false) {
             let fullPath = self.fullyQualifiedPath(of: filePath)
             guard FileManager.default.fileExists(atPath: fullPath) else {
                 debugPrint("Unexpected: Attempting to clean up temp file with invariant path '\(filePath) but temp file does not exist at '\(fullPath)")
@@ -1433,13 +1456,6 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
             if let fileCoordinatorError = fileCoordinatorError {
                 debugPrint("Error coordinating deletion of file \(tempFile): \(fileCoordinatorError)")
             }
-        }
-
-        if OperationQueue.current == self.uploadQueue {
-            block()
-        }
-        else {
-            self.uploadQueue.addOperation(block)
         }
     }
     

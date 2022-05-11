@@ -5,7 +5,7 @@ import android.content.Context.MODE_APPEND
 import android.content.Context.MODE_PRIVATE
 import android.content.res.AssetManager
 import android.os.Build
-import android.util.Log
+import co.touchlab.kermit.Logger
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -55,8 +55,7 @@ abstract class AssessmentResultArchiveUploader(
                                     eventTimestamp: String,
                                     sessionWindowExpiration: kotlinx.datetime.Instant? = null) {
         if (assessmentResult.schemaIdentifier == null) {
-            Log.e(
-                "Archiver",
+            Logger.e(
                 "Quitting: No schema found for assessment ${assessmentResult.assessmentIdentifier}"
             )
             return
@@ -86,7 +85,7 @@ abstract class AssessmentResultArchiveUploader(
         }
 
         val assessmentRunUUID =  if (assessmentResult.runUUIDString.isEmpty()) {
-            Log.e("Archiver", "No runUUIDString in assessmentResult, created")
+            Logger.e("No runUUIDString in assessmentResult, created")
             UUID.randomUUID().toString()
         } else {
             assessmentResult.runUUIDString
@@ -99,7 +98,7 @@ abstract class AssessmentResultArchiveUploader(
 
 
         val uploadFile = persist(assessmentRunUUID, builder.build(), uploadMetadata, sessionWindowExpiration)
-        Log.i("Archiver", "UploadFile $uploadFile")
+        Logger.i("UploadFile $uploadFile")
         uploadRequester.queueAndRequestUpload(context, uploadFile, assessmentInstanceId)
     }
 
@@ -114,7 +113,7 @@ abstract class AssessmentResultArchiveUploader(
         val md5: MessageDigest = try {
             MessageDigest.getInstance("MD5")
         } catch (e: NoSuchAlgorithmException) {
-            Log.e("Archiver", "Unable to load md5", e)
+            Logger.e("Unable to load md5", e)
             throw e
         }
 
@@ -149,7 +148,7 @@ abstract class AssessmentResultArchiveUploader(
             )
 
         } catch (e: CMSException) {
-            Log.e("Archiver", "Error encrypting archive", e)
+            Logger.e("Error encrypting archive", e)
             throw e
         }
     }
@@ -167,9 +166,7 @@ abstract class AssessmentResultArchiveUploader(
                     ) as X509Certificate
             }
         } catch (e: IOException) {
-            Log.e(
-                "Archiver", "Could not load public key from /assets/study_public_key.pem", e
-            )
+            Logger.e("Could not load public key from /assets/study_public_key.pem", e)
             throw e
         }
     }

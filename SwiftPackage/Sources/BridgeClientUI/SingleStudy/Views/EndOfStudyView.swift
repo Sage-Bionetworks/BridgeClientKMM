@@ -53,7 +53,7 @@ public struct EndOfStudyView: View {
     
     public var body: some View {
         ScreenBackground {
-            if bridgeManager.isUploadingResults {
+            if bridgeManager.isUploading {
                 waitMessage
             }
             else {

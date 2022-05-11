@@ -671,7 +671,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
     @Test
     fun testScheduledSessionsDay2WithCompletion() {
         runTest {
-            val studyId = "testScheduledSessionsDay2WithCompletiont"
+            val studyId = "testScheduledSessionsDay2WithCompletion"
             val eventTimeStamp = Clock.System.now().minus(2, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
             val repo = getTestScheduleTimelineRepo(adherenceRecordDay2json, timeStamp = eventTimeStamp)
             repo.adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)

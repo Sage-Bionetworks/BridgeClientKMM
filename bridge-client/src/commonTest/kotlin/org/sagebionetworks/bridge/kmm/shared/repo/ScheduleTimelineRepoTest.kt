@@ -442,9 +442,15 @@ class ScheduleTimelineRepoTest: BaseTest() {
 
     private fun getTestScheduleTimelineRepo(adherenceRecordJson: String = "", timeStamp: Instant, timelineJson: String = getScheduleJson(timeStamp) ) : ScheduleTimelineRepo {
         val adherenceRecordRepo = AdherenceRecordRepo(getTestClient(adherenceRecordJson), databaseHelper, MainScope())
-        val eventJson = Json.encodeToString(getActivityEventList(timeStamp))
-        val activityEventsRepo = ActivityEventsRepo(getTestClient(eventJson), databaseHelper, MainScope())
-        return ScheduleTimelineRepo(adherenceRecordRepo, activityEventsRepo, getTestClient(timelineJson), databaseHelper, MainScope())
+        val configJson = "{\n" +
+                "  \"config\": {},\n" +
+                "  \"createdOn\": \"2020-08-28T14:28:13.386Z\",\n" +
+                "  \"modifiedOn\": \"2020-08-28T14:28:13.386Z\",\n" +
+                "  \"version\": 0,\n" +
+                "  \"type\": \"AssessmentConfig\"\n" +
+                "}"
+        val assessmentConfigRepo = AssessmentConfigRepo(getTestClient(configJson), databaseHelper, MainScope())
+        return ScheduleTimelineRepo(adherenceRecordRepo, assessmentConfigRepo, getTestClient(timelineJson), databaseHelper, MainScope())
     }
 
     @BeforeTest

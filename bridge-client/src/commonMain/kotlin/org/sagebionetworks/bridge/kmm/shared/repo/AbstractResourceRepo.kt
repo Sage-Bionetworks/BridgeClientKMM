@@ -17,6 +17,7 @@ abstract class AbstractResourceRepo(val database: ResourceDatabaseHelper, protec
     internal inline fun <reified T: Any> getResourceById(identifier: String,
                                                          studyId: String,
                                                          resourceType: ResourceType,
+                                                         secondaryId: String? = null,
                                                          noinline remoteLoad: suspend () -> String,
                                                          noinline shouldUpdate: (Resource) -> Boolean = {false}): Flow<ResourceResult<T>> {
         return database.getResourceAsFlow(identifier, resourceType, studyId).filter { curResource ->
@@ -29,7 +30,7 @@ abstract class AbstractResourceRepo(val database: ResourceDatabaseHelper, protec
 
                 //Need to load resource from Bridge
                 backgroundScope.launch {
-                    remoteLoadResource(database, identifier, resourceType, studyId, curResource, remoteLoad)
+                    remoteLoadResource(database, identifier, secondaryId, resourceType, studyId, curResource, remoteLoad)
                 }
             }
             filterResource
@@ -46,6 +47,7 @@ abstract class AbstractResourceRepo(val database: ResourceDatabaseHelper, protec
         internal suspend fun remoteLoadResource(
             database: ResourceDatabaseHelper,
             identifier: String,
+            secondaryId: String? = null,
             resourceType: ResourceType,
             studyId: String,
             curResource: Resource?, //Current resource from local cache if there is one
@@ -54,7 +56,7 @@ abstract class AbstractResourceRepo(val database: ResourceDatabaseHelper, protec
             //Mark the resource as pending update
             var resource = Resource(
                 identifier = identifier,
-                secondaryId = ResourceDatabaseHelper.DEFAULT_SECONDARY_ID,
+                secondaryId = secondaryId ?: ResourceDatabaseHelper.DEFAULT_SECONDARY_ID,
                 type = resourceType,
                 studyId = studyId,
                 json = curResource?.json,
@@ -68,7 +70,7 @@ abstract class AbstractResourceRepo(val database: ResourceDatabaseHelper, protec
                 val resourceJson = remoteLoad()
                 resource = Resource(
                     identifier = identifier,
-                    secondaryId = ResourceDatabaseHelper.DEFAULT_SECONDARY_ID,
+                    secondaryId = secondaryId ?: ResourceDatabaseHelper.DEFAULT_SECONDARY_ID,
                     type = resourceType,
                     studyId = studyId,
                     json = resourceJson,
@@ -78,7 +80,7 @@ abstract class AbstractResourceRepo(val database: ResourceDatabaseHelper, protec
                 )
                 database.insertUpdateResource(resource)
             } catch (err: Throwable) {
-                resource = processResponseException(database, identifier, resourceType, studyId, curResource, err)
+                resource = processResponseException(database, identifier, secondaryId, resourceType, studyId, curResource, err)
                 database.insertUpdateResource(resource)
             }
             return resource
@@ -87,6 +89,7 @@ abstract class AbstractResourceRepo(val database: ResourceDatabaseHelper, protec
         private fun processResponseException(
             database: ResourceDatabaseHelper,
             identifier: String,
+            secondaryId: String? = null,
             resourceType: ResourceType,
             studyId: String,
             curResource: Resource?,
@@ -146,7 +149,7 @@ abstract class AbstractResourceRepo(val database: ResourceDatabaseHelper, protec
             }
             return Resource(
                 identifier = identifier,
-                secondaryId = ResourceDatabaseHelper.DEFAULT_SECONDARY_ID,
+                secondaryId = secondaryId ?: ResourceDatabaseHelper.DEFAULT_SECONDARY_ID,
                 type = resourceType,
                 studyId = studyId,
                 json = json,

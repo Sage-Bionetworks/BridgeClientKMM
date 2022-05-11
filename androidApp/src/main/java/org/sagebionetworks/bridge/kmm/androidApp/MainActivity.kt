@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
         val tv: TextView = findViewById(R.id.text_view)
 
         if (authenticationRepository.isAuthenticated()) {
-            assessmentConfigRepo.getAssessmentById("eGhiQTT2a6SCCmjTod6CDb0t").asLiveData()
+            assessmentConfigRepo.getCachedAssessmentConfigByGuidAsFlow("eGhiQTT2a6SCCmjTod6CDb0t").asLiveData()
                 .observe(this, { t ->
                     when (t) {
                         is ResourceResult.Success -> {tv.text = t.data.config.toString()}

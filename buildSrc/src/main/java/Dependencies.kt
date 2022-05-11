@@ -4,8 +4,8 @@ object Versions {
     const val compile_sdk = 30
 
     //Kotlin
-    const val kotlin = "1.5.30"
-    const val kotlinCoroutines = "1.5.2-native-mt"
+    const val kotlin = "1.6.21"
+    const val kotlinCoroutines = "1.6.1-native-mt"
     const val ktor = "1.6.5"
     const val kotlinxSerialization = "1.3.0"
     const val kotlinxDateTime = "0.3.0"

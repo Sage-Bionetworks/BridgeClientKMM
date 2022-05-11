@@ -5,6 +5,7 @@ import io.ktor.client.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
 import kotlinx.datetime.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
@@ -19,7 +20,7 @@ import kotlin.math.roundToInt
 import kotlin.time.ExperimentalTime
 
 class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo,
-                           internal val activityEventsRepo: ActivityEventsRepo,
+                           internal val assessmentConfigRepo: AssessmentConfigRepo,
                            httpClient: HttpClient,
                            databaseHelper: ResourceDatabaseHelper,
                            backgroundScope: CoroutineScope) :
@@ -47,7 +48,13 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
     }
 
     private suspend fun loadRemoteTimeline(studyId: String): String {
-        return Json.encodeToString(scheduleApi.getParticipantScheduleForSelf(studyId))
+        val schedule = scheduleApi.getParticipantScheduleForSelf(studyId)
+        backgroundScope.launch() {
+            schedule.assessments?.let {
+                assessmentConfigRepo.loadAndCacheConfigs(it)
+            }
+        }
+        return Json.encodeToString(schedule)
     }
 
     /**
@@ -323,7 +330,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         day: LocalDate,
         instantInDay: Instant,
         studyId: String,
-        assessmentInfoMap: Map<String?, AssessmentInfo>,
+        assessmentInfoMap: Map<String, AssessmentInfo>,
         session: SessionInfo,
         eventMap: Map<String,Instant>?,
         timezone: TimeZone,
@@ -410,7 +417,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
     private fun mapAssessments(
         scheduledSession: ScheduledSession,
         studyId: String,
-        assessmentInfoMap: Map<String?, AssessmentInfo>
+        assessmentInfoMap: Map<String, AssessmentInfo>
     ): List<ScheduledAssessmentReference> {
 
         val adherenceRecords = adherenceRecordRepo.getCachedAdherenceRecords(

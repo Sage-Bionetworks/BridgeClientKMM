@@ -61,13 +61,14 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                implementation(Deps.Coroutines.core)
+                implementation(Deps.SqlDelight.runtime)
+                implementation(Deps.SqlDelight.coroutineExtensions)
                 implementation(Deps.Coroutines.core) {
                     version {
                         strictly(Versions.kotlinCoroutines)
                     }
                 }
-                implementation(Deps.SqlDelight.runtime)
-                implementation(Deps.SqlDelight.coroutineExtensions)
                 api(Deps.Serialization.core)
                 implementation(Deps.Ktor.clientCore)
                 //Is api to give depending modules access to JsonElement

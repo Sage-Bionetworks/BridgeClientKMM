@@ -41,16 +41,18 @@ class ResourceDatabaseHelper(sqlDriver: SqlDriver) : EtagStorageCache {
     }
 
     internal fun insertUpdateResource(resource: Resource) {
-        dbQuery.insertUpdateResource(
-            identifier = resource.identifier,
-            secondaryId = resource.secondaryId,
-            type = resource.type,
-            json = resource.json,
-            lastUpdate = resource.lastUpdate,
-            status = resource.status,
-            studyId = resource.studyId,
-            needSave = resource.needSave
-        )
+        dbQuery.transaction {
+            dbQuery.insertUpdateResource(
+                identifier = resource.identifier,
+                secondaryId = resource.secondaryId,
+                type = resource.type,
+                json = resource.json,
+                lastUpdate = resource.lastUpdate,
+                status = resource.status,
+                studyId = resource.studyId,
+                needSave = resource.needSave
+            )
+        }
     }
 
     internal fun getResourcesByIds(ids: List<String>, type: ResourceType, studyId: String) : List<Resource> {

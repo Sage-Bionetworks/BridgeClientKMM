@@ -322,7 +322,7 @@ extension BridgeFileUploadManagerTestCaseTyped {
         }
         
         // -- wait here until everything above has worked its way through.
-        XCTWaiter(delegate: self).wait(for: [expectRetried], timeout: 500.0)
+        XCTWaiter(delegate: self).wait(for: [expectRetried], timeout: 5.0)
         NotificationCenter.default.removeObserver(observer503Retried)
         NotificationCenter.default.removeObserver(observer503NotRetried)
         NotificationCenter.default.removeObserver(observer503RetriedButS3Failed)

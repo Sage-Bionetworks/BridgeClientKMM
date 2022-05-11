@@ -443,8 +443,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
         val databaseHelper = ResourceDatabaseHelper(testDatabaseDriver())
         val adherenceRecordRepo = AdherenceRecordRepo(getTestClient(adherenceRecordJson), databaseHelper, MainScope())
         val eventJson = Json.encodeToString(getActivityEventList(timeStamp))
-        val activityEventsRepo = ActivityEventsRepo(getTestClient(eventJson), databaseHelper, MainScope())
-        return ScheduleTimelineRepo(adherenceRecordRepo, activityEventsRepo, getTestClient(timelineJson), databaseHelper, MainScope())
+        val assessmentConfigRepo = AssessmentConfigRepo(getTestClient(eventJson), databaseHelper, MainScope())
+        return ScheduleTimelineRepo(adherenceRecordRepo, assessmentConfigRepo, getTestClient(timelineJson), databaseHelper, MainScope())
     }
 
     @Test

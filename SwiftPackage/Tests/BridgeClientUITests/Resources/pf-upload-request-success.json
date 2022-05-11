@@ -2,5 +2,6 @@
     "fileId":"TestFileId",
     "mimeType": "image/jpeg",
     "uploadUrl":"/not-a-real-pre-signed-S3-url",
+    "expiresOn":"2999-12-31T11:59:59.999Z",
     "type":"ParticipantFile"
 }

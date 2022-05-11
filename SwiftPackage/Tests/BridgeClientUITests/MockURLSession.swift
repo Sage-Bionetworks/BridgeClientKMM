@@ -309,5 +309,11 @@ class MockURLSession: URLSession {
         add(mockTask: task)
         return task
     }
+    
+    override func getAllTasks(completionHandler: @escaping ([URLSessionTask]) -> Void) {
+        self.delegateQueue.addOperation {
+            completionHandler(self.mockTasks as? [URLSessionTask] ?? [])
+        }
+    }
 }
 

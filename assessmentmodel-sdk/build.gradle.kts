@@ -44,6 +44,8 @@ dependencies {
         implementation("org.sagebionetworks.assessmentmodel:presentation:$assessmentVersion")
 
         api(Deps.Koin.android)
+        // Kermit
+        implementation(Deps.Kermit.core)
 
         // legacy Bridge dependencies
         // migrate to use kotlinx/java8 time and see if we can publish multi-platform

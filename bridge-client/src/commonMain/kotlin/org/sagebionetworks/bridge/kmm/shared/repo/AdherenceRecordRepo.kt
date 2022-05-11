@@ -1,5 +1,6 @@
 package org.sagebionetworks.bridge.kmm.shared.repo
 
+import co.touchlab.kermit.Logger
 import co.touchlab.stately.ensureNeverFrozen
 import io.ktor.client.*
 import io.ktor.client.features.*
@@ -62,7 +63,7 @@ class AdherenceRecordRepo(httpClient: HttpClient, databaseHelper: ResourceDataba
                 adherenceRecordsSearch = adherenceRecordsSearch.copy(offsetBy = pageOffset)
             } while (curPageSize + pageSize < recordResult.total)
         } catch (throwable: Throwable) {
-            println(throwable)
+            Logger.e("Error loading remote adherence records", throwable)
             return false
         }
         return true

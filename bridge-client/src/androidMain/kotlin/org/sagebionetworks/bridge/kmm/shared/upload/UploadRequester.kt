@@ -3,6 +3,7 @@ package org.sagebionetworks.bridge.kmm.shared.upload
 import android.content.Context
 import android.util.Log
 import androidx.work.*
+import co.touchlab.kermit.Logger
 import com.squareup.sqldelight.db.SqlDriver
 import io.ktor.client.*
 import kotlinx.coroutines.Dispatchers
@@ -98,21 +99,21 @@ internal class CoroutineUploadWorker(
     
     override suspend fun doWork(): Result {
         return withContext(Dispatchers.IO) {
-            Log.d(TAG, "Upload worker started")
+            Logger.d { "Upload worker started" }
             val uploadManager = UploadManager(
                 httpClient, sqlDriver
             )
             return@withContext try {
                 if (uploadManager.processUploads()) {
-                    Log.d(TAG, "Successfully processed all uploads")
+                    Logger.d { "Successfully processed all uploads" }
                     Result.success()
                 } else {
-                    Log.w(TAG, "uploadManager.processUploads did not finish all uploads")
+                    Logger.d { "uploadManager.processUploads did not finish all uploads" }
                     //TODO: Handle failure and retry scenarios -nbrown 12/21/20
                     Result.retry()
                 }
             } catch (t: Throwable) {
-                Log.e(TAG, "Error calling uploadManager.ProcessUploads", t)
+                Logger.e("Error calling uploadManager.ProcessUploads", t)
                 Result.retry()
             }
         }

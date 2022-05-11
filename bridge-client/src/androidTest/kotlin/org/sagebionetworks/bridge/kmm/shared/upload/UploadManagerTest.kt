@@ -165,7 +165,9 @@ class UploadManagerTest {
                 addHandler { respondOk() }
                 // 3 - First completeUploadSession call
                 addHandler { respondError(HttpStatusCode.GatewayTimeout) }
-                // 4 - completeUploadSession call
+                // 4 - Second completeUploadSession call
+                addHandler { respondError(HttpStatusCode.GatewayTimeout) }
+                // 5 - completeUploadSession call
                 addHandler (
                     getJsonReponseHandler(Json.encodeToString(uploadValidationStatus))
                 )

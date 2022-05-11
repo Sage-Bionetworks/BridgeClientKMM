@@ -64,6 +64,11 @@ kotlin {
                 implementation(Deps.Coroutines.core)
                 implementation(Deps.SqlDelight.runtime)
                 implementation(Deps.SqlDelight.coroutineExtensions)
+                implementation(Deps.Coroutines.core) {
+                    version {
+                        strictly(Versions.kotlinCoroutines)
+                    }
+                }
                 api(Deps.Serialization.core)
                 implementation(Deps.Ktor.clientCore)
                 //Is api to give depending modules access to JsonElement

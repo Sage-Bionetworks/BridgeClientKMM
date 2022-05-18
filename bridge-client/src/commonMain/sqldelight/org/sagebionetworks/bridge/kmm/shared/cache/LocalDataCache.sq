@@ -1,0 +1,40 @@
+import kotlinx.datetime.LocalDateTime;
+import kotlinx.datetime.TimeZone;
+import kotlinx.serialization.json.JsonElement;
+
+CREATE TABLE JsonData (
+    identifier TEXT NOT NULL,
+    dataType TEXT NOT NULL,
+    json TEXT AS JsonElement NOT NULL,
+    lastUpdate INTEGER AS Long NOT NULL,
+    expire TEXT AS LocalDateTime NOT NULL,
+    timeZone TEXT AS TimeZone NOT NULL ,
+    PRIMARY KEY (identifier, dataType)
+);
+
+insertUpdateJsonData:
+INSERT OR REPLACE INTO JsonData(identifier, dataType, json, lastUpdate, expire, timeZone)
+VALUES(?, ?,?, ?, ?, ?);
+
+removeAllJsonData:
+DELETE FROM JsonData;
+
+selectAllJsonDataByType:
+SELECT * FROM JsonData
+WHERE dataType = ?;
+
+removeAllJsonDataType:
+DELETE FROM JsonData
+WHERE dataType = ?;
+
+selectJsonDataById:
+SELECT * FROM JsonData
+WHERE identifier = ? AND dataType = ?;
+
+removeJsonDataById:
+DELETE FROM JsonData
+WHERE identifier = ? AND dataType = ?;
+
+removeExpiredData:
+DELETE FROM JsonData
+WHERE expire < ?;

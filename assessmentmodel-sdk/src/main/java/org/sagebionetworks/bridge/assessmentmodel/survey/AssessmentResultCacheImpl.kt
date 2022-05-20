@@ -7,12 +7,12 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.encodeToJsonElement
 import org.sagebionetworks.assessmentmodel.AssessmentResult
+import org.sagebionetworks.assessmentmodel.AssessmentResultCache
 import org.sagebionetworks.bridge.kmm.shared.cache.LocalJsonDataCache
 
-//TODO: Implement AssessmentResultCache interface once AssessmentModel is ready -nbrown 05/18/2022
-class AssessmentResultCacheImpl (private val jsonDataCache: LocalJsonDataCache) { // : AssessmentResultCache {
+class AssessmentResultCacheImpl (private val jsonDataCache: LocalJsonDataCache) : AssessmentResultCache {
 
-    fun loadAssessmentResult(instanceGuid: String, jsonCoder: Json) : AssessmentResult? {
+    override fun loadAssessmentResult(instanceGuid: String, jsonCoder: Json) : AssessmentResult? {
         val data = jsonDataCache.loadData(instanceGuid, TYPE_ASSESSMENT_RESULT)
         data?.let {
             return jsonCoder.decodeFromJsonElement(it.json)
@@ -20,7 +20,7 @@ class AssessmentResultCacheImpl (private val jsonDataCache: LocalJsonDataCache) 
         return null
     }
 
-    fun storeAssessmentResult(instanceGuid: String, result: AssessmentResult, jsonCoder: Json, expire: Instant?) {
+    override fun storeAssessmentResult(instanceGuid: String, result: AssessmentResult, jsonCoder: Json, expire: Instant?) {
         jsonDataCache.storeData(
             id = instanceGuid,
             dataType = TYPE_ASSESSMENT_RESULT,
@@ -29,7 +29,7 @@ class AssessmentResultCacheImpl (private val jsonDataCache: LocalJsonDataCache) 
         )
     }
 
-    fun clearExpiredAssessmentResults() {
+    override fun clearExpiredAssessmentResults() {
         jsonDataCache.removeExpiredData()
     }
 

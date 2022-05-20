@@ -43,4 +43,9 @@ class BridgeAssessmentRegistryProvider(override val fileLoader: FileLoader, val 
         }
         return false
     }
+
+    override fun getJsonCoder(assessmentPlaceholder: AssessmentPlaceholder): Json {
+        // Return the default AssessmentModel serializer, which should work for surveys
+        return Serialization.JsonCoder.default
+    }
 }

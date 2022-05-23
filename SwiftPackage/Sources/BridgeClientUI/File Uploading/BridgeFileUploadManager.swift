@@ -1299,7 +1299,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         // remove the file from the temp -> orig mappings, and retrieve the original file path
         guard let originalFilePath = removeMapping(String.self, from: invariantFilePath, defaultsKey: self.bridgeFileUploadsKey) else {
             debugPrint("Unexpected: No original file path found mapped from temp file path \(invariantFilePath)")
-            debugPrint(" Error: \(error)")
+            debugPrint(" Error: \(String(describing: error))")
             debugPrint(" Task: \(task)")
             debugPrint(" Session: \(session)")
             return

@@ -299,7 +299,7 @@ extension AssessmentInfo {
                   label: identifier,
                   minutesToComplete: 3,
                   colorScheme: nil,
-                  configUrl: nil,
+                  configUrl: "http://foo.org",
                   type: "AssessmentInfo")
     }
 }

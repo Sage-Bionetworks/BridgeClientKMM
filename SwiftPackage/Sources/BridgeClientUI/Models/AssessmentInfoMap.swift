@@ -88,7 +88,7 @@ public struct AssessmentInfoMap {
     
     /// The mapped title for a given assessment.
     public func title(for info: BridgeClient.AssessmentInfo) -> Text {
-        info.label.map { Text(LocalizedStringKey($0)) } ?? mappings[info.assessmentId]?.title ?? Text(info.assessmentId)
+        !info.label.isEmpty ? Text(LocalizedStringKey(info.label)) : (mappings[info.assessmentId]?.title ?? Text(info.assessmentId))
     }
     
     /// The mapped icon to use for a given assessment when displaying an `AssessmentTimelineCardView`.
@@ -115,7 +115,7 @@ public struct AssessmentInfoMap {
 }
 
 extension BridgeClient.AssessmentInfo {
-    fileprivate var assessmentId: String { identifier ?? "" }
+    fileprivate var assessmentId: String { identifier }
     fileprivate var iconKey: SageResourceImage.Name {
         // TODO: syoung 05/19/2022 Support getting the resource image key from the AssessmentInfo object.
         .survey

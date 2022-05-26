@@ -87,10 +87,6 @@ open class SageResearchTaskDelegate : NSObject, RSDTaskViewControllerDelegate {
     // MARK: RSDTaskViewControllerDelegate
     
     open func taskController(_ taskController: RSDTaskController, didFinishWith reason: RSDTaskFinishReason, error: Error?) {
-        
-        // Dismiss the view
-        assessmentManager.isPresentingAssessment = false
-        
         if reason != .completed && !self.didCallReadyToSave {
             // If the task finished with an error or discarded results, then delete the output directory.
             taskController.taskViewModel.deleteOutputDirectory(error: error)
@@ -104,11 +100,14 @@ open class SageResearchTaskDelegate : NSObject, RSDTaskViewControllerDelegate {
         let declined = taskController.taskViewModel.didAbandon
         let endedOn = (reason == .completed) && !declined ? taskResult.endDate : nil
         
-        assessmentManager.updateAdherenceRecord(scheduleInfo: scheduledAssessment,
-                                   startedOn: taskResult.startDate,
-                                   endedOn: endedOn,
-                                   declined: declined,
-                                   clientData: clientData)
+        Task {
+            await assessmentManager.updateAdherenceRecord(scheduleInfo: scheduledAssessment,
+                                                          startedOn: taskResult.startDate,
+                                                          endedOn: endedOn,
+                                                          declined: declined,
+                                                          clientData: clientData)
+            assessmentManager.isPresentingAssessment = false
+        }
     }
     
     open func taskController(_ taskController: RSDTaskController, readyToSave taskViewModel: RSDTaskViewModel) {

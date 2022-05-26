@@ -159,6 +159,7 @@ final class TodayTimelineViewModelTests: XCTestCase {
         XCTAssertTrue(assessmentB.isEnabled)
     }
     
+    @MainActor
     func testUpdateAdherenceRecord_Declined() {
         guard previewSessionBEnd.isToday else {
             debugPrint("WARNING! Unit test will not work near midnight.")
@@ -189,10 +190,10 @@ final class TodayTimelineViewModelTests: XCTestCase {
         XCTAssertFalse(assessmentB.isCompleted)
         
         todayManager.updateAdherenceRecord(scheduleInfo: assessmentA.assessmentScheduleInfo,
-                                           startedOn: Date(),
-                                           endedOn: nil,
-                                           declined: true,
-                                           clientData: nil)
+                                                 startedOn: Date(),
+                                                 endedOn: nil,
+                                                 declined: true,
+                                                 clientData: nil)
         
         // Check new state
         XCTAssertTrue(assessmentA.isDeclined)

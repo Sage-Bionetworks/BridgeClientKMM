@@ -41,7 +41,7 @@ fileprivate let kUserSessionIdKey = "userSessionId"
 /// The default view implementation is the ``TodayView``. That design supports *either* permanently
 /// available schedules *or* a chronological list where the assessments are grouped by session.
 ///
-open class TodayTimelineViewModel : NSObject, ObservableObject {
+open class TodayTimelineViewModel : NSObject, ObservableObject, ScheduledAssessmentHandler {
     
     /// Current date. This is updated to match the date used in calculating timelines when the timeline is updated.
     @Published open var today: Date = Date()
@@ -194,7 +194,10 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
     ///     - endedOn: When the assessment was ended. If nil, then the assessment was *not* finished but the `clientData` or `declined` state may have changed.
     ///     - declined: Did the participant "decline" to finish? In other words, do they want to skip this assessment?
     ///     - clientData: Any `JsonSerializable` object that should be stored with this adherence record.
-    open func updateAdherenceRecord(scheduleInfo: AssessmentScheduleInfo, startedOn: Date?, endedOn: Date?, declined: Bool, clientData: JsonSerializable?) {
+    @MainActor
+    func updateAdherenceRecord(scheduleInfo: AssessmentScheduleInfo, startedOn: Date, endedOn: Date? = nil, declined: Bool = false, clientData: JsonSerializable? = nil) {
+
+        // Create and write an adherence record.
         let record = NativeAdherenceRecord(instanceGuid: scheduleInfo.instanceGuid,
                                            eventTimestamp: scheduleInfo.session.eventTimestamp,
                                            timezoneIdentifier: TimeZone.current.identifier,
@@ -206,14 +209,8 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
         
         // Look for a view model to update so that the completion status is updated immediately upon
         // dismissing the view instead of whenever the bridge repos get updated.
-        guard let (session, assessment) = findTimelineModel(sessionGuid: scheduleInfo.session.instanceGuid,
-                                                            assessmentGuid: scheduleInfo.instanceGuid)
-        else {
-            print("WARNING! Could not find schedule from guid")
-            return
-        }
-
-        if (endedOn != nil || declined) && !session.window.persistent {
+        if let (session, assessment) = findTimelineModel(sessionGuid: scheduleInfo.session.instanceGuid, assessmentGuid: scheduleInfo.instanceGuid),
+           (endedOn != nil || declined), !session.window.persistent {
             assessment.isCompleted = (endedOn != nil)
             assessment.isDeclined = declined
             session.updateState()
@@ -239,6 +236,76 @@ open class TodayTimelineViewModel : NSObject, ObservableObject {
             return nil
         }
         return (window, assessment)
+    }
+    
+    // MARK: ScheduledAssessmentHandler
+    
+    @MainActor
+    public func fetchAssessmentConfig(for scheduleInfo: AssessmentScheduleInfo) async throws -> ScheduledAssessmentConfig {
+        guard let (_, assessment) = self.findTimelineModel(sessionGuid: scheduleInfo.session.instanceGuid, assessmentGuid: scheduleInfo.instanceGuid)
+        else {
+            throw ValidationError.unexpectedNull("Could not find assessment with instanceGuid=\(scheduleInfo.instanceGuid)")
+        }
+        
+        return try await withCheckedThrowingContinuation { continuation in
+            let loader = NativeAssessmentConfigLoader()
+            loader.fetchAssessmentConfig(instanceGuid: assessment.instanceGuid, assessmentInfo: assessment.assessmentInfo) { nativeConfig in
+                if let config = nativeConfig.config {
+                    continuation.resume(returning: .init(scheduleInfo: scheduleInfo, config: config, restoreResult: nativeConfig.restoredResult))
+                }
+                else {
+                    continuation.resume(throwing: ValidationError.unexpectedNull("Could not find assessment with instanceGuid=\(scheduleInfo.instanceGuid)"))
+                }
+            }
+        }
+    }
+    
+    @MainActor
+    public func updateAssessmentStatus(_ scheduleInfo: AssessmentScheduleInfo, status: ScheduledAssessmentStatus) {
+        guard scheduleInfo == selectedAssessment else { return }
+        
+        switch status {
+        case .declined(let startedOn):
+            updateAdherenceRecord(scheduleInfo: scheduleInfo, startedOn: startedOn, declined: true)
+            dismissAssessment(scheduleInfo)
+            
+        case .saveForLater(let result):
+            // TODO: syoung 05/25/2022 Update handling to save cached resultData.
+            updateAdherenceRecord(scheduleInfo: scheduleInfo, startedOn: result.startDate)
+            dismissAssessment(scheduleInfo)
+        
+        case .restartLater:
+            dismissAssessment(scheduleInfo)
+            
+        case .error(let error):
+            debugPrint("Assessment \(scheduleInfo.assessmentInfo.identifier) finished early due to error. \(error)")
+            dismissAssessment(scheduleInfo)
+            
+        case .saveAndFinish(let archiveBuilder):
+            save(scheduleInfo, archiveBuilder)
+            dismissAssessment(scheduleInfo)
+            
+        case .readyToSave(let archiveBuilder):
+            save(scheduleInfo, archiveBuilder)
+            
+        case .finished:
+            dismissAssessment(scheduleInfo)
+        }
+    }
+    
+    @MainActor
+    private func save(_ scheduleInfo: AssessmentScheduleInfo, _ archiveBuilder: ResultArchiveBuilder) {
+        bridgeManager.encryptAndUpload(using: archiveBuilder)
+        updateAdherenceRecord(scheduleInfo: scheduleInfo,
+                              startedOn: archiveBuilder.startedOn,
+                              endedOn: archiveBuilder.endedOn,
+                              clientData: archiveBuilder.adherenceData)
+    }
+    
+    @MainActor
+    private func dismissAssessment(_ scheduleInfo: AssessmentScheduleInfo) {
+        isPresentingAssessment = false
+        selectedAssessment = nil
     }
 }
 

@@ -209,13 +209,6 @@ open class SageResearchArchiveManager : NSObject, RSDDataArchiveManager {
             }
             return archive
         }
-        #if DEBUG
-        if dataGroups()?.contains("test_user") ?? false {
-            archives.forEach {
-                $0.copyTestArchive()
-            }
-        }
-        #endif
         bridgeManager.encryptAndUpload(archives)
         completion()
     }

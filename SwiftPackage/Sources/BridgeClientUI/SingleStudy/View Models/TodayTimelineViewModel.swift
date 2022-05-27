@@ -390,7 +390,7 @@ public final class TodayTimelineSession : ObservableObject, Identifiable {
         // Determine availability.
         let availableNow = window.availableNow(now)
         let isExpired = window.isExpired(now)
-        let performInOrder = window.performInOrder
+        let performInOrder = window.performInOrder && !window.persistent
         var found = false
         var finishedOn: Date?
         let isCompleted = self.assessments.reduce(true) { (initial, assessment) in

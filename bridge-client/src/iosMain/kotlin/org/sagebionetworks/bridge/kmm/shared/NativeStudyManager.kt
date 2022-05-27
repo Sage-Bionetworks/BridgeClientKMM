@@ -23,6 +23,7 @@ class NativeStudyInfoManager : KoinComponent {
             when(val resource = repo.getStudyInfo(studyId)) {
                 is ResourceResult.Success -> callBack(resource.data, resource.status)
                 is ResourceResult.Failed -> callBack(null, resource.status)
+                else -> {}  // do nothing if in progress
             }
         }
     }

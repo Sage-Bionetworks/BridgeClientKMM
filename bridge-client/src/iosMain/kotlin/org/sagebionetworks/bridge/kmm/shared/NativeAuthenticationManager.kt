@@ -60,6 +60,7 @@ open class NativeAuthenticationManager(
             when(val userSessionResult = authManager.signInEmail(email = userName, password = password)) {
                 is ResourceResult.Success -> callBack(userSessionResult.data, userSessionResult.status)
                 is ResourceResult.Failed -> callBack(null, userSessionResult.status)
+                else -> {}  // do nothing if in progress
             }
         }
     }
@@ -69,6 +70,7 @@ open class NativeAuthenticationManager(
             when(val userSessionResult = authManager.signInExternalId(externalId, password ?: externalId)) {
                 is ResourceResult.Success -> callBack(userSessionResult.data, userSessionResult.status)
                 is ResourceResult.Failed -> callBack(null, userSessionResult.status)
+                else -> {}  // do nothing if in progress
             }
         }
     }

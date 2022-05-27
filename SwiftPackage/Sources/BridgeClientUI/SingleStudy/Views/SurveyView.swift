@@ -58,60 +58,17 @@ public struct SurveyView: View {
     @ViewBuilder
     func content() -> some View {
         if let assessment = viewModel.assessmentState {
-            AssessmentListener(assessmentInfo: assessmentInfo, handler: handler, assessmentState: assessment)
+            AssessmentView(assessment)
+                .assessmentStateListener(assessment, info: assessmentInfo, handler: handler)
         }
         else {
             ProgressView()
         }
     }
-    
-    struct AssessmentListener : View {
-        let assessmentInfo: AssessmentScheduleInfo
-        let handler: ScheduledAssessmentHandler
-        @ObservedObject var assessmentState: AssessmentState
-        
-        var body: some View {
-            AssessmentView(assessmentState)
-                .onChange(of: assessmentState.status) { newValue in
-                    guard let status = newStatus(newValue) else { return }
-                    handler.updateAssessmentStatus(assessmentInfo, status: status)
-                }
-        }
-        
-        func newStatus(_ newValue: AssessmentState.Status) -> ScheduledAssessmentStatus? {
-            switch newValue {
-            case .running:
-                return nil
-                
-            case .readyToSave:
-                return AssessmentResultArchive(assessmentState.assessmentResult.deepCopy(), schedule: assessmentInfo).map {
-                    .readyToSave($0)
-                }
-                
-            case .finished:
-                return .finished
-                
-            case .continueLater:
-                if assessmentState.interruptionHandling.canSaveForLater {
-                    return .saveForLater(assessmentState.assessmentResult)
-                }
-                else {
-                    return .restartLater
-                }
-                
-            case .declined:
-                return .declined(assessmentState.assessmentResult.startDate)
-                
-            case .error:
-                return .error(assessmentState.navigationError ?? ValidationError.unknown)
-            }
-        }
-    }
-    
+
     @MainActor
     class ViewModel : ObservableObject {
         @Published var assessmentState: AssessmentState?
-        @Published var startedOn: Date = Date()
         
         func loadAssessment(_ assessmentInfo: AssessmentScheduleInfo, using handler: ScheduledAssessmentHandler) async {
             guard assessmentState == nil else { return }
@@ -131,3 +88,51 @@ public struct SurveyView: View {
     }
 }
 
+public extension View {
+    func assessmentStateListener(_ assessmentState: AssessmentState, info: AssessmentScheduleInfo, handler: ScheduledAssessmentHandler) -> some View {
+        modifier(AssessmentViewListener(assessmentState: assessmentState, assessmentInfo: info, handler: handler))
+    }
+}
+
+struct AssessmentViewListener : ViewModifier {
+    @ObservedObject var assessmentState: AssessmentState
+    let assessmentInfo: AssessmentScheduleInfo
+    let handler: ScheduledAssessmentHandler
+    
+    func body(content: Content) -> some View {
+        content
+            .onChange(of: assessmentState.status) { _ in
+                guard let status = bridgeStatus() else { return }
+                handler.updateAssessmentStatus(assessmentInfo, status: status)
+            }
+    }
+    
+    func bridgeStatus() -> ScheduledAssessmentStatus? {
+        switch assessmentState.status {
+        case .running:
+            return nil
+            
+        case .readyToSave:
+            return AssessmentResultArchive(assessmentState.assessmentResult.deepCopy(), schedule: assessmentInfo).map {
+                .readyToSave($0)
+            }
+            
+        case .finished:
+            return .finished
+            
+        case .continueLater:
+            if assessmentState.interruptionHandling.canSaveForLater {
+                return .saveForLater(assessmentState.assessmentResult)
+            }
+            else {
+                return .restartLater
+            }
+            
+        case .declined:
+            return .declined(assessmentState.assessmentResult.startDate)
+            
+        case .error:
+            return .error(assessmentState.navigationError ?? ValidationError.unknown)
+        }
+    }
+}

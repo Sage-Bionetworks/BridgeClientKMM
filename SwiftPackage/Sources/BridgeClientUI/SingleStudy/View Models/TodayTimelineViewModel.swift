@@ -41,7 +41,11 @@ fileprivate let kUserSessionIdKey = "userSessionId"
 /// The default view implementation is the ``TodayView``. That design supports *either* permanently
 /// available schedules *or* a chronological list where the assessments are grouped by session.
 ///
-open class TodayTimelineViewModel : NSObject, ObservableObject, ScheduledAssessmentHandler {
+public final class TodayTimelineViewModel : AbstractTodayTimelineViewModel {
+}
+
+/// The ``TodayTimelineViewModel`` is final the ``TodayView`` references this as an `EnvironmentObject`.
+open class AbstractTodayTimelineViewModel : NSObject, ObservableObject, ScheduledAssessmentHandler {
     
     /// Current date. This is updated to match the date used in calculating timelines when the timeline is updated.
     @Published open var today: Date = Date()

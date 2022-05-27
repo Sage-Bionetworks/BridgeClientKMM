@@ -101,13 +101,14 @@ open class SageResearchTaskDelegate : NSObject, RSDTaskViewControllerDelegate {
         let endedOn = (reason == .completed) && !declined ? taskResult.endDate : nil
         
         Task {
-            await assessmentManager.updateAdherenceRecord(scheduleInfo: scheduledAssessment,
-                                                          startedOn: taskResult.startDate,
-                                                          endedOn: endedOn,
-                                                          declined: declined,
-                                                          clientData: clientData)
-            assessmentManager.isPresentingAssessment = false
+            await dismissAssessment(startedOn: taskResult.startDate, endedOn: endedOn, declined: declined, clientData: clientData)
         }
+    }
+    
+    @MainActor
+    func dismissAssessment(startedOn: Date, endedOn: Date?, declined: Bool, clientData: JsonSerializable?) {
+        assessmentManager.updateAdherenceRecord(scheduleInfo: scheduledAssessment, startedOn: startedOn, endedOn: endedOn, declined: declined, clientData: clientData)
+        assessmentManager.isPresentingAssessment = false
     }
     
     open func taskController(_ taskController: RSDTaskController, readyToSave taskViewModel: RSDTaskViewModel) {

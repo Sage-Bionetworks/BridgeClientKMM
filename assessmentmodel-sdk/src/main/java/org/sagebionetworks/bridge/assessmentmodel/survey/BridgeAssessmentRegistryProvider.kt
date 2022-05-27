@@ -2,9 +2,11 @@ package org.sagebionetworks.bridge.assessmentmodel.survey
 
 import kotlinx.serialization.PolymorphicSerializer
 import kotlinx.serialization.json.Json
-import org.sagebionetworks.assessmentmodel.*
+import org.sagebionetworks.assessmentmodel.Assessment
+import org.sagebionetworks.assessmentmodel.AssessmentPlaceholder
+import org.sagebionetworks.assessmentmodel.AssessmentRegistryProvider
+import org.sagebionetworks.assessmentmodel.ModuleInfo
 import org.sagebionetworks.assessmentmodel.resourcemanagement.FileLoader
-import org.sagebionetworks.assessmentmodel.resourcemanagement.ResourceInfo
 import org.sagebionetworks.assessmentmodel.serialization.Serialization
 import org.sagebionetworks.bridge.kmm.shared.repo.AssessmentConfigRepo
 
@@ -40,5 +42,10 @@ class BridgeAssessmentRegistryProvider(override val fileLoader: FileLoader, val 
             return assessmentConfigRepo.getCachedAssessmentConfigByGuid(it)?.config?.toString()?.isNotEmpty() == true
         }
         return false
+    }
+
+    override fun getJsonCoder(assessmentPlaceholder: AssessmentPlaceholder): Json {
+        // Return the default AssessmentModel serializer, which should work for surveys
+        return Serialization.JsonCoder.default
     }
 }

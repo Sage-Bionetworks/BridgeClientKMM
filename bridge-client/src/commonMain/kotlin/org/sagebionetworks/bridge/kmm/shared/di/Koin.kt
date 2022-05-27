@@ -5,6 +5,7 @@ import org.koin.core.module.Module
 import org.koin.core.qualifier.named
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
+import org.sagebionetworks.bridge.kmm.shared.cache.LocalJsonDataCache
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
 import org.sagebionetworks.bridge.kmm.shared.repo.*
 
@@ -39,6 +40,7 @@ val commonModule = module {
     single<AppConfigRepo> { AppConfigRepo(get(), get(), get(named("background")), get()) }
     single<StudyRepo> { StudyRepo(get(), get(), get(), get(named("background"))) }
     single<ParticipantRepo> { ParticipantRepo(get(), get(), get(named("background")), get()) }
+    single<LocalJsonDataCache> {LocalJsonDataCache(get())}
 
 }
 

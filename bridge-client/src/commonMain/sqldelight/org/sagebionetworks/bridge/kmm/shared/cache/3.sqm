@@ -1,0 +1,13 @@
+import kotlinx.datetime.LocalDateTime;
+import kotlinx.datetime.TimeZone;
+import kotlinx.serialization.json.JsonElement;
+
+CREATE TABLE JsonData (
+    identifier TEXT NOT NULL,
+    dataType TEXT NOT NULL,
+    json TEXT AS JsonElement NOT NULL,
+    lastUpdate INTEGER AS Long NOT NULL,
+    expire TEXT AS LocalDateTime NOT NULL,
+    timeZone TEXT AS TimeZone NOT NULL ,
+    PRIMARY KEY (identifier, dataType)
+);

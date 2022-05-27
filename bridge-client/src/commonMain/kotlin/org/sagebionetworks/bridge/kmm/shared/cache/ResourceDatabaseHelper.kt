@@ -1,5 +1,6 @@
 package org.sagebionetworks.bridge.kmm.shared.cache
 
+import com.squareup.sqldelight.ColumnAdapter
 import com.squareup.sqldelight.EnumColumnAdapter
 import com.squareup.sqldelight.db.SqlDriver
 import com.squareup.sqldelight.runtime.coroutines.asFlow
@@ -7,21 +8,47 @@ import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.squareup.sqldelight.runtime.coroutines.mapToOneOrNull
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
 import org.sagebionetworks.bridge.kmm.shared.apis.EtagStorageCache
 
 class ResourceDatabaseHelper(sqlDriver: SqlDriver) : EtagStorageCache {
+
+    private inline fun <reified T: Any>serializableColumnAdapter() = object: ColumnAdapter<T, String> {
+        override fun decode(databaseValue: String): T {
+            return Json.decodeFromString(databaseValue)
+        }
+
+        override fun encode(value: T): String {
+            return Json.encodeToString(value)
+        }
+    }
+
     internal val database = BridgeResourceDatabase(
         sqlDriver,
+        JsonData.Adapter(
+            jsonAdapter = serializableColumnAdapter<JsonElement>(),
+            expireAdapter = serializableColumnAdapter<LocalDateTime>(),
+            timeZoneAdapter = serializableColumnAdapter<TimeZone>()
+        ),
         Resource.Adapter(EnumColumnAdapter(), EnumColumnAdapter())
     )
     private val dbQuery = database.bridgeResourceDatabaseQueries
 
 
+    /**
+     * Clears all tables in the local database.
+     */
     internal fun clearDatabase() {
         dbQuery.transaction {
             dbQuery.removeAllResources()
             dbQuery.removeAllEtags()
         }
+        database.localDataCacheQueries.removeAllJsonData()
     }
 
     internal fun getResourceAsFlow(id: String, type: ResourceType, studyId: String): Flow<Resource?> {

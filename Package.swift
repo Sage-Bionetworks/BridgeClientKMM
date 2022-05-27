@@ -33,8 +33,9 @@ let package = Package(
         .package(name: "JsonModel",
                  url: "https://github.com/Sage-Bionetworks/JsonModel-Swift.git",
                  from: "1.4.6"),
-        // TODO: syoung 04/13/2021 Add AssessmentModel-KotlinNative once that repo is set up
-        // to build the xcframework when the version is updated.
+        .package(name: "AssessmentModel",
+                 url: "https://github.com/Sage-Bionetworks/AssessmentModelKMM.git",
+                 from: "0.6.1"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -49,6 +50,8 @@ let package = Package(
                     "JsonModel",
                     .product(name: "Research", package: "SageResearch"),
                     .product(name: "ResearchUI", package: "SageResearch"),
+                    .product(name: "AssessmentModel", package: "AssessmentModel"),
+                    .product(name: "AssessmentModelUI", package: "AssessmentModel"),
                 ],
                 path: "SwiftPackage/Sources/BridgeClientUI",
                 resources: [.process("Resources")]),

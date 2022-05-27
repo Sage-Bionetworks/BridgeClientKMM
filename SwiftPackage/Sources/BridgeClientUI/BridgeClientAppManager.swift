@@ -284,46 +284,89 @@ open class BridgeClientAppManager : ObservableObject {
         }
     }
     
+    /// Encrypt and upload an archive created with the given builder.
+    ///
+    /// - Parameter builder: The archive builder.
+    public final func encryptAndUpload(using builder: ArchiveBuilder) {
+        Task.detached(priority: .medium) {
+            await self._encryptAndUpload(using: builder)
+        }
+    }
+    
+    @MainActor
+    private func _encryptAndUpload(using builder: ArchiveBuilder) async {
+        isUploading = true
+        do {
+            let archive = try await builder.buildArchive()
+            await copyTest(archive: archive)
+            let encrypted = await encrypt(archive: archive)
+            await self.upload(archive: archive, encrypted: encrypted)
+        } catch {
+            debugPrint("ERROR Failed to archive and upload \(builder.identifier): \(error)")
+        }
+    }
+    
     /// Encrypt and upload the given data archives.
     ///
     /// - Parameter archives: The archives to encrypt and upload.
-    public final func encryptAndUpload(_ archives: [DataArchive]) {
-        DispatchQueue.global().async {
-
-            // Encrypt the files.
-            if let path = self.pemPath {
-                archives.forEach { archive in
-                    do {
-                        try archive.encryptArchive(using: path)
-                    } catch let err {
-                        print("ERROR: Failed to encrypt \(archive.identifier). \(err)")
-                    }
+    final func encryptAndUpload(_ archives: [DataArchive]) {
+        Task.detached(priority: .medium) {
+            await self._encryptAndUpload(archives)
+        }
+    }
+    
+    @MainActor
+    private func _encryptAndUpload(_ archives: [DataArchive]) async {
+        isUploading = true
+        await withTaskGroup(of: Void.self) { group in
+            archives.forEach { archive in
+                group.addTask {
+                    await self.copyTest(archive: archive)
+                    let encrypted = await self.encrypt(archive: archive)
+                    await self.upload(archive: archive, encrypted: encrypted)
                 }
             }
-
-            DispatchQueue.main.async {
-                archives.forEach { archive in
-                    var exporterV3Metadata: JsonElement? = nil
-                    if let schedule = (archive as? AbstractResultArchive)?.schedule {
-                        exporterV3Metadata = JsonElement([
-                            "instanceGuid": schedule.instanceGuid,
-                            "eventTimestamp": schedule.session.eventTimestamp
-                        ])
-                    }
-                    let extras = StudyDataUploadExtras(encrypted: true, metadata: exporterV3Metadata, zipped: true)
-                    let id = archive.identifier
-                    guard let url = archive.encryptedURL else {
-                        print("WARNING! Cannot upload \(id)")
-                        return
-                    }
-                    StudyDataUploadAPI.shared.upload(fileId: id, fileUrl: url, contentType: "application/zip", extras: extras)
-                    do {
-                        try FileManager.default.removeItem(at: url)
-                    } catch let err {
-                        print("Failed to delete encrypted archive \(id) at \(url). \(err)")
-                    }
-                }
-            }
+        }
+    }
+    
+    private func copyTest(archive: DataArchive) async {
+        #if DEBUG
+        if userSessionInfo.dataGroups?.contains("test_user") ?? false {
+            archive.copyTestArchive()
+        }
+        #endif
+    }
+    
+    private func encrypt(archive: DataArchive) async -> Bool {
+        guard let path = self.pemPath else { return false }
+        do {
+            try archive.encryptArchive(using: path)
+            return true
+        } catch {
+            debugPrint("ERROR: Failed to encrypt \(archive.identifier). \(error)")
+            return false
+        }
+    }
+    
+    @MainActor
+    private func upload(archive: DataArchive, encrypted: Bool) async {
+        let exporterV3Metadata: JsonElement? = (archive as? AbstractResultArchive)?.schedule.map { schedule in
+            .object([
+                "instanceGuid": schedule.instanceGuid,
+                "eventTimestamp": schedule.session.eventTimestamp
+            ])
+        }
+        let extras = StudyDataUploadExtras(encrypted: encrypted, metadata: exporterV3Metadata, zipped: true)
+        let id = archive.identifier
+        guard let url = archive.encryptedURL else {
+            debugPrint("WARNING! Cannot upload \(id)")
+            return
+        }
+        StudyDataUploadAPI.shared.upload(fileId: id, fileUrl: url, contentType: "application/zip", extras: extras)
+        do {
+            try FileManager.default.removeItem(at: url)
+        } catch let err {
+            debugPrint("WARNING! Failed to delete encrypted archive \(id) at \(url). \(err)")
         }
     }
 }

@@ -1,7 +1,7 @@
 //
 //  AssessmentInfoMap.swift
 //
-//  Copyright © 2021 Sage Bionetworks. All rights reserved.
+//  Copyright © 2021-2022 Sage Bionetworks. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -33,6 +33,8 @@
 import SwiftUI
 import BridgeClient
 import SharedMobileUI
+import AssessmentModel
+import AssessmentModelUI
 
 /// A protocol for mapping the display information about an assessment.
 public protocol AssessmentInfoExtension {
@@ -47,7 +49,7 @@ public protocol AssessmentInfoExtension {
     ///
     /// - Note: This is different from the smaller icon used for displaying BridgeSDK/BridgeApp
     /// lists of tasks.
-    func icon() -> Image
+    func icon() -> ContentImage
     
     /// The color to use when displaying an `AssessmentTimelineCardView`.
     func color() -> Color
@@ -65,7 +67,7 @@ public struct AssessmentInfoMap {
     
     private struct Mapping {
         let title: Text
-        let icon: Image
+        let icon: ContentImage
         let color: Color
     }
     
@@ -86,12 +88,12 @@ public struct AssessmentInfoMap {
     
     /// The mapped title for a given assessment.
     public func title(for info: BridgeClient.AssessmentInfo) -> Text {
-        info.label.map { Text(LocalizedStringKey($0)) } ?? mappings[info.assessmentId]?.title ?? Text(info.assessmentId)
+        !info.label.isEmpty ? Text(LocalizedStringKey(info.label)) : (mappings[info.assessmentId]?.title ?? Text(info.assessmentId))
     }
     
     /// The mapped icon to use for a given assessment when displaying an `AssessmentTimelineCardView`.
-    public func icon(for info: BridgeClient.AssessmentInfo) -> Image {
-        mappings[info.assessmentId]?.icon ?? Image(info.assessmentId, bundle: Bundle.main, label: title(for: info))
+    public func icon(for info: BridgeClient.AssessmentInfo) -> ContentImage {
+        mappings[info.assessmentId]?.icon ?? ContentImage(icon: info.iconKey)
     }
     
     /// The mapped color to use for a given assessment when displaying an `AssessmentTimelineCardView`.
@@ -113,7 +115,11 @@ public struct AssessmentInfoMap {
 }
 
 extension BridgeClient.AssessmentInfo {
-    fileprivate var assessmentId: String { identifier ?? "" }
+    fileprivate var assessmentId: String { identifier }
+    fileprivate var iconKey: SageResourceImage.Name {
+        // TODO: syoung 05/19/2022 Support getting the resource image key from the AssessmentInfo object.
+        .survey
+    }
 }
 
 public struct AssessmentInfoMapEnvironmentKey: EnvironmentKey {

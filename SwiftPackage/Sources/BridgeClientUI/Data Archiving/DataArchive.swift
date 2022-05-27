@@ -35,7 +35,8 @@ import BridgeArchiver
 import JsonModel
 
 /// Wrapper for tying a ``BridgeArchiver`` to an uploaded archive.
-open class DataArchive : NSObject {
+open class DataArchive : NSObject, Identifiable {
+    public let id: UUID = .init()
     
     /// The identifier for this archive.
     public let identifier: String
@@ -127,3 +128,4 @@ open class DataArchive : NSObject {
     }
     #endif
 }
+

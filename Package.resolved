@@ -2,6 +2,15 @@
   "object": {
     "pins": [
       {
+        "package": "AssessmentModel",
+        "repositoryURL": "https://github.com/Sage-Bionetworks/AssessmentModelKMM.git",
+        "state": {
+          "branch": null,
+          "revision": "fa08361dfb9ef115b75dbbc922bbf4af8b04be71",
+          "version": "0.6.1"
+        }
+      },
+      {
         "package": "BridgeArchiver",
         "repositoryURL": "https://github.com/Sage-Bionetworks/BridgeArchiver-Swift.git",
         "state": {
@@ -24,8 +33,8 @@
         "repositoryURL": "https://github.com/Sage-Bionetworks/JsonModel-Swift.git",
         "state": {
           "branch": null,
-          "revision": "b828a14b255c849199032b6d7eaec0e6be025115",
-          "version": "1.4.6"
+          "revision": "1d2d24643fc3687075efadd3fb78bdbe6e52c850",
+          "version": "1.4.8"
         }
       },
       {
@@ -51,8 +60,8 @@
         "repositoryURL": "https://github.com/Sage-Bionetworks/SharedMobileUI-AppleOS.git",
         "state": {
           "branch": null,
-          "revision": "39f64b3557b0f08066639c3c1c5dbfaaee7496fc",
-          "version": "0.14.0"
+          "revision": "c16c754cff58d9eb3ec786aa163350538fc74c3d",
+          "version": "0.15.2"
         }
       },
       {

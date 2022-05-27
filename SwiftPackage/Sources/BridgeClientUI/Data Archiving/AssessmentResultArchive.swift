@@ -41,7 +41,7 @@ open class AssessmentResultArchive : AbstractResultArchive, ResultArchiveBuilder
     
     /// File URL for the directory in which generated data files that are referenced using `FileResult`
     /// may be included. Asynchronous actions with recorders (and potentially steps) can save data to
-    /// files during the progress of the task. This property specifies where such data was be written to
+    /// files during the progress of the task. This property specifies where such data was being written to
     /// allow the archive to delete the output directory once the results have been archived and encrypted
     /// for upload.
     let outputDirectory: URL?

@@ -131,8 +131,3 @@ public struct SurveyView: View {
     }
 }
 
-//struct SurveyView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        SurveyView()
-//    }
-//}

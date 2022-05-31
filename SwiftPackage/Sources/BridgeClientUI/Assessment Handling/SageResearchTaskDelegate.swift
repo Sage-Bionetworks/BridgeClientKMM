@@ -36,7 +36,7 @@ import JsonModel
 import Research
 import ResearchUI
 
-/// A wrapper that can be used to launch and control an assessment.
+/// A wrapper that can be used to launch and control an assessment developed using SageResearch.
 open class SageResearchTaskDelegate : NSObject, RSDTaskViewControllerDelegate {
     
     /// The timeline manager that "called" this assessment.

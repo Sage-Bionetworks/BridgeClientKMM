@@ -36,7 +36,7 @@ import JsonModel
 import AssessmentModel
 import AssessmentModelUI
 
-public struct SurveyView: View {
+public struct SurveyView<DisplayView : AssessmentDisplayView>: View {
     let assessmentInfo: AssessmentScheduleInfo
     let handler: ScheduledAssessmentHandler
     @StateObject var viewModel: ViewModel = .init()
@@ -50,7 +50,7 @@ public struct SurveyView: View {
         content()
             .onAppear {
                 Task {
-                    await viewModel.loadAssessment(assessmentInfo, using: handler)
+                    await loadAssessment(assessmentInfo, using: handler)
                 }
             }
     }
@@ -58,33 +58,29 @@ public struct SurveyView: View {
     @ViewBuilder
     func content() -> some View {
         if let assessment = viewModel.assessmentState {
-            AssessmentView(assessment)
+            DisplayView(assessment)
                 .assessmentStateListener(assessment, info: assessmentInfo, handler: handler)
         }
         else {
             ProgressView()
         }
     }
+    
+    @MainActor
+    func loadAssessment(_ assessmentInfo: AssessmentScheduleInfo, using handler: ScheduledAssessmentHandler) async {
+        guard viewModel.assessmentState == nil else { return }
+        do {
+            let config = try await handler.fetchAssessmentConfig(for: assessmentInfo)
+            viewModel.assessmentState = try DisplayView.instantiateAssessmentState(config.config, restoredResult: config.restoreResult, interruptionHandling: nil)
+        } catch {
+            debugPrint("Failed to load assessment \(assessmentInfo.assessmentInfo.identifier): \(error)")
+            handler.updateAssessmentStatus(assessmentInfo, status: .error(error))
+        }
+    }
 
     @MainActor
     class ViewModel : ObservableObject {
         @Published var assessmentState: AssessmentState?
-        
-        func loadAssessment(_ assessmentInfo: AssessmentScheduleInfo, using handler: ScheduledAssessmentHandler) async {
-            guard assessmentState == nil else { return }
-            do {
-                let config = try await handler.fetchAssessmentConfig(for: assessmentInfo)
-                let decoder = AssessmentModel.AssessmentFactory.defaultFactory.createJSONDecoder()
-                let assessment = try decoder.decode(AssessmentObject.self, from: config.config)
-                let restoredResult = try config.restoreResult.map {
-                    try decoder.decode(AssessmentResultObject.self, from: $0)
-                }
-                assessmentState = .init(assessment, restoredResult: restoredResult)
-            } catch {
-                debugPrint("Failed to load assessment \(assessmentInfo.assessmentInfo.identifier): \(error)")
-                handler.updateAssessmentStatus(assessmentInfo, status: .error(error))
-            }
-        }
     }
 }
 

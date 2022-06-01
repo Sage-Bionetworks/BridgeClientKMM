@@ -3,9 +3,12 @@ package org.sagebionetworks.bridge.kmm.shared
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.datetime.*
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.sagebionetworks.bridge.kmm.shared.cache.*
@@ -24,6 +27,8 @@ class NativeTimelineManager(
 ) : KoinComponent {
 
     private val repo : ScheduleTimelineRepo by inject(mode = LazyThreadSafetyMode.NONE)
+    private val assessmentConfigRepo : AssessmentConfigRepo by inject(mode = LazyThreadSafetyMode.NONE)
+    private val localCache : LocalJsonDataCache by inject(mode = LazyThreadSafetyMode.NONE)
     private val adherenceRecordRepo : AdherenceRecordRepo by inject(mode = LazyThreadSafetyMode.NONE)
 
     private val scope = MainScope()
@@ -66,6 +71,36 @@ class NativeTimelineManager(
             clientData = record.clientData,
         )
         adherenceRecordRepo.createUpdateAdherenceRecord(adherenceRecord, studyId)
+    }
+
+    fun fetchAssessmentConfig(instanceGuid: String, assessmentInfo: AssessmentInfo, callBack: (NativeAssessmentConfig) -> Unit) {
+        scope.launch {
+            assessmentConfigRepo.getAssessmentConfig(assessmentInfo).collectLatest { resource ->
+                val restoredResultData = localCache.loadData(instanceGuid, "AssessmentResult")
+                val restoredJson = (restoredResultData?.json as? JsonObject)?.toString()?.toNSData()
+                callBack(
+                    NativeAssessmentConfig(
+                        instanceGuid = instanceGuid,
+                        identifier = assessmentInfo.identifier,
+                        config = (resource as? ResourceResult.Success)?.data?.config.toString()?.toNSData(),
+                        restoredResult = restoredJson
+                    )
+                )
+            }
+        }
+    }
+
+    fun saveAssessmentResult(instanceGuid: String, json: JsonElement, expiresOn: NSDate?) {
+        localCache.storeData(
+            id = instanceGuid,
+            dataType = "AssessmentResult",
+            data = json,
+            expire = expiresOn?.toKotlinInstant()?.toLocalDateTime(TimeZone.currentSystemDefault())
+        )
+    }
+
+    fun clearAssessmentResult(instanceGuid: String) {
+        localCache.removeData(instanceGuid, "AssessmentResult")
     }
 }
 
@@ -174,3 +209,9 @@ data class NativeScheduledNotification(
     val isTimeSensitive: Boolean,
 )
 
+data class NativeAssessmentConfig(
+    val instanceGuid: String,
+    val identifier: String,
+    val config: NSData?,
+    val restoredResult: NSData?
+)

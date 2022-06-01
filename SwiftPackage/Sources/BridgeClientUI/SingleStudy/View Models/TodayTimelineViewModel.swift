@@ -252,8 +252,7 @@ open class AbstractTodayTimelineViewModel : NSObject, ObservableObject, Schedule
         }
         
         return try await withCheckedThrowingContinuation { continuation in
-            let loader = NativeAssessmentConfigLoader()
-            loader.fetchAssessmentConfig(instanceGuid: assessment.instanceGuid, assessmentInfo: assessment.assessmentInfo) { nativeConfig in
+            self.timelineManager.fetchAssessmentConfig(instanceGuid: assessment.instanceGuid, assessmentInfo: assessment.assessmentInfo) { nativeConfig in
                 if let config = nativeConfig.config {
                     continuation.resume(returning: .init(scheduleInfo: scheduleInfo, config: config, restoreResult: nativeConfig.restoredResult))
                 }
@@ -274,7 +273,10 @@ open class AbstractTodayTimelineViewModel : NSObject, ObservableObject, Schedule
             dismissAssessment(scheduleInfo)
             
         case .saveForLater(let result):
-            // TODO: syoung 05/25/2022 Update handling to save cached resultData.
+            if let jsonElement = result.toBridgeClientJsonElement(),
+               let (session, _) = self.findTimelineModel(sessionGuid: scheduleInfo.session.instanceGuid, assessmentGuid: scheduleInfo.instanceGuid) {
+                timelineManager.saveAssessmentResult(instanceGuid: scheduleInfo.instanceGuid, json: jsonElement, expiresOn: session.window.endDateTime)
+            }
             updateAdherenceRecord(scheduleInfo: scheduleInfo, startedOn: result.startDate)
             dismissAssessment(scheduleInfo)
         
@@ -304,6 +306,7 @@ open class AbstractTodayTimelineViewModel : NSObject, ObservableObject, Schedule
                               startedOn: archiveBuilder.startedOn,
                               endedOn: archiveBuilder.endedOn,
                               clientData: archiveBuilder.adherenceData)
+        timelineManager.clearAssessmentResult(instanceGuid: scheduleInfo.instanceGuid)
     }
     
     @MainActor

@@ -47,6 +47,19 @@ extension JsonModel.JsonSerializable {
     }
 }
 
+extension JsonModel.AssessmentResult {
+    public func toBridgeClientJsonElement() -> BridgeClient.Kotlinx_serialization_jsonJsonElement? {
+        do {
+            let data = try self.jsonEncodedData()
+            let decoder = BridgeClient.JsonElementDecoder(jsonData: data)
+            return try decoder.decodeObject()
+        } catch {
+            debugPrint("WARNING! Failed to encode result: \(error)")
+            return nil
+        }
+    }
+}
+
 // syoung 07/23/2021 This no longer works. Kotlin is returning an `BridgeClient.KMapAsNSDictionary`
 // instead of `BridgeClient.Kotlinx_serialization_jsonJsonElement` and that object does not respond
 // to the selector (because it's not a Kotlinx_serialization_jsonJsonElement). I'm leaving this

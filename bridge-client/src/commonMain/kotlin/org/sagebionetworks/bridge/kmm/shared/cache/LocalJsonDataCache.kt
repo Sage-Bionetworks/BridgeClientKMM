@@ -1,5 +1,6 @@
 package org.sagebionetworks.bridge.kmm.shared.cache
 
+import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.*
 import kotlinx.serialization.json.JsonElement
 
@@ -30,6 +31,10 @@ class LocalJsonDataCache(databaseHelper: ResourceDatabaseHelper) {
 
     fun removeExpiredData() {
         dbQuery.removeExpiredData(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()))
+    }
+
+    fun removeData(id: String, dataType: String) {
+        dbQuery.removeJsonDataById(id, dataType)
     }
 
 }

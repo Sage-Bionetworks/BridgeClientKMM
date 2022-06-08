@@ -61,7 +61,7 @@ public enum ScheduledAssessmentStatus {
 public struct ScheduledAssessmentConfig : Identifiable {
     public var id: String { scheduleInfo.instanceGuid }
     public let scheduleInfo: AssessmentScheduleInfo
-    public let config: Data
+    public let config: Data?
     public let restoreResult: Data?
 }
 
@@ -78,6 +78,10 @@ public struct AssessmentScheduleInfo : Identifiable, Hashable, Codable {
     
     /// Information about the assessment.
     public let assessmentInfo: Info
+    
+    public var assessmentIdentifier : String {
+        assessmentInfo.identifier
+    }
     
     public init(session: NativeScheduledSessionWindow, assessment: NativeScheduledAssessment) {
         self.instanceGuid = assessment.instanceGuid

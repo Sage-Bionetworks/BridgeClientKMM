@@ -251,14 +251,9 @@ open class AbstractTodayTimelineViewModel : NSObject, ObservableObject, Schedule
             throw ValidationError.unexpectedNull("Could not find assessment with instanceGuid=\(scheduleInfo.instanceGuid)")
         }
         
-        return try await withCheckedThrowingContinuation { continuation in
+        return await withCheckedContinuation { continuation in
             self.timelineManager.fetchAssessmentConfig(instanceGuid: assessment.instanceGuid, assessmentInfo: assessment.assessmentInfo) { nativeConfig in
-                if let config = nativeConfig.config {
-                    continuation.resume(returning: .init(scheduleInfo: scheduleInfo, config: config, restoreResult: nativeConfig.restoredResult))
-                }
-                else {
-                    continuation.resume(throwing: ValidationError.unexpectedNull("Could not find assessment with instanceGuid=\(scheduleInfo.instanceGuid)"))
-                }
+                continuation.resume(returning: .init(scheduleInfo: scheduleInfo, config: nativeConfig.config, restoreResult: nativeConfig.restoredResult))
             }
         }
     }

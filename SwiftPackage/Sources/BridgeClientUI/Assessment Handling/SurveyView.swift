@@ -100,6 +100,7 @@ struct AssessmentViewListener : ViewModifier {
     @ObservedObject var assessmentState: AssessmentState
     let assessmentInfo: AssessmentScheduleInfo
     let handler: ScheduledAssessmentHandler
+    @State var hasSaved: Bool = false
     
     func body(content: Content) -> some View {
         content
@@ -115,12 +116,20 @@ struct AssessmentViewListener : ViewModifier {
             return nil
             
         case .readyToSave:
+            self.hasSaved = true
             return AssessmentResultArchive(assessmentState.assessmentResult.deepCopy(), schedule: assessmentInfo).map {
                 .readyToSave($0)
             }
             
         case .finished:
-            return .finished
+            if self.hasSaved {
+                return .finished
+            }
+            else {
+                return AssessmentResultArchive(assessmentState.assessmentResult.deepCopy(), schedule: assessmentInfo).map {
+                    .saveAndFinish($0)
+                } ?? .finished
+            }
             
         case .continueLater:
             if assessmentState.interruptionHandling.canSaveForLater {

@@ -127,6 +127,6 @@ public struct AssessmentRecord : Identifiable {
         self.finishedOn = finishedOn
         self.timeZone = timeZone ?? TimeZone.current
         self.clientData = clientData
-        self.minutes = Calendar.current.dateComponents([.minute], from: startedOn, to: finishedOn).minute ?? 1
+        self.minutes = max(1, Calendar.current.dateComponents([.minute], from: startedOn, to: finishedOn).minute ?? 1)
     }
 }

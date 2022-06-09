@@ -32,7 +32,7 @@ let package = Package(
                  from: "4.4.0"),
         .package(name: "JsonModel",
                  url: "https://github.com/Sage-Bionetworks/JsonModel-Swift.git",
-                 from: "1.4.6"),
+                 from: "1.4.9"),
         .package(name: "AssessmentModel",
                  url: "https://github.com/Sage-Bionetworks/AssessmentModelKMM.git",
                  from: "0.7.0"),

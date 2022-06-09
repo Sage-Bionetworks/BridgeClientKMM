@@ -198,7 +198,7 @@ extension NativeScheduledAssessment {
 
 extension AssessmentInfo {
     fileprivate convenience init(identifier: String) {
-        self.init(key: identifier, guid: UUID().uuidString, appId: kPreviewStudyId, identifier: identifier, revision: nil, label: identifier, minutesToComplete: 3, colorScheme: assessmentColors[identifier], configUrl: nil, type: "AssessmentInfo")
+        self.init(key: identifier, guid: UUID().uuidString, appId: kPreviewStudyId, identifier: identifier, revision: nil, label: identifier, minutesToComplete: 3, colorScheme: assessmentColors[identifier], configUrl: "nil", type: "AssessmentInfo")
     }
 }
 

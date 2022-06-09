@@ -39,19 +39,20 @@ import AssessmentModelUI
 public struct SurveyView<DisplayView : AssessmentDisplayView>: View {
     let assessmentInfo: AssessmentScheduleInfo
     let handler: ScheduledAssessmentHandler
+    let taskIdentifier: String
+    
     @StateObject var viewModel: ViewModel = .init()
     
-    public init(_ assessmentInfo: AssessmentScheduleInfo, handler: ScheduledAssessmentHandler) {
+    public init(_ assessmentInfo: AssessmentScheduleInfo, handler: ScheduledAssessmentHandler, taskIdentifier: String? = nil) {
         self.assessmentInfo = assessmentInfo
         self.handler = handler
+        self.taskIdentifier = taskIdentifier ?? assessmentInfo.assessmentIdentifier
     }
     
     public var body: some View {
         content()
             .onAppear {
-                Task {
-                    await loadAssessment(assessmentInfo, using: handler)
-                }
+                loadAssessment()
             }
     }
     
@@ -66,15 +67,20 @@ public struct SurveyView<DisplayView : AssessmentDisplayView>: View {
         }
     }
     
-    @MainActor
-    func loadAssessment(_ assessmentInfo: AssessmentScheduleInfo, using handler: ScheduledAssessmentHandler) async {
+    func loadAssessment() {
         guard viewModel.assessmentState == nil else { return }
-        do {
-            let config = try await handler.fetchAssessmentConfig(for: assessmentInfo)
-            viewModel.assessmentState = try DisplayView.instantiateAssessmentState(config.config, restoredResult: config.restoreResult, interruptionHandling: nil)
-        } catch {
-            debugPrint("Failed to load assessment \(assessmentInfo.assessmentInfo.identifier): \(error)")
-            handler.updateAssessmentStatus(assessmentInfo, status: .error(error))
+        Task {
+            do {
+                let config = try await handler.fetchAssessmentConfig(for: assessmentInfo)
+                viewModel.assessmentState = try DisplayView.instantiateAssessmentState(
+                    taskIdentifier,
+                    config: config.config,
+                    restoredResult: config.restoreResult,
+                    interruptionHandling: nil)
+            } catch {
+                debugPrint("Failed to load assessment \(assessmentInfo.assessmentInfo.identifier): \(error)")
+                handler.updateAssessmentStatus(assessmentInfo, status: .error(error))
+            }
         }
     }
 
@@ -94,6 +100,7 @@ struct AssessmentViewListener : ViewModifier {
     @ObservedObject var assessmentState: AssessmentState
     let assessmentInfo: AssessmentScheduleInfo
     let handler: ScheduledAssessmentHandler
+    @State var hasSaved: Bool = false
     
     func body(content: Content) -> some View {
         content
@@ -109,12 +116,20 @@ struct AssessmentViewListener : ViewModifier {
             return nil
             
         case .readyToSave:
+            self.hasSaved = true
             return AssessmentResultArchive(assessmentState.assessmentResult.deepCopy(), schedule: assessmentInfo).map {
                 .readyToSave($0)
             }
             
         case .finished:
-            return .finished
+            if self.hasSaved {
+                return .finished
+            }
+            else {
+                return AssessmentResultArchive(assessmentState.assessmentResult.deepCopy(), schedule: assessmentInfo).map {
+                    .saveAndFinish($0)
+                } ?? .finished
+            }
             
         case .continueLater:
             if assessmentState.interruptionHandling.canSaveForLater {

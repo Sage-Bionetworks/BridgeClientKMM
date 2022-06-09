@@ -58,7 +58,7 @@ open class AssessmentResultArchive : AbstractResultArchive, ResultArchiveBuilder
     public var uuid: UUID { assessmentResult.taskRunUUID }
     public var startedOn: Date { assessmentResult.startDate }
     public var endedOn: Date { assessmentResult.endDate }
-    public let adherenceData: JsonSerializable?
+    public private(set) var adherenceData: JsonSerializable?
     
     public func cleanup() async throws {
         try outputDirectory.map {
@@ -70,6 +70,15 @@ open class AssessmentResultArchive : AbstractResultArchive, ResultArchiveBuilder
 
         // Iterate through all the results within this collection and add if they are `FileArchivable`.
         try addBranchResults(assessmentResult)
+        
+        // For backwards compatibility and adherence, add an "answers.json" dictionary.
+        if !answers.isEmpty {
+            adherenceData = adherenceData ?? answers
+            let data = try JSONSerialization.data(withJSONObject: answers, options: [.prettyPrinted, .withoutEscapingSlashes, .sortedKeys])
+            let manifestInfo = FileInfo(filename: "answers.json", timestamp: assessmentResult.endDate, contentType: "application/json")
+            try self.addFile(data: data, filepath: manifestInfo.filename, createdOn: manifestInfo.timestamp, contentType: manifestInfo.contentType)
+            manifest.insert(manifestInfo)
+        }
         
         // Add the top-level assessment if desired.
         if let (data, manifestInfo) = try assessmentResultFile() {
@@ -86,6 +95,7 @@ open class AssessmentResultArchive : AbstractResultArchive, ResultArchiveBuilder
     }
     
     private var manifest = Set<FileInfo>()
+    private var answers: [String : JsonSerializable] = [:]
     
     private func addBranchResults(_ branchResult: BranchNodeResult, _ stepPath: String? = nil) throws {
         try recursiveAddFiles(branchResult.stepHistory, stepPath)
@@ -116,6 +126,10 @@ open class AssessmentResultArchive : AbstractResultArchive, ResultArchiveBuilder
             try self.addFile(data: data, filepath: manifestInfo.filename, createdOn: manifestInfo.timestamp, contentType: manifestInfo.contentType)
             manifest.insert(manifestInfo)
         }
+        else if let answer = result as? AnswerResult,
+                let value = answer.jsonValue {
+            answers[answer.identifier] = value.jsonObject()
+        }
     }
     
     /// Return the FileInfo to use when including a file in the archive. This method is included to allow applications
@@ -126,7 +140,7 @@ open class AssessmentResultArchive : AbstractResultArchive, ResultArchiveBuilder
         fileInfo
     }
     
-    /// The top-level assessment result file to include in the archive (if any). By default, this is only included for surveys.
+    /// The top-level assessment result file to include in the archive (if any).
     open func assessmentResultFile() throws -> (Data, FileInfo)? {
         guard let result = assessmentResult as? AssessmentResultObject else {
             return nil

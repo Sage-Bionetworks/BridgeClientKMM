@@ -34,6 +34,11 @@ import Foundation
 import BridgeArchiver
 import JsonModel
 
+// Errors are thrown by server if the size is more that 100,000,000 bytes.
+// Note: I am not sure why its not 100 mb = 104857600 bytes, but messaging
+// suggests that this is the actual limit. syoung 06/13/2022
+let kFileSizeLimit = 100000000
+
 /// Wrapper for tying a ``BridgeArchiver`` to an uploaded archive.
 open class DataArchive : NSObject, Identifiable {
     public let id: UUID = .init()
@@ -79,6 +84,11 @@ open class DataArchive : NSObject, Identifiable {
     ///   - createdOn: The timestamp for when the data was created.
     ///   - contentType: The content type of the data.
     public final func addFile(data: Data, filepath: String, createdOn: Date = Date(), contentType: String? = nil) throws {
+        guard data.count <= kFileSizeLimit
+        else {
+            debugPrint("File size exceeds allowed limit. filepath=\(filepath), filesize=\(data.count)")
+            return
+        }
         try archiver.addFile(data: data, filepath: filepath, createdOn: createdOn, contentType: contentType)
     }
     

@@ -54,6 +54,9 @@ public struct SurveyView<DisplayView : AssessmentDisplayView>: View {
             .onAppear {
                 loadAssessment()
             }
+            .onDisappear {
+                viewModel.loadingTask?.cancel()
+            }
     }
     
     @ViewBuilder
@@ -68,10 +71,11 @@ public struct SurveyView<DisplayView : AssessmentDisplayView>: View {
     }
     
     func loadAssessment() {
-        guard viewModel.assessmentState == nil else { return }
-        Task {
+        guard viewModel.assessmentState == nil, viewModel.loadingTask == nil else { return }
+        viewModel.loadingTask = Task {
             do {
                 let config = try await handler.fetchAssessmentConfig(for: assessmentInfo)
+                guard !Task.isCancelled else { return }
                 viewModel.assessmentState = try DisplayView.instantiateAssessmentState(
                     taskIdentifier,
                     config: config.config,
@@ -87,6 +91,11 @@ public struct SurveyView<DisplayView : AssessmentDisplayView>: View {
     @MainActor
     class ViewModel : ObservableObject {
         @Published var assessmentState: AssessmentState?
+        var loadingTask: Task<Void, Never>?
+
+        deinit {
+            loadingTask?.cancel()
+        }
     }
 }
 
@@ -132,7 +141,7 @@ struct AssessmentViewListener : ViewModifier {
             }
             
         case .continueLater:
-            if assessmentState.interruptionHandling.canSaveForLater {
+            if shouldSave() {
                 return .saveForLater(assessmentState.assessmentResult)
             }
             else {
@@ -145,5 +154,9 @@ struct AssessmentViewListener : ViewModifier {
         case .error:
             return .error(assessmentState.navigationError ?? ValidationError.unknown)
         }
+    }
+    
+    func shouldSave() -> Bool {
+        assessmentState.interruptionHandling.canSaveForLater && assessmentState.hasPartialResults
     }
 }

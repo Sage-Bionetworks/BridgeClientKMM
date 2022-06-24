@@ -54,13 +54,6 @@ abstract class AssessmentResultArchiveUploader(
                                     assessmentInstanceId: String,
                                     eventTimestamp: String,
                                     sessionWindowExpiration: kotlinx.datetime.Instant? = null) {
-        if (assessmentResult.schemaIdentifier == null) {
-            Logger.e(
-                "Quitting: No schema found for assessment ${assessmentResult.assessmentIdentifier}"
-            )
-            return
-        }
-
         val appVersion = "version ${bridgeConfig.appVersionName}, build ${bridgeConfig.appVersion}"
         val builder = getArchiveBuilderForActivity(assessmentResult)
             .withAppVersionName(appVersion)

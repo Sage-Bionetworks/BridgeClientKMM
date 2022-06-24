@@ -29,6 +29,10 @@ class AssessmentResultCacheImpl (private val jsonDataCache: LocalJsonDataCache) 
         )
     }
 
+    override fun removeAssessmentResult(instanceGuid: String) {
+        jsonDataCache.removeData(instanceGuid, TYPE_ASSESSMENT_RESULT)
+    }
+
     override fun clearExpiredAssessmentResults() {
         jsonDataCache.removeExpiredData()
     }

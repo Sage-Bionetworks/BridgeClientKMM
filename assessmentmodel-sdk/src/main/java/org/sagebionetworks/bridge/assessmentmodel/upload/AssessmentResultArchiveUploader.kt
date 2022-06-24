@@ -10,6 +10,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
+import okio.ByteString.Companion.toByteString
 import org.joda.time.DateTimeZone
 import org.joda.time.Instant
 import org.sagebionetworks.assessmentmodel.AssessmentResult
@@ -124,17 +125,13 @@ abstract class AssessmentResultArchiveUploader(
             val filePath = context.getFileStreamPath(filename).absolutePath
 
             val digest = md5.digest()
-            val digestEnc = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                Base64.getEncoder().encodeToString(digest)
-            } else {
-                android.util.Base64.encodeToString(digest, android.util.Base64.DEFAULT)
-            }
+            val md5Hash = digest.toByteString().base64()
 
             return UploadFile(
                 filePath = filePath,
                 contentType = CONTENT_TYPE_DATA_ARCHIVE,
                 fileLength = size,
-                md5Hash = digestEnc,
+                md5Hash = md5Hash,
                 encrypted = true,
                 metadata = uploadMetadata,
                 sessionExpires = sessionWindowExpiration
@@ -167,7 +164,7 @@ abstract class AssessmentResultArchiveUploader(
     open fun getMetadataMap(
         assessmentResult: AssessmentResult,
         jsonCoder: Json
-    ): MutableMap<String, String> {
+    ): Map<String, String> {
         val appVersion = "version ${bridgeConfig.appVersionName}, build ${bridgeConfig.appVersion}"
         val os = "${bridgeConfig.osName}/${bridgeConfig.osVersion}"
         val session = authenticationRepository.session()
@@ -190,7 +187,7 @@ abstract class AssessmentResultArchiveUploader(
             .toDateTime(DateTimeZone.UTC)
 
         // add Android equivalent of rsdFrameworkVersion - liujoshua 04/01/2021
-        return mutableMapOf(
+        return mapOf(
             "taskIdentifier" to assessmentResult.identifier,
             "deviceInfo" to "${Build.PRODUCT} ${Build.MODEL}; $os",
             "appVersion" to appVersion,

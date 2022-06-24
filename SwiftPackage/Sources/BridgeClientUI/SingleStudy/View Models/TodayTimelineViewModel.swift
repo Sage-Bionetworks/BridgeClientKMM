@@ -253,7 +253,9 @@ open class AbstractTodayTimelineViewModel : NSObject, ObservableObject, Schedule
         
         return await withCheckedContinuation { continuation in
             self.timelineManager.fetchAssessmentConfig(instanceGuid: assessment.instanceGuid, assessmentInfo: assessment.assessmentInfo) { nativeConfig in
-                continuation.resume(returning: .init(scheduleInfo: scheduleInfo, config: nativeConfig.config, restoreResult: nativeConfig.restoredResult))
+                DispatchQueue.main.async {
+                    continuation.resume(returning: .init(scheduleInfo: scheduleInfo, config: nativeConfig.config, restoreResult: nativeConfig.restoredResult))
+                }
             }
         }
     }

@@ -19,11 +19,12 @@ import org.sagebionetworks.bridge.kmm.shared.models.*
 import kotlin.math.roundToInt
 import kotlin.time.ExperimentalTime
 
-open class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo,
+class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo,
                            internal val assessmentConfigRepo: AssessmentConfigRepo,
                            httpClient: HttpClient,
                            databaseHelper: ResourceDatabaseHelper,
-                           backgroundScope: CoroutineScope) :
+                           backgroundScope: CoroutineScope,
+                           var scheduleMutator: ParticipantScheduleMutator? = null) :
     AbstractResourceRepo(databaseHelper, backgroundScope) {
 
     internal companion object {
@@ -47,19 +48,9 @@ open class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecor
         )
     }
 
-
-    /**
-     * This function is a workaround for apps that need to define part of the schedule client side.
-     * By modifying the schedule before it gets cached locally, apps can take advantage of the rest of
-     * the ScheduleTimeLineRepo. DIAN is using this to define Session startTimes client side.
-     * -NOTE: This should only be used after discussing your use case with team at Sage. -nbrown 7/8/22
-     */
-    open fun translateParticipantSchedule(participantSchedule: ParticipantSchedule) : ParticipantSchedule {
-        return participantSchedule
-    }
-
     private suspend fun loadRemoteTimeline(studyId: String): String {
-        val schedule = translateParticipantSchedule(scheduleApi.getParticipantScheduleForSelf(studyId))
+        var schedule = scheduleApi.getParticipantScheduleForSelf(studyId)
+        schedule = scheduleMutator?.mutateParticipantSchedule(schedule) ?: schedule
         backgroundScope.launch() {
             schedule.assessments?.let {
                 assessmentConfigRepo.loadAndCacheConfigs(it)
@@ -573,4 +564,10 @@ data class AssessmentHistoryRecord (
     val minutes: Int = ((finishedOn.epochSeconds - startedOn.epochSeconds) / 60).toInt()
 //    @OptIn(ExperimentalTime::class)
 //    val minutes = finishedOn.minus(startedOn).inMinutes.roundToInt()
+}
+
+interface ParticipantScheduleMutator {
+
+    fun mutateParticipantSchedule(participantSchedule: ParticipantSchedule) : ParticipantSchedule
+
 }

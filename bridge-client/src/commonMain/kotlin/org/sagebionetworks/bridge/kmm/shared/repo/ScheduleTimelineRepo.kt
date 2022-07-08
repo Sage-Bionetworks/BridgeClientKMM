@@ -19,7 +19,7 @@ import org.sagebionetworks.bridge.kmm.shared.models.*
 import kotlin.math.roundToInt
 import kotlin.time.ExperimentalTime
 
-class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo,
+open class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo,
                            internal val assessmentConfigRepo: AssessmentConfigRepo,
                            httpClient: HttpClient,
                            databaseHelper: ResourceDatabaseHelper,
@@ -47,8 +47,19 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         )
     }
 
+
+    /**
+     * This function is a workaround for apps that need to define part of the schedule client side.
+     * By modifying the schedule before it gets cached locally, apps can take advantage of the rest of
+     * the ScheduleTimeLineRepo. DIAN is using this to define Session startTimes client side.
+     * -NOTE: This should only be used after discussing your use case with team at Sage. -nbrown 7/8/22
+     */
+    open fun translateParticipantSchedule(participantSchedule: ParticipantSchedule) : ParticipantSchedule {
+        return participantSchedule
+    }
+
     private suspend fun loadRemoteTimeline(studyId: String): String {
-        val schedule = scheduleApi.getParticipantScheduleForSelf(studyId)
+        val schedule = translateParticipantSchedule(scheduleApi.getParticipantScheduleForSelf(studyId))
         backgroundScope.launch() {
             schedule.assessments?.let {
                 assessmentConfigRepo.loadAndCacheConfigs(it)

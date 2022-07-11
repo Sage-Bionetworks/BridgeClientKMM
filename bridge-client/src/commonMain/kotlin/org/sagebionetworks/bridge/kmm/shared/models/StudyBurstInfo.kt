@@ -37,7 +37,7 @@ data class StudyBurstInfo (
 
     /* ISO 8601 duration between the origin event timestamp and the first burst in the study burst sequence (days or weeks) */
     @SerialName("delay")
-    val delay: DateTimePeriod,
+    val delay: DateTimePeriod = DateTimePeriod(), //Defaults to delay of 0, if no value returned from server.
 
     /* ISO 8601 duration between the burst event timestamps in days or weeks */
     @SerialName("interval")

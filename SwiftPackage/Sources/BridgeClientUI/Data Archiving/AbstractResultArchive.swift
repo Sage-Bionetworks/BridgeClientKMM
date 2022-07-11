@@ -110,7 +110,7 @@ open class AbstractResultArchive : DataArchive {
             metadataDictionary[kDataGroups] = dataGroups.joined(separator: ",")
         }
         
-        let data = try JSONSerialization.data(withJSONObject: metadataDictionary, options: .prettyPrinted)
+        let data = try JSONSerialization.data(withJSONObject: metadataDictionary, options: [.prettyPrinted, .withoutEscapingSlashes])
         try addFile(data: data, filepath: kMetadataFilename, createdOn: Date(), contentType: "json")
     }
     

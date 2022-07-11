@@ -23,7 +23,8 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
                            internal val assessmentConfigRepo: AssessmentConfigRepo,
                            httpClient: HttpClient,
                            databaseHelper: ResourceDatabaseHelper,
-                           backgroundScope: CoroutineScope) :
+                           backgroundScope: CoroutineScope,
+                           var scheduleMutator: ParticipantScheduleMutator? = null) :
     AbstractResourceRepo(databaseHelper, backgroundScope) {
 
     internal companion object {
@@ -48,7 +49,8 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
     }
 
     private suspend fun loadRemoteTimeline(studyId: String): String {
-        val schedule = scheduleApi.getParticipantScheduleForSelf(studyId)
+        var schedule = scheduleApi.getParticipantScheduleForSelf(studyId)
+        schedule = scheduleMutator?.mutateParticipantSchedule(schedule) ?: schedule
         backgroundScope.launch() {
             schedule.assessments?.let {
                 assessmentConfigRepo.loadAndCacheConfigs(it)
@@ -562,4 +564,10 @@ data class AssessmentHistoryRecord (
     val minutes: Int = ((finishedOn.epochSeconds - startedOn.epochSeconds) / 60).toInt()
 //    @OptIn(ExperimentalTime::class)
 //    val minutes = finishedOn.minus(startedOn).inMinutes.roundToInt()
+}
+
+interface ParticipantScheduleMutator {
+
+    fun mutateParticipantSchedule(participantSchedule: ParticipantSchedule) : ParticipantSchedule
+
 }

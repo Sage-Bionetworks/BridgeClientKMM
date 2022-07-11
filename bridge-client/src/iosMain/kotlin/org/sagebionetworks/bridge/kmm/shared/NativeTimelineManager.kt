@@ -2,12 +2,10 @@ package org.sagebionetworks.bridge.kmm.shared
 
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.datetime.*
 import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -33,11 +31,14 @@ class NativeTimelineManager(
 
     private val scope = MainScope()
 
-    fun observeTodaySchedule(isNewLogin: Boolean) {
+    fun observeTodaySchedule(isNewLogin: Boolean) = observeTodaySchedule(isNewLogin, null)
+
+    fun observeTodaySchedule(isNewLogin: Boolean, scheduleMutator: ParticipantScheduleMutator?) {
         scope.launch {
             if (isNewLogin) {
                 adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)
             }
+            repo.scheduleMutator = scheduleMutator
             repo.getSessionsForToday(studyId, includeAllNotifications, alwaysIncludeNextDay).collect { timelineResource ->
                 (timelineResource as? ResourceResult.Success)?.data?.let { timelineSlice ->
                     viewUpdate(timelineSlice.toNaive())
@@ -82,7 +83,7 @@ class NativeTimelineManager(
                     NativeAssessmentConfig(
                         instanceGuid = instanceGuid,
                         identifier = assessmentInfo.identifier,
-                        config = (resource as? ResourceResult.Success)?.data?.config.toString()?.toNSData(),
+                        config = (resource as? ResourceResult.Success)?.data?.config.toString().toNSData(),
                         restoredResult = restoredJson
                     )
                 )

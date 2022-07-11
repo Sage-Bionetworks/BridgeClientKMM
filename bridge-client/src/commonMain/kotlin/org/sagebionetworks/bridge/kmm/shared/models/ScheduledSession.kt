@@ -55,8 +55,9 @@ data class ScheduledSession (
 //    @SerialName("endDay")
 //    val endDay: Int,
 
+    // startTime is a var so that apps (DIAN) that define this client side can change it -nbrown 7/8/22
     @SerialName("startTime")
-    val startTime: String,
+    var startTime: String,
 
     @SerialName("delayTime")
     val delayTime: String? = null,

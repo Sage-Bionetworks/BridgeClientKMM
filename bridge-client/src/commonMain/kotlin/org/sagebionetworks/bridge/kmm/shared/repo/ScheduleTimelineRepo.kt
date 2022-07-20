@@ -59,6 +59,10 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         return Json.encodeToString(schedule)
     }
 
+    internal fun clearCachedSchedule(studyId: String) {
+        database.removeAllResources(ResourceType.PARTICIPANT_SCHEDULE, studyId)
+    }
+
     /**
      * Get all the scheduled sessions for today that have not expired.
      * @param studyId Study identifier

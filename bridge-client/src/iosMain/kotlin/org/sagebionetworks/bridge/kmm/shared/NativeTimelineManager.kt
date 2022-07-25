@@ -10,10 +10,7 @@ import kotlinx.serialization.json.JsonObject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.sagebionetworks.bridge.kmm.shared.cache.*
-import org.sagebionetworks.bridge.kmm.shared.models.AdherenceRecord
-import org.sagebionetworks.bridge.kmm.shared.models.AssessmentInfo
-import org.sagebionetworks.bridge.kmm.shared.models.NotificationMessage
-import org.sagebionetworks.bridge.kmm.shared.models.SessionInfo
+import org.sagebionetworks.bridge.kmm.shared.models.*
 import org.sagebionetworks.bridge.kmm.shared.repo.*
 import platform.Foundation.*
 
@@ -28,6 +25,7 @@ class NativeTimelineManager(
     private val assessmentConfigRepo : AssessmentConfigRepo by inject(mode = LazyThreadSafetyMode.NONE)
     private val localCache : LocalJsonDataCache by inject(mode = LazyThreadSafetyMode.NONE)
     private val adherenceRecordRepo : AdherenceRecordRepo by inject(mode = LazyThreadSafetyMode.NONE)
+    private val activityEventsRepo : ActivityEventsRepo by inject(mode = LazyThreadSafetyMode.NONE)
 
     private val scope = MainScope()
 
@@ -102,6 +100,12 @@ class NativeTimelineManager(
 
     fun clearAssessmentResult(instanceGuid: String) {
         localCache.removeData(instanceGuid, "AssessmentResult")
+    }
+
+    fun createActivityEvent(studyId: String, eventId: String, timeStamp: Instant, callBack: (Boolean) -> Unit) {
+        scope.launch {
+            callBack(activityEventsRepo.createActivityEvent(studyId, eventId, timeStamp))
+        }
     }
 }
 

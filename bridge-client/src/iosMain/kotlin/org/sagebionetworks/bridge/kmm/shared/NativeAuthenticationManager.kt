@@ -55,6 +55,14 @@ open class NativeAuthenticationManager(
         }
     }
 
+    /**
+     * Set the cached [UserSessionInfo]. This should only be used for migrating apps using old
+     * Bridge client libraries. This will do nothing if there already is a session.
+     */
+    fun migrateSession(userSession: UserSessionInfo) {
+        authManager.migrateSession(userSession)
+    }
+
     fun signInEmail(userName: String, password: String, callBack: (UserSessionInfo?, ResourceStatus) -> Unit) {
         scope.launch {
             when(val userSessionResult = authManager.signInEmail(email = userName, password = password)) {

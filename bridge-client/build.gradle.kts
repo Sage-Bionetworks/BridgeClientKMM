@@ -58,6 +58,15 @@ kotlin {
         }
     }
 
+    targets.withType<KotlinNativeTarget> {
+        compilations.all {
+            kotlinOptions {
+                freeCompilerArgs += "-linker-options"
+                freeCompilerArgs += "-application_extension"
+            }
+        }
+    }
+
     sourceSets {
         val commonMain by getting {
             dependencies {

@@ -32,11 +32,14 @@
 //
 
 import Foundation
-import UIKit
 import UniformTypeIdentifiers
 import CoreServices
 import BridgeClient
 import JsonModel
+
+#if canImport(UIKit)
+import UIKit
+#endif
 
 protocol BridgeFileUploadMetadataBlob {}
 struct BridgeFileUploadMetadata<T>: Codable, BridgeFileUploadMetadataBlob where T: Codable {
@@ -536,10 +539,12 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         
         self.netManager.backgroundTransferDelegate = self
         
+        #if canImport(UIKit)
         // Set up a listener to retry temporarily-failed uploads whenever the app becomes active
         NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: nil) { notification in
             self.checkAndRetryOrphanedUploads()
         }
+        #endif
         
         // Also do it right away
         self.checkAndRetryOrphanedUploads()

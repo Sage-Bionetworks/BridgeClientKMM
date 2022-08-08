@@ -297,6 +297,7 @@ __attribute__((swift_name("NativeAuthenticationManager")))
 @interface BridgeClientNativeAuthenticationManager : BridgeClientBase <BridgeClientKoin_coreKoinComponent>
 - (instancetype)initWithViewUpdate:(void (^)(BridgeClientUserSessionInfo * _Nullable))viewUpdate __attribute__((swift_name("init(viewUpdate:)"))) __attribute__((objc_designated_initializer));
 - (BOOL)isAuthenticated __attribute__((swift_name("isAuthenticated()")));
+- (void)migrateSessionUserSession:(BridgeClientUserSessionInfo *)userSession __attribute__((swift_name("migrateSession(userSession:)")));
 - (void)notifyUIOfBridgeErrorStatusCode:(BridgeClientKtor_httpHttpStatusCode *)statusCode __attribute__((swift_name("notifyUIOfBridgeError(statusCode:)")));
 - (void)observeUserSessionInfo __attribute__((swift_name("observeUserSessionInfo()")));
 
@@ -2641,6 +2642,7 @@ __attribute__((swift_name("AuthenticationRepository")))
 - (instancetype)initWithAuthHttpClient:(BridgeClientKtor_client_coreHttpClient *)authHttpClient bridgeConfig:(id<BridgeClientBridgeConfig>)bridgeConfig database:(BridgeClientResourceDatabaseHelper *)database backgroundScope:(id<BridgeClientKotlinx_coroutines_coreCoroutineScope>)backgroundScope __attribute__((swift_name("init(authHttpClient:bridgeConfig:database:backgroundScope:)"))) __attribute__((objc_designated_initializer));
 - (NSString * _Nullable)currentStudyId __attribute__((swift_name("currentStudyId()")));
 - (BOOL)isAuthenticated __attribute__((swift_name("isAuthenticated()")));
+- (void)migrateSessionUserSession:(BridgeClientUserSessionInfo *)userSession __attribute__((swift_name("migrateSession(userSession:)")));
 - (void)notifyUIOfBridgeErrorStatusCode:(BridgeClientKtor_httpHttpStatusCode *)statusCode __attribute__((swift_name("notifyUIOfBridgeError(statusCode:)")));
 
 /**

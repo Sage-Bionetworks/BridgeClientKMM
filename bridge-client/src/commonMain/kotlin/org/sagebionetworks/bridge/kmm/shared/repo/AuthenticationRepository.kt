@@ -56,6 +56,16 @@ class AuthenticationRepository(
         return database.getResource(USER_SESSION_ID, ResourceType.USER_SESSION_INFO, APP_WIDE_STUDY_ID)
     }
 
+    /**
+     * Set the cached [UserSessionInfo]. This should only be used for migrating apps using old
+     * Bridge client libraries. This will do nothing if there already is a session.
+     */
+    fun migrateSession(userSession: UserSessionInfo) {
+        if (sessionResource() == null) {
+            updateCachedSession(null, userSession)
+        }
+    }
+
 
     /**
      * Get the ID of the current study.

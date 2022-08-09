@@ -60,7 +60,9 @@ abstract class AssessmentResultArchiveUploader(
             .withAppVersionName(appVersion)
             .withPhoneInfo(bridgeConfig.deviceName)
 
-        val metadataMap = getMetadataMap(assessmentResult, jsonCoder)
+        val archiveFiles = toArchiveFiles(assessmentResult, jsonCoder)
+
+        val metadataMap = getMetadataMap(archiveFiles, assessmentResult, jsonCoder)
         
         val kotlinEndTimeInstant = assessmentResult.endDateTime!!
         val jodaEndTime = Instant(kotlinEndTimeInstant.toEpochMilliseconds())
@@ -74,7 +76,7 @@ abstract class AssessmentResultArchiveUploader(
             )
         )
 
-        for (archiveFile in toArchiveFiles(assessmentResult, jsonCoder)) {
+        for (archiveFile in archiveFiles) {
             builder.addDataFile(archiveFile)
         }
 
@@ -162,9 +164,10 @@ abstract class AssessmentResultArchiveUploader(
     }
 
     open fun getMetadataMap(
+        archiveFiles: Set<ArchiveFile>,
         assessmentResult: AssessmentResult,
         jsonCoder: Json
-    ): Map<String, String> {
+    ): Map<String, Any> {
         val appVersion = "version ${bridgeConfig.appVersionName}, build ${bridgeConfig.appVersion}"
         val os = "${bridgeConfig.osName}/${bridgeConfig.osVersion}"
         val session = authenticationRepository.session()
@@ -176,6 +179,7 @@ abstract class AssessmentResultArchiveUploader(
         // migrate once MTB is compatible with assessmentModels  0.4.3 - liujoshua 04/01/2021
         // val startDate =jsonCoder.encodeToString(assessmentResult.startDateTime)
         // val endDate = jsonCoder.encodeToString(assessmentResult.endDateTime)
+        val fileInfoList = archiveFiles.map { it.fileInfoMap() }
 
 
         val kotlinStartTimeInstant = assessmentResult.startDateTime
@@ -190,16 +194,29 @@ abstract class AssessmentResultArchiveUploader(
         return mapOf(
             "taskIdentifier" to assessmentResult.identifier,
             "deviceInfo" to "${Build.PRODUCT} ${Build.MODEL}; $os",
+            "appName" to bridgeConfig.appName,
             "appVersion" to appVersion,
             "deviceTypeIdentifier" to bridgeConfig.deviceName,
             "taskRunUUID" to assessmentResult.runUUIDString,
             "dataGroups" to dataGroups,
             "startDate" to jodaStartTime.toString(),
-            "endDate" to jodaEndTime.toString()
+            "endDate" to jodaEndTime.toString(),
+            "files" to fileInfoList
         )
     }
 
     open fun toArchiveFiles(assessmentResult: AssessmentResult, jsonCoder: Json): Set<ArchiveFile> {
         return setOf()
     }
+}
+
+fun ArchiveFile.fileInfoMap() : Map<String, String> {
+    val map = mutableMapOf(
+        "filename" to filename,
+        "timestamp" to endDate.toString()
+    )
+    if (this is JsonArchiveFile) {
+        map.put("contentType", "application/json")
+    }
+    return map
 }

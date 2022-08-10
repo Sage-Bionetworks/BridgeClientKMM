@@ -19,15 +19,7 @@ class NativeTimelineManager(
     private val includeAllNotifications: Boolean,
     private val alwaysIncludeNextDay: Boolean,
     private val viewUpdate: (NativeScheduledSessionTimelineSlice) -> Unit
-) : KoinComponent {
-
-    private val repo : ScheduleTimelineRepo by inject(mode = LazyThreadSafetyMode.NONE)
-    private val assessmentConfigRepo : AssessmentConfigRepo by inject(mode = LazyThreadSafetyMode.NONE)
-    private val localCache : LocalJsonDataCache by inject(mode = LazyThreadSafetyMode.NONE)
-    private val adherenceRecordRepo : AdherenceRecordRepo by inject(mode = LazyThreadSafetyMode.NONE)
-    private val activityEventsRepo : ActivityEventsRepo by inject(mode = LazyThreadSafetyMode.NONE)
-
-    private val scope = MainScope()
+) : AbstractNativeTimelineManager(studyId) {
 
     fun observeTodaySchedule(isNewLogin: Boolean) = observeTodaySchedule(isNewLogin, null)
 
@@ -49,6 +41,19 @@ class NativeTimelineManager(
         runCatching { scope.cancel() }
         observeTodaySchedule(false)
     }
+}
+
+abstract class AbstractNativeTimelineManager(
+    private val studyId: String
+) : KoinComponent {
+
+    internal val repo : ScheduleTimelineRepo by inject(mode = LazyThreadSafetyMode.NONE)
+    internal val assessmentConfigRepo : AssessmentConfigRepo by inject(mode = LazyThreadSafetyMode.NONE)
+    internal val localCache : LocalJsonDataCache by inject(mode = LazyThreadSafetyMode.NONE)
+    internal val adherenceRecordRepo : AdherenceRecordRepo by inject(mode = LazyThreadSafetyMode.NONE)
+    internal val activityEventsRepo : ActivityEventsRepo by inject(mode = LazyThreadSafetyMode.NONE)
+
+    internal val scope = MainScope()
 
     @Throws(Throwable::class)
     fun onCleared() {

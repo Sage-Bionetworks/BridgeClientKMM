@@ -55,7 +55,7 @@ class ResourceDatabaseHelper(sqlDriver: SqlDriver) : EtagStorageCache {
         return dbQuery.selectResourceById(id, type, studyId).asFlow().mapToOneOrNull().distinctUntilChanged(areEquivalent = {old, new -> old == new })
     }
 
-    internal fun getResource(id: String, type: ResourceType, studyId: String): Resource? {
+    fun getResource(id: String, type: ResourceType, studyId: String): Resource? {
         return dbQuery.selectResourceById(id, type, studyId).executeAsOneOrNull()
     }
 
@@ -67,7 +67,7 @@ class ResourceDatabaseHelper(sqlDriver: SqlDriver) : EtagStorageCache {
         dbQuery.removeResourceById(id, type, studyId)
     }
 
-    internal fun insertUpdateResource(resource: Resource) {
+    fun insertUpdateResource(resource: Resource) {
         dbQuery.transaction {
             dbQuery.insertUpdateResource(
                 identifier = resource.identifier,

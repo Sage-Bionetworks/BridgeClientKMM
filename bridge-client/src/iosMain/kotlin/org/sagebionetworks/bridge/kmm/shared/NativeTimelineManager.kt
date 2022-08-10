@@ -21,11 +21,11 @@ class NativeTimelineManager(
     private val viewUpdate: (NativeScheduledSessionTimelineSlice) -> Unit
 ) : KoinComponent {
 
-    private val repo : ScheduleTimelineRepo by inject(mode = LazyThreadSafetyMode.NONE)
-    private val assessmentConfigRepo : AssessmentConfigRepo by inject(mode = LazyThreadSafetyMode.NONE)
-    private val localCache : LocalJsonDataCache by inject(mode = LazyThreadSafetyMode.NONE)
-    private val adherenceRecordRepo : AdherenceRecordRepo by inject(mode = LazyThreadSafetyMode.NONE)
-    private val activityEventsRepo : ActivityEventsRepo by inject(mode = LazyThreadSafetyMode.NONE)
+    val repo : ScheduleTimelineRepo by inject(mode = LazyThreadSafetyMode.NONE)
+    val assessmentConfigRepo : AssessmentConfigRepo by inject(mode = LazyThreadSafetyMode.NONE)
+    val localCache : LocalJsonDataCache by inject(mode = LazyThreadSafetyMode.NONE)
+    val adherenceRecordRepo : AdherenceRecordRepo by inject(mode = LazyThreadSafetyMode.NONE)
+    val activityEventsRepo : ActivityEventsRepo by inject(mode = LazyThreadSafetyMode.NONE)
 
     private val scope = MainScope()
 

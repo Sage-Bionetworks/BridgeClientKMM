@@ -168,7 +168,7 @@ open class BridgeClientAppManager : ObservableObject {
     }
     
     private var appConfigManager: NativeAppConfigManager!
-    internal private(set) var authManager: NativeAuthenticationManager!
+    public private(set) var authManager: NativeAuthenticationManager!
     
     /// The local notification manager is a singleton that can be set up as the notification delegate (to handle snoozing).
     lazy public var localNotificationManager : LocalNotificationManager = LocalNotificationManager()

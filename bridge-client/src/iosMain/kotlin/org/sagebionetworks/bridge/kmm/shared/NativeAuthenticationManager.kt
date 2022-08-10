@@ -11,12 +11,14 @@ import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus
 import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
 import org.sagebionetworks.bridge.kmm.shared.repo.AuthenticationRepository
+import org.sagebionetworks.bridge.kmm.shared.repo.ParticipantRepo
 
 open class NativeAuthenticationManager(
     private val viewUpdate: (UserSessionInfo?) -> Unit
 ) : KoinComponent {
 
     private val authManager : AuthenticationRepository by inject(mode = LazyThreadSafetyMode.NONE)
+    private val participantManager : ParticipantRepo by inject(mode = LazyThreadSafetyMode.NONE)
 
     private val scope = MainScope()
 
@@ -53,6 +55,14 @@ open class NativeAuthenticationManager(
             println("Failed to retrieve session: ${err.message}")
             null
         }
+    }
+
+    fun getParticipantRecord() : ParticipantRepo.UpdateParticipantRecord? {
+        return session()?.let { ParticipantRepo.UpdateParticipantRecord.getUpdateParticipantRecord(it) }
+    }
+
+    fun updateParticipant(record: ParticipantRepo.UpdateParticipantRecord) {
+        participantManager.updateParticipant(record)
     }
 
     /**

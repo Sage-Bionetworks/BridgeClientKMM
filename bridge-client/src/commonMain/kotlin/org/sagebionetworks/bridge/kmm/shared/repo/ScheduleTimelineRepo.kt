@@ -11,10 +11,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.sagebionetworks.bridge.kmm.shared.apis.SchedulesV2Api
-import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
-import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
-import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus
-import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
+import org.sagebionetworks.bridge.kmm.shared.cache.*
 import org.sagebionetworks.bridge.kmm.shared.models.*
 import kotlin.math.roundToInt
 import kotlin.time.ExperimentalTime
@@ -38,6 +35,35 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
     private var scheduleApi = SchedulesV2Api(
         httpClient = httpClient
     )
+
+    private fun getCachedSchedule(studyId: String): ParticipantSchedule? {
+        return database.getResource(SCHEDULE_TIMELINE_ID + studyId, ResourceType.PARTICIPANT_SCHEDULE, studyId )?.loadResource()
+    }
+
+    private fun updateCachedSchedule(participantSchedule: ParticipantSchedule, studyId: String) {
+        val resource = Resource(
+            identifier = SCHEDULE_TIMELINE_ID + studyId,
+            secondaryId = ResourceDatabaseHelper.DEFAULT_SECONDARY_ID,
+            type = ResourceType.PARTICIPANT_SCHEDULE,
+            studyId = studyId,
+            json = Json.encodeToString(participantSchedule),
+            lastUpdate = Clock.System.now().toEpochMilliseconds(),
+            status = ResourceStatus.SUCCESS,
+            needSave = false
+        )
+        database.insertUpdateResource(resource)
+    }
+
+    fun runScheduleMutator(studyId: String) {
+        if (scheduleMutator != null) {
+            getCachedSchedule(studyId)?.let {
+                scheduleMutator?.mutateParticipantSchedule(it)?.let { mutatedSchedule ->
+                    updateCachedSchedule(mutatedSchedule, studyId)
+                }
+
+            }
+        }
+    }
 
     private fun getTimeline(studyId: String): Flow<ResourceResult<ParticipantSchedule>> {
         return getResourceById(

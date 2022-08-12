@@ -32,6 +32,7 @@
 
 import XCTest
 import BridgeClient
+import BridgeClientExtension
 @testable import BridgeClientUI
 
 final class TodayTimelineViewModelTests: XCTestCase {

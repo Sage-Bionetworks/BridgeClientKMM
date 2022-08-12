@@ -32,6 +32,7 @@
 
 import SwiftUI
 import BridgeClient
+import BridgeClientExtension
 import JsonModel
 
 /// The view model that backs a `HistoryView` and wraps `BridgeClient.NativeAdherenceRecord`

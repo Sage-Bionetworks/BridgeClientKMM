@@ -33,7 +33,7 @@
 
 import XCTest
 @testable import BridgeClient
-@testable import BridgeClientUI
+@testable import BridgeClientExtension
 
 extension NSNotification.Name {
     /// Placeholder notification name for initializing values intended to be overridden in subclasses.
@@ -47,7 +47,7 @@ protocol BridgeFileUploadManagerTestCase : XCTWaiterDelegate {
     
     var savedSession: URLSession? { get set }
     var savedDelay: TimeInterval? { get set }
-    var savedAppManager: BridgeClientAppManager? { get set }
+    var savedAppManager: UploadAppManager? { get set }
     
     var requestEndpoint: String { get }
     var uploadRequestSuccessResponseFile: String { get }
@@ -539,8 +539,8 @@ extension BridgeFileUploadManagerTestCaseTyped {
     // still in process, so we don't want to fail the test if there are still
     // mock responses etc. set for that step.
     func keysEmptyAfterUpload(for mockURLSessionList: NSMutableDictionary) -> [String] {
-        var allKeys = mockURLSessionList.allKeys as! [String]
-        return allKeys.remove { key in
+        let allKeys = mockURLSessionList.allKeys as! [String]
+        return allKeys.filter { key in
             key == BridgeFileUploadManager.shared.notifyingBridgeUploadSucceededKey
         }
     }

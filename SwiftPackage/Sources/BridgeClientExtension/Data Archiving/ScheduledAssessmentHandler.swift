@@ -63,6 +63,12 @@ public struct ScheduledAssessmentConfig : Identifiable {
     public let scheduleInfo: AssessmentScheduleInfo
     public let config: Data?
     public let restoreResult: Data?
+    
+    public init(scheduleInfo: AssessmentScheduleInfo, config: Data?, restoreResult: Data?) {
+        self.scheduleInfo = scheduleInfo
+        self.config = config
+        self.restoreResult = restoreResult
+    }
 }
 
 /// Thread-safe assessment schedule info. Kotlin objects can only be accessed from the main thread or it causes

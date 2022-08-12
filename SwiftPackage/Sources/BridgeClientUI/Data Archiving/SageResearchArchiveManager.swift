@@ -34,6 +34,7 @@ import Foundation
 import Research
 import JsonModel
 import BridgeClient
+import BridgeClientExtension
 
 /// Base-class implementation of archiving results from a ``Research.RSDTaskState`` run.
 /// Typically, this is used for active assessments, but can be used for any data collected using the
@@ -55,7 +56,7 @@ open class SageResearchArchiveManager : NSObject, RSDDataArchiveManager {
         self.bridgeManager = bridgeManager
         self._defaultTaskToSchemaMapping = taskToSchemaMapping
         self._appConfigTaskToSchemaMapping = processResultOnMainThread() {
-            bridgeManager.config?.taskToSchemaMapping()
+            bridgeManager.appConfig.taskToSchemaMapping()
         }
     }
     
@@ -74,8 +75,8 @@ open class SageResearchArchiveManager : NSObject, RSDDataArchiveManager {
                 (taskResult as? AssessmentResult)?.schemaIdentifier ??
                 taskResult.identifier
             
-            if let ref = bridgeManager.config?.schemaReferences?.first(where: { $0.id == schemaIdentifier }) {
-                return RSDSchemaInfoObject(identifier: ref.id, revision: ref.revision?.intValue ?? 0)
+            if let revision = bridgeManager.appConfig.schemaReferences?[schemaIdentifier] {
+                return RSDSchemaInfoObject(identifier: schemaIdentifier, revision: revision)
             }
             else if let assessmentResult = taskResult as? AssessmentResult,
                     let schemaIdentifier = assessmentResult.schemaIdentifier,
@@ -237,11 +238,12 @@ open class SageResearchArchiveManager : NSObject, RSDDataArchiveManager {
     }
 }
 
-extension AppConfig {
+extension AppConfigObserver {
     
     func taskToSchemaMapping() -> [String : String]? {
         do {
-            guard let dictionary = try self.clientDataDictionary()
+            guard let jsonData = self.clientData,
+                  let dictionary = try JSONSerialization.jsonObject(with: jsonData) as? [String : Any]
             else {
                 return nil
             }

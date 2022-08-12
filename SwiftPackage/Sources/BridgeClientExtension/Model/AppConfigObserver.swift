@@ -63,6 +63,9 @@ public final class AppConfigObserver : ObservableObject {
     /// (the revision given in the configReferences map).
     @Published public var configElements: [String : Data]?
     
+    /// A map of schema identifiers to revisions.
+    @Published public var schemaReferences: [String : Int]?
+    
     /// Get the config element with the given identifier.
     public func configElementJson(identifier: String) -> Data? {
         configElements?[identifier]
@@ -72,5 +75,10 @@ public final class AppConfigObserver : ObservableObject {
         guard let config = newValue else { return }
         self.clientData = config.clientDataJson()
         self.configElements = config.mapConfigElements()
+        self.schemaReferences = config.schemaReferences?.reduce(into: [String : Int]()) { dictionary, ref in
+            ref.revision.map {
+                dictionary[ref.id] = $0.intValue
+            }
+        }
     }
 }

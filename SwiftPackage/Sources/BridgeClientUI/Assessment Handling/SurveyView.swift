@@ -35,6 +35,7 @@ import SwiftUI
 import JsonModel
 import AssessmentModel
 import AssessmentModelUI
+import BridgeClientExtension
 
 public struct SurveyView<DisplayView : AssessmentDisplayView>: View {
     let assessmentInfo: AssessmentScheduleInfo

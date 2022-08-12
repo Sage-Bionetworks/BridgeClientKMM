@@ -81,7 +81,7 @@ open class AbstractResultArchive : DataArchive {
     }
     
     /// Close the archive with optional metadata from a task result.
-    final func completeArchive(createdOn: Date, with metadata: [String : Any]? = nil) throws {
+    public final func completeArchive(createdOn: Date, with metadata: [String : Any]? = nil) throws {
         
         // If the archive is empty and this is a placeholder archive, then exit early without
         // adding the metadata.

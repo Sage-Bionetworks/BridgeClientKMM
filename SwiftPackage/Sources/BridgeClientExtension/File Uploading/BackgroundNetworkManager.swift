@@ -69,7 +69,7 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
     
     /// BackgroundNetworkManager needs access to app configuration and user session info. The app manager should create the singleton
     /// instance and immediately set this value to itself.
-    var appManager: BridgeClientAppManager!
+    var appManager: UploadAppManager!
 
     /// We use this custom HTTP request header as a hack to keep track of how many times we've retried a request.
     let retryCountHeader = "X-SageBridge-Retry"

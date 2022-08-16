@@ -34,6 +34,8 @@ import Foundation
 import Research
 import JsonModel
 import BridgeClient
+import BridgeClient
+import BridgeClientUI
 import BridgeClientExtension
 
 /// Base-class implementation of archiving results from a ``Research.RSDTaskState`` run.

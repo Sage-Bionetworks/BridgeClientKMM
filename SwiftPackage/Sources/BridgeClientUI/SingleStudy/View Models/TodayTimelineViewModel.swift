@@ -200,7 +200,7 @@ open class AbstractTodayTimelineViewModel : NSObject, ObservableObject, Schedule
     ///     - declined: Did the participant "decline" to finish? In other words, do they want to skip this assessment?
     ///     - clientData: Any `JsonSerializable` object that should be stored with this adherence record.
     @MainActor
-    func updateAdherenceRecord(scheduleInfo: AssessmentScheduleInfo, startedOn: Date, endedOn: Date? = nil, declined: Bool = false, clientData: JsonSerializable? = nil) {
+    open func updateAdherenceRecord(scheduleInfo: AssessmentScheduleInfo, startedOn: Date, endedOn: Date? = nil, declined: Bool = false, clientData: JsonSerializable? = nil) {
 
         // Create and write an adherence record.
         let record = NativeAdherenceRecord(instanceGuid: scheduleInfo.instanceGuid,

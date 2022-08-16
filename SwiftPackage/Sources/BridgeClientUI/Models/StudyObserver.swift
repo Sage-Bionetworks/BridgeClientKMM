@@ -323,3 +323,27 @@ public struct StudyContact : Hashable, Identifiable {
         self.jurisdiction = jurisdiction
     }
 }
+
+/// A convenience method for ensuring that a given result is processed on the main thread.
+func processResultOnMainThread<T>(_ process: () -> T?) -> T? {
+    var ret: T? = nil
+    if Thread.isMainThread {
+        ret = process()
+    } else {
+        DispatchQueue.main.sync {
+            ret = process()
+        }
+    }
+    return ret
+}
+
+/// A convenience method for ensuring that a given result is processed on the main thread.
+func processOnMainThread(_ process: () -> Void) {
+    if Thread.isMainThread {
+        process()
+    } else {
+        DispatchQueue.main.sync {
+            process()
+        }
+    }
+}

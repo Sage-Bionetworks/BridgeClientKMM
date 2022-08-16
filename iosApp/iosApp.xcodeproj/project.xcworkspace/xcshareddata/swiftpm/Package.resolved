@@ -29,6 +29,15 @@
         }
       },
       {
+        "package": "iOSPrivateProjectInfo",
+        "repositoryURL": "https://github.com/Sage-Bionetworks/iOSPrivateProjectInfo.git",
+        "state": {
+          "branch": null,
+          "revision": "d39a617b446d05690f4e8c76ee7a263fa79cc305",
+          "version": null
+        }
+      },
+      {
         "package": "JsonModel",
         "repositoryURL": "https://github.com/Sage-Bionetworks/JsonModel-Swift.git",
         "state": {

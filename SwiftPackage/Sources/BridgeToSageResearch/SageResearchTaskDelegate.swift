@@ -32,6 +32,7 @@
 
 import Foundation
 import BridgeClient
+import BridgeClientUI
 import BridgeClientExtension
 import JsonModel
 import Research

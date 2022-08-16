@@ -17,6 +17,7 @@ let package = Package(
                 "BridgeClient",
                 "BridgeClientExtension",
                 "BridgeClientUI",
+                "BridgeToSageResearch",
             ]),
         .library(
             name: "BridgeClientAppExtension",
@@ -71,8 +72,6 @@ let package = Package(
                     "BridgeClientExtension",
                     "SharedMobileUI",
                     "JsonModel",
-                    .product(name: "Research", package: "SageResearch"),
-                    .product(name: "ResearchUI", package: "SageResearch"),
                     .product(name: "AssessmentModel", package: "AssessmentModel"),
                     .product(name: "AssessmentModelUI", package: "AssessmentModel"),
                 ],
@@ -84,5 +83,16 @@ let package = Package(
                         "BridgeClientUI",
                     ],
                     path: "SwiftPackage/Tests/BridgeClientUITests"),
+        
+        .target(name: "BridgeToSageResearch",
+                dependencies: [
+                    "BridgeClient",
+                    "BridgeClientExtension",
+                    "BridgeClientUI",
+                    "JsonModel",
+                    .product(name: "Research", package: "SageResearch"),
+                    .product(name: "ResearchUI", package: "SageResearch"),
+                ],
+                path: "SwiftPackage/Sources/BridgeToSageResearch"),
     ]
 )

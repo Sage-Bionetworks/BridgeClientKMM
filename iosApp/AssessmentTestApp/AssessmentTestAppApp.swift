@@ -34,12 +34,10 @@
 import SwiftUI
 import BridgeClient
 import BridgeClientUI
-import BridgeClientExtension
-import AssessmentTestApp_Private
 
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
-    let bridgeManager: SingleStudyAppManager = SingleStudyAppManager(appId: PrivateKeys.shared.appId, pemPath: PrivateKeys.shared.pemPath)
+    let bridgeManager: SingleStudyAppManager = SingleStudyAppManager(platformConfig: kPlatformConfig, pemPath: kPemPath)
     
     func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]?) -> Bool {
         bridgeManager.appWillFinishLaunching(launchOptions)

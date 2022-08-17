@@ -46,7 +46,7 @@ struct LoginView: View {
     @State var participantId = ""
     
     // For this app, there is no log into the study and then as the participant.
-    let studyId = "test_study"
+    let studyId = kStudyId
 
     var body: some View {
         // For this preview app, everyone is signed in with the same login.

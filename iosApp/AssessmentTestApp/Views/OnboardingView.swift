@@ -33,6 +33,7 @@
 
 import SwiftUI
 import BridgeClientUI
+import BridgeClientExtension
 
 struct OnboardingView: View {
     @EnvironmentObject var bridgeManager: SingleStudyAppManager

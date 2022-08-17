@@ -32,6 +32,7 @@
 //
 
 import SwiftUI
+import BridgeClientExtension
 import BridgeClientUI
 import AssessmentModel
 import AssessmentModelUI
@@ -65,15 +66,7 @@ public struct ContentView: View {
     
     @ViewBuilder
     func assessmentView() -> some View {
-        SurveyView<AssessmentView>(info, handler: todayViewModel)
-    }
-    
-    @ViewBuilder
-    func emptyAssessment() -> some View {
-        VStack {
-            Text("This assessment is not supported by this app version")
-            Button("Dismiss", action: { todayViewModel.isPresentingAssessment = false })
-        }
+        SurveyView<AssessmentView>(todayViewModel.selectedAssessment!, handler: todayViewModel)
     }
 }
 

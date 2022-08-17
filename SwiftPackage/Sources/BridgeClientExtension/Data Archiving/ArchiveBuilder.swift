@@ -71,11 +71,13 @@ open class JsonResultArchive : AbstractResultArchive, ResultArchiveBuilder {
     public var endedOn: Date { fileInfo.timestamp }
     public var adherenceData: JsonSerializable? { nil }
     
-    public init?(json: Data, filename: String, schema: URL, timestamp: Date = Date(), startedOn: Date? = nil, schedule: AssessmentScheduleInfo? = nil) {
+    public init?(json: Data, filename: String, schema: URL, timestamp: Date = Date(), startedOn: Date? = nil, schedule: AssessmentScheduleInfo? = nil, schemaIdentifier: String? = nil) {
         self.json = json
         self.startedOn = startedOn ?? timestamp
         self.fileInfo = .init(filename: filename, timestamp: timestamp, contentType: "application/json", identifier: schedule?.assessmentInfo.identifier, jsonSchema: schema)
-        super.init(identifier: schedule?.assessmentInfo.identifier ?? filename, schedule: schedule)
+        super.init(identifier: schedule?.assessmentInfo.identifier ?? schemaIdentifier ?? filename,
+                   schemaIdentifier: schemaIdentifier,
+                   schedule: schedule)
     }
         
     public func buildArchive() async throws -> DataArchive {

@@ -1,6 +1,5 @@
 package org.sagebionetworks.bridge.kmm.shared.repo
 
-import edu.wustl.dian.app.schedule.StudyBurstScheduleJsonResource
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.datetime.*

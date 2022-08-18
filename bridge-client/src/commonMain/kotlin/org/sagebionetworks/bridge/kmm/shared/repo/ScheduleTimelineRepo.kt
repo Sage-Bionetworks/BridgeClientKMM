@@ -131,11 +131,11 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
      * @param studyId the study identifier
      * @param now the current instant, or what you want to provide in testing.
      */
-    fun getFutureSessions(studyId: String, now: Instant = Clock.System.now())
+    fun getFutureSessions(studyId: String, fromInstant: Instant = Clock.System.now())
         : Flow<ResourceResult<ScheduledSessionTimelineSlice>> {
 
         return getTimeline(studyId).map {
-            extractFutureSessionsFromResults(it, studyId, now)
+            extractFutureSessionsFromResults(it, studyId, fromInstant)
         }
     }
 
@@ -169,9 +169,9 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
     private fun extractFutureSessionsFromResults(
         timelineResult: ResourceResult<ParticipantSchedule>,
         studyId: String,
-        userJoinedDate: Instant,
+        instantInDay: Instant,
     ): ResourceResult<ScheduledSessionTimelineSlice> {
-        return extractSessionsFromResults(timelineResult, studyId, userJoinedDate, WindowFilterType.Future)
+        return extractSessionsFromResults(timelineResult, studyId, instantInDay, WindowFilterType.Future)
     }
 
     private fun extractPastSessionsFromResults(

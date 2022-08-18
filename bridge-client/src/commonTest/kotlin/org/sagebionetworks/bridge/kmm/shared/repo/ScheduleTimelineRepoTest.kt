@@ -1,5 +1,6 @@
 package org.sagebionetworks.bridge.kmm.shared.repo
 
+import edu.wustl.dian.app.schedule.StudyBurstScheduleJsonResource
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.datetime.*
@@ -869,6 +870,70 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val sessionList = resourceResult.data.scheduledSessionWindows
             assertNotNull(sessionList)
             assertEquals(13, sessionList.size)
+        }
+    }
+
+    @Test
+    fun testFutureSessionsDayBefore0() {
+        runTest {
+            val eventTimeStamp = Clock.System.now()
+            val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
+            val resourceResult = repo.getFutureSessions("testPastSessionsDay0",
+                getTodayInstant().minus(1, DateTimeUnit.DAY, TimeZone.currentSystemDefault()))
+                .firstOrNull { it is ResourceResult.Success }
+
+            assertTrue(resourceResult is ResourceResult.Success)
+            val sessionList = resourceResult.data.scheduledSessionWindows
+            assertNotNull(sessionList)
+            assertEquals(13, sessionList.size)
+        }
+    }
+
+    @Test
+    fun testFutureSessionsDay0() {
+        runTest {
+            val eventTimeStamp = Clock.System.now()
+            //         Clock.System.now().minus(DateTimeUnit.DAY, TimeZone.currentSystemDefault())
+            val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
+            val resourceResult = repo.getFutureSessions("testPastSessionsDay0", getTodayInstant())
+                .firstOrNull { it is ResourceResult.Success }
+
+            assertTrue(resourceResult is ResourceResult.Success)
+            val sessionList = resourceResult.data.scheduledSessionWindows
+            assertNotNull(sessionList)
+            assertEquals(9, sessionList.size)
+        }
+    }
+
+    @Test
+    fun testFutureSessionsDay1() {
+        runTest {
+            val eventTimeStamp =
+                Clock.System.now().minus(1, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
+            val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
+            val resourceResult = repo.getFutureSessions("testPastSessionsDay1", getTodayInstant())
+                .firstOrNull { it is ResourceResult.Success }
+
+            assertTrue(resourceResult is ResourceResult.Success)
+            val sessionList = resourceResult.data.scheduledSessionWindows
+            assertNotNull(sessionList)
+            assertEquals(6, sessionList.size)
+        }
+    }
+
+    @Test
+    fun testFutureSessionsDay4() {
+        runTest {
+            val eventTimeStamp =
+                Clock.System.now().minus(4, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
+            val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
+            val resourceResult = repo.getFutureSessions("testPastSessionsDay4", getTodayInstant())
+                .firstOrNull { it is ResourceResult.Success }
+
+            assertTrue(resourceResult is ResourceResult.Success)
+            val sessionList = resourceResult.data.scheduledSessionWindows
+            assertNotNull(sessionList)
+            assertEquals(0, sessionList.size)
         }
     }
 
@@ -2784,5 +2849,127 @@ class ScheduleTimelineRepoTest: BaseTest() {
         }
     }
 
+    @Test
+    fun test_createStudyBurst() {
+        runTest {
+            val tz = TimeZone.currentSystemDefault()
+            val timestamp = LocalDate(2021, 6, 23).atStartOfDayIn(tz)
+            val repo = getTestScheduleTimelineRepo(timeStamp = timestamp, timelineJson = StudyBurstScheduleJsonResource.participantScheduleJson)
+            val resourceResult = repo.getStudyBurstSchedule("testPastSessionsDay0", timestamp)
+                .firstOrNull { it is ResourceResult.Success }
+
+            assertTrue(resourceResult is ResourceResult.Success)
+
+            val burstSchedule = resourceResult.data
+            assertNotNull(burstSchedule)
+            assertEquals(10, burstSchedule.studyBurstList.size)
+
+            assertEquals(LocalDate(2021, 6, 23),
+                burstSchedule.studyBurstList[0].startDate())
+            assertEquals(LocalDate(2021, 6, 29),
+                burstSchedule.studyBurstList[0].endDate())
+            burstSchedule.studyBurstList[0].sessions.flatten().forEach {
+                assertEquals("study_burst:timeline_retrieved_burst:01", it.scheduledSession.startEventId)
+            }
+
+            assertEquals(LocalDate(2021, 12, 22),
+                burstSchedule.studyBurstList[1].startDate())
+            assertEquals(LocalDate(2021, 12, 28),
+                burstSchedule.studyBurstList[1].endDate())
+            burstSchedule.studyBurstList[1].sessions.flatten().forEach {
+                assertEquals("study_burst:timeline_retrieved_burst:02", it.scheduledSession.startEventId)
+            }
+
+            assertEquals(LocalDate(2022, 6, 22),
+                burstSchedule.studyBurstList[2].startDate())
+            assertEquals(LocalDate(2022, 6, 28),
+                burstSchedule.studyBurstList[2].endDate())
+            burstSchedule.studyBurstList[2].sessions.flatten().forEach {
+                assertEquals("study_burst:timeline_retrieved_burst:03", it.scheduledSession.startEventId)
+            }
+
+            assertEquals(LocalDate(2022, 12, 21),
+                burstSchedule.studyBurstList[3].startDate())
+            assertEquals(LocalDate(2022, 12, 27),
+                burstSchedule.studyBurstList[3].endDate())
+            burstSchedule.studyBurstList[3].sessions.flatten().forEach {
+                assertEquals("study_burst:timeline_retrieved_burst:04", it.scheduledSession.startEventId)
+            }
+
+            assertEquals(LocalDate(2023, 6, 21),
+                burstSchedule.studyBurstList[4].startDate())
+            assertEquals(LocalDate(2023, 6, 27),
+                burstSchedule.studyBurstList[4].endDate())
+            burstSchedule.studyBurstList[4].sessions.flatten().forEach {
+                assertEquals("study_burst:timeline_retrieved_burst:05", it.scheduledSession.startEventId)
+            }
+
+            assertEquals(LocalDate(2023, 12, 20),
+                burstSchedule.studyBurstList[5].startDate())
+            assertEquals(LocalDate(2023, 12, 26),
+                burstSchedule.studyBurstList[5].endDate())
+            burstSchedule.studyBurstList[5].sessions.flatten().forEach {
+                assertEquals("study_burst:timeline_retrieved_burst:06", it.scheduledSession.startEventId)
+            }
+
+            assertEquals(LocalDate(2024, 6, 19),
+                burstSchedule.studyBurstList[6].startDate())
+            assertEquals(LocalDate(2024, 6, 25),
+                burstSchedule.studyBurstList[6].endDate())
+            burstSchedule.studyBurstList[6].sessions.flatten().forEach {
+                assertEquals("study_burst:timeline_retrieved_burst:07", it.scheduledSession.startEventId)
+            }
+
+            assertEquals(LocalDate(2024, 12, 18),
+                burstSchedule.studyBurstList[7].startDate())
+            assertEquals(LocalDate(2024, 12, 24),
+                burstSchedule.studyBurstList[7].endDate())
+            burstSchedule.studyBurstList[7].sessions.flatten().forEach {
+                assertEquals("study_burst:timeline_retrieved_burst:08", it.scheduledSession.startEventId)
+            }
+
+            assertEquals(LocalDate(2025, 6, 18),
+                burstSchedule.studyBurstList[8].startDate())
+            assertEquals(LocalDate(2025, 6, 24),
+                burstSchedule.studyBurstList[8].endDate())
+            burstSchedule.studyBurstList[8].sessions.flatten().forEach {
+                assertEquals("study_burst:timeline_retrieved_burst:09", it.scheduledSession.startEventId)
+            }
+
+            assertEquals(LocalDate(2025, 12, 17),
+                burstSchedule.studyBurstList[9].startDate())
+            assertEquals(LocalDate(2025, 12, 23),
+                burstSchedule.studyBurstList[9].endDate())
+            burstSchedule.studyBurstList[9].sessions.flatten().forEach {
+                assertEquals("study_burst:timeline_retrieved_burst:10", it.scheduledSession.startEventId)
+            }
+
+            burstSchedule.studyBurstList.forEach { burst ->
+                assertEquals(7, burst.sessions.size)
+                burst.sessions.forEach {
+                    assertEquals(4, it.size)
+                }
+            }
+
+            var lastSession: ScheduledSessionWindow? = null
+            // Make sure all sessions are sorted
+            burstSchedule.studyBurstList.map({ it.sessions }).flatten().flatten().forEach({
+                if (lastSession != null) {
+                    assertTrue(lastSession!!.startDateTime < it.startDateTime)
+                }
+                lastSession = it
+            })
+        }
+    }
+
+    fun StudyBurst.startDate(): LocalDate {
+        return this.sessions.first().first().startDateTime.date
+    }
+
+    fun StudyBurst.endDate(): LocalDate {
+        return this.sessions.last().last().startDateTime.date
+    }
 }
+
+
 

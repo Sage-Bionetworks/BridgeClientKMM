@@ -2,7 +2,9 @@ package org.sagebionetworks.bridge.kmm.shared
 
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.datetime.*
 import kotlinx.serialization.json.JsonElement
@@ -13,6 +15,31 @@ import org.sagebionetworks.bridge.kmm.shared.cache.*
 import org.sagebionetworks.bridge.kmm.shared.models.*
 import org.sagebionetworks.bridge.kmm.shared.repo.*
 import platform.Foundation.*
+
+class NativeTimelineStudyBurstManager(
+    private val studyId: String
+) : AbstractNativeTimelineManager(studyId) {
+
+    fun getStudyBurstSchedule(isNewLogin: Boolean,
+                              userJoinedDate: Instant,
+                              scheduleMutator: ParticipantScheduleMutator?,
+                              completed: (NativeStudyBurstSchedule?) -> Unit) {
+        scope.launch {
+            if (isNewLogin) {
+                adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)
+            }
+            repo.scheduleMutator = scheduleMutator
+
+            repo.getStudyBurstSchedule(studyId, userJoinedDate).collectLatest { timelineResource ->
+                (timelineResource as? ResourceResult.Success)?.data?.let { schedule ->
+                    completed(schedule.toNative())
+                } ?: run {
+                    completed(null)
+                }
+            }
+        }
+    }
+}
 
 class NativeTimelineManager(
     private val studyId: String,
@@ -64,6 +91,16 @@ abstract class AbstractNativeTimelineManager(
         }
     }
 
+    fun getAllCachedAdherence(callBack: (List<NativeAdherenceRecord>) -> Unit) {
+        scope.launch {
+            adherenceRecordRepo.getAllCachedAdherenceRecords(studyId).collectLatest { all ->
+                callBack(
+                    all.values.flatten().map { it.toNative() }
+                )
+            }
+        }
+    }
+
     fun updateAdherenceRecord(record: NativeAdherenceRecord) {
         val adherenceRecord = AdherenceRecord(
             instanceGuid = record.instanceGuid,
@@ -110,6 +147,13 @@ abstract class AbstractNativeTimelineManager(
     fun createActivityEvent(studyId: String, eventId: String, timeStamp: Instant, callBack: (Boolean) -> Unit) {
         scope.launch {
             callBack(activityEventsRepo.createActivityEvent(studyId, eventId, timeStamp))
+        }
+    }
+
+    fun runScheduleMutator(callBack: () -> Unit) {
+        scope.launch {
+            repo.runScheduleMutator(studyId)
+            callBack()
         }
     }
 }
@@ -172,11 +216,33 @@ internal fun ScheduledNotification.toNative()  =
         isTimeSensitive = isTimeSensitive,
     )
 
+internal fun StudyBurst.toNative() =
+    NativeStudyBurst(
+        sessions = sessions.map { list ->
+            list.map { it.toNative() }
+        }
+    )
+
+internal fun StudyBurstSchedule.toNative() =
+    NativeStudyBurstSchedule(
+        timezone = timezone.toNSTimeZone(),
+        studyBurstList = studyBurstList.map { it.toNative() }
+    )
+
 data class NativeScheduledSessionTimelineSlice (
     val instantInDay: NSDate,
     val timezone: NSTimeZone,
     val scheduledSessionWindows: List<NativeScheduledSessionWindow>,
     val notifications: List<NativeScheduledNotification>,
+)
+
+data class NativeStudyBurstSchedule (
+    val timezone: NSTimeZone,
+    val studyBurstList: List<NativeStudyBurst>
+)
+
+data class NativeStudyBurst (
+    val sessions: List<List<NativeScheduledSessionWindow>>
 )
 
 data class NativeScheduledSessionWindow(

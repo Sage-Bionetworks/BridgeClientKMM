@@ -5,9 +5,11 @@ import io.ktor.client.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.datetime.*
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.sagebionetworks.bridge.kmm.shared.apis.SchedulesV2Api
@@ -124,16 +126,75 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         }
     }
 
+    /**
+     * Get all sessions with a start time after the date provided for now.
+     * @param studyId the study identifier
+     * @param now the current instant, or what you want to provide in testing.
+     */
+    fun getFutureSessions(studyId: String, now: Instant = Clock.System.now())
+        : Flow<ResourceResult<ScheduledSessionTimelineSlice>> {
+
+        return getTimeline(studyId).map {
+            extractFutureSessionsFromResults(it, studyId, now)
+        }
+    }
+
+    /**
+     * Get all the scheduled sessions for the study, organized by study burst.
+     * @param studyId Study identifier
+     * @param userJoinedDate the instant the user joined the study
+     * @param timezone provide a custom timzone if desired, i.e. for testing.
+     */
+    fun getStudyBurstSchedule(studyId: String,
+                              userJoinedDate: Instant,
+                              timezone: TimeZone = TimeZone.currentSystemDefault())
+            : Flow<ResourceResult<StudyBurstSchedule>> {
+
+        val oneDayBeforeJoin = userJoinedDate.minus(1, DateTimeUnit.DAY, timezone)
+        return getFutureSessions(studyId, oneDayBeforeJoin).map {
+            // TODO in PR: mdephillips 8/17/22 - is this the best way to convert between ResourceResults?
+            when (it) {
+                is ResourceResult.Success -> {
+                    ResourceResult.Success(StudyBurstSchedule(it.data), ResourceStatus.SUCCESS)
+                }
+                is ResourceResult.Failed -> {
+                    ResourceResult.Failed(ResourceStatus.FAILED)
+                }
+                else -> {
+                    ResourceResult.InProgress
+                }
+            }
+        }
+    }
+
+    private fun extractFutureSessionsFromResults(
+        timelineResult: ResourceResult<ParticipantSchedule>,
+        studyId: String,
+        userJoinedDate: Instant,
+    ): ResourceResult<ScheduledSessionTimelineSlice> {
+        return extractSessionsFromResults(timelineResult, studyId, userJoinedDate, WindowFilterType.Future)
+    }
+
     private fun extractPastSessionsFromResults(
         timelineResult: ResourceResult<ParticipantSchedule>,
         studyId: String,
         instantInDay: Instant,
     ): ResourceResult<ScheduledSessionTimelineSlice> {
+        return extractSessionsFromResults(timelineResult, studyId, instantInDay, WindowFilterType.Past)
+    }
+
+    private fun extractSessionsFromResults(
+        timelineResult: ResourceResult<ParticipantSchedule>,
+        studyId: String,
+        instantInDay: Instant,
+        filterType: WindowFilterType
+    ): ResourceResult<ScheduledSessionTimelineSlice> {
         if (timelineResult is ResourceResult.Success) {
-            return ResourceResult.Success(extractPastSessions(
+            return ResourceResult.Success(extractSessions(
                 timeline = timelineResult.data,
                 studyId = studyId,
-                instantInDay = instantInDay
+                instantInDay = instantInDay,
+                filterType = filterType
             ), ResourceStatus.SUCCESS)
         } else if (timelineResult is ResourceResult.Failed) {
             return ResourceResult.Failed(ResourceStatus.FAILED)
@@ -142,10 +203,11 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         }
     }
 
-    private fun extractPastSessions(
+    private fun extractSessions(
         timeline: ParticipantSchedule,
         studyId: String,
         instantInDay: Instant,
+        filterType: WindowFilterType,
         timezone: TimeZone = TimeZone.currentSystemDefault(),
     ): ScheduledSessionTimelineSlice {
 
@@ -154,7 +216,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
             timeline,
             instantInDay,
             studyId,
-            WindowFilterType.Past,
+            filterType,
             false,
             timezone
         ).sortedBy { it.startDateTime }
@@ -164,7 +226,10 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         val schedules = mutableListOf<ScheduledSessionWindow>()
 
         windows.forEach { window ->
-             if (window.startDateTime <= today) {
+             if (filterType == WindowFilterType.Future &&
+                 window.startDateTime > today) {
+                 schedules.add(window)
+             } else if (window.startDateTime <= today) {
                  schedules.add(window)
              }
         }
@@ -601,3 +666,37 @@ interface ParticipantScheduleMutator {
     fun mutateParticipantSchedule(participantSchedule: ParticipantSchedule) : ParticipantSchedule
 
 }
+
+/**
+ * A parsed instance of the schedule calculated from the user's joined instant in time onward,
+ * and organized in by study burst event ID
+ */
+data class StudyBurstSchedule (
+    val timezone: TimeZone,
+    val studyBurstList: List<StudyBurst> = listOf()
+) {
+    /**
+     * Using the full participant schedule, first filter the non-study burst sessions,
+     * and then organize the sessions by study burst and the LocalDate startDate.
+     * @param studyBurstScheduleSlice full list of schedule sessions containing the study bursts
+     * @return the full study burst schedule over their entire timeline
+     */
+    constructor(studyBurstScheduleSlice: ScheduledSessionTimelineSlice):
+        this(studyBurstScheduleSlice.timezone,
+             studyBurstScheduleSlice.scheduledSessionWindows.filter {
+                 it.scheduledSession.studyBurstId != null && it.scheduledSession.startEventId != null
+             }.groupBy {  // Group sessions by study burst ID
+                 it.scheduledSession.startEventId
+             }.values.sortedBy { // Put sessions lists by burst in chronological order
+                 it.first().startDateTime.date
+             }.map { sessionsInBurst -> // Group and chronologically sort burst sessions by day
+                 sessionsInBurst.groupBy { it.startDateTime.date }
+                     .values.sortedBy { it.first().startDateTime.date }
+             }.map {
+                 StudyBurst(it)
+             })
+}
+
+data class StudyBurst(
+    /** Sessions grouped by day, ordered by session startDate */
+    val sessions: List<List<ScheduledSessionWindow>> = listOf())

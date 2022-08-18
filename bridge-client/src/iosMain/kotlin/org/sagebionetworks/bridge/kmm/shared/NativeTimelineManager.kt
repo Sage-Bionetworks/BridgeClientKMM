@@ -17,24 +17,38 @@ import org.sagebionetworks.bridge.kmm.shared.repo.*
 import platform.Foundation.*
 
 class NativeTimelineStudyBurstManager(
-    private val studyId: String
+    private val studyId: String,
+    private val viewUpdated: (NativeStudyBurstSchedule?, String?) -> Unit,
+    private val scheduleMutator: ParticipantScheduleMutator?,
+    private val updateFailed: (() -> Unit)? = null,
 ) : AbstractNativeTimelineManager(studyId) {
 
-    fun getStudyBurstSchedule(isNewLogin: Boolean,
-                              userJoinedDate: Instant,
-                              scheduleMutator: ParticipantScheduleMutator?,
-                              completed: (NativeStudyBurstSchedule?) -> Unit) {
+    init {
+        repo.scheduleMutator = scheduleMutator
+    }
+
+    fun refreshStudyBurstSchedule(userJoinedDate: Instant) {
+        runCatching { scope.cancel() }
+        observeStudyBurstSchedule(false, userJoinedDate)
+    }
+
+    fun observeStudyBurstSchedule(isNewLogin: Boolean,
+                                  userJoinedDate: Instant) {
         scope.launch {
             if (isNewLogin) {
-                adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)
+                if (!adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)) {
+                    updateFailed?.invoke()
+                }
             }
             repo.scheduleMutator = scheduleMutator
 
-            repo.getStudyBurstSchedule(studyId, userJoinedDate).collectLatest { timelineResource ->
+            repo.getStudyBurstSchedule(studyId, userJoinedDate).collect { timelineResource ->
                 (timelineResource as? ResourceResult.Success)?.data?.let { schedule ->
-                    completed(schedule.toNative())
+                    viewUpdated(schedule.toNative(), null)
                 } ?: run {
-                    completed(null)
+                    if (timelineResource is ResourceResult.Failed) {
+                        updateFailed?.invoke()
+                    }
                 }
             }
         }
@@ -88,16 +102,6 @@ abstract class AbstractNativeTimelineManager(
             scope.cancel()
         } catch (err: Exception) {
             throw Throwable(err.message)
-        }
-    }
-
-    fun getAllCachedAdherence(callBack: (List<NativeAdherenceRecord>) -> Unit) {
-        scope.launch {
-            adherenceRecordRepo.getAllCachedAdherenceRecords(studyId).collectLatest { all ->
-                callBack(
-                    all.values.flatten().map { it.toNative() }
-                )
-            }
         }
     }
 

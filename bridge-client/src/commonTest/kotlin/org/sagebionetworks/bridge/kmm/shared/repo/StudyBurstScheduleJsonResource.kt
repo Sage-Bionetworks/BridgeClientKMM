@@ -1,4 +1,4 @@
-package edu.wustl.dian.app.schedule
+package org.sagebionetworks.bridge.kmm.shared.repo
 
 /**
  * This class contains a ParticipantSchedule JSON object for testing.

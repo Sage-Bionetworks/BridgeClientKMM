@@ -27,7 +27,7 @@ tasks.dokkaHtmlMultiModule {
 allprojects {
     group = "org.sagebionetworks.bridge.kmm"
     extra["sdkVersionCode"] = 1
-    version = "0.6.4"
+    version = "0.6.5"
     extra["versionName"] = "android-sdk v${version}"
 
     repositories {

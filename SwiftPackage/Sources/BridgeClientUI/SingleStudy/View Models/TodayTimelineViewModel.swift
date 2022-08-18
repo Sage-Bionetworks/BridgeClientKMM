@@ -82,7 +82,7 @@ open class AbstractTodayTimelineViewModel : NSObject, ObservableObject, Schedule
                 existingSession.window = schedule
                 return existingSession
             }
-            self.sessions = newSessions
+            self.sessions = filterSessions(newSessions)
         }
     }
     
@@ -91,13 +91,16 @@ open class AbstractTodayTimelineViewModel : NSObject, ObservableObject, Schedule
     /// The view that uses this model must hook up the manager - typically by calling `onAppear()`.
     public private(set) var bridgeManager: SingleStudyAppManager!
     
-    private var timelineManager: NativeTimelineManager! {
+    public private(set) var timelineManager: NativeTimelineManager! {
         willSet {
             try? timelineManager?.onCleared()
         }
     }
     
-    public override init() {
+    private var filterSessions: (([TodayTimelineSession]) -> [TodayTimelineSession])
+    
+    public init(filterSessions: (([TodayTimelineSession]) -> [TodayTimelineSession])? = nil) {
+        self.filterSessions = filterSessions ?? { $0 }
         super.init()
         NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: .main) { _ in
             self.updateSessionState()

@@ -150,6 +150,8 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
                               timezone: TimeZone = TimeZone.currentSystemDefault())
             : Flow<ResourceResult<StudyBurstSchedule>> {
 
+        // Sessions may be scheduled on the day the user joined,
+        // so use one day before their joined date to include these sessions as well.
         val oneDayBeforeJoin = userJoinedDate.minus(1, DateTimeUnit.DAY, timezone)
         return getFutureSessions(studyId, oneDayBeforeJoin).map {
             when (it) {
@@ -225,12 +227,9 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         val schedules = mutableListOf<ScheduledSessionWindow>()
 
         windows.forEach { window ->
-             if (filterType == WindowFilterType.Future &&
-                 window.startDateTime > today) {
-                 schedules.add(window)
-             } else if (window.startDateTime <= today) {
-                 schedules.add(window)
-             }
+            if (window.startDateTime <= today || filterType == WindowFilterType.Future) {
+                schedules.add(window)
+            }
         }
 
         return ScheduledSessionTimelineSlice(

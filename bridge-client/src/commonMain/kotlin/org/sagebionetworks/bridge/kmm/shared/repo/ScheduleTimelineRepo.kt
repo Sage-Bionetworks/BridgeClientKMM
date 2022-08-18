@@ -152,7 +152,6 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
 
         val oneDayBeforeJoin = userJoinedDate.minus(1, DateTimeUnit.DAY, timezone)
         return getFutureSessions(studyId, oneDayBeforeJoin).map {
-            // TODO in PR: mdephillips 8/17/22 - is this the best way to convert between ResourceResults?
             when (it) {
                 is ResourceResult.Success -> {
                     ResourceResult.Success(StudyBurstSchedule(it.data), ResourceStatus.SUCCESS)

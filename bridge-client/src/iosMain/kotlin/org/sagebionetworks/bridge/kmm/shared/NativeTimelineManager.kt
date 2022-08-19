@@ -18,14 +18,10 @@ import platform.Foundation.*
 
 class NativeTimelineStudyBurstManager(
     private val studyId: String,
+    scheduleMutator: ParticipantScheduleMutator? = null,
     private val viewUpdated: (NativeStudyBurstSchedule?, String?) -> Unit,
-    private val scheduleMutator: ParticipantScheduleMutator?,
-    private val updateFailed: (() -> Unit)? = null,
-) : AbstractNativeTimelineManager(studyId) {
-
-    init {
-        repo.scheduleMutator = scheduleMutator
-    }
+    private val updateFailed: (() -> Unit)? = null
+) : AbstractNativeTimelineManager(studyId, scheduleMutator) {
 
     fun refreshStudyBurstSchedule(userJoinedDate: Instant) {
         runCatching { scope.cancel() }
@@ -40,8 +36,6 @@ class NativeTimelineStudyBurstManager(
                     updateFailed?.invoke()
                 }
             }
-            repo.scheduleMutator = scheduleMutator
-
             repo.getStudyBurstSchedule(studyId, userJoinedDate).collect { timelineResource ->
                 (timelineResource as? ResourceResult.Success)?.data?.let { schedule ->
                     viewUpdated(schedule.toNative(), null)
@@ -59,17 +53,15 @@ class NativeTimelineManager(
     private val studyId: String,
     private val includeAllNotifications: Boolean,
     private val alwaysIncludeNextDay: Boolean,
+    scheduleMutator: ParticipantScheduleMutator? = null,
     private val viewUpdate: (NativeScheduledSessionTimelineSlice) -> Unit
-) : AbstractNativeTimelineManager(studyId) {
+) : AbstractNativeTimelineManager(studyId, scheduleMutator) {
 
-    fun observeTodaySchedule(isNewLogin: Boolean) = observeTodaySchedule(isNewLogin, null)
-
-    fun observeTodaySchedule(isNewLogin: Boolean, scheduleMutator: ParticipantScheduleMutator?) {
+    fun observeTodaySchedule(isNewLogin: Boolean) {
         scope.launch {
             if (isNewLogin) {
                 adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)
             }
-            repo.scheduleMutator = scheduleMutator
             repo.getSessionsForToday(studyId, includeAllNotifications, alwaysIncludeNextDay).collect { timelineResource ->
                 (timelineResource as? ResourceResult.Success)?.data?.let { timelineSlice ->
                     viewUpdate(timelineSlice.toNaive())
@@ -85,7 +77,8 @@ class NativeTimelineManager(
 }
 
 abstract class AbstractNativeTimelineManager(
-    private val studyId: String
+    private val studyId: String,
+    scheduleMutator: ParticipantScheduleMutator? = null
 ) : KoinComponent {
 
     internal val repo : ScheduleTimelineRepo by inject(mode = LazyThreadSafetyMode.NONE)
@@ -95,6 +88,10 @@ abstract class AbstractNativeTimelineManager(
     internal val activityEventsRepo : ActivityEventsRepo by inject(mode = LazyThreadSafetyMode.NONE)
 
     internal val scope = MainScope()
+
+    init {
+        repo.scheduleMutator = scheduleMutator
+    }
 
     @Throws(Throwable::class)
     fun onCleared() {
@@ -221,11 +218,7 @@ internal fun ScheduledNotification.toNative()  =
     )
 
 internal fun StudyBurst.toNative() =
-    NativeStudyBurst(
-        sessions = sessions.map { list ->
-            list.map { it.toNative() }
-        }
-    )
+    NativeStudyBurst(sessions = sessions.map { it.toNative() })
 
 internal fun StudyBurstSchedule.toNative() =
     NativeStudyBurstSchedule(
@@ -246,7 +239,7 @@ data class NativeStudyBurstSchedule (
 )
 
 data class NativeStudyBurst (
-    val sessions: List<List<NativeScheduledSessionWindow>>
+    val sessions: List<NativeScheduledSessionWindow>
 )
 
 data class NativeScheduledSessionWindow(

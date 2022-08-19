@@ -2867,7 +2867,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
                 burstSchedule.studyBurstList[0].startDate())
             assertEquals(LocalDate(2021, 6, 29),
                 burstSchedule.studyBurstList[0].endDate())
-            burstSchedule.studyBurstList[0].sessions.flatten().forEach {
+            burstSchedule.studyBurstList[0].sessions.forEach {
                 assertEquals("study_burst:timeline_retrieved_burst:01", it.scheduledSession.startEventId)
             }
 
@@ -2875,7 +2875,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
                 burstSchedule.studyBurstList[1].startDate())
             assertEquals(LocalDate(2021, 12, 28),
                 burstSchedule.studyBurstList[1].endDate())
-            burstSchedule.studyBurstList[1].sessions.flatten().forEach {
+            burstSchedule.studyBurstList[1].sessions.forEach {
                 assertEquals("study_burst:timeline_retrieved_burst:02", it.scheduledSession.startEventId)
             }
 
@@ -2883,7 +2883,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
                 burstSchedule.studyBurstList[2].startDate())
             assertEquals(LocalDate(2022, 6, 28),
                 burstSchedule.studyBurstList[2].endDate())
-            burstSchedule.studyBurstList[2].sessions.flatten().forEach {
+            burstSchedule.studyBurstList[2].sessions.forEach {
                 assertEquals("study_burst:timeline_retrieved_burst:03", it.scheduledSession.startEventId)
             }
 
@@ -2891,7 +2891,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
                 burstSchedule.studyBurstList[3].startDate())
             assertEquals(LocalDate(2022, 12, 27),
                 burstSchedule.studyBurstList[3].endDate())
-            burstSchedule.studyBurstList[3].sessions.flatten().forEach {
+            burstSchedule.studyBurstList[3].sessions.forEach {
                 assertEquals("study_burst:timeline_retrieved_burst:04", it.scheduledSession.startEventId)
             }
 
@@ -2899,7 +2899,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
                 burstSchedule.studyBurstList[4].startDate())
             assertEquals(LocalDate(2023, 6, 27),
                 burstSchedule.studyBurstList[4].endDate())
-            burstSchedule.studyBurstList[4].sessions.flatten().forEach {
+            burstSchedule.studyBurstList[4].sessions.forEach {
                 assertEquals("study_burst:timeline_retrieved_burst:05", it.scheduledSession.startEventId)
             }
 
@@ -2907,7 +2907,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
                 burstSchedule.studyBurstList[5].startDate())
             assertEquals(LocalDate(2023, 12, 26),
                 burstSchedule.studyBurstList[5].endDate())
-            burstSchedule.studyBurstList[5].sessions.flatten().forEach {
+            burstSchedule.studyBurstList[5].sessions.forEach {
                 assertEquals("study_burst:timeline_retrieved_burst:06", it.scheduledSession.startEventId)
             }
 
@@ -2915,7 +2915,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
                 burstSchedule.studyBurstList[6].startDate())
             assertEquals(LocalDate(2024, 6, 25),
                 burstSchedule.studyBurstList[6].endDate())
-            burstSchedule.studyBurstList[6].sessions.flatten().forEach {
+            burstSchedule.studyBurstList[6].sessions.forEach {
                 assertEquals("study_burst:timeline_retrieved_burst:07", it.scheduledSession.startEventId)
             }
 
@@ -2923,7 +2923,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
                 burstSchedule.studyBurstList[7].startDate())
             assertEquals(LocalDate(2024, 12, 24),
                 burstSchedule.studyBurstList[7].endDate())
-            burstSchedule.studyBurstList[7].sessions.flatten().forEach {
+            burstSchedule.studyBurstList[7].sessions.forEach {
                 assertEquals("study_burst:timeline_retrieved_burst:08", it.scheduledSession.startEventId)
             }
 
@@ -2931,7 +2931,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
                 burstSchedule.studyBurstList[8].startDate())
             assertEquals(LocalDate(2025, 6, 24),
                 burstSchedule.studyBurstList[8].endDate())
-            burstSchedule.studyBurstList[8].sessions.flatten().forEach {
+            burstSchedule.studyBurstList[8].sessions.forEach {
                 assertEquals("study_burst:timeline_retrieved_burst:09", it.scheduledSession.startEventId)
             }
 
@@ -2939,20 +2939,17 @@ class ScheduleTimelineRepoTest: BaseTest() {
                 burstSchedule.studyBurstList[9].startDate())
             assertEquals(LocalDate(2025, 12, 23),
                 burstSchedule.studyBurstList[9].endDate())
-            burstSchedule.studyBurstList[9].sessions.flatten().forEach {
+            burstSchedule.studyBurstList[9].sessions.forEach {
                 assertEquals("study_burst:timeline_retrieved_burst:10", it.scheduledSession.startEventId)
             }
 
             burstSchedule.studyBurstList.forEach { burst ->
-                assertEquals(7, burst.sessions.size)
-                burst.sessions.forEach {
-                    assertEquals(4, it.size)
-                }
+                assertEquals(28, burst.sessions.size)
             }
 
             var lastSession: ScheduledSessionWindow? = null
             // Make sure all sessions are sorted
-            burstSchedule.studyBurstList.map({ it.sessions }).flatten().flatten().forEach({
+            burstSchedule.studyBurstList.map({ it.sessions }).flatten().forEach({
                 if (lastSession != null) {
                     assertTrue(lastSession!!.startDateTime < it.startDateTime)
                 }
@@ -2962,11 +2959,11 @@ class ScheduleTimelineRepoTest: BaseTest() {
     }
 
     fun StudyBurst.startDate(): LocalDate {
-        return this.sessions.first().first().startDateTime.date
+        return this.sessions.first().startDateTime.date
     }
 
     fun StudyBurst.endDate(): LocalDate {
-        return this.sessions.last().last().startDateTime.date
+        return this.sessions.last().startDateTime.date
     }
 }
 

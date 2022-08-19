@@ -687,14 +687,13 @@ data class StudyBurstSchedule (
                  it.scheduledSession.startEventId
              }.values.sortedBy { // Put sessions lists by burst in chronological order
                  it.first().startDateTime.date
-             }.map { sessionsInBurst -> // Group and chronologically sort burst sessions by day
-                 sessionsInBurst.groupBy { it.startDateTime.date }
-                     .values.sortedBy { it.first().startDateTime.date }
+             }.map { sessionsInBurst -> // Sort burst sessions chronologically
+                 sessionsInBurst.sortedBy { it.startDateTime.date }
              }.map {
                  StudyBurst(it)
              })
 }
 
 data class StudyBurst(
-    /** Sessions grouped by day, ordered by session startDate */
-    val sessions: List<List<ScheduledSessionWindow>> = listOf())
+    /** Sessions ordered by session startDate */
+    val sessions: List<ScheduledSessionWindow> = listOf())

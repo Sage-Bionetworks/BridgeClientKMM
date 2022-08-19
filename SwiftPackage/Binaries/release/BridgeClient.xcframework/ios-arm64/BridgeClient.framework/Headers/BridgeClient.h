@@ -482,6 +482,7 @@ __attribute__((swift_name("NativeStudyManager")))
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("NativeTimelineManager")))
 @interface BridgeClientNativeTimelineManager : BridgeClientAbstractNativeTimelineManager
+- (instancetype)initWithStudyId:(NSString *)studyId includeAllNotifications:(BOOL)includeAllNotifications alwaysIncludeNextDay:(BOOL)alwaysIncludeNextDay viewUpdate:(void (^)(BridgeClientNativeScheduledSessionTimelineSlice *))viewUpdate __attribute__((swift_name("init(studyId:includeAllNotifications:alwaysIncludeNextDay:viewUpdate:)"))) __attribute__((objc_designated_initializer));
 - (instancetype)initWithStudyId:(NSString *)studyId includeAllNotifications:(BOOL)includeAllNotifications alwaysIncludeNextDay:(BOOL)alwaysIncludeNextDay scheduleMutator:(id<BridgeClientParticipantScheduleMutator> _Nullable)scheduleMutator viewUpdate:(void (^)(BridgeClientNativeScheduledSessionTimelineSlice *))viewUpdate __attribute__((swift_name("init(studyId:includeAllNotifications:alwaysIncludeNextDay:scheduleMutator:viewUpdate:)"))) __attribute__((objc_designated_initializer));
 - (instancetype)initWithStudyId:(NSString *)studyId scheduleMutator:(id<BridgeClientParticipantScheduleMutator> _Nullable)scheduleMutator __attribute__((swift_name("init(studyId:scheduleMutator:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
 - (void)observeTodayScheduleIsNewLogin:(BOOL)isNewLogin __attribute__((swift_name("observeTodaySchedule(isNewLogin:)")));

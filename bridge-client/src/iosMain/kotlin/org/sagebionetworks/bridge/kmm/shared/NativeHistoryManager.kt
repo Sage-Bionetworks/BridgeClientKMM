@@ -3,6 +3,7 @@ package org.sagebionetworks.bridge.kmm.shared
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -24,6 +25,16 @@ class NativeHistoryManager(
                 (timelineResource as? ResourceResult.Success)?.data?.let { timelineSlice ->
                     viewUpdate(timelineSlice.toNaive())
                 }
+            }
+        }
+    }
+
+    fun observeAllAdherence(callBack: (List<NativeAdherenceRecord>) -> Unit) {
+        scope.launch {
+            repo.adherenceRecordRepo.getAllCachedAdherenceRecords(studyId).collect { all ->
+                callBack(
+                    all.values.flatten().map { it.toNative() }
+                )
             }
         }
     }

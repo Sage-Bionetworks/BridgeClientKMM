@@ -153,7 +153,7 @@ open class AbstractTodayTimelineViewModel : NSObject, ObservableObject, Schedule
         
         // Update views
         if !bridgeManager.isPreview {
-            self.timelineManager = NativeTimelineManager(studyId: studyId!, includeAllNotifications: true, alwaysIncludeNextDay: true) { timelineSlice in
+            self.timelineManager = NativeTimelineManager(studyId: studyId!, includeAllNotifications: true, alwaysIncludeNextDay: true, scheduleMutator: nil) { timelineSlice in
                 DispatchQueue.main.async {
                     self.today = timelineSlice.instantInDay
                     self.schedules = timelineSlice.scheduledSessionWindows

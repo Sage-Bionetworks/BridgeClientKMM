@@ -1,5 +1,7 @@
 package org.sagebionetworks.bridge.kmm.shared
 
+import co.touchlab.sqliter.DatabaseConfiguration
+import co.touchlab.sqliter.createDatabaseManager
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
@@ -18,9 +20,9 @@ import platform.Foundation.*
 
 class NativeTimelineStudyBurstManager(
     private val studyId: String,
-    scheduleMutator: ParticipantScheduleMutator? = null,
+    scheduleMutator: ParticipantScheduleMutator?,
     private val viewUpdated: (NativeStudyBurstSchedule?, String?) -> Unit,
-    private val updateFailed: (() -> Unit)? = null
+    private val updateFailed: (() -> Unit)?
 ) : AbstractNativeTimelineManager(studyId, scheduleMutator) {
 
     fun refreshStudyBurstSchedule(userJoinedDate: Instant) {
@@ -53,9 +55,22 @@ class NativeTimelineManager(
     private val studyId: String,
     private val includeAllNotifications: Boolean,
     private val alwaysIncludeNextDay: Boolean,
-    scheduleMutator: ParticipantScheduleMutator? = null,
+    scheduleMutator: ParticipantScheduleMutator?,
     private val viewUpdate: (NativeScheduledSessionTimelineSlice) -> Unit
 ) : AbstractNativeTimelineManager(studyId, scheduleMutator) {
+
+    constructor(
+        studyId: String,
+        includeAllNotifications: Boolean,
+        alwaysIncludeNextDay: Boolean,
+        viewUpdate: (NativeScheduledSessionTimelineSlice) -> Unit
+    ) : this(
+        studyId = studyId,
+        includeAllNotifications = includeAllNotifications,
+        alwaysIncludeNextDay = alwaysIncludeNextDay,
+        scheduleMutator = null,
+        viewUpdate = viewUpdate
+    )
 
     fun observeTodaySchedule(isNewLogin: Boolean) {
         scope.launch {
@@ -78,7 +93,7 @@ class NativeTimelineManager(
 
 abstract class AbstractNativeTimelineManager(
     private val studyId: String,
-    scheduleMutator: ParticipantScheduleMutator? = null
+    scheduleMutator: ParticipantScheduleMutator?
 ) : KoinComponent {
 
     internal val repo : ScheduleTimelineRepo by inject(mode = LazyThreadSafetyMode.NONE)

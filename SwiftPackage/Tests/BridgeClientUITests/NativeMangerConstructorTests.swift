@@ -28,12 +28,13 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-import XCTest
+import Foundation
 import BridgeClient
 
-final class NativeMangerConstructorTests: XCTestCase {
+// Just tests that the constructors haven't changed and will build.
+final class NativeMangerConstructorTests {
     
-    func testTimelineManager() {
+    func buildTimelineManager() {
         let _ = NativeTimelineManager(studyId: "preview", includeAllNotifications: false, alwaysIncludeNextDay: false) { _ in
         }
     }

@@ -13,7 +13,7 @@ if(savedDarkMode === true){
     <div class="navigation-wrapper" id="navigation-wrapper">
       <div id="leftToggler"><span class="icon-toggler"></span></div>
       <div class="library-name"><a href="../../../index.html"><span>BridgeClientKMM</span></a></div>
-      <div>0.6.3</div>
+      <div>0.6.6</div>
       <div class="pull-right d-flex">
         <div class="filter-section" id="filter-section"><button class="platform-tag platform-selector common-like" data-active="" data-filter=":bridge-client:dokkaHtmlPartial/commonMain">common</button></div>
 <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
@@ -37,7 +37,22 @@ if(savedDarkMode === true){
             <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Functions">Functions</button><button class="section-tab" data-togglable="Properties">Properties</button></div>
             <div class="tabs-section-body">
               <h2 class="">Functions</h2>
-              <div class="table" data-togglable="Functions"><a data-name="-111078994%2FFunctions%2F-202008714" anchor-label="getPastSessions" id="-111078994%2FFunctions%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a>
+              <div class="table" data-togglable="Functions"><a data-name="345446175%2FFunctions%2F-202008714" anchor-label="getFutureSessions" id="345446175%2FFunctions%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a>
+                <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="get-future-sessions.html"><span>get</span><wbr><span>Future</span><wbr><span><span>Sessions</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="345446175%2FFunctions%2F-202008714"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/commonMain">common</button></div>
+<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="get-future-sessions.html"><span class="token function">getFutureSessions</span></a><span class="token punctuation">(</span>studyId<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span>fromInstant<span class="token operator">: </span><span data-unresolved-link="/<ERROR CLASS>///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token operator"> = </span>Clock.System.now()<span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<ERROR CLASS>///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../org.sagebionetworks.bridge.kmm.shared.cache/-resource-result/index.html">ResourceResult</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../-scheduled-session-timeline-slice/index.html">ScheduledSessionTimelineSlice</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Get all sessions with a start time after the date provided for now.</p></div></div>                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-111078994%2FFunctions%2F-202008714" anchor-label="getPastSessions" id="-111078994%2FFunctions%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a>
                 <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain">
                   <div class="main-subrow keyValue ">
                     <div class=""><span class="inline-flex"><a href="get-past-sessions.html"><span>get</span><wbr><span>Past</span><wbr><span><span>Sessions</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-111078994%2FFunctions%2F-202008714"></span>
@@ -63,6 +78,36 @@ if(savedDarkMode === true){
                         <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
                           <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/commonMain">common</button></div>
 <div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="get-sessions-for-today.html"><span class="token function">getSessionsForToday</span></a><span class="token punctuation">(</span>studyId<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span>includeAllNotifications<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span><span class="token punctuation">, </span>alwaysIncludeNextDay<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<ERROR CLASS>///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../org.sagebionetworks.bridge.kmm.shared.cache/-resource-result/index.html">ResourceResult</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../-scheduled-session-timeline-slice/index.html">ScheduledSessionTimelineSlice</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Get all the scheduled sessions for today that have not expired.</p></div></div>                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-1280252391%2FFunctions%2F-202008714" anchor-label="getStudyBurstSchedule" id="-1280252391%2FFunctions%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a>
+                <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="get-study-burst-schedule.html"><span>get</span><wbr><span>Study</span><wbr><span>Burst</span><wbr><span><span>Schedule</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1280252391%2FFunctions%2F-202008714"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/commonMain">common</button></div>
+<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="get-study-burst-schedule.html"><span class="token function">getStudyBurstSchedule</span></a><span class="token punctuation">(</span>studyId<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span>userJoinedDate<span class="token operator">: </span><span data-unresolved-link="/<ERROR CLASS>///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token punctuation">, </span>timezone<span class="token operator">: </span><span data-unresolved-link="/<ERROR CLASS>///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token operator"> = </span>TimeZone.currentSystemDefault()<span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<ERROR CLASS>///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../org.sagebionetworks.bridge.kmm.shared.cache/-resource-result/index.html">ResourceResult</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../-study-burst-schedule/index.html">StudyBurstSchedule</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Get all the scheduled sessions for the study, organized by study burst.</p></div></div>                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-566615513%2FFunctions%2F-202008714" anchor-label="runScheduleMutator" id="-566615513%2FFunctions%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a>
+                <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="run-schedule-mutator.html"><span>run</span><wbr><span>Schedule</span><wbr><span><span>Mutator</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-566615513%2FFunctions%2F-202008714"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/commonMain">common</button></div>
+<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="run-schedule-mutator.html"><span class="token function">runScheduleMutator</span></a><span class="token punctuation">(</span>studyId<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>                        </div>
                       </div>
                     </div>
                   </div>

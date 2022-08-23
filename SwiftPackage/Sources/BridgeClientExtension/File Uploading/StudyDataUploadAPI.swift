@@ -118,20 +118,18 @@ public class StudyDataUploadAPI: BridgeFileUploadAPITyped {
         self.uploadManager = BridgeFileUploadManager.shared
         
         // Set up a directory to keep temp copies of files being uploaded
-        guard let appSupportDir = FileManager.default.urls(for: FileManager.SearchPathDirectory.applicationSupportDirectory, in: FileManager.SearchPathDomainMask.userDomainMask).first
-        else {
-            fatalError("StudyDataUploadAPI unable to find app support directory")
-        }
-        self.tempUploadDirURL = appSupportDir.appendingPathComponent("StudyDataUploads")
         do {
+            let appSupportDir = try FileManager.default.sharedUploadDirectory()
+            self.tempUploadDirURL = appSupportDir.appendingPathComponent("StudyDataUploads")
             try FileManager.default.createDirectory(at: self.tempUploadDirURL, withIntermediateDirectories: true, attributes: nil)
-        } catch let err {
-            fatalError("StudyDataUploadAPI unable to create study data temp upload dir: \(err)")
+        }
+        catch {
+            fatalError("StudyDataUploadAPI unable to create temp upload directory: \(error)")
         }
         
         // Register this upload API with the file upload manager
         self.uploadManager.bridgeFileUploadApis[self.apiString] = self
-  }
+    }
     
     // adapted from https://stackoverflow.com/a/32166735
     func md5base64(data: Data) -> String {

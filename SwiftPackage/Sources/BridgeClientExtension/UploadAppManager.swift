@@ -111,8 +111,8 @@ open class UploadAppManager : ObservableObject {
     ///   - pemPath: The path to the pem file (as an embedded resource) to use for encrypting uploads. The pem file can be downloaded
     ///     from the [Bridge Study Manager](https://research.sagebridge.org) by going "Server Settings -> Settings"
     ///     and tapping on the button labeled "Download CMS Public Key..." and saving the file to a secure location.
-    public convenience init(appId: String, pemPath: String? = nil) {
-        self.init(platformConfig: PlatformConfigImpl(appId: appId), pemPath: pemPath)
+    public convenience init(appId: String, appGroupId: String? = nil, pemPath: String? = nil) {
+        self.init(platformConfig: PlatformConfigImpl(appId: appId, appGroupIdentifier: appGroupId), pemPath: pemPath)
     }
     
     /// Initialize the bridge manager with a custom platform config.

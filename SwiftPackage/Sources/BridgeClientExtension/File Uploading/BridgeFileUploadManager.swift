@@ -162,6 +162,18 @@ extension URL {
     }
 }
 
+extension FileManager {
+    func sharedUploadDirectory() throws -> URL {
+        if let appGroupId = BridgeClient.IOSBridgeConfig().appGroupIdentifier,
+           let url = self.containerURL(forSecurityApplicationGroupIdentifier: appGroupId) {
+            return url
+        }
+        else {
+            return try self.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+        }
+    }
+}
+
 /// BridgeFileUploadAPI is a protocol for BridgeFileUploadManager to call for a given Bridge API as it
 /// progresses through the upload dance.
 protocol BridgeFileUploadAPI {
@@ -589,7 +601,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         // ...and get its sandbox-relative part since there are circumstances under
         // which the full path might change (e.g. app update, or during debugging--
         // sim vs device, subsequent run of the same app after a new build)
-        let invariantTempFilePath = self.sandboxRelativePath(of: tempFileURL.path)
+        let invariantTempFilePath = self.sandboxRelativePath(of: tempFileURL)
 
         // Use a NSFileCoordinator to make a temp local copy so the app can delete
         // the original as soon as the upload call returns.
@@ -600,7 +612,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
             do {
                 try FileManager.default.copyItem(at: readURL, to: writeURL)
             } catch let err {
-                debugPrint("Error copying Participant File \(fileURL) to temp file \(String(describing: invariantTempFilePath)) for upload: \(err)")
+                debugPrint("Error copying upload file \(fileURL) to temp file \(String(describing: invariantTempFilePath)) for upload: \(err)")
                 copyError = err
             }
         }
@@ -608,7 +620,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
             return nil
         }
         if let err = coordError {
-            debugPrint("File coordinator error copying Participant File \(fileURL) to temp file \(String(describing: invariantTempFilePath)) for upload: \(err)")
+            debugPrint("File coordinator error copying upload file \(fileURL) to temp file \(String(describing: invariantTempFilePath)) for upload: \(err)")
             return nil
         }
         
@@ -802,7 +814,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
                 return nil
             }
                 
-            invariantFilePath = self.sandboxRelativePath(of: tempFile.path)
+            invariantFilePath = self.sandboxRelativePath(of: tempFile)
         }
         else {
             // we already have the file copy--create a URL from its path
@@ -1106,7 +1118,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
             }
             let retryQueue = defaults.dictionary(forKey: self.retryUploadsKey) ?? [String : Any]()
             for fileUrl in allFiles {
-                let invariantFilePath = self.sandboxRelativePath(of: fileUrl.path)
+                let invariantFilePath = self.sandboxRelativePath(of: fileUrl)
                 guard !filesInFlight.contains(invariantFilePath) else { continue }
                 guard !fileUploads.keys.contains(invariantFilePath) else { continue }
                 guard !uploadURLsRequested.keys.contains(invariantFilePath) else { continue }
@@ -1193,8 +1205,8 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
             wasNotifyingBridge = true
         }
         else {
-                debugPrint("Unexpected: Unable to retrieve BridgeFileUploadMetadataBlob for \(String(describing: invariantFilePath))")
-                return
+            debugPrint("Unexpected: Unable to retrieve BridgeFileUploadMetadataBlob for \(String(describing: invariantFilePath))")
+            return
         }
 
         // remove the file from the temp -> orig mappings, and retrieve the original file path
@@ -1465,10 +1477,11 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
     /// MARK: Handle converting between sandbox-relative and fully-qualified file paths.
     private lazy var baseDirectory: String = {
         var baseDirectory: String
-        if let appGroupIdentifier = IOSBridgeConfig().appGroupIdentifier, appGroupIdentifier.count > 0, let baseDirUrl = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupIdentifier) {
+        if let appGroupIdentifier = IOSBridgeConfig().appGroupIdentifier, !appGroupIdentifier.isEmpty,
+           let baseDirUrl = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupIdentifier) {
             // normalize the path--i.e. /private/var-->/var (see docs for URL.resolvingSymlinksInPath, which removes /private as a special case
             // even though /var is actually a symlink to /private/var in this case)
-            baseDirectory = baseDirUrl.resolvingSymlinksInPath().path
+            baseDirectory = baseDirUrl.pathResolvingAllSymlinks()
         }
         else {
             baseDirectory = NSHomeDirectory()
@@ -1495,10 +1508,10 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         return regex
     }()
     
-    func sandboxRelativePath(of path: String) -> String {
+    func sandboxRelativePath(of url: URL) -> String {
         // normalize the path--i.e. /private/var-->/var (see docs for URL.resolvingSymlinksInPath, which removes /private as a special case
         // even though /var is actually a symlink to /private/var in this case)
-        let normalizedPath = URL(fileURLWithPath: path).resolvingSymlinksInPath().path
+        let normalizedPath = url.pathResolvingAllSymlinks()
         let range = normalizedPath.range(of: self.sandboxRegex, options: [.regularExpression])
         // if it didn't match the sandbox regex, this will just give back normalizedPath
         return String(normalizedPath[(range?.upperBound ?? normalizedPath.startIndex)...])
@@ -1507,7 +1520,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
     func fullyQualifiedPath(of path: String) -> String {
         // normalize the path--i.e. /private/var-->/var (see docs for URL.resolvingSymlinksInPath, which removes /private as a special case
         // even though /var is actually a symlink to /private/var in this case)
-        let normalizedPath = URL(fileURLWithPath: path).resolvingSymlinksInPath().path
+        let normalizedPath = URL(fileURLWithPath: path).pathResolvingAllSymlinks()
 
         // check if it's already a full path first
         guard let range = normalizedPath.range(of: self.sandboxRegex, options: [.regularExpression]), !range.isEmpty else {
@@ -1520,4 +1533,20 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         return normalizedPath
     }
 
+}
+
+extension URL {
+    func pathResolvingAllSymlinks() -> String {
+        guard self.isFileURL else { return path }
+        // resolvingSymlinksInPath will only work if the file exists. This checks for the case where the file
+        // has not been created yet. syoung 08/22/2022
+        let path = self.resolvingSymlinksInPath().path
+        let privatePrefix = "/private"
+        if path.hasPrefix(privatePrefix) {
+            return String(path[privatePrefix.endIndex...])
+        }
+        else {
+            return path
+        }
+    }
 }

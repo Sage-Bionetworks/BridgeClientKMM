@@ -49,7 +49,7 @@ public final class UserSessionInfoObserver : ObservableObject {
     }
     private var _userSessionInfo : UserSessionInfo?
     
-    init() {}
+    public init() {}
     
     /// Whether or not the session is authenticated.
     @Published public var isAuthenticated: Bool = false
@@ -79,7 +79,7 @@ public final class UserSessionInfoObserver : ObservableObject {
 
     // MARK: Study and External ID
     
-    @Published var identifier: String?
+    @Published public var identifier: String?
     
     /// The studies this participant is associated to.
     @Published public var studyIds: [String] = []

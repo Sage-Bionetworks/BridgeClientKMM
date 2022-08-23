@@ -1,5 +1,5 @@
 //
-//  StudyDataUploadAPITests.swift
+//  ParticipantFileUploadAPITests.swift
 //  BridgeFileUploadsTests
 //
 //  Copyright © 2021 Sage Bionetworks. All rights reserved.
@@ -33,30 +33,30 @@
 
 import XCTest
 @testable import BridgeClient
-@testable import BridgeClientUI
+@testable import BridgeClientExtension
 
-class StudyDataUploadAPITests : XCTestCase, BridgeFileUploadManagerTestCaseTyped {
-    typealias T = StudyDataUploadObject
+class ParticipantFileUploadAPITests : XCTestCase, BridgeFileUploadManagerTestCaseTyped {
+    typealias T = ParticipantFile
     
-    var uploadRequestSuccessResponseFile: String = "sd-upload-request-success"
-    var uploadRequestExpiredResponseFile: String = "sd-upload-request-expired"
+    var uploadRequestSuccessResponseFile: String = "pf-upload-request-success"
+    var uploadRequestExpiredResponseFile: String = "pf-upload-request-expired"
     var mockURLSession: MockURLSession = MockURLSession()
     var mockAppManager: MockBridgeClientAppManager = MockBridgeClientAppManager(appId: "not-a-real-appid")
     var testFileId: String = "TestFileId"
     var savedSession: URLSession?
     var savedDelay: TimeInterval?
-    var savedAppManager: BridgeClientAppManager?
-    var uploadApi: BridgeFileUploadAPI = StudyDataUploadAPI.shared
+    var savedAppManager: UploadAppManager?
+    var uploadApi: BridgeFileUploadAPI = ParticipantFileUploadAPI.shared
     var uploadExtras: Codable?
     
     lazy var requestEndpoint: String = {
-        "/v3/uploads"
+        "/v3/participants/self/files/\(testFileId)"
     }()
     
-    var uploadSucceededNotification: Notification.Name = .SBBStudyFileUploaded
-    var uploadRequestFailedNotification: Notification.Name = .SBBStudyFileUploadRequestFailed
-    var uploadToS3FailedNotification: Notification.Name  = .SBBStudyFileUploadToS3Failed
-    var bridgeNotificationFailedNotification: Notification.Name = .SBBStudyFileUploadBridgeNotificationFailed
+    var uploadSucceededNotification: Notification.Name = .SBBParticipantFileUploaded
+    var uploadRequestFailedNotification: Notification.Name = .SBBParticipantFileUploadRequestFailed
+    var uploadToS3FailedNotification: Notification.Name  = .SBBParticipantFileUploadToS3Failed
+    var bridgeNotificationFailedNotification: Notification.Name = .SBBFileUploadPlaceholder
 
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -71,15 +71,21 @@ class StudyDataUploadAPITests : XCTestCase, BridgeFileUploadManagerTestCaseTyped
     }
     
     func uploadRequestFailed412Tests(userInfo: [AnyHashable : Any]) {
-        let sdua = StudyDataUploadAPI.shared
-        let fileName = userInfo[sdua.fileNameKey] as? String
-        XCTAssertNotNil(fileName, "SBBStudyFileUploadRequestFailed notification userInfo has no file name string at '\(sdua.fileNameKey)'")
+        let pfua = ParticipantFileUploadAPI.shared
+        let fileId = userInfo[pfua.fileIdKey] as? String
+        XCTAssertNotNil(fileId, "SBBParticipantFileUploadRequestFailed notification userInfo has no file id string at '\(pfua.fileIdKey)'")
+        let participantFile = userInfo[pfua.participantFileKey] as? ParticipantFile
+        XCTAssertNotNil(participantFile, "SBBParticipantFileUploadRequestFailed notification userInfo has no ParticipantFile object at '\(pfua.participantFileKey)'")
     }
     
     func uploadSucceeded503RetriedTests(userInfo: [AnyHashable : Any]) {
-        let sdua = StudyDataUploadAPI.shared
-        let fileName = userInfo[sdua.fileNameKey] as? String
-        XCTAssertNotNil(fileName, "SBBStudyFileUploaded notification userInfo has no file name string at '\(sdua.fileNameKey)'")
+        let pfua = ParticipantFileUploadAPI.shared
+        let fileId = userInfo[pfua.fileIdKey] as? String
+        XCTAssertNotNil(fileId, "SBBParticipantFileUploaded notification userInfo has no file id string at '\(pfua.fileIdKey)'")
+        let participantFile = userInfo[pfua.participantFileKey] as? ParticipantFile
+        XCTAssertNotNil(participantFile, "SBBParticipantFileUploaded notification userInfo has no ParticipantFile object at '\(pfua.participantFileKey)'")
+        let requestUrl = userInfo[pfua.requestUrlKey] as? URL
+        XCTAssertNotNil(requestUrl, "SBBParticipantFileUploaded notification userInfo has no request URL at '\(pfua.requestUrlKey)")
     }
     
     func testUploadRequestFails() {

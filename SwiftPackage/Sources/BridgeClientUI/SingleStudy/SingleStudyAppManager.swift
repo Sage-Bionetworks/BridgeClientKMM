@@ -32,6 +32,7 @@
 
 import SwiftUI
 import BridgeClient
+import BridgeClientExtension
 
 fileprivate let kStudyIdKey = "studyId"
 
@@ -57,7 +58,7 @@ public final class SingleStudyAppManager : BridgeClientAppManager {
     /// Has the participant "completed" this study?
     @Published public var isStudyComplete: Bool = false
     
-    override func didUpdateUserSessionInfo() {
+    override public func didUpdateUserSessionInfo() {
         super.didUpdateUserSessionInfo()
         updateStudy()
     }
@@ -124,7 +125,7 @@ public final class SingleStudyAppManager : BridgeClientAppManager {
         self.studyManager!.observeStudy()
     }
     
-    override func updateAppState() {
+    override public func updateAppState() {
         if appConfig.isLaunching {
             appState = .launching
         }

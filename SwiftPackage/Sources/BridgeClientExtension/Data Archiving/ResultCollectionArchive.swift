@@ -1,7 +1,6 @@
 //
-//  ArchiveBuilder.swift
+//  ResultCollectionArchive.swift
 //  
-//
 //  Copyright © 2022 Sage Bionetworks. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification,
@@ -34,64 +33,63 @@
 import Foundation
 import JsonModel
 
-public protocol ArchiveBuilder : AnyObject {
-    
-    /// A unique identifier that can be used to retain this task until it is complete.
-    var uuid: UUID { get }
-
-    /// An identifier that can be logging reports.
-    var identifier: String { get }
-
-    /// Build an archive asyncronously and return the result.
-    func buildArchive() async throws -> DataArchive
-    
-    /// Cleanup after.
-    func cleanup() async throws
-}
-
-public protocol ResultArchiveBuilder : ArchiveBuilder {
-    
-    /// A timestamp for tracking the archive.
+public protocol ResultCollectionArchivable : FileArchivable {
     var startedOn: Date { get }
-    
-    /// A timestamp for tracking the archive.
     var endedOn: Date { get }
+    var associatedFiles: [FileResultObject]? { get }
     
-    /// Any adherence data that should be added to the adherence record. Limit 64kb.
-    var adherenceData: JsonSerializable? { get }
+    func buildAdherenceData() throws -> JsonSerializable?
 }
 
-open class JsonResultArchive : AbstractResultArchive, ResultArchiveBuilder {
+public class ResultCollectionArchive : AbstractResultArchive, ResultArchiveBuilder {
     
-    public let uuid: UUID = .init()
-    public let json: Data
-    public let fileInfo: FileInfo
-    public let startedOn: Date
+    public let uuid: UUID
+    public let adherenceData: JsonSerializable?
+    public var startedOn: Date { collection.startedOn }
+    public var endedOn: Date { collection.endedOn }
     
-    public var endedOn: Date { fileInfo.timestamp }
-    public var adherenceData: JsonSerializable? { nil }
-    
-    public init?(json: Data, filename: String, schema: URL, timestamp: Date = Date(), startedOn: Date? = nil, schedule: AssessmentScheduleInfo? = nil) {
-        self.json = json
-        self.startedOn = startedOn ?? timestamp
-        self.fileInfo = .init(filename: filename, timestamp: timestamp, contentType: "application/json", identifier: schedule?.assessmentInfo.identifier, jsonSchema: schema)
-        super.init(identifier: schedule?.assessmentInfo.identifier ?? filename, schedule: schedule)
+    private let collection: ResultCollectionArchivable
+    private let outputDirectory: URL?
+    private var manifest = Set<FileInfo>()
+
+    public init?(_ collection: ResultCollectionArchivable, outputDirectory: URL?, schedule: AssessmentScheduleInfo? = nil) throws {
+        self.collection = collection
+        self.uuid = .init()
+        self.adherenceData = try collection.buildAdherenceData()
+        self.outputDirectory = outputDirectory
+        super.init(identifier: "KeyboardSession",
+                   schemaIdentifier: "KeyboardSession",
+                   schedule: schedule)
     }
-        
+
+    public func cleanup() async throws {
+        try outputDirectory.map {
+            try FileManager.default.removeItem(at: $0)
+        }
+    }
+    
     public func buildArchive() async throws -> DataArchive {
 
-        // Add the JSON file
-        try self.addFile(data: json, filepath: fileInfo.filename, createdOn: fileInfo.timestamp, contentType: fileInfo.contentType)
-        
+        // Add the files
+        try addFile(collection)
+        try collection.associatedFiles?.forEach {
+            try addFile($0)
+        }
+
         // Close the archive.
-        let metadata = ArchiveMetadata(files: [fileInfo])
+        let metadata = ArchiveMetadata(files: Array(manifest))
         let metadataDictionary = try metadata.jsonEncodedDictionary()
         try completeArchive(createdOn: Date(), with: metadataDictionary)
         
         return self
     }
-    
-    public func cleanup() async throws {
-        // Do nothing - A single json file result does not support output directory cleanup.
+
+    func addFile(_ fileArchivable: FileArchivable) throws {
+        guard let (manifestInfo, data) = try fileArchivable.buildArchivableFileData(at: nil)
+        else {
+            return
+        }
+        try self.addFile(data: data, filepath: manifestInfo.filename, createdOn: manifestInfo.timestamp, contentType: manifestInfo.contentType)
+        manifest.insert(manifestInfo)
     }
 }

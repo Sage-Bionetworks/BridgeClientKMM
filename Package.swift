@@ -15,7 +15,15 @@ let package = Package(
             name: "BridgeClient",
             targets: [
                 "BridgeClient",
+                "BridgeClientExtension",
                 "BridgeClientUI",
+                "BridgeToSageResearch",
+            ]),
+        .library(
+            name: "BridgeClientAppExtension",
+            targets: [
+                "BridgeClient",
+                "BridgeClientExtension",
             ]),
     ],
     dependencies: [
@@ -42,14 +50,28 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .binaryTarget(name: "BridgeClient",
                       path: "SwiftPackage/Binaries/release/BridgeClient.xcframework"),
+        
+        .target(name: "BridgeClientExtension",
+                dependencies: [
+                    "BridgeClient",
+                    "BridgeArchiver",
+                    "JsonModel",
+                ],
+                path: "SwiftPackage/Sources/BridgeClientExtension"),
+        .testTarget(name: "BridgeClientExtensionTests",
+                    dependencies: [
+                        "BridgeClient",
+                        "BridgeClientExtension",
+                    ],
+                    path: "SwiftPackage/Tests/BridgeClientExtensionTests",
+                    resources: [.process("Resources")]),
+        
         .target(name: "BridgeClientUI",
                 dependencies: [
                     "BridgeClient",
+                    "BridgeClientExtension",
                     "SharedMobileUI",
-                    "BridgeArchiver",
                     "JsonModel",
-                    .product(name: "Research", package: "SageResearch"),
-                    .product(name: "ResearchUI", package: "SageResearch"),
                     .product(name: "AssessmentModel", package: "AssessmentModel"),
                     .product(name: "AssessmentModelUI", package: "AssessmentModel"),
                 ],
@@ -60,7 +82,17 @@ let package = Package(
                         "BridgeClient",
                         "BridgeClientUI",
                     ],
-                    path: "SwiftPackage/Tests/BridgeClientUITests",
-                    resources: [.process("Resources")]),
+                    path: "SwiftPackage/Tests/BridgeClientUITests"),
+        
+        .target(name: "BridgeToSageResearch",
+                dependencies: [
+                    "BridgeClient",
+                    "BridgeClientExtension",
+                    "BridgeClientUI",
+                    "JsonModel",
+                    .product(name: "Research", package: "SageResearch"),
+                    .product(name: "ResearchUI", package: "SageResearch"),
+                ],
+                path: "SwiftPackage/Sources/BridgeToSageResearch"),
     ]
 )

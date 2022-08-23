@@ -1,7 +1,7 @@
 //
 //  BridgeClientAppManager.swift
 //
-//  Copyright © 2021 Sage Bionetworks. All rights reserved.
+//  Copyright © 2021-2022 Sage Bionetworks. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -32,12 +32,10 @@
 
 import SwiftUI
 import BridgeClient
+import BridgeClientExtension
 import JsonModel
 
-
 fileprivate let kOnboardingStateKey = "isOnboardingFinished"
-
-public let kPreviewStudyId = "xcode_preview"
 
 /// This class is intended to be used as the `BridgeClient` app singleton. It manages login, app state,
 /// app configuration, user configuration, notifications, and uploading files to Bridge services. It is intended
@@ -64,7 +62,7 @@ public let kPreviewStudyId = "xcode_preview"
 /// - SeeAlso: ``SingleStudyAppManager`` which subclasses ``BridgeClientAppManager``
 ///             to support features of a single study sign-in that is required to get a timeline for the participant.
 /// 
-open class BridgeClientAppManager : ObservableObject {
+open class BridgeClientAppManager : UploadAppManager {
     
     /// The  "state" of the app. SwiftUI relies upon observance patterns that do not work with Kotlin classes
     /// because those classes are not threadsafe. The state handling of SwiftUI relies upon being able to
@@ -101,63 +99,9 @@ open class BridgeClientAppManager : ObservableObject {
     public enum AppState : String {
         case launching, login, onboarding, main
     }
-
-    /// Is this manager used for previewing the app? (Unit tests, SwiftUI Preview, etc.)
-    public let isPreview: Bool
-    
-    /// The configuration bits that need to be set on the 'BridgeClient.xcframework' in order to connect to
-    /// Bridge services.
-    public let platformConfig: IOSPlatformConfig
-    
-    /// The path to the pem file that is used to encrypt data being uploaded to Bridge.
-    ///
-    /// - Note: Data should be encrypted so that it is not stored insecurely on the phone (while waiting
-    ///         for an upload connection).
-    public let pemPath: String?
-        
-    /// The title of the app to display. By default, this is the localized display name of the app that is shown
-    /// to the participant in their phone home screen.
-    @Published public var title: String
     
     /// The "state" of the app.
     @Published public var appState: AppState = .launching
-    
-    /// Is the app currently uploading results or user files? This status is maintained and updated by BridgeFileUploadManager.
-    @Published public var isUploading: Bool = false
-    
-    /// A threadsafe observer for the `BridgeClient.UserSessionInfo` for the current user.
-    public let appConfig: AppConfigObserver = .init()
-    
-    // Do not expose publicly. This class is not threadsafe.
-    var config: AppConfig? {
-        didSet {
-            appConfig.appConfig = config
-            didUpdateAppConfig()
-            updateAppState()
-        }
-    }
-    
-    /// Called when the `BridgeClient.AppConfig` is updated.
-    func didUpdateAppConfig() {
-        // Do nothing. Allows subclass override of `config.didSet`.
-    }
-    
-    /// A threadsafe observer for the `BridgeClient.UserSessionInfo` for the current user.
-    public let userSessionInfo: UserSessionInfoObserver = .init()
-    
-    // Do not expose publicly. This class is not threadsafe.
-    var session: UserSessionInfo? {
-        didSet {
-            userSessionInfo.userSessionInfo = session
-            didUpdateUserSessionInfo()
-            updateAppState()
-        }
-    }
-    
-    /// Called when the `BridgeClient.UserSessionInfo` is updated.
-    func didUpdateUserSessionInfo() {
-        // Do nothing. Allows subclass override of `session.didSet`.
-    }
     
     /// Has the participant been shown the onboarding flow?
     @Published public var isOnboardingFinished: Bool = UserDefaults.standard.bool(forKey: kOnboardingStateKey) {
@@ -167,83 +111,12 @@ open class BridgeClientAppManager : ObservableObject {
         }
     }
     
-    private var appConfigManager: NativeAppConfigManager!
-    public private(set) var authManager: NativeAuthenticationManager!
-    
     /// The local notification manager is a singleton that can be set up as the notification delegate (to handle snoozing).
     lazy public var localNotificationManager : LocalNotificationManager = LocalNotificationManager()
     
-    /// Convenience initializer for intializing a bridge manager with just an app id and pem file.
-    ///
-    /// Both the APP ID and the CMS Public Key (ie. pem file) are accessible through the [Bridge Study Manager](https://research.sagebridge.org).
-    /// Once logged into an "app" (which can host multiple "studies"), select "Server Config -> Settings" from the menu.
-    ///
-    /// - Parameters:
-    ///   - appId: The "APP ID" is shown in the upper right corner of the [Bridge Study Manager](https://research.sagebridge.org).
-    ///   - pemPath: The path to the pem file (as an embedded resource) to use for encrypting uploads. The pem file can be downloaded
-    ///     from the [Bridge Study Manager](https://research.sagebridge.org) by going "Server Settings -> Settings"
-    ///     and tapping on the button labeled "Download CMS Public Key..." and saving the file to a secure location.
-    public convenience init(appId: String, pemPath: String? = nil) {
-        self.init(platformConfig: PlatformConfigImpl(appId: appId), pemPath: pemPath)
-    }
-    
-    /// Initialize the bridge manager with a custom platform config.
-    ///
-    /// - Parameters:
-    ///   - platformConfig: The platform config to use to set up the connection to Bridge.
-    ///   - pemPath: The path to the location of the pem file to use when encrypting uploads.
-    public init(platformConfig: IOSPlatformConfig, pemPath: String? = nil) {
-        self.pemPath = pemPath ?? Bundle.main.path(forResource: platformConfig.appId, ofType: "pem")
-        self.platformConfig = platformConfig
-        self.title = self.platformConfig.localizedAppName
-        self.isPreview = (platformConfig.appId == kPreviewStudyId)
-        if !self.isPreview {
-            IOSBridgeConfig().initialize(platformConfig: self.platformConfig)
-        }
-
-        // Set up the background network manager singleton and make us its app manager
-        let bnm = BackgroundNetworkManager.shared
-        bnm.appManager = self
-        
-        // Register the file upload APIs so that retries can happen
-        let _ = ParticipantFileUploadAPI.shared
-        let _ = StudyDataUploadAPI.shared
-    }
-    
     /// **Required:** This method should be called by the app delegate when the app is launching in either `willLaunch` or `didLaunch`.
     open func appWillFinishLaunching(_ launchOptions: [UIApplication.LaunchOptionsKey : Any]? ) {
-
-        // Initialize koin
-        #if DEBUG
-            let enableNetworkLogs = true
-        #else
-            let enableNetworkLogs = false
-        #endif
-        KoinKt.doInitKoin(enableNetworkLogs: enableNetworkLogs)
-        
-        // Hook up app config
-        self.appConfigManager = NativeAppConfigManager() { appConfig, _ in
-            self.config = appConfig ?? self.config
-        }
-        self.appConfigManager.observeAppConfig()
-        
-        // Hook up user session info
-        self.authManager = NativeAuthenticationManager() { userSessionInfo in
-            guard userSessionInfo == nil || !userSessionInfo!.isEqual(userSessionInfo) else { return }
-            self.session = userSessionInfo
-        }
-        self.session = self.authManager.session()
-        self.authManager.observeUserSessionInfo()
-        
-        // Update the app state
-        updateAppState()
-    }
-    
-    /// **Required:** This method should be called by the app delegate in the implementation of
-    /// `application(:, handleEventsForBackgroundURLSession:, completionHandler:)` and is used to
-    /// restore a background upload session.
-    public final func handleEvents(for backgroundSession: String, completionHandler: @escaping () -> Void) {
-        BackgroundNetworkManager.shared.restore(backgroundSession: backgroundSession, completionHandler: completionHandler)
+        setup()
     }
     
     /// Login with the given external ID and password.
@@ -255,21 +128,22 @@ open class BridgeClientAppManager : ObservableObject {
     public final func loginWithExternalId(_ externalId: String, password: String, completion: @escaping ((BridgeClient.ResourceStatus) -> Void)) {
         self.authManager.signInExternalId(externalId: externalId, password: password) { (userSessionInfo, status) in
             guard status == ResourceStatus.success || status == ResourceStatus.failed else { return }
-            self.session = userSessionInfo
-            completion(status)
+            Task {
+                await self.setUserSessionInfo(userSessionInfo)
+                completion(status)
+            }
         }
     }
     
     /// Sign out the current user.
-    open func signOut() {
+    override open func signOut() {
         localNotificationManager.clearAll()
-        authManager.signOut()
+        super.signOut()
         isOnboardingFinished = false
-        self.session = nil
     }
     
     // @Protected - Only this class should call this method and only subclasses should implement.
-    func updateAppState() {
+    override open func updateAppState() {
         if appConfig.isLaunching {
             appState = .launching
         }
@@ -281,92 +155,6 @@ open class BridgeClientAppManager : ObservableObject {
         }
         else {
             appState = .main
-        }
-    }
-    
-    /// Encrypt and upload an archive created with the given builder.
-    ///
-    /// - Parameter builder: The archive builder.
-    public final func encryptAndUpload(using builder: ArchiveBuilder) {
-        Task.detached(priority: .medium) {
-            await self._encryptAndUpload(using: builder)
-        }
-    }
-    
-    @MainActor
-    private func _encryptAndUpload(using builder: ArchiveBuilder) async {
-        isUploading = true
-        do {
-            let archive = try await builder.buildArchive()
-            await copyTest(archive: archive)
-            let encrypted = await encrypt(archive: archive)
-            await self.upload(archive: archive, encrypted: encrypted)
-        } catch {
-            debugPrint("ERROR Failed to archive and upload \(builder.identifier): \(error)")
-        }
-    }
-    
-    /// Encrypt and upload the given data archives.
-    ///
-    /// - Parameter archives: The archives to encrypt and upload.
-    final func encryptAndUpload(_ archives: [DataArchive]) {
-        Task.detached(priority: .medium) {
-            await self._encryptAndUpload(archives)
-        }
-    }
-    
-    @MainActor
-    private func _encryptAndUpload(_ archives: [DataArchive]) async {
-        isUploading = true
-        await withTaskGroup(of: Void.self) { group in
-            archives.forEach { archive in
-                group.addTask {
-                    await self.copyTest(archive: archive)
-                    let encrypted = await self.encrypt(archive: archive)
-                    await self.upload(archive: archive, encrypted: encrypted)
-                }
-            }
-        }
-    }
-    
-    private func copyTest(archive: DataArchive) async {
-        #if DEBUG
-        if userSessionInfo.dataGroups?.contains("test_user") ?? false {
-            archive.copyTestArchive()
-        }
-        #endif
-    }
-    
-    private func encrypt(archive: DataArchive) async -> Bool {
-        guard let path = self.pemPath else { return false }
-        do {
-            try archive.encryptArchive(using: path)
-            return true
-        } catch {
-            debugPrint("ERROR: Failed to encrypt \(archive.identifier). \(error)")
-            return false
-        }
-    }
-    
-    @MainActor
-    private func upload(archive: DataArchive, encrypted: Bool) async {
-        let exporterV3Metadata: JsonElement? = (archive as? AbstractResultArchive)?.schedule.map { schedule in
-            .object([
-                "instanceGuid": schedule.instanceGuid,
-                "eventTimestamp": schedule.session.eventTimestamp
-            ])
-        }
-        let extras = StudyDataUploadExtras(encrypted: encrypted, metadata: exporterV3Metadata, zipped: true)
-        let id = archive.identifier
-        guard let url = archive.encryptedURL else {
-            debugPrint("WARNING! Cannot upload \(id)")
-            return
-        }
-        StudyDataUploadAPI.shared.upload(fileId: id, fileUrl: url, contentType: "application/zip", extras: extras)
-        do {
-            try FileManager.default.removeItem(at: url)
-        } catch let err {
-            debugPrint("WARNING! Failed to delete encrypted archive \(id) at \(url). \(err)")
         }
     }
 }

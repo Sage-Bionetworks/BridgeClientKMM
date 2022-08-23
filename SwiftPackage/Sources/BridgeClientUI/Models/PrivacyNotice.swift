@@ -32,6 +32,7 @@
 
 import Foundation
 import BridgeClient
+import BridgeClientExtension
 
 /// A codable list of privacy notice items grouped by ``Category``.
 public struct PrivacyNotice : Codable, Hashable {

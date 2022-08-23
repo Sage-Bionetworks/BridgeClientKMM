@@ -32,6 +32,7 @@
 
 import SwiftUI
 import BridgeClient
+import BridgeClientExtension
 import JsonModel
 
 fileprivate let kUserSessionIdKey = "userSessionId"
@@ -81,7 +82,7 @@ open class AbstractTodayTimelineViewModel : NSObject, ObservableObject, Schedule
                 existingSession.window = schedule
                 return existingSession
             }
-            self.sessions = newSessions
+            self.sessions = filterSessions(newSessions)
         }
     }
     
@@ -90,13 +91,16 @@ open class AbstractTodayTimelineViewModel : NSObject, ObservableObject, Schedule
     /// The view that uses this model must hook up the manager - typically by calling `onAppear()`.
     public private(set) var bridgeManager: SingleStudyAppManager!
     
-    private var timelineManager: NativeTimelineManager! {
+    public private(set) var timelineManager: NativeTimelineManager! {
         willSet {
             try? timelineManager?.onCleared()
         }
     }
     
-    public override init() {
+    private var filterSessions: (([TodayTimelineSession]) -> [TodayTimelineSession])
+    
+    public init(filterSessions: (([TodayTimelineSession]) -> [TodayTimelineSession])? = nil) {
+        self.filterSessions = filterSessions ?? { $0 }
         super.init()
         NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: .main) { _ in
             self.updateSessionState()
@@ -199,7 +203,7 @@ open class AbstractTodayTimelineViewModel : NSObject, ObservableObject, Schedule
     ///     - declined: Did the participant "decline" to finish? In other words, do they want to skip this assessment?
     ///     - clientData: Any `JsonSerializable` object that should be stored with this adherence record.
     @MainActor
-    func updateAdherenceRecord(scheduleInfo: AssessmentScheduleInfo, startedOn: Date, endedOn: Date? = nil, declined: Bool = false, clientData: JsonSerializable? = nil) {
+    open func updateAdherenceRecord(scheduleInfo: AssessmentScheduleInfo, startedOn: Date, endedOn: Date? = nil, declined: Bool = false, clientData: JsonSerializable? = nil) {
 
         // Create and write an adherence record.
         let record = NativeAdherenceRecord(instanceGuid: scheduleInfo.instanceGuid,

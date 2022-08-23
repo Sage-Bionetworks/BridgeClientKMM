@@ -49,7 +49,7 @@ public class PlatformConfigImpl : IOSPlatformConfig {
         "\(deviceName); \(osName)/\(osVersion)"
     }
     
-    init(appId: String? = nil, appGroupIdentifier: String? = nil, bridgeEnvironment: PlatformConfigBridgeEnvironment = .production) {
+    public init(appId: String? = nil, appGroupIdentifier: String? = nil, bridgeEnvironment: PlatformConfigBridgeEnvironment = .production) {
         
         self.appId = appId ?? Bundle.main.bridgeAppId
         self.appGroupIdentifier = appGroupIdentifier

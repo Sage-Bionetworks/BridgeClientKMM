@@ -33,7 +33,7 @@
 import XCTest
 import JsonModel
 import BridgeClient
-@testable import BridgeClientUI
+@testable import BridgeClientExtension
 
 final class ClientDataCodingTests: XCTestCase {
     

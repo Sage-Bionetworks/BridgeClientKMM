@@ -1,8 +1,8 @@
 //
-//  AppConfigObserver.swift
+//  ContentView.swift
+//  Shared
 //
-//
-//  Copyright © 2021 Sage Bionetworks. All rights reserved.
+//  Copyright © 2022 BiAffect. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -31,46 +31,50 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-import Foundation
-import BridgeClient
-import JsonModel
+import SwiftUI
+import BridgeClientExtension
+import BridgeClientUI
+import AssessmentModel
+import AssessmentModelUI
 
-/// This is a threadsafe wrapper for the Kotlin class ``BridgeClient.UserSessionInfo``.
-public final class AppConfigObserver : ObservableObject {
+public struct ContentView: View {
+    @EnvironmentObject var bridgeManager: SingleStudyAppManager
+    @StateObject var todayViewModel: TodayTimelineViewModel = .init()
     
-    var appConfig : AppConfig? {
-        get { self._appConfig }
-        set {
-            self._appConfig = processResultOnMainThread {
-                self.isLaunching = false
-                self.copyFrom(newValue)
-                return newValue
-            }
+    public init() {}
+    
+    public var body: some View {
+        switch bridgeManager.appState {
+        case .launching:
+            LaunchView()
+        case .login:
+            LoginView()
+        case .onboarding:
+            OnboardingView()
+                .onAppear {
+                    // Start fetching records and schedules on login
+                    todayViewModel.onAppear(bridgeManager: bridgeManager)
+                }
+        case .main:
+            MainView()
+                .environmentObject(todayViewModel)
+                .fullScreenCover(isPresented: $todayViewModel.isPresentingAssessment) {
+                    assessmentView()
+                }
         }
     }
-    private var _appConfig : AppConfig?
     
-    init() {}
-    
-    /// Is the app launching?
-    @Published public var isLaunching: Bool = true
-    
-    /// Client data for a user should be in a syntactically valid JSON format. It will be returned as is to the client
-    /// (as JSON).
-    @Published public var clientData: Data?
-    
-    /// A map of app config element IDs to the app config element JSON of a specific app config element revision
-    /// (the revision given in the configReferences map).
-    @Published public var configElements: [String : Data]?
-    
-    /// Get the config element with the given identifier.
-    public func configElementJson(identifier: String) -> Data? {
-        configElements?[identifier]
+    @ViewBuilder
+    func assessmentView() -> some View {
+        SurveyView<AssessmentView>(todayViewModel.selectedAssessment!, handler: todayViewModel)
     }
-    
-    func copyFrom(_ newValue: AppConfig?) {
-        guard let config = newValue else { return }
-        self.clientData = config.clientDataJson()
-        self.configElements = config.mapConfigElements()
+}
+
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            ContentView()
+                .environmentObject(SingleStudyAppManager(appId: kPreviewStudyId))
+        }
     }
 }

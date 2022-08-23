@@ -39,7 +39,7 @@ fileprivate let timeOnly: Set<Calendar.Component> = [.hour, .minute]
 
 extension Date {
     fileprivate func addingDays(_ days: Int) -> Date {
-        let calendar = Calendar.iso8601
+        let calendar = Calendar.init(identifier: .iso8601)
         return calendar.date(byAdding: .day, value: days, to: self, wrappingComponents: false)!
     }
 }

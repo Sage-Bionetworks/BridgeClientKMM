@@ -513,7 +513,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
     let netManager: BackgroundNetworkManager
     
     /// BridgeFileUploadManager needs access to app configuration and user session info.
-    var appManager: BridgeClientAppManager! {
+    var appManager: UploadAppManager! {
         BackgroundNetworkManager.shared.appManager
     }
     
@@ -1001,9 +1001,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
             
             // Get the set of all temp files for which there is a currently-active background
             // URLSession task.
-            let filesInFlight = tasks.rsd_flatMapSet { task in
-                task.description
-            }
+            let filesInFlight = Set(tasks.map { $0.description })
             
             // Get the mappings from temp file to original file for all in-progress uploads.
             let fileUploads = defaults.dictionary(forKey: self.bridgeFileUploadsKey) ?? [String : Any]()

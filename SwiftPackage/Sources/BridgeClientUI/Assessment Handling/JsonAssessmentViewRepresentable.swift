@@ -32,6 +32,8 @@
 //
 
 import Foundation
+import BridgeClient
+import BridgeClientExtension
 import JsonModel
 
 /// This class can be used as a pointer or using `public final` and implementing a subclass that implements the protocol

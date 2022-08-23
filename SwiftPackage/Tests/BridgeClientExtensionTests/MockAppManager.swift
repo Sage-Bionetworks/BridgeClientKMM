@@ -32,7 +32,7 @@
 //
 
 @testable import BridgeClient
-@testable import BridgeClientUI
+@testable import BridgeClientExtension
 
 // MARK: MockAuthManager
 class MockAuthManager : NativeAuthenticationManager {
@@ -53,7 +53,7 @@ class MockAuthManager : NativeAuthenticationManager {
 }
 
 // MARK: MockBridgeClientAppManager
-class MockBridgeClientAppManager : BridgeClientAppManager {
+class MockBridgeClientAppManager : UploadAppManager {
     let mockAuthManager = MockAuthManager {_ in }
     
     override var authManager: NativeAuthenticationManager! {

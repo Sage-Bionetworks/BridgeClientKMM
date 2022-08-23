@@ -7,9 +7,7 @@ import android.content.res.AssetManager
 import android.os.Build
 import co.touchlab.kermit.Logger
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.*
 import okio.ByteString.Companion.toByteString
 import org.joda.time.DateTimeZone
 import org.joda.time.Instant
@@ -167,7 +165,7 @@ abstract class AssessmentResultArchiveUploader(
         archiveFiles: Set<ArchiveFile>,
         assessmentResult: AssessmentResult,
         jsonCoder: Json
-    ): Map<String, Any> {
+    ): Map<String, JsonElement> {
         val appVersion = "version ${bridgeConfig.appVersionName}, build ${bridgeConfig.appVersion}"
         val os = "${bridgeConfig.osName}/${bridgeConfig.osVersion}"
         val session = authenticationRepository.session()
@@ -179,7 +177,7 @@ abstract class AssessmentResultArchiveUploader(
         // migrate once MTB is compatible with assessmentModels  0.4.3 - liujoshua 04/01/2021
         // val startDate =jsonCoder.encodeToString(assessmentResult.startDateTime)
         // val endDate = jsonCoder.encodeToString(assessmentResult.endDateTime)
-        val fileInfoList = archiveFiles.map { it.fileInfoMap() }
+        val fileInfoList = archiveFiles.map { JsonObject(it.fileInfoMap()) }
 
 
         val kotlinStartTimeInstant = assessmentResult.startDateTime
@@ -192,16 +190,16 @@ abstract class AssessmentResultArchiveUploader(
 
         // add Android equivalent of rsdFrameworkVersion - liujoshua 04/01/2021
         return mapOf(
-            "taskIdentifier" to assessmentResult.identifier,
-            "deviceInfo" to "${Build.PRODUCT} ${Build.MODEL}; $os",
-            "appName" to bridgeConfig.appName,
-            "appVersion" to appVersion,
-            "deviceTypeIdentifier" to bridgeConfig.deviceName,
-            "taskRunUUID" to assessmentResult.runUUIDString,
-            "dataGroups" to dataGroups,
-            "startDate" to jodaStartTime.toString(),
-            "endDate" to jodaEndTime.toString(),
-            "files" to fileInfoList
+            "taskIdentifier" to JsonPrimitive(assessmentResult.identifier),
+            "deviceInfo" to JsonPrimitive("${Build.PRODUCT} ${Build.MODEL}; $os"),
+            "appName" to JsonPrimitive(bridgeConfig.appName),
+            "appVersion" to JsonPrimitive(appVersion),
+            "deviceTypeIdentifier" to JsonPrimitive(bridgeConfig.deviceName),
+            "taskRunUUID" to JsonPrimitive(assessmentResult.runUUIDString),
+            "dataGroups" to JsonPrimitive(dataGroups),
+            "startDate" to JsonPrimitive(jodaStartTime.toString()),
+            "endDate" to JsonPrimitive(jodaEndTime.toString()),
+            "files" to JsonArray(fileInfoList)
         )
     }
 
@@ -210,13 +208,13 @@ abstract class AssessmentResultArchiveUploader(
     }
 }
 
-fun ArchiveFile.fileInfoMap() : Map<String, String> {
+fun ArchiveFile.fileInfoMap() : Map<String, JsonElement> {
     val map = mutableMapOf(
-        "filename" to filename,
-        "timestamp" to endDate.toString()
+        "filename" to JsonPrimitive(filename),
+        "timestamp" to JsonPrimitive(endDate.toString())
     )
     if (this is JsonArchiveFile) {
-        map.put("contentType", "application/json")
+        map.put("contentType", JsonPrimitive("application/json"))
     }
     return map
 }

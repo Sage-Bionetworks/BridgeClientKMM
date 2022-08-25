@@ -193,6 +193,7 @@ internal fun ScheduledSessionWindow.toNative() =
         hasEndTimeOfDay = hasEndTimeOfDay,
         assessments = assessments.map { it.toNative() },
         sessionInfo = sessionInfo,
+        startEventId = scheduledSession.startEventId
     )
 
 internal fun ScheduledAssessmentReference.toNative()  =
@@ -267,6 +268,7 @@ data class NativeScheduledSessionWindow(
     val hasEndTimeOfDay: Boolean,
     val assessments: List<NativeScheduledAssessment>,
     val sessionInfo: SessionInfo,
+    val startEventId: String?
 )
 
 data class NativeScheduledAssessment(

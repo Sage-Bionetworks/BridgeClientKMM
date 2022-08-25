@@ -21,7 +21,7 @@ import platform.Foundation.*
 class NativeTimelineStudyBurstManager(
     private val studyId: String,
     scheduleMutator: ParticipantScheduleMutator?,
-    private val viewUpdated: (NativeStudyBurstSchedule?, String?) -> Unit,
+    private val viewUpdated: (NativeStudyBurstSchedule) -> Unit,
     private val updateFailed: (() -> Unit)?
 ) : AbstractNativeTimelineManager(studyId, scheduleMutator) {
 
@@ -40,7 +40,7 @@ class NativeTimelineStudyBurstManager(
             }
             repo.getStudyBurstSchedule(studyId, userJoinedDate).collect { timelineResource ->
                 (timelineResource as? ResourceResult.Success)?.data?.let { schedule ->
-                    viewUpdated(schedule.toNative(), null)
+                    viewUpdated(schedule.toNative())
                 } ?: run {
                     if (timelineResource is ResourceResult.Failed) {
                         updateFailed?.invoke()

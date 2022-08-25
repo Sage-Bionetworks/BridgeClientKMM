@@ -277,7 +277,8 @@ extension NativeScheduledSessionWindow {
                                  timeWindowGuids: nil,
                                  minutesToComplete: nil,
                                  notifications: nil,
-                                 type: "SessionInfo"))
+                                 type: "SessionInfo"),
+              startEventId: "timeline_retreived")
     }
 }
 

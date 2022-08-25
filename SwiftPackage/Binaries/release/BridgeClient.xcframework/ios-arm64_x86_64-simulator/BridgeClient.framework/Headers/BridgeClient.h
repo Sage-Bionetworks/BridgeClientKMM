@@ -408,8 +408,9 @@ __attribute__((swift_name("NativeScheduledSessionTimelineSlice")))
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("NativeScheduledSessionWindow")))
 @interface BridgeClientNativeScheduledSessionWindow : BridgeClientBase
-- (instancetype)initWithInstanceGuid:(NSString *)instanceGuid eventTimestamp:(NSString *)eventTimestamp startDateTime:(NSDate *)startDateTime endDateTime:(NSDate *)endDateTime persistent:(BOOL)persistent hasStartTimeOfDay:(BOOL)hasStartTimeOfDay hasEndTimeOfDay:(BOOL)hasEndTimeOfDay assessments:(NSArray<BridgeClientNativeScheduledAssessment *> *)assessments sessionInfo:(BridgeClientSessionInfo *)sessionInfo __attribute__((swift_name("init(instanceGuid:eventTimestamp:startDateTime:endDateTime:persistent:hasStartTimeOfDay:hasEndTimeOfDay:assessments:sessionInfo:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithInstanceGuid:(NSString *)instanceGuid eventTimestamp:(NSString *)eventTimestamp startDateTime:(NSDate *)startDateTime endDateTime:(NSDate *)endDateTime persistent:(BOOL)persistent hasStartTimeOfDay:(BOOL)hasStartTimeOfDay hasEndTimeOfDay:(BOOL)hasEndTimeOfDay assessments:(NSArray<BridgeClientNativeScheduledAssessment *> *)assessments sessionInfo:(BridgeClientSessionInfo *)sessionInfo startEventId:(NSString * _Nullable)startEventId __attribute__((swift_name("init(instanceGuid:eventTimestamp:startDateTime:endDateTime:persistent:hasStartTimeOfDay:hasEndTimeOfDay:assessments:sessionInfo:startEventId:)"))) __attribute__((objc_designated_initializer));
 - (NSString *)component1 __attribute__((swift_name("component1()")));
+- (NSString * _Nullable)component10 __attribute__((swift_name("component10()")));
 - (NSString *)component2 __attribute__((swift_name("component2()")));
 - (NSDate *)component3 __attribute__((swift_name("component3()")));
 - (NSDate *)component4 __attribute__((swift_name("component4()")));
@@ -418,7 +419,7 @@ __attribute__((swift_name("NativeScheduledSessionWindow")))
 - (BOOL)component7 __attribute__((swift_name("component7()")));
 - (NSArray<BridgeClientNativeScheduledAssessment *> *)component8 __attribute__((swift_name("component8()")));
 - (BridgeClientSessionInfo *)component9 __attribute__((swift_name("component9()")));
-- (BridgeClientNativeScheduledSessionWindow *)doCopyInstanceGuid:(NSString *)instanceGuid eventTimestamp:(NSString *)eventTimestamp startDateTime:(NSDate *)startDateTime endDateTime:(NSDate *)endDateTime persistent:(BOOL)persistent hasStartTimeOfDay:(BOOL)hasStartTimeOfDay hasEndTimeOfDay:(BOOL)hasEndTimeOfDay assessments:(NSArray<BridgeClientNativeScheduledAssessment *> *)assessments sessionInfo:(BridgeClientSessionInfo *)sessionInfo __attribute__((swift_name("doCopy(instanceGuid:eventTimestamp:startDateTime:endDateTime:persistent:hasStartTimeOfDay:hasEndTimeOfDay:assessments:sessionInfo:)")));
+- (BridgeClientNativeScheduledSessionWindow *)doCopyInstanceGuid:(NSString *)instanceGuid eventTimestamp:(NSString *)eventTimestamp startDateTime:(NSDate *)startDateTime endDateTime:(NSDate *)endDateTime persistent:(BOOL)persistent hasStartTimeOfDay:(BOOL)hasStartTimeOfDay hasEndTimeOfDay:(BOOL)hasEndTimeOfDay assessments:(NSArray<BridgeClientNativeScheduledAssessment *> *)assessments sessionInfo:(BridgeClientSessionInfo *)sessionInfo startEventId:(NSString * _Nullable)startEventId __attribute__((swift_name("doCopy(instanceGuid:eventTimestamp:startDateTime:endDateTime:persistent:hasStartTimeOfDay:hasEndTimeOfDay:assessments:sessionInfo:startEventId:)")));
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
@@ -431,6 +432,7 @@ __attribute__((swift_name("NativeScheduledSessionWindow")))
 @property (readonly) BOOL persistent __attribute__((swift_name("persistent")));
 @property (readonly) BridgeClientSessionInfo *sessionInfo __attribute__((swift_name("sessionInfo")));
 @property (readonly) NSDate *startDateTime __attribute__((swift_name("startDateTime")));
+@property (readonly) NSString * _Nullable startEventId __attribute__((swift_name("startEventId")));
 @end;
 
 __attribute__((objc_subclassing_restricted))
@@ -492,7 +494,7 @@ __attribute__((swift_name("NativeTimelineManager")))
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("NativeTimelineStudyBurstManager")))
 @interface BridgeClientNativeTimelineStudyBurstManager : BridgeClientAbstractNativeTimelineManager
-- (instancetype)initWithStudyId:(NSString *)studyId scheduleMutator:(id<BridgeClientParticipantScheduleMutator> _Nullable)scheduleMutator viewUpdated:(void (^)(BridgeClientNativeStudyBurstSchedule * _Nullable, NSString * _Nullable))viewUpdated updateFailed:(void (^ _Nullable)(void))updateFailed __attribute__((swift_name("init(studyId:scheduleMutator:viewUpdated:updateFailed:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithStudyId:(NSString *)studyId scheduleMutator:(id<BridgeClientParticipantScheduleMutator> _Nullable)scheduleMutator viewUpdated:(void (^)(BridgeClientNativeStudyBurstSchedule *))viewUpdated updateFailed:(void (^ _Nullable)(void))updateFailed __attribute__((swift_name("init(studyId:scheduleMutator:viewUpdated:updateFailed:)"))) __attribute__((objc_designated_initializer));
 - (instancetype)initWithStudyId:(NSString *)studyId scheduleMutator:(id<BridgeClientParticipantScheduleMutator> _Nullable)scheduleMutator __attribute__((swift_name("init(studyId:scheduleMutator:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
 - (void)observeStudyBurstScheduleIsNewLogin:(BOOL)isNewLogin userJoinedDate:(BridgeClientKotlinx_datetimeInstant *)userJoinedDate __attribute__((swift_name("observeStudyBurstSchedule(isNewLogin:userJoinedDate:)")));
 - (void)refreshStudyBurstScheduleUserJoinedDate:(BridgeClientKotlinx_datetimeInstant *)userJoinedDate __attribute__((swift_name("refreshStudyBurstSchedule(userJoinedDate:)")));

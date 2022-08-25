@@ -21,7 +21,7 @@ import platform.Foundation.*
 class NativeTimelineStudyBurstManager(
     private val studyId: String,
     scheduleMutator: ParticipantScheduleMutator?,
-    private val viewUpdated: (NativeStudyBurstSchedule?, String?) -> Unit,
+    private val viewUpdated: (NativeStudyBurstSchedule) -> Unit,
     private val updateFailed: (() -> Unit)?
 ) : AbstractNativeTimelineManager(studyId, scheduleMutator) {
 
@@ -40,7 +40,7 @@ class NativeTimelineStudyBurstManager(
             }
             repo.getStudyBurstSchedule(studyId, userJoinedDate).collect { timelineResource ->
                 (timelineResource as? ResourceResult.Success)?.data?.let { schedule ->
-                    viewUpdated(schedule.toNative(), null)
+                    viewUpdated(schedule.toNative())
                 } ?: run {
                     if (timelineResource is ResourceResult.Failed) {
                         updateFailed?.invoke()
@@ -193,6 +193,7 @@ internal fun ScheduledSessionWindow.toNative() =
         hasEndTimeOfDay = hasEndTimeOfDay,
         assessments = assessments.map { it.toNative() },
         sessionInfo = sessionInfo,
+        startEventId = scheduledSession.startEventId
     )
 
 internal fun ScheduledAssessmentReference.toNative()  =
@@ -267,6 +268,7 @@ data class NativeScheduledSessionWindow(
     val hasEndTimeOfDay: Boolean,
     val assessments: List<NativeScheduledAssessment>,
     val sessionInfo: SessionInfo,
+    val startEventId: String?
 )
 
 data class NativeScheduledAssessment(

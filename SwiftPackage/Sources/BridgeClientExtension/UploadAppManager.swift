@@ -50,7 +50,8 @@ open class UploadAppManager : ObservableObject {
     ///
     /// - Note: Data should be encrypted so that it is not stored insecurely on the phone (while waiting
     ///         for an upload connection).
-    public let pemPath: String?
+    public var pemPath: String? { uploadProcessor.pemPath }
+    private let uploadProcessor: ArchiveUploadProcessor
         
     /// The title of the app to display. By default, this is the localized display name of the app that is shown
     /// to the participant in their phone home screen.
@@ -83,6 +84,7 @@ open class UploadAppManager : ObservableObject {
     var session: UserSessionInfo? {
         didSet {
             userSessionInfo.userSessionInfo = session
+            uploadProcessor.isTestUser = userSessionInfo.dataGroups?.contains("test_user") ?? false
             didUpdateUserSessionInfo()
             updateAppState()
         }
@@ -121,7 +123,8 @@ open class UploadAppManager : ObservableObject {
     ///   - platformConfig: The platform config to use to set up the connection to Bridge.
     ///   - pemPath: The path to the location of the pem file to use when encrypting uploads.
     public init(platformConfig: IOSPlatformConfig, pemPath: String? = nil) {
-        self.pemPath = pemPath ?? Bundle.main.path(forResource: platformConfig.appId, ofType: "pem")
+        let pemPath = pemPath ?? Bundle.main.path(forResource: platformConfig.appId, ofType: "pem")
+        uploadProcessor = .init(pemPath: pemPath)
         self.platformConfig = platformConfig
         self.title = self.platformConfig.localizedAppName
         self.isPreview = (platformConfig.appId == kPreviewStudyId)
@@ -189,6 +192,29 @@ open class UploadAppManager : ObservableObject {
     ///
     /// - Parameter builder: The archive builder.
     public final func encryptAndUpload(using builder: ArchiveBuilder) {
+        isUploading = true
+        uploadProcessor.encryptAndUpload(using: builder)
+    }
+    
+    /// Encrypt and upload the given data archives.
+    ///
+    /// - Parameter archives: The archives to encrypt and upload.
+    public final func encryptAndUpload(_ archives: [DataArchive]) {
+        isUploading = true
+        uploadProcessor.encryptAndUpload(archives)
+    }
+}
+
+final class ArchiveUploadProcessor {
+    
+    let pemPath: String?
+    var isTestUser: Bool = false
+    
+    init(pemPath: String?) {
+        self.pemPath = pemPath
+    }
+    
+    func encryptAndUpload(using builder: ArchiveBuilder) {
         Task.detached(priority: .medium) {
             await self._encryptAndUpload(using: builder)
         }
@@ -196,49 +222,44 @@ open class UploadAppManager : ObservableObject {
     
     @MainActor
     private func _encryptAndUpload(using builder: ArchiveBuilder) async {
-        isUploading = true
         do {
             let archive = try await builder.buildArchive()
-            await copyTest(archive: archive)
-            let encrypted = await encrypt(archive: archive)
-            await self.upload(archive: archive, encrypted: encrypted)
+            await _copyTest(archive: archive)
+            let encrypted = await _encrypt(archive: archive)
+            await _upload(archive: archive, encrypted: encrypted)
         } catch {
             debugPrint("ERROR Failed to archive and upload \(builder.identifier): \(error)")
         }
     }
     
-    /// Encrypt and upload the given data archives.
-    ///
-    /// - Parameter archives: The archives to encrypt and upload.
-    public final func encryptAndUpload(_ archives: [DataArchive]) {
+    func encryptAndUpload(_ archives: [DataArchive]) {
         Task.detached(priority: .medium) {
             await self._encryptAndUpload(archives)
         }
     }
-    
+
     @MainActor
     private func _encryptAndUpload(_ archives: [DataArchive]) async {
-        isUploading = true
         await withTaskGroup(of: Void.self) { group in
             archives.forEach { archive in
                 group.addTask {
-                    await self.copyTest(archive: archive)
-                    let encrypted = await self.encrypt(archive: archive)
-                    await self.upload(archive: archive, encrypted: encrypted)
+                    await self._copyTest(archive: archive)
+                    let encrypted = await self._encrypt(archive: archive)
+                    await self._upload(archive: archive, encrypted: encrypted)
                 }
             }
         }
     }
     
-    private func copyTest(archive: DataArchive) async {
+    private func _copyTest(archive: DataArchive) async {
         #if DEBUG
-        if userSessionInfo.dataGroups?.contains("test_user") ?? false {
+        if isTestUser {
             archive.copyTestArchive()
         }
         #endif
     }
     
-    private func encrypt(archive: DataArchive) async -> Bool {
+    private func _encrypt(archive: DataArchive) async -> Bool {
         guard let path = self.pemPath else { return false }
         do {
             try archive.encryptArchive(using: path)
@@ -250,7 +271,7 @@ open class UploadAppManager : ObservableObject {
     }
     
     @MainActor
-    private func upload(archive: DataArchive, encrypted: Bool) async {
+    private func _upload(archive: DataArchive, encrypted: Bool) async {
         let exporterV3Metadata: JsonElement? = (archive as? AbstractResultArchive)?.schedule.map { schedule in
             .object([
                 "instanceGuid": schedule.instanceGuid,

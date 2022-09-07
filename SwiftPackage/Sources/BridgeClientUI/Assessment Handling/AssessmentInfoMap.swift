@@ -118,7 +118,7 @@ extension BridgeClient.AssessmentInfo {
     fileprivate var assessmentId: String { identifier }
     fileprivate var iconKey: SageResourceImage.Name {
         // TODO: syoung 05/19/2022 Support getting the resource image key from the AssessmentInfo object.
-        .survey
+        SageResourceImage.Name.allCases.first!
     }
 }
 

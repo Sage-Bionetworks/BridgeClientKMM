@@ -34,6 +34,8 @@ import Foundation
 import JsonModel
 
 public protocol ResultCollectionArchivable : FileArchivable {
+    var identifier: String { get }
+    var schemaIdentifier: String?  { get }
     var startedOn: Date { get }
     var endedOn: Date { get }
     var associatedFiles: [FileResultObject]? { get }
@@ -57,8 +59,8 @@ public class ResultCollectionArchive : AbstractResultArchive, ResultArchiveBuild
         self.uuid = .init()
         self.adherenceData = try collection.buildAdherenceData()
         self.outputDirectory = outputDirectory
-        super.init(identifier: "KeyboardSession",
-                   schemaIdentifier: "KeyboardSession",
+        super.init(identifier: collection.identifier,
+                   schemaIdentifier: collection.schemaIdentifier ?? collection.identifier,
                    schedule: schedule)
     }
 

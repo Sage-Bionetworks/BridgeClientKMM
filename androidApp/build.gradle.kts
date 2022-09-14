@@ -5,28 +5,28 @@ plugins {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:${Versions.kotlin}")
-    implementation(Deps.AndroidX.annotation)
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:${libs.versions.kotlin}")
+    implementation(libs.androidx.annotation)
     implementation(project(":bridge-client"))
     implementation(project(":bridge-client-presentation"))
-    implementation(Deps.AndroidX.material)
-    implementation(Deps.AndroidX.appcompat)
-    implementation(Deps.AndroidX.constraintlayout)
+    implementation(libs.androidx.material)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.constraintlayout)
 
-    implementation(Deps.Koin.android)
-    implementation(Deps.Koin.androidWorkManager)
+    implementation(libs.koin.android)
+    implementation(libs.koin.android.workmanager)
 
     // ViewModel
-    implementation(Deps.AndroidX.lifecycle_viewmodel_ktx)
+    implementation(libs.androidx.lifecycle.viewmodelKtx)
     // LiveData
-    implementation(Deps.AndroidX.lifecycle_livedata_ktx)
+    implementation(libs.androidx.lifecycle.livedataKtx)
 }
 android {
-    compileSdkVersion(Versions.compile_sdk)
+    compileSdk = libs.versions.compileSdk.get().toInt()
     defaultConfig {
         applicationId = "org.sagebionetworks.bridge.kmm.androidApp"
-        minSdkVersion(Versions.min_sdk)
-        targetSdkVersion(Versions.target_sdk)
+        minSdk = libs.versions.minSdk.get().toInt()
+        targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = 1
         versionName = "$version"
     }

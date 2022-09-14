@@ -1,0 +1,85 @@
+[versions]
+## SDK Versions
+minSdk = "23"
+targetSdk = "30"
+compileSdk = "30"
+
+# Dependencies
+coroutines = "1.6.1-native-mt"
+kotlin = "1.6.21"
+ktor = "1.6.5"
+kotlinxSerialization = "1.3.0"
+kotlinxDateTime = "0.3.0"
+sqlDelight = "1.5.3"
+koin = "3.1.5"
+okio = "3.0.0"
+kermit = "1.0.0"
+androidWorkManager = "2.6.0"
+androidxLifecycle = "2.2.0"
+
+[libraries]
+
+androidx-work-runtime = { module = "androidx.work:work-runtime", version.ref = "androidWorkManager"}
+androidx-work-runtimeKts = { module = "androidx.work:work-runtime-ktx", version.ref = "androidWorkManager"}
+
+androidx-annotation = "androidx.annotation:annotation:1.1.0"
+androidx-appcompat = "androidx.appcompat:appcompat:1.2.0"
+androidx-coreKtx = "androidx.core:core-ktx:1.3.2"
+androidx-constraintlayout = "androidx.constraintlayout:constraintlayout:2.0.4"
+androidx-lifecycle-viewmodelKtx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidxLifecycle" }
+androidx-lifecycle-livedataKtx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "androidxLifecycle" }
+androidx-material = "com.google.android.material:material:1.3.0"
+
+coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+
+gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+gradlePlugin-android = "com.android.tools.build:gradle:7.2.2"
+gradlePlugin-kotlinSerialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
+gradlePlugin-sqlDelight = { module = "com.squareup.sqldelight:gradle-plugin", version.ref = "sqlDelight" }
+
+junit = { module = "junit:junit", version = "4.13.2" }
+
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+koin-android-workmanager = { module = "io.insert-koin:koin-androidx-workmanager", version.ref = "koin" }
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
+
+kotlinx-dateTime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDateTime" }
+kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
+
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
+ktor-client-ios = { module = "io.ktor:ktor-client-ios", version.ref = "ktor" }
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
+ktor-client-json = { module = "io.ktor:ktor-client-json", version.ref = "ktor" }
+ktor-client-serialization = { module = "io.ktor:ktor-client-serialization", version.ref = "ktor" }
+ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
+
+okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
+
+sqlDelight-android = { module = "com.squareup.sqldelight:android-driver", version.ref = "sqlDelight" }
+sqlDelight-jvm = { module = "com.squareup.sqldelight:sqlite-driver", version.ref = "sqlDelight" }
+sqlDelight-coroutinesExt = { module = "com.squareup.sqldelight:coroutines-extensions", version.ref = "sqlDelight" }
+sqlDelight-native = { module = "com.squareup.sqldelight:native-driver", version.ref = "sqlDelight" }
+sqlDelight-runtime = { module = "com.squareup.sqldelight:runtime", version.ref = "sqlDelight" }
+
+touchlab-kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
+touchlab-stately = { module = "co.touchlab:stately-common", version = "1.1.1" }
+
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+
+[plugins]
+gradleDependencyUpdate = "com.github.ben-manes.versions:0.42.0"
+
+[bundles]
+
+gradlePlugins = [
+    "gradlePlugin",
+    "gradlePlugin-android",
+    "gradlePlugin-kotlinSerialization",
+    "gradlePlugin-sqlDelight",
+]
+ktor-common = ["ktor-client-core", "ktor-client-logging", "ktor-client-serialization"]
+
+

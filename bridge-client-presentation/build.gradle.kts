@@ -6,10 +6,10 @@ plugins {
 }
 
 android {
-    compileSdkVersion(Versions.compile_sdk)
+    compileSdk = libs.versions.compileSdk.get().toInt()
     defaultConfig {
-        minSdkVersion(Versions.min_sdk)
-        targetSdkVersion(Versions.target_sdk)
+        minSdk = libs.versions.minSdk.get().toInt()
+        targetSdk = libs.versions.targetSdk.get().toInt()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -31,24 +31,24 @@ android {
 
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:${Versions.kotlin}")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:${libs.versions.kotlin}")
     implementation(project(":bridge-client"))
-    implementation(Deps.AndroidX.core_ktx)
-    implementation(Deps.AndroidX.material)
-    implementation(Deps.AndroidX.appcompat)
-    implementation(Deps.AndroidX.constraintlayout)
+    implementation(libs.androidx.coreKtx)
+    implementation(libs.androidx.material)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.constraintlayout)
 
-    implementation(Deps.Koin.android)
+    implementation(libs.koin.android)
 
     // ViewModel
-    implementation(Deps.AndroidX.lifecycle_viewmodel_ktx)
+    implementation(libs.androidx.lifecycle.viewmodelKtx)
     // LiveData
-    implementation(Deps.AndroidX.lifecycle_livedata_ktx)
+    implementation(libs.androidx.lifecycle.livedataKtx)
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.3.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.0")
 
-    testImplementation(Deps.Test.junit)
+    testImplementation(libs.junit)
     androidTestImplementation("androidx.test.ext:junit:1.1.2")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
 }

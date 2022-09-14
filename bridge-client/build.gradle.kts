@@ -70,22 +70,21 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(Deps.SqlDelight.runtime)
-                implementation(Deps.SqlDelight.coroutineExtensions)
-                implementation(Deps.Coroutines.core)
-                api(Deps.Serialization.core)
-                implementation(Deps.Ktor.clientCore)
+                implementation(libs.sqlDelight.runtime)
+                implementation(libs.sqlDelight.coroutinesExt)
+                implementation(libs.coroutines.core)
+                api(libs.kotlinx.serialization)
+                implementation(libs.ktor.client.core)
                 //Is api to give depending modules access to JsonElement
-                api(Deps.Ktor.clientSerialization)
-                implementation(Deps.Serialization.core)
-                implementation(Deps.Ktor.clientLogging)
-                implementation(Deps.kotlinxDateTime)
-                implementation(Deps.stately)
-                implementation(Deps.okio)
+                api(libs.ktor.client.serialization)
+                implementation(libs.ktor.client.logging)
+                implementation(libs.kotlinx.dateTime)
+                implementation(libs.touchlab.stately)
+                implementation(libs.okio)
                 // koin
-                api(Deps.Koin.core)
+                api(libs.koin.core)
                 // Kermit
-                implementation(Deps.Kermit.core)
+                implementation(libs.touchlab.kermit)
             }
         }
 
@@ -93,33 +92,32 @@ kotlin {
             dependencies {
                 implementation(kotlin("test-common"))
                 implementation(kotlin("test-annotations-common"))
-                implementation(Deps.Ktor.clientMock)
-                api(Deps.Koin.test)
+                implementation(libs.ktor.client.mock)
+                api(libs.koin.test)
             }
         }
         val androidMain by getting {
             dependencies {
-                implementation(Deps.AndroidX.material)
-                implementation(Deps.SqlDelight.androidDriver)
-                implementation(Deps.Ktor.clientAndroid)
-                implementation(Deps.AndroidX.work_runtime)
-                implementation(Deps.AndroidX.work_runtime_kts)
-                implementation(Deps.Koin.android)
-                implementation(Deps.Koin.androidWorkManager)
+                implementation(libs.sqlDelight.android)
+                implementation(libs.ktor.client.android)
+                implementation(libs.androidx.work.runtime)
+                implementation(libs.androidx.work.runtimeKts)
+                implementation(libs.koin.android)
+                implementation(libs.koin.android.workmanager)
             }
         }
         val androidTest by getting {
             dependencies {
                 implementation(kotlin("test-junit"))
-                implementation(Deps.Test.junit)
-                implementation(Deps.SqlDelight.sqlliteDriver)
-                implementation(Deps.Coroutines.test)
+                implementation(libs.junit)
+                implementation(libs.sqlDelight.jvm)
+                implementation(libs.coroutines.test)
             }
         }
         val iosMain by getting {
             dependencies {
-                implementation(Deps.SqlDelight.nativeDriver)
-                implementation(Deps.Ktor.clientIos)
+                implementation(libs.sqlDelight.native)
+                implementation(libs.ktor.client.ios)
             }
         }
 
@@ -133,13 +131,13 @@ kotlin {
     }
 }
 android {
-    compileSdkVersion(Versions.compile_sdk)
+    compileSdk = libs.versions.compileSdk.get().toInt()
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].res.srcDirs("src/androidMain/res")
     sourceSets["main"].java.srcDirs("src/androidMain/kotlin")
     defaultConfig {
-        minSdkVersion(Versions.min_sdk)
-        targetSdkVersion(Versions.target_sdk)
+        minSdk = libs.versions.minSdk.get().toInt()
+        targetSdk = libs.versions.targetSdk.get().toInt()
         val versionCode = extra["sdkVersionCode"]
         val versionName = extra["versionName"]
         buildConfigField("int", "VERSION_CODE", "${versionCode}")

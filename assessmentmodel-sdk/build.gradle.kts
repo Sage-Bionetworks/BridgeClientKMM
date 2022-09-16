@@ -7,10 +7,10 @@ plugins {
 }
 
 android {
-    compileSdkVersion(Versions.compile_sdk)
+    compileSdk = libs.versions.compileSdk.get().toInt()
     defaultConfig {
-        minSdkVersion(Versions.min_sdk)
-        targetSdkVersion(Versions.target_sdk)
+        minSdk = libs.versions.minSdk.get().toInt()
+        targetSdk = libs.versions.targetSdk.get().toInt()
         val versionCode = extra["sdkVersionCode"]
         val versionName = extra["versionName"]
         buildConfigField("int", "VERSION_CODE", "${versionCode}")
@@ -40,12 +40,9 @@ dependencies {
         api(project(":bridge-client"))
         api("org.sagebionetworks.assessmentmodel:assessmentModel:$assessmentVersion")
 
-        implementation(project(":bridge-client-presentation"))
-        implementation("org.sagebionetworks.assessmentmodel:presentation:$assessmentVersion")
-
-        api(Deps.Koin.android)
+        api(libs.koin.android)
         // Kermit
-        implementation(Deps.Kermit.core)
+        implementation(libs.touchlab.kermit)
 
         // legacy Bridge dependencies
         // migrate to use kotlinx/java8 time and see if we can publish multi-platform

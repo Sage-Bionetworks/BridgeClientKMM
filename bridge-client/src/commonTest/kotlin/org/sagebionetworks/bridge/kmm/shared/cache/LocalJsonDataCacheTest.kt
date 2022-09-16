@@ -11,7 +11,9 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 class LocalJsonDataCacheTest {
 
     @Test

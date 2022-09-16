@@ -4,12 +4,10 @@ buildscript {
         gradlePluginPortal()
         google()
         mavenCentral()
+        maven("https://plugins.gradle.org/m2/")
     }
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}")
-        classpath("com.android.tools.build:gradle:7.1.3")
-        classpath("com.squareup.sqldelight:gradle-plugin:${Versions.sqlDelight}")
-        classpath("org.jetbrains.kotlin:kotlin-serialization:${Versions.kotlin}")
+        classpath(libs.bundles.gradlePlugins)
         classpath("dev.icerock.moko:network-generator:0.16.0")
     }
 

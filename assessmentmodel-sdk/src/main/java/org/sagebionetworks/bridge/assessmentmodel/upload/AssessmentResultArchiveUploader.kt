@@ -223,8 +223,8 @@ data class MetadataMap(
 data class ArchiveFileInfo(
     val filename: String,
     val timestamp: String,
-    val contentType: String? = null
-    val identifier: String? = null
-    val stepPath: String? = null
+    val contentType: String? = null,
+    val identifier: String? = null,
+    val stepPath: String? = null,
     val jsonSchema: String? = null
 )

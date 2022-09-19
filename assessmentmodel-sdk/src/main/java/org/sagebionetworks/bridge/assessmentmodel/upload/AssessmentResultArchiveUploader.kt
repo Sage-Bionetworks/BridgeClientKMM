@@ -207,15 +207,15 @@ fun ArchiveFile.fileInfo(): ArchiveFileInfo {
 
 @Serializable
 data class MetadataMap(
-    val taskIdentifier: String,
+    val taskIdentifier: String? = null, // Not part of metadata schema -nbrown 9/19/22
     val deviceInfo: String,
     val appName: String,
     val appVersion: String,
     val deviceTypeIdentifier: String,
-    val taskRunUUID: String,
-    val dataGroups: String,
-    val startDate: kotlinx.datetime.Instant,
-    val endDate: kotlinx.datetime.Instant?,
+    val taskRunUUID: String? = null, // Not part of metadata schema -nbrown 9/19/22
+    val dataGroups: String? = null, // Not part of metadata schema -nbrown 9/19/22
+    val startDate: kotlinx.datetime.Instant? = null, // Not part of metadata schema -nbrown 9/19/22
+    val endDate: kotlinx.datetime.Instant? = null, // Not part of metadata schema -nbrown 9/19/22
     val files: List<ArchiveFileInfo>
 )
 

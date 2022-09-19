@@ -6,8 +6,11 @@ import android.content.Context.MODE_PRIVATE
 import android.content.res.AssetManager
 import android.os.Build
 import co.touchlab.kermit.Logger
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonPrimitive
 import okio.ByteString.Companion.toByteString
 import org.joda.time.DateTimeZone
 import org.joda.time.Instant
@@ -165,7 +168,7 @@ abstract class AssessmentResultArchiveUploader(
         archiveFiles: Set<ArchiveFile>,
         assessmentResult: AssessmentResult,
         jsonCoder: Json
-    ): Map<String, JsonElement> {
+    ): MetadataMap {
         val appVersion = "version ${bridgeConfig.appVersionName}, build ${bridgeConfig.appVersion}"
         val os = "${bridgeConfig.osName}/${bridgeConfig.osVersion}"
         val session = authenticationRepository.session()
@@ -174,32 +177,18 @@ abstract class AssessmentResultArchiveUploader(
                 "$acc${if (index > 0) "," else ""}$s"
             } ?: ""
 
-        // migrate once MTB is compatible with assessmentModels  0.4.3 - liujoshua 04/01/2021
-        // val startDate =jsonCoder.encodeToString(assessmentResult.startDateTime)
-        // val endDate = jsonCoder.encodeToString(assessmentResult.endDateTime)
-        val fileInfoList = archiveFiles.map { JsonObject(it.fileInfoMap()) }
-
-
-        val kotlinStartTimeInstant = assessmentResult.startDateTime
-        val jodaStartTime = Instant(kotlinStartTimeInstant.toEpochMilliseconds())
-            .toDateTime(DateTimeZone.UTC)
-
-        val kotlinEndTimeInstant = assessmentResult.endDateTime!!
-        val jodaEndTime = Instant(kotlinEndTimeInstant.toEpochMilliseconds())
-            .toDateTime(DateTimeZone.UTC)
-
-        // add Android equivalent of rsdFrameworkVersion - liujoshua 04/01/2021
-        return mapOf(
-            "taskIdentifier" to JsonPrimitive(assessmentResult.identifier),
-            "deviceInfo" to JsonPrimitive("${Build.PRODUCT} ${Build.MODEL}; $os"),
-            "appName" to JsonPrimitive(bridgeConfig.appName),
-            "appVersion" to JsonPrimitive(appVersion),
-            "deviceTypeIdentifier" to JsonPrimitive(bridgeConfig.deviceName),
-            "taskRunUUID" to JsonPrimitive(assessmentResult.runUUIDString),
-            "dataGroups" to JsonPrimitive(dataGroups),
-            "startDate" to JsonPrimitive(jodaStartTime.toString()),
-            "endDate" to JsonPrimitive(jodaEndTime.toString()),
-            "files" to JsonArray(fileInfoList)
+        val archiveFileInfoList = archiveFiles.map { it.fileInfo() }
+        return MetadataMap(
+            taskIdentifier = assessmentResult.identifier,
+            deviceInfo = "${Build.PRODUCT} ${Build.MODEL}; $os",
+            appName = bridgeConfig.appName,
+            appVersion = appVersion,
+            deviceTypeIdentifier = bridgeConfig.deviceName,
+            taskRunUUID = assessmentResult.runUUIDString,
+            dataGroups = dataGroups,
+            startDate = assessmentResult.startDateTime,
+            endDate = assessmentResult.endDateTime,
+            files = archiveFileInfoList
         )
     }
 
@@ -208,13 +197,34 @@ abstract class AssessmentResultArchiveUploader(
     }
 }
 
-fun ArchiveFile.fileInfoMap() : Map<String, JsonElement> {
-    val map = mutableMapOf(
-        "filename" to JsonPrimitive(filename),
-        "timestamp" to JsonPrimitive(endDate.toString())
-    )
+fun ArchiveFile.fileInfo(): ArchiveFileInfo {
     if (this is JsonArchiveFile) {
-        map.put("contentType", JsonPrimitive("application/json"))
+        return ArchiveFileInfo(filename, endDate.toString(), "application/json")
+    } else {
+        return ArchiveFileInfo(filename, endDate.toString())
     }
-    return map
 }
+
+@Serializable
+data class MetadataMap(
+    val taskIdentifier: String? = null, // Not part of metadata schema -nbrown 9/19/22
+    val deviceInfo: String,
+    val appName: String,
+    val appVersion: String,
+    val deviceTypeIdentifier: String,
+    val taskRunUUID: String? = null, // Not part of metadata schema -nbrown 9/19/22
+    val dataGroups: String? = null, // Not part of metadata schema -nbrown 9/19/22
+    val startDate: kotlinx.datetime.Instant? = null, // Not part of metadata schema -nbrown 9/19/22
+    val endDate: kotlinx.datetime.Instant? = null, // Not part of metadata schema -nbrown 9/19/22
+    val files: List<ArchiveFileInfo>
+)
+
+@Serializable
+data class ArchiveFileInfo(
+    val filename: String,
+    val timestamp: String,
+    val contentType: String? = null,
+    val identifier: String? = null,
+    val stepPath: String? = null,
+    val jsonSchema: String? = null
+)

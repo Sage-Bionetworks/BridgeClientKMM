@@ -176,8 +176,8 @@ open class AbstractTodayTimelineViewModel : NSObject, ObservableObject, Schedule
     }
     
     var userSessionId: String? {
-        get { UserDefaults.standard.string(forKey: kUserSessionIdKey) }
-        set { UserDefaults.standard.set(newValue, forKey: kUserSessionIdKey) }
+        get { bridgeManager?.sharedUserDefaults.string(forKey: kUserSessionIdKey) }
+        set { bridgeManager?.sharedUserDefaults.set(newValue, forKey: kUserSessionIdKey) }
     }
     
     private func updateSessionState() {

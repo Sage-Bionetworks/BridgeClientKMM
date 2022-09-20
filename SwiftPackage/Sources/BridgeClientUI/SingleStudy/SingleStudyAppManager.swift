@@ -34,8 +34,6 @@ import SwiftUI
 import BridgeClient
 import BridgeClientExtension
 
-fileprivate let kStudyIdKey = "studyId"
-
 /// An app manager that can be used with apps that require participants to be signed in to a single study
 /// at a time. The timeline and history for a participant are calculated for a given study. While they *could*
 /// be part of more than one study, only one study is the "main" study that is tracked for these kinds of
@@ -51,7 +49,7 @@ public final class SingleStudyAppManager : BridgeClientAppManager {
     /// object or a `BridgeClient.Study` object. This object is threadsafe and observable.
     @Published public var study: StudyObserver? {
         didSet {
-            UserDefaults.standard.set(study?.id, forKey: kStudyIdKey)
+            sharedUserDefaults.set(study?.id, forKey: kStudyIdKey)
         }
     }
     
@@ -67,7 +65,7 @@ public final class SingleStudyAppManager : BridgeClientAppManager {
 
     public override init(platformConfig: IOSPlatformConfig, pemPath: String? = nil) {
         super.init(platformConfig: platformConfig, pemPath: pemPath)
-        let studyId = self.isPreview ? previewStudy.identifier : UserDefaults.standard.string(forKey: kStudyIdKey)
+        let studyId = self.isPreview ? previewStudy.identifier : sharedUserDefaults.string(forKey: kStudyIdKey)
         self.study = studyId.map { .init(identifier: $0) }
         if self.isPreview {
             self.study?.update(from: previewStudy)

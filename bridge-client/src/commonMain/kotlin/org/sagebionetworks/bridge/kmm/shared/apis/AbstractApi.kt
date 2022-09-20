@@ -12,7 +12,7 @@ internal abstract class AbstractApi(protected val basePath: String, protected va
         const val BRIDGE_SERVER_CHECK = "webservices.sagebridge"
     }
 
-    protected suspend inline fun <T, reified S: Any> postData(model: T, path: String) : S {
+    protected suspend inline fun <reified T, reified S: Any> postData(model: T, path: String) : S {
         val builder = HttpRequestBuilder()
 
         builder.method = HttpMethod.Post
@@ -25,14 +25,14 @@ internal abstract class AbstractApi(protected val basePath: String, protected va
         }
         builder.contentType()
         if(model != null) {
-            builder.body = model
+            builder.setBody(model)
         }
 
         builder.header("Accept", "application/json")
         builder.header("Content-Type", "application/json; charset=UTF-8")
 
         try {
-            return httpClient.post(builder)
+            return httpClient.post(builder).body()
         } catch (pipeline: ReceivePipelineException) {
             throw pipeline.cause
         }
@@ -69,7 +69,7 @@ internal abstract class AbstractApi(protected val basePath: String, protected va
         }
 
         try {
-            return httpClient.get(builder)
+            return httpClient.get(builder).body()
         } catch (pipeline: ReceivePipelineException) {
             throw pipeline.cause
         }

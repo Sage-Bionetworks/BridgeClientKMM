@@ -3,7 +3,7 @@ package org.sagebionetworks.bridge.kmm.shared.repo
 import co.touchlab.kermit.Logger
 import co.touchlab.stately.ensureNeverFrozen
 import io.ktor.client.*
-import io.ktor.client.features.*
+import io.ktor.client.plugins.*
 import io.ktor.http.*
 import io.ktor.util.network.*
 import kotlinx.coroutines.CoroutineScope

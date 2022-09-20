@@ -34,7 +34,7 @@ internal class UploadsApi(basePath: String = BASE_PATH, httpClient: HttpClient):
      * @param uploadId Upload ID
      */
     suspend fun completeUploadSession(uploadId: String) : UploadValidationStatus {
-        return postData(null, "v3/uploads/$uploadId/complete")
+        return postData("", "v3/uploads/$uploadId/complete")
     }
 
 }

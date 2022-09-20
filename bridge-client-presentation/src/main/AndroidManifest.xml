@@ -3,7 +3,8 @@
     package="org.sagebionetworks.bridge.kmm.presentation">
     <application>
         <activity
-            android:name=".auth.ExternalIdSignInActivity">
+            android:name=".auth.ExternalIdSignInActivity"
+            android:exported="false">
         </activity>
 
     </application>

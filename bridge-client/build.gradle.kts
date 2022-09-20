@@ -8,7 +8,7 @@ plugins {
     id("com.android.library")
     kotlin("multiplatform")
     kotlin("plugin.serialization")
-    id("com.squareup.sqldelight")
+    id("app.cash.sqldelight")
     id("maven-publish")
     //Uncomment to enable model generation from swagger file
     //id("dev.icerock.mobile.multiplatform-network-generator")
@@ -77,6 +77,7 @@ kotlin {
                 implementation(libs.ktor.client.core)
                 //Is api to give depending modules access to JsonElement
                 api(libs.ktor.client.serialization)
+                api(libs.ktor.client.contentNegotiation)
                 implementation(libs.ktor.client.logging)
                 implementation(libs.kotlinx.dateTime)
                 implementation(libs.touchlab.stately)

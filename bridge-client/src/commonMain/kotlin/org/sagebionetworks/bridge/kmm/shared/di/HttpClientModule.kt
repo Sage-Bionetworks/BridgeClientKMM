@@ -1,12 +1,13 @@
 package org.sagebionetworks.bridge.kmm.shared.di
 
 import io.ktor.client.*
-import io.ktor.client.features.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
-import io.ktor.client.features.logging.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.json.Json
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import org.sagebionetworks.bridge.kmm.shared.BridgeConfig
@@ -41,9 +42,8 @@ private fun createBridgeHttpClient(
     install(UserAgent) {
         agent = bridgeConfig.userAgent
     }
-
-    install(JsonFeature) {
-        serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
+    install(ContentNegotiation) {
+        json(Json {
             ignoreUnknownKeys = true
         })
     }
@@ -99,8 +99,8 @@ private fun createHttpClient(enableNetworkLogs: Boolean, bridgeConfig: BridgeCon
         agent = bridgeConfig.userAgent
     }
 
-    install(JsonFeature) {
-        serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
+    install(ContentNegotiation) {
+        json(Json {
             ignoreUnknownKeys = true
         })
     }
@@ -130,7 +130,7 @@ private fun createHttpClient(enableNetworkLogs: Boolean, bridgeConfig: BridgeCon
             }
 
             val exceptionResponse = originCall.response
-            val exceptionResponseText = exceptionResponse.readText()
+            val exceptionResponseText = exceptionResponse.bodyAsText()
             when (statusCode) {
                 in 300..399 -> throw RedirectResponseException(exceptionResponse, exceptionResponseText)
                 in 400..499 -> throw ClientRequestException(exceptionResponse, exceptionResponseText)

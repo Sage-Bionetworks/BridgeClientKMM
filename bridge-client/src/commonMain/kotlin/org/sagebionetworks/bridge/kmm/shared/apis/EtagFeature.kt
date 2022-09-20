@@ -1,7 +1,7 @@
 package org.sagebionetworks.bridge.kmm.shared.apis
 
 import io.ktor.client.*
-import io.ktor.client.features.*
+import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -16,7 +16,7 @@ class EtagFeature private constructor(val storageCache: EtagStorageCache) {
         )
     }
 
-    companion object Feature : HttpClientFeature<Config, EtagFeature> {
+    companion object Feature : HttpClientPlugin<Config, EtagFeature> {
         override val key = AttributeKey<EtagFeature>("EtagFeature")
 
         override fun prepare(block: Config.() -> Unit): EtagFeature = Config().apply(block).build()
@@ -29,8 +29,8 @@ class EtagFeature private constructor(val storageCache: EtagStorageCache) {
                 }
             }
             scope.receivePipeline.intercept(HttpReceivePipeline.State) {
-                val eTag = context.response.headers.get("etag")
-                val urlString = context.request.url.toString()
+                val eTag = subject.headers.get("etag")
+                val urlString = subject.request.url.toString()
                 eTag?.let {
                     feature.storageCache.putEtag(urlString, eTag)
                 }

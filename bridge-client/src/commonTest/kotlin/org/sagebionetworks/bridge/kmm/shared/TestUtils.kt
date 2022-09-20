@@ -1,13 +1,14 @@
 package org.sagebionetworks.bridge.kmm.shared
 
-import com.squareup.sqldelight.db.SqlDriver
+import app.cash.sqldelight.db.SqlDriver
 import io.ktor.client.*
 import io.ktor.client.engine.*
 import io.ktor.client.engine.mock.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
-import io.ktor.client.features.logging.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.logging.*
 import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.json.Json
 
 internal expect fun testDatabaseDriver() : SqlDriver
 
@@ -22,8 +23,8 @@ fun getTestClient(json: String): HttpClient {
 
 fun getTestClient(mockEngine: HttpClientEngineFactory<MockEngineConfig>) : HttpClient {
     return HttpClient(mockEngine) {
-        install(JsonFeature) {
-            serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
+        install(ContentNegotiation) {
+            json(Json {
                 ignoreUnknownKeys = true
             })
         }
@@ -35,6 +36,7 @@ fun getTestClient(mockEngine: HttpClientEngineFactory<MockEngineConfig>) : HttpC
                 }
             }
         }
+        expectSuccess = true
     }
 }
 

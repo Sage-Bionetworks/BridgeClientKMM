@@ -73,7 +73,6 @@ open class AssessmentResultArchive : AbstractResultArchive, ResultArchiveBuilder
         
         // For backwards compatibility and adherence, add an "answers.json" dictionary.
         if !answers.isEmpty {
-            adherenceData = adherenceData ?? answers
             let data = try JSONSerialization.data(withJSONObject: answers, options: [.prettyPrinted, .withoutEscapingSlashes, .sortedKeys])
             let manifestInfo = FileInfo(filename: "answers.json", timestamp: assessmentResult.endDate, contentType: "application/json")
             try self.addFile(data: data, filepath: manifestInfo.filename, createdOn: manifestInfo.timestamp, contentType: manifestInfo.contentType)

@@ -36,6 +36,7 @@ import BridgeClient
 import JsonModel
 
 public let kPreviewStudyId = "xcode_preview"
+public let kStudyIdKey = "studyId"
 
 open class UploadAppManager : ObservableObject {
 
@@ -59,6 +60,8 @@ open class UploadAppManager : ObservableObject {
     
     /// Is the app currently uploading results or user files? This status is maintained and updated by BridgeFileUploadManager.
     @Published public var isUploading: Bool = false
+    
+    public var sharedUserDefaults: UserDefaults
     
     /// A threadsafe observer for the `BridgeClient.UserSessionInfo` for the current user.
     public let appConfig: AppConfigObserver = .init()
@@ -130,6 +133,10 @@ open class UploadAppManager : ObservableObject {
         self.isPreview = (platformConfig.appId == kPreviewStudyId)
         if !self.isPreview {
             IOSBridgeConfig().initialize(platformConfig: self.platformConfig)
+            self.sharedUserDefaults = self.platformConfig.appGroupIdentifier.flatMap { .init(suiteName: $0) } ?? .standard
+        }
+        else {
+            self.sharedUserDefaults = UserDefaults.standard
         }
 
         // Set up the background network manager singleton and make us its app manager

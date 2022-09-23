@@ -37,16 +37,66 @@ import AssessmentModel
 import AssessmentModelUI
 import BridgeClientExtension
 
+/// Light-weight protocol for handling building the result archive.
+public protocol ArchiveFactory {
+    func buildResult(from assessmentState: AssessmentState, schedule: AssessmentScheduleInfo) -> ResultArchiveBuilder?
+}
+
+public struct DefaultArchiveFactory : ArchiveFactory {
+    public init() {}
+    
+    public func buildResult(from assessmentState: AssessmentState, schedule: AssessmentScheduleInfo) -> ResultArchiveBuilder? {
+        AssessmentResultArchive(assessmentState.assessmentResult.deepCopy(),
+                                schedule: schedule,
+                                adherenceData: assessmentState.assessmentResult.buildScore(),
+                                outputDirectory: assessmentState.outputDirectory)
+    }
+}
+
+extension Array where Element == ResultData {
+    func mapAnswers() -> [String : JsonSerializable]? {
+        let ret = self.reduce(into: [String : JsonSerializable]()) { dictionary, result in
+            if let answerResult = result as? AnswerResult {
+                answerResult.jsonValue.map {
+                    dictionary[result.identifier] = $0.jsonObject()
+                }
+            }
+            else if let branchResult = result as? BranchNodeResult {
+                branchResult.buildScore().map {
+                    dictionary[result.identifier] = $0
+                }
+            }
+            else if let collectionResult = result as? CollectionResult {
+                collectionResult.children.mapAnswers().map {
+                    dictionary[result.identifier] = $0
+                }
+            }
+        }
+        return ret.count > 0 ? ret : nil
+    }
+}
+
+extension BranchNodeResult {
+    func buildScore() -> JsonSerializable? {
+        let dict1 = self.stepHistory.mapAnswers() ?? [:]
+        let dict2 = self.asyncResults?.mapAnswers() ?? [:]
+        let ret = dict1.merging(dict2, uniquingKeysWith: { (first, _) in first })
+        return ret.count > 0 ? ret : nil
+    }
+}
+
 public struct SurveyView<DisplayView : AssessmentDisplayView>: View {
     let assessmentInfo: AssessmentScheduleInfo
     let handler: ScheduledAssessmentHandler
+    let factory: ArchiveFactory
     let taskIdentifier: String
     
     @StateObject var viewModel: ViewModel = .init()
     
-    public init(_ assessmentInfo: AssessmentScheduleInfo, handler: ScheduledAssessmentHandler, taskIdentifier: String? = nil) {
+    public init(_ assessmentInfo: AssessmentScheduleInfo, handler: ScheduledAssessmentHandler, taskIdentifier: String? = nil, archiveFactory: ArchiveFactory? = nil) {
         self.assessmentInfo = assessmentInfo
         self.handler = handler
+        self.factory = archiveFactory ?? DefaultArchiveFactory()
         self.taskIdentifier = taskIdentifier ?? assessmentInfo.assessmentIdentifier
     }
     
@@ -64,7 +114,7 @@ public struct SurveyView<DisplayView : AssessmentDisplayView>: View {
     func content() -> some View {
         if let assessment = viewModel.assessmentState {
             DisplayView(assessment)
-                .assessmentStateListener(assessment, info: assessmentInfo, handler: handler)
+                .assessmentStateListener(assessment, info: assessmentInfo, handler: handler, factory: factory)
         }
         else {
             ProgressView()
@@ -100,9 +150,9 @@ public struct SurveyView<DisplayView : AssessmentDisplayView>: View {
     }
 }
 
-public extension View {
-    func assessmentStateListener(_ assessmentState: AssessmentState, info: AssessmentScheduleInfo, handler: ScheduledAssessmentHandler) -> some View {
-        modifier(AssessmentViewListener(assessmentState: assessmentState, assessmentInfo: info, handler: handler))
+extension View {
+    func assessmentStateListener(_ assessmentState: AssessmentState, info: AssessmentScheduleInfo, handler: ScheduledAssessmentHandler, factory: ArchiveFactory) -> some View {
+        modifier(AssessmentViewListener(assessmentState: assessmentState, assessmentInfo: info, handler: handler, factory: factory))
     }
 }
 
@@ -110,6 +160,7 @@ struct AssessmentViewListener : ViewModifier {
     @ObservedObject var assessmentState: AssessmentState
     let assessmentInfo: AssessmentScheduleInfo
     let handler: ScheduledAssessmentHandler
+    let factory: ArchiveFactory
     @State var hasSaved: Bool = false
     
     func body(content: Content) -> some View {
@@ -127,7 +178,7 @@ struct AssessmentViewListener : ViewModifier {
             
         case .readyToSave:
             self.hasSaved = true
-            return AssessmentResultArchive(assessmentState.assessmentResult.deepCopy(), schedule: assessmentInfo).map {
+            return factory.buildResult(from: assessmentState, schedule: assessmentInfo).map {
                 .readyToSave($0)
             }
             
@@ -136,7 +187,7 @@ struct AssessmentViewListener : ViewModifier {
                 return .finished
             }
             else {
-                return AssessmentResultArchive(assessmentState.assessmentResult.deepCopy(), schedule: assessmentInfo).map {
+                return factory.buildResult(from: assessmentState, schedule: assessmentInfo).map {
                     .saveAndFinish($0)
                 } ?? .finished
             }

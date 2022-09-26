@@ -20,7 +20,7 @@ internal abstract class AbstractApi(protected val basePath: String, protected va
             takeFrom(basePath)
             encodedPath = encodedPath.let { startingPath ->
                 path(path)
-                return@let startingPath + encodedPath.substring(1)
+                return@let startingPath + encodedPath
             }
         }
         builder.contentType()

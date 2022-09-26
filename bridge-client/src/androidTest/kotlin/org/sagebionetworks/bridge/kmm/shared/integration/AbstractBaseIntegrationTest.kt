@@ -15,18 +15,24 @@ import kotlin.test.*
 // https://youtrack.jetbrains.com/issue/KT-38317 -nbrown 01/02/21
 abstract class AbstractBaseIntegrationTest: BaseTest(), KoinTest {
 
+    companion object {
+        private val testModule = module {
+            single { ResourceDatabaseHelper(testDatabaseDriver()) }
+            single<BridgeConfig> { TestBridgeConfig() }
+
+        }
+        init {
+            startKoin { modules(bridgeClientkoinModules(true).plus(testModule)) }
+        }
+    }
 
     @BeforeTest
     fun setUp() {
-        startKoin { modules(bridgeClientkoinModules(true).plus(testModule)) }
-    }
-
-
-    val testModule = module {
-        single { ResourceDatabaseHelper(testDatabaseDriver()) }
-        single<BridgeConfig> { TestBridgeConfig() }
 
     }
+
+
+
 
     class TestBridgeConfig: BridgeConfig {
         override val appId: String

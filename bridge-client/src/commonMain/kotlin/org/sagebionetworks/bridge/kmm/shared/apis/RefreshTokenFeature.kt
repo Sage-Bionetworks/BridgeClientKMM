@@ -5,14 +5,14 @@
 package org.sagebionetworks.bridge.kmm.shared.apis
 
 import io.ktor.client.HttpClient
-import io.ktor.client.features.HttpClientFeature
+import io.ktor.client.features.*
 import io.ktor.client.request.HttpRequest
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.request
 import io.ktor.client.request.takeFrom
 import io.ktor.client.statement.HttpReceivePipeline
 import io.ktor.client.statement.HttpResponse
-import io.ktor.http.HttpStatusCode
+import io.ktor.http.*
 import io.ktor.util.AttributeKey
 import kotlinx.coroutines.sync.Mutex
 
@@ -56,6 +56,9 @@ internal class RefreshTokenFeature(
                     if (!feature.isCredentialsActual(context.request)) {
                         refreshTokenHttpFeatureMutex.unlock()
                         val requestBuilder = HttpRequestBuilder().takeFrom(context.request)
+                        // Remove the User-Agent header so that UserAgent plugin doesn't add a second one
+                        // This prevents BRIDGE-3335 bug -nbrown 9/21/2022
+                        requestBuilder.headers.remove(HttpHeaders.UserAgent)
                         val result: HttpResponse = context.client!!.request(requestBuilder)
                         proceedWith(result)
                         return@intercept
@@ -67,6 +70,9 @@ internal class RefreshTokenFeature(
                         // If the request refresh was successful, then let's just to try repeat request
                         refreshTokenHttpFeatureMutex.unlock()
                         val requestBuilder = HttpRequestBuilder().takeFrom(context.request)
+                        // Remove the User-Agent header so that UserAgent plugin doesn't add a second one
+                        // This prevents BRIDGE-3335 bug -nbrown 9/21/2022
+                        requestBuilder.headers.remove(HttpHeaders.UserAgent)
                         val result: HttpResponse = context.client!!.request(requestBuilder)
                         proceedWith(result)
                     } else {

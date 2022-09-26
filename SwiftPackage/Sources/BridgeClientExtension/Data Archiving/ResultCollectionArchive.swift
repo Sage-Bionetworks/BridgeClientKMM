@@ -35,7 +35,6 @@ import JsonModel
 
 public protocol ResultCollectionArchivable : FileArchivable {
     var identifier: String { get }
-    var schemaIdentifier: String?  { get }
     var startedOn: Date { get }
     var endedOn: Date { get }
     var associatedFiles: [FileResultObject]? { get }
@@ -54,13 +53,14 @@ public class ResultCollectionArchive : AbstractResultArchive, ResultArchiveBuild
     private let outputDirectory: URL?
     private var manifest = Set<FileInfo>()
 
-    public init?(_ collection: ResultCollectionArchivable, outputDirectory: URL?, schedule: AssessmentScheduleInfo? = nil) throws {
+    public init?(_ collection: ResultCollectionArchivable, outputDirectory: URL?, schedule: AssessmentScheduleInfo? = nil, schemaIdentifier: String? = nil, schemaRevision: Int? = nil) throws {
         self.collection = collection
         self.uuid = .init()
         self.adherenceData = try collection.buildAdherenceData()
         self.outputDirectory = outputDirectory
         super.init(identifier: collection.identifier,
-                   schemaIdentifier: collection.schemaIdentifier ?? collection.identifier,
+                   schemaIdentifier: schemaIdentifier ?? collection.identifier,
+                   schemaRevision: schemaRevision,
                    schedule: schedule)
     }
 

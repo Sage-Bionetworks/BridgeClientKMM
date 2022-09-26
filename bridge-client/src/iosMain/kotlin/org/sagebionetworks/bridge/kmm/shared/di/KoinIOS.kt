@@ -9,11 +9,14 @@ import org.koin.dsl.module
 import org.sagebionetworks.bridge.kmm.shared.BridgeConfig
 import org.sagebionetworks.bridge.kmm.shared.IOSBridgeConfig
 import org.sagebionetworks.bridge.kmm.shared.cache.BridgeResourceDatabase
+import org.sagebionetworks.bridge.kmm.shared.cache.SqliteDriverFactory
+import platform.Foundation.NSFileManager
 
 actual val platformModule = module {
-    single<SqlDriver> { NativeSqliteDriver(BridgeResourceDatabase.Schema, "resource.db") }
+    single<SqlDriver> { SqliteDriverFactory.createDriver(BridgeResourceDatabase.Schema, "resource.db") }
 
     single<CoroutineScope>(named("background"))  { MainScope() }
 
     single<BridgeConfig> { IOSBridgeConfig }
 }
+

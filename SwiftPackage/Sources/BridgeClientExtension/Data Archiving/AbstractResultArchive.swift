@@ -61,6 +61,8 @@ open class AbstractResultArchive : DataArchive {
     /// The data groups that are set as metadata on this archive.
     public let dataGroups: [String]?
     
+    let v2Format: BridgeUploaderInfoV2.FormatVersion
+    
     /// The schedule identifier is the `NativeScheduledAssessment.instanceGuid`
     public var scheduleIdentifier: String? {
         return schedule?.instanceGuid
@@ -71,12 +73,14 @@ open class AbstractResultArchive : DataArchive {
                  schemaRevision: Int? = nil,
                  dataGroups: [String]? = nil,
                  schedule: AssessmentScheduleInfo? = nil,
-                 isPlaceholder: Bool = false) {
+                 isPlaceholder: Bool = false,
+                 v2Format: BridgeUploaderInfoV2.FormatVersion = .v2_generic) {
         self.schemaIdentifier = schemaIdentifier
         self.schemaRevision = schemaRevision
         self.dataGroups = dataGroups
         self.schedule = schedule
         self.isPlaceholder = isPlaceholder
+        self.v2Format = v2Format
         super.init(identifier: identifier)
     }
     
@@ -118,7 +122,7 @@ open class AbstractResultArchive : DataArchive {
         let platformConfig = PlatformConfigImpl()
         let info = BridgeUploaderInfoV2(files: files,
                                         dataFilename: dataFilename,
-                                        format: .v2_generic,
+                                        format: v2Format,
                                         item: schemaIdentifier ?? identifier,
                                         schemaRevision: schemaRevision,
                                         appName: platformConfig.appName,
@@ -130,7 +134,7 @@ open class AbstractResultArchive : DataArchive {
     }
 }
 
-struct BridgeUploaderInfoV2 : Encodable {
+public struct BridgeUploaderInfoV2 : Encodable {
     
     let files: [FileEntry]
     let dataFilename: String
@@ -141,7 +145,7 @@ struct BridgeUploaderInfoV2 : Encodable {
     let appVersion: String
     let phoneInfo: String
     
-    enum FormatVersion : String, Codable {
+    public enum FormatVersion : String, Codable {
         case v1_legacy, v2_generic
     }
 }

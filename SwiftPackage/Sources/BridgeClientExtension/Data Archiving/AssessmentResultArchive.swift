@@ -46,13 +46,23 @@ open class AssessmentResultArchive : AbstractResultArchive, ResultArchiveBuilder
     /// for upload.
     let outputDirectory: URL?
     
-    public init?(_ assessmentResult: AssessmentResult, schedule: AssessmentScheduleInfo? = nil, adherenceData: JsonSerializable? = nil, outputDirectory: URL? = nil) {
+    public init?(_ assessmentResult: AssessmentResult,
+                 schedule: AssessmentScheduleInfo? = nil,
+                 adherenceData: JsonSerializable? = nil,
+                 outputDirectory: URL? = nil,
+                 schemaIdentifier: String? = nil,
+                 schemaRevision: Int? = nil,
+                 dataGroups: [String]? = nil,
+                 v2Format: BridgeUploaderInfoV2.FormatVersion = .v2_generic) {
         self.assessmentResult = assessmentResult
         self.adherenceData = adherenceData
         self.outputDirectory = outputDirectory
         super.init(identifier: assessmentResult.identifier,
-                   schemaIdentifier: assessmentResult.schemaIdentifier,
-                   schedule: schedule)
+                   schemaIdentifier: schemaIdentifier ?? assessmentResult.schemaIdentifier,
+                   schemaRevision: schemaRevision,
+                   dataGroups: dataGroups,
+                   schedule: schedule,
+                   v2Format: v2Format)
     }
     
     public var uuid: UUID { assessmentResult.taskRunUUID }

@@ -33,6 +33,7 @@
 import Foundation
 import BridgeArchiver
 import JsonModel
+import BridgeClient
 
 // Errors are thrown by server if the size is more that 100,000,000 bytes.
 // Note: I am not sure why its not 100 mb = 104857600 bytes, but messaging
@@ -111,7 +112,7 @@ open class DataArchive : NSObject, Identifiable {
         do {
             let fileManager = FileManager.default
             
-            let outputDirectory = try fileManager.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+            let outputDirectory = try IOSBridgeConfig().sharedDocumentDirectory()
             let dirURL = outputDirectory.appendingPathComponent("archives", isDirectory: true)
             try FileManager.default.createDirectory(at: dirURL, withIntermediateDirectories: true, attributes: nil)
             

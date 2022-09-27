@@ -36,7 +36,7 @@ kotlin {
                 "testExternalId01",
                 gradleLocalProperties(rootProject.rootDir)
                     .getProperty("testExternalId01")
-                    ?: System.getenv("TEST_EXTERNAL_ID_01")
+                    ?: System.getenv("testExternalId01")
             )
         }
     }

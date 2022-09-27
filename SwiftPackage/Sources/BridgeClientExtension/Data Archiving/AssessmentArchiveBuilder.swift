@@ -1,5 +1,5 @@
 //
-//  AssessmentResultArchive.swift
+//  AssessmentArchiveBuilder.swift
 //  
 //
 //  Copyright © 2022 Sage Bionetworks. All rights reserved.
@@ -34,7 +34,7 @@
 import Foundation
 import JsonModel
 
-open class AssessmentResultArchive : AbstractResultArchive, ResultArchiveBuilder {
+open class AssessmentArchiveBuilder : ResultArchiveBuilder {
 
     /// The result to be processed for archive and upload.
     public let assessmentResult: AssessmentResult
@@ -45,6 +45,13 @@ open class AssessmentResultArchive : AbstractResultArchive, ResultArchiveBuilder
     /// allow the archive to delete the output directory once the results have been archived and encrypted
     /// for upload.
     let outputDirectory: URL?
+    
+    /// The archive that backs this builder.
+    let archive: StudyDataUploadArchive
+    
+    public var identifier: String {
+        archive.identifier
+    }
     
     public init?(_ assessmentResult: AssessmentResult,
                  schedule: AssessmentScheduleInfo? = nil,
@@ -57,12 +64,16 @@ open class AssessmentResultArchive : AbstractResultArchive, ResultArchiveBuilder
         self.assessmentResult = assessmentResult
         self.adherenceData = adherenceData
         self.outputDirectory = outputDirectory
-        super.init(identifier: assessmentResult.identifier,
-                   schemaIdentifier: schemaIdentifier ?? assessmentResult.schemaIdentifier,
-                   schemaRevision: schemaRevision,
-                   dataGroups: dataGroups,
-                   schedule: schedule,
-                   v2Format: v2Format)
+        guard let archive = StudyDataUploadArchive(identifier: assessmentResult.identifier,
+                                                   schemaIdentifier: schemaIdentifier ?? assessmentResult.schemaIdentifier,
+                                                   schemaRevision: schemaRevision,
+                                                   dataGroups: dataGroups,
+                                                   schedule: schedule,
+                                                   v2Format: v2Format)
+        else {
+            return nil
+        }
+        self.archive = archive
     }
     
     public var uuid: UUID { assessmentResult.taskRunUUID }
@@ -85,22 +96,22 @@ open class AssessmentResultArchive : AbstractResultArchive, ResultArchiveBuilder
         if !answers.isEmpty {
             let data = try JSONSerialization.data(withJSONObject: answers, options: [.prettyPrinted, .withoutEscapingSlashes, .sortedKeys])
             let manifestInfo = FileInfo(filename: "answers.json", timestamp: assessmentResult.endDate, contentType: "application/json")
-            try self.addFile(data: data, filepath: manifestInfo.filename, createdOn: manifestInfo.timestamp, contentType: manifestInfo.contentType)
+            try archive.addFile(data: data, filepath: manifestInfo.filename, createdOn: manifestInfo.timestamp, contentType: manifestInfo.contentType)
             manifest.insert(manifestInfo)
         }
         
         // Add the top-level assessment if desired.
         if let (data, manifestInfo) = try assessmentResultFile() {
-            try self.addFile(data: data, filepath: manifestInfo.filename, createdOn: manifestInfo.timestamp, contentType: manifestInfo.contentType)
+            try archive.addFile(data: data, filepath: manifestInfo.filename, createdOn: manifestInfo.timestamp, contentType: manifestInfo.contentType)
             manifest.insert(manifestInfo)
         }
         
         // Close the archive.
         let metadata = ArchiveMetadata(files: Array(manifest))
         let metadataDictionary = try metadata.jsonEncodedDictionary()
-        try completeArchive(createdOn: Date(), with: metadataDictionary)
+        try archive.completeArchive(createdOn: Date(), with: metadataDictionary)
         
-        return self
+        return archive
     }
     
     private var manifest = Set<FileInfo>()
@@ -132,7 +143,7 @@ open class AssessmentResultArchive : AbstractResultArchive, ResultArchiveBuilder
         else if let fileArchivable = result as? FileArchivable,
                 let (fileInfo, data) = try fileArchivable.buildArchivableFileData(at: stepPath),
                 let manifestInfo = manifestFileInfo(for: fileArchivable, fileInfo: fileInfo) {
-            try self.addFile(data: data, filepath: manifestInfo.filename, createdOn: manifestInfo.timestamp, contentType: manifestInfo.contentType)
+            try archive.addFile(data: data, filepath: manifestInfo.filename, createdOn: manifestInfo.timestamp, contentType: manifestInfo.contentType)
             manifest.insert(manifestInfo)
         }
         else if let answer = result as? AnswerResult,

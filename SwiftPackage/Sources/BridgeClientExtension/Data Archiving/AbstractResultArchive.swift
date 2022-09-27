@@ -42,6 +42,9 @@ fileprivate let kScheduledOnKey                   = "scheduledOn"
 fileprivate let kScheduledActivityLabelKey        = "activityLabel"
 fileprivate let kDataGroups                       = "dataGroups"
 
+public final class StudyDataUploadArchive : AbstractResultArchive {
+}
+
 /// An abstract class for archiving result data.
 open class AbstractResultArchive : DataArchive {
     

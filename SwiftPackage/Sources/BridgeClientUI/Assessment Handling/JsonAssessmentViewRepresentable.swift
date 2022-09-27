@@ -56,12 +56,12 @@ open class JsonAssessmentViewRepresentable { // : UIViewControllerRepresentable 
         if let result = result {
             switch result {
             case .success(let jsonFile):
-                if let builder = JsonResultArchive(json: jsonFile.json,
-                                                   filename: jsonFile.filename,
-                                                   schema: jsonFile.schema,
-                                                   timestamp: jsonFile.timestamp,
-                                                   startedOn: startedOn,
-                                                   schedule: scheduleInfo) {
+                if let builder = JsonResultArchiveBuilder(json: jsonFile.json,
+                                                          filename: jsonFile.filename,
+                                                          schema: jsonFile.schema,
+                                                          timestamp: jsonFile.timestamp,
+                                                          startedOn: startedOn,
+                                                          schedule: scheduleInfo) {
                     handler.updateAssessmentStatus(scheduleInfo, status: .saveAndFinish(builder))
                 }
                 else {

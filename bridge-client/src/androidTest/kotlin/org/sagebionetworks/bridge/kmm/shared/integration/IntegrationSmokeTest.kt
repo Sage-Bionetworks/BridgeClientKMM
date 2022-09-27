@@ -26,7 +26,7 @@ class IntegrationSmokeTest: AbstractBaseIntegrationTest() {
             authRepo.signOut()
             // signIn
             assertFalse(authRepo.isAuthenticated())
-            val externalId = System.getProperty("testExternalId01")
+            val externalId = getBridgeTestUserExternalId()
             assertNotNull(externalId)
             val signInResult = authRepo.signInExternalId(externalId, externalId)
             assertTrue(signInResult is ResourceResult.Success<*>)

@@ -31,8 +31,10 @@ abstract class AbstractBaseIntegrationTest: BaseTest(), KoinTest {
 
     }
 
-
-
+    // To run tests locally, add the external id to your local.properties file: testExternalId01=External_ID_Here -nbrown 9/27/22
+    protected fun getBridgeTestUserExternalId(): String? {
+        return System.getProperty("testExternalId01")
+    }
 
     class TestBridgeConfig: BridgeConfig {
         override val appId: String

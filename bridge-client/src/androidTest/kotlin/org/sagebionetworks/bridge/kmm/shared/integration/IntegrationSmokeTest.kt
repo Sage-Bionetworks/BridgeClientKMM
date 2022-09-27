@@ -7,22 +7,21 @@ import kotlinx.datetime.TimeZone
 import org.koin.core.component.inject
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
 import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
-import org.sagebionetworks.bridge.kmm.shared.repo.AdherenceRecordRepo
-import org.sagebionetworks.bridge.kmm.shared.repo.AuthenticationRepository
-import org.sagebionetworks.bridge.kmm.shared.repo.ScheduleTimelineRepo
-import org.sagebionetworks.bridge.kmm.shared.repo.StudyRepo
+import org.sagebionetworks.bridge.kmm.shared.repo.*
 import kotlin.test.*
 
-class ScheduleTimelineIntegrationTest: AbstractBaseIntegrationTest() {
+class IntegrationSmokeTest: AbstractBaseIntegrationTest() {
 
     private val authRepo by inject<AuthenticationRepository>()
     private val timelineRepo by inject<ScheduleTimelineRepo>()
     private val adherenceRecordRepo by inject<AdherenceRecordRepo>()
     private val studyRepo by inject<StudyRepo>()
+    private val activityEventsRepo by inject<ActivityEventsRepo>()
+    private val assessmentConfigRepo by inject<AssessmentConfigRepo>()
 
 
     @Test
-    fun testLoadTimeline() {
+    fun testIntegrationSmokeTest() {
         runTest {
             authRepo.signOut()
             // signIn
@@ -40,6 +39,10 @@ class ScheduleTimelineIntegrationTest: AbstractBaseIntegrationTest() {
             val studyInfo = studyResult.data
             assertEquals("BridgeClientKMM Integration Tests Study", studyInfo.name)
 
+            // Set activity event that will trigger the schedule
+            val success = activityEventsRepo.createActivityEvent(studyId, "custom:integration-test-start", Clock.System.now())
+            assertTrue(success)
+
             // Load adherence records
             assertTrue(adherenceRecordRepo.loadRemoteAdherenceRecords(studyId))
 
@@ -48,6 +51,15 @@ class ScheduleTimelineIntegrationTest: AbstractBaseIntegrationTest() {
             val sliceResult = timeLineFlow.filter { it is ResourceResult.Success }.first()
             val slice = (sliceResult as ResourceResult.Success).data
             assertEquals(TimeZone.currentSystemDefault(), slice.timezone)
+            assertEquals(1, slice.scheduledSessionWindows.size)
+            val session = slice.scheduledSessionWindows[0]
+            assertEquals("TestSession1", session.sessionInfo.label)
+
+            // Load an AssessmentConfig
+            val assessmentInfo = session.assessments[0].assessmentInfo
+            val assessmentResult = assessmentConfigRepo.getAssessmentConfig(assessmentInfo).filter { it is ResourceResult.Success }.first()
+            val assessmentConfig = (assessmentResult as ResourceResult.Success).data
+            assertEquals("AssessmentConfig", assessmentConfig.type)
 
             authRepo.signOut()
 

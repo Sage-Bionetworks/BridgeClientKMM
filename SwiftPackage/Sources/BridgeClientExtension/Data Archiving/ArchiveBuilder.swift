@@ -61,7 +61,7 @@ public protocol ResultArchiveBuilder : ArchiveBuilder {
     var adherenceData: JsonSerializable? { get }
 }
 
-open class JsonResultArchive : AbstractResultArchive, ResultArchiveBuilder {
+open class JsonResultArchiveBuilder : ResultArchiveBuilder {
     
     public let uuid: UUID = .init()
     public let json: Data
@@ -71,26 +71,37 @@ open class JsonResultArchive : AbstractResultArchive, ResultArchiveBuilder {
     public var endedOn: Date { fileInfo.timestamp }
     public var adherenceData: JsonSerializable? { nil }
     
+    /// The archive that backs this builder.
+    let archive: StudyDataUploadArchive
+    
+    public var identifier: String {
+        archive.identifier
+    }
+    
     public init?(json: Data, filename: String, schema: URL, timestamp: Date = Date(), startedOn: Date? = nil, schedule: AssessmentScheduleInfo? = nil, schemaIdentifier: String? = nil) {
         self.json = json
         self.startedOn = startedOn ?? timestamp
         self.fileInfo = .init(filename: filename, timestamp: timestamp, contentType: "application/json", identifier: schedule?.assessmentInfo.identifier, jsonSchema: schema)
-        super.init(identifier: schedule?.assessmentInfo.identifier ?? schemaIdentifier ?? filename,
+        guard let archive = StudyDataUploadArchive(identifier: schedule?.assessmentInfo.identifier ?? schemaIdentifier ?? filename,
                    schemaIdentifier: schemaIdentifier,
                    schedule: schedule)
+        else {
+            return nil
+        }
+        self.archive = archive
     }
         
     public func buildArchive() async throws -> DataArchive {
 
         // Add the JSON file
-        try self.addFile(data: json, filepath: fileInfo.filename, createdOn: fileInfo.timestamp, contentType: fileInfo.contentType)
+        try archive.addFile(data: json, filepath: fileInfo.filename, createdOn: fileInfo.timestamp, contentType: fileInfo.contentType)
         
         // Close the archive.
         let metadata = ArchiveMetadata(files: [fileInfo])
         let metadataDictionary = try metadata.jsonEncodedDictionary()
-        try completeArchive(createdOn: Date(), with: metadataDictionary)
+        try archive.completeArchive(createdOn: Date(), with: metadataDictionary)
         
-        return self
+        return archive
     }
     
     public func cleanup() async throws {

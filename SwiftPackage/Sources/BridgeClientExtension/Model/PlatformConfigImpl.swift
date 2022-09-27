@@ -83,6 +83,15 @@ extension PlatformConfig {
     }
 }
 
+extension IOSBridgeConfig {
+    
+    public func sharedDocumentDirectory() throws -> URL {
+        try appGroupIdentifier.flatMap { sharedId in
+            FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: sharedId)
+        } ?? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+    }
+}
+
 extension Bundle {
     /// The localized name of this application.
     /// This method looks at the plist for the main bundle and returns the most

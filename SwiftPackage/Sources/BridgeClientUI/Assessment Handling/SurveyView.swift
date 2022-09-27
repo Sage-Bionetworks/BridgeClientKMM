@@ -46,10 +46,10 @@ public struct DefaultArchiveFactory : ArchiveFactory {
     public init() {}
     
     public func buildResult(from assessmentState: AssessmentState, schedule: AssessmentScheduleInfo) -> ResultArchiveBuilder? {
-        AssessmentResultArchive(assessmentState.assessmentResult.deepCopy(),
-                                schedule: schedule,
-                                adherenceData: assessmentState.assessmentResult.buildScore(),
-                                outputDirectory: assessmentState.outputDirectory)
+        AssessmentArchiveBuilder(assessmentState.assessmentResult.deepCopy(),
+                                 schedule: schedule,
+                                 adherenceData: assessmentState.assessmentResult.buildScore(),
+                                 outputDirectory: assessmentState.outputDirectory)
     }
 }
 

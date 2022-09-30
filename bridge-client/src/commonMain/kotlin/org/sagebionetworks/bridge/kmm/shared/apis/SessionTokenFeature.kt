@@ -5,7 +5,7 @@
 package org.sagebionetworks.bridge.kmm.shared.apis
 
 import io.ktor.client.HttpClient
-import io.ktor.client.features.HttpClientFeature
+import io.ktor.client.plugins.HttpClientPlugin
 import io.ktor.client.request.HttpRequestPipeline
 import io.ktor.client.request.header
 import io.ktor.util.AttributeKey
@@ -26,7 +26,7 @@ internal class SessionTokenFeature constructor(
         )
     }
 
-    companion object Feature : HttpClientFeature<Config, SessionTokenFeature> {
+    companion object Feature : HttpClientPlugin<Config, SessionTokenFeature> {
         override val key = AttributeKey<SessionTokenFeature>("SessionTokenFeature")
 
         override fun prepare(block: Config.() -> Unit) = Config().apply(block).build()

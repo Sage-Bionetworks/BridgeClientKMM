@@ -3,4 +3,6 @@ framework module BridgeClient {
 
     export *
     module * { export * }
+
+    use Foundation
 }

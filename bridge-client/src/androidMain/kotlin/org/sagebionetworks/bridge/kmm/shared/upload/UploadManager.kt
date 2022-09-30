@@ -2,7 +2,7 @@ package org.sagebionetworks.bridge.kmm.shared.upload
 
 import android.util.Log
 import co.touchlab.kermit.Logger
-import com.squareup.sqldelight.db.SqlDriver
+import app.cash.sqldelight.db.SqlDriver
 import io.ktor.client.*
 import kotlinx.datetime.*
 import kotlinx.serialization.encodeToString

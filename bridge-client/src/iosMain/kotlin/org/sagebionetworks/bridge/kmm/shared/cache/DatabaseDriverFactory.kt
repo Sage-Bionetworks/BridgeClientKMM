@@ -2,9 +2,10 @@ package org.sagebionetworks.bridge.kmm.shared.cache
 
 import co.touchlab.kermit.Logger
 import co.touchlab.sqliter.DatabaseConfiguration
-import com.squareup.sqldelight.db.SqlDriver
-import com.squareup.sqldelight.drivers.native.NativeSqliteDriver
-import com.squareup.sqldelight.drivers.native.wrapConnection
+import app.cash.sqldelight.db.SqlDriver
+import app.cash.sqldelight.db.SqlSchema
+import app.cash.sqldelight.driver.native.NativeSqliteDriver
+import app.cash.sqldelight.driver.native.wrapConnection
 import org.sagebionetworks.bridge.kmm.shared.IOSBridgeConfig
 import platform.Foundation.*
 
@@ -13,7 +14,7 @@ actual class DatabaseDriverFactory: DbDriverFactory {
 }
 
 object SqliteDriverFactory {
-    fun createDriver(schema: SqlDriver.Schema, name: String): NativeSqliteDriver {
+    fun createDriver(schema: SqlSchema, name: String): NativeSqliteDriver {
 
         val path = IOSBridgeConfig.appGroupIdentifier?.let { groupId ->
             NSFileManager.defaultManager.containerURLForSecurityApplicationGroupIdentifier(groupId)?.let { baseURL ->

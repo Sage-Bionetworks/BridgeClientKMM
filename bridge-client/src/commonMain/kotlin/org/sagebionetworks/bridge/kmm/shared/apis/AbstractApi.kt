@@ -3,6 +3,7 @@ package org.sagebionetworks.bridge.kmm.shared.apis
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 
 internal abstract class AbstractApi(protected val basePath: String, protected val httpClient: HttpClient) {
@@ -12,7 +13,11 @@ internal abstract class AbstractApi(protected val basePath: String, protected va
         const val BRIDGE_SERVER_CHECK = "webservices.sagebridge"
     }
 
-    protected suspend inline fun <T, reified S: Any> postData(model: T, path: String) : S {
+    protected suspend inline fun <reified T, reified S: Any> postData(model: T, path: String) : S {
+        return postDataResponse(model, path).body()
+    }
+
+    internal suspend inline fun <reified T> postDataResponse(model: T, path: String) : HttpResponse {
         val builder = HttpRequestBuilder()
 
         builder.method = HttpMethod.Post
@@ -20,19 +25,19 @@ internal abstract class AbstractApi(protected val basePath: String, protected va
             takeFrom(basePath)
             encodedPath = encodedPath.let { startingPath ->
                 path(path)
-                return@let startingPath + encodedPath.substring(1)
+                return@let startingPath + encodedPath
             }
         }
         builder.contentType()
         if(model != null) {
-            builder.body = model
+            builder.setBody(model)
         }
 
         builder.header("Accept", "application/json")
         builder.header("Content-Type", "application/json; charset=UTF-8")
 
         try {
-            return httpClient.post(builder)
+            return httpClient.post(builder).body()
         } catch (pipeline: ReceivePipelineException) {
             throw pipeline.cause
         }
@@ -43,6 +48,14 @@ internal abstract class AbstractApi(protected val basePath: String, protected va
         modifiedDateTimeString: String? = null,
         queryParams: Map<String, String>? = null,
     ): S {
+        return getDataResponse(path, modifiedDateTimeString, queryParams).body()
+    }
+
+    internal suspend fun getDataResponse(
+        path: String,
+        modifiedDateTimeString: String? = null,
+        queryParams: Map<String, String>? = null,
+    ): HttpResponse {
         val builder = HttpRequestBuilder()
 
         builder.method = HttpMethod.Get
@@ -50,7 +63,7 @@ internal abstract class AbstractApi(protected val basePath: String, protected va
             takeFrom(basePath)
             encodedPath = encodedPath.let { startingPath ->
                 path(path)
-                return@let startingPath + encodedPath.substring(1)
+                return@let startingPath + encodedPath
             }
             with(parameters) {
                 queryParams?.let {

@@ -15,17 +15,25 @@ import kotlin.test.*
 // https://youtrack.jetbrains.com/issue/KT-38317 -nbrown 01/02/21
 abstract class AbstractBaseIntegrationTest: BaseTest(), KoinTest {
 
+    companion object {
+        private val testModule = module {
+            single { ResourceDatabaseHelper(testDatabaseDriver()) }
+            single<BridgeConfig> { TestBridgeConfig() }
+
+        }
+        init {
+            startKoin { modules(bridgeClientkoinModules(true).plus(testModule)) }
+        }
+    }
 
     @BeforeTest
     fun setUp() {
-        startKoin { modules(bridgeClientkoinModules(true).plus(testModule)) }
+
     }
 
-
-    val testModule = module {
-        single { ResourceDatabaseHelper(testDatabaseDriver()) }
-        single<BridgeConfig> { TestBridgeConfig() }
-
+    // To run tests locally, add the external id to your local.properties file: testExternalId01=External_ID_Here -nbrown 9/27/22
+    protected fun getBridgeTestUserExternalId(): String? {
+        return System.getProperty("testExternalId01")
     }
 
     class TestBridgeConfig: BridgeConfig {

@@ -1,6 +1,6 @@
 package org.sagebionetworks.bridge.kmm.shared.repo
 
-import io.ktor.client.features.*
+import io.ktor.client.plugins.*
 import io.ktor.http.*
 import io.ktor.util.network.*
 import kotlinx.coroutines.CoroutineScope

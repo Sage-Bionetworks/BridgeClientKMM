@@ -5,13 +5,12 @@
 package org.sagebionetworks.bridge.kmm.shared.apis
 
 import io.ktor.client.HttpClient
-import io.ktor.client.features.*
+import io.ktor.client.plugins.HttpClientPlugin
 import io.ktor.client.request.HttpRequest
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.request
 import io.ktor.client.request.takeFrom
-import io.ktor.client.statement.HttpReceivePipeline
-import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.util.AttributeKey
 import kotlinx.coroutines.sync.Mutex
@@ -32,7 +31,7 @@ internal class RefreshTokenFeature(
         )
     }
 
-    companion object Feature : HttpClientFeature<Config, RefreshTokenFeature> {
+    companion object Feature : HttpClientPlugin<Config, RefreshTokenFeature> {
 
         private val refreshTokenHttpFeatureMutex = Mutex()
 
@@ -41,10 +40,10 @@ internal class RefreshTokenFeature(
         override fun prepare(block: Config.() -> Unit) = Config().apply(block).build()
 
         override fun install(feature: RefreshTokenFeature, scope: HttpClient) {
-            scope.receivePipeline.intercept(HttpReceivePipeline.After) { subject ->
+            scope.receivePipeline.intercept(HttpReceivePipeline.After) { param ->
                 //Only applicable if we are making a call to Bridge server
-                if (context.request.url.host.contains(AbstractApi.BRIDGE_SERVER_CHECK)) {
-                    if (context.response.status != HttpStatusCode.Unauthorized) {
+                if (subject.request.url.host.contains(AbstractApi.BRIDGE_SERVER_CHECK)) {
+                    if (subject.status != HttpStatusCode.Unauthorized) {
                         proceedWith(subject)
                         return@intercept
                     }
@@ -53,13 +52,13 @@ internal class RefreshTokenFeature(
 
                     // If token of the request isn't actual, then token has already been updated and
                     // let's just to try repeat request.
-                    if (!feature.isCredentialsActual(context.request)) {
+                    if (!feature.isCredentialsActual(subject.request)) {
                         refreshTokenHttpFeatureMutex.unlock()
-                        val requestBuilder = HttpRequestBuilder().takeFrom(context.request)
+                        val requestBuilder = HttpRequestBuilder().takeFrom(subject.request)
                         // Remove the User-Agent header so that UserAgent plugin doesn't add a second one
                         // This prevents BRIDGE-3335 bug -nbrown 9/21/2022
                         requestBuilder.headers.remove(HttpHeaders.UserAgent)
-                        val result: HttpResponse = context.client!!.request(requestBuilder)
+                        val result: HttpResponse = scope.request(requestBuilder)
                         proceedWith(result)
                         return@intercept
                     }
@@ -69,11 +68,11 @@ internal class RefreshTokenFeature(
                     if (feature.updateTokenHandler.invoke()) {
                         // If the request refresh was successful, then let's just to try repeat request
                         refreshTokenHttpFeatureMutex.unlock()
-                        val requestBuilder = HttpRequestBuilder().takeFrom(context.request)
+                        val requestBuilder = HttpRequestBuilder().takeFrom(subject.request)
                         // Remove the User-Agent header so that UserAgent plugin doesn't add a second one
                         // This prevents BRIDGE-3335 bug -nbrown 9/21/2022
                         requestBuilder.headers.remove(HttpHeaders.UserAgent)
-                        val result: HttpResponse = context.client!!.request(requestBuilder)
+                        val result: HttpResponse = scope.request(requestBuilder)
                         proceedWith(result)
                     } else {
                         // If the request refresh was unsuccessful.

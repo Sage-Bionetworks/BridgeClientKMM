@@ -2,7 +2,7 @@ package org.sagebionetworks.bridge.kmm.shared.repo
 
 import co.touchlab.kermit.Logger
 import io.ktor.client.*
-import io.ktor.client.features.*
+import io.ktor.client.plugins.*
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow

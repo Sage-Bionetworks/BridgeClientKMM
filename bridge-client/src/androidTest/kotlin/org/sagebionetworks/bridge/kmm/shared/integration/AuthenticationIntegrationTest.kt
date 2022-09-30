@@ -10,13 +10,13 @@ class AuthenticationIntegrationTest: AbstractBaseIntegrationTest() {
 
     private val authRepo by inject<AuthenticationRepository>()
 
-    @Test @Ignore
+    @Test
     fun testExternalIdSignIn() {
         runTest {
-
+            authRepo.signOut()
             //Test signIn
             assertFalse(authRepo.isAuthenticated())
-            val externalId = System.getProperty("testExternalId01")
+            val externalId = getBridgeTestUserExternalId()
             assertNotNull(externalId)
             val signInResult = authRepo.signInExternalId(externalId, externalId)
             assertTrue(signInResult is ResourceResult.Success<*>)

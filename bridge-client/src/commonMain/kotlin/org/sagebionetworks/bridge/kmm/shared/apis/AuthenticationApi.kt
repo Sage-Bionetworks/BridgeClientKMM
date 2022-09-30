@@ -5,16 +5,9 @@ package org.sagebionetworks.bridge.kmm.shared.apis
 
 import io.ktor.client.*
 import io.ktor.client.call.*
-import io.ktor.client.features.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
-import io.ktor.client.features.logging.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import io.ktor.http.*
 import org.sagebionetworks.bridge.kmm.shared.models.*
-import org.sagebionetworks.bridge.kmm.shared.models.Message
-import org.sagebionetworks.bridge.kmm.shared.models.SignIn
 
 internal class AuthenticationApi(basePath: String = BASE_PATH, httpClient: HttpClient) : AbstractApi(basePath, httpClient) {
 
@@ -87,7 +80,7 @@ internal class AuthenticationApi(basePath: String = BASE_PATH, httpClient: HttpC
         }
 
         try {
-            return httpClient.post(builder)
+            return httpClient.post(builder).body()
         } catch (pipeline: ReceivePipelineException) {
             throw pipeline.cause
         }

@@ -6,6 +6,7 @@ import org.koin.test.KoinTest
 import org.sagebionetworks.bridge.kmm.shared.BaseTest
 import org.sagebionetworks.bridge.kmm.shared.BridgeConfig
 import org.sagebionetworks.bridge.kmm.shared.PlatformConfig
+import org.sagebionetworks.bridge.kmm.shared.apis.HttpUtil
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
 import org.sagebionetworks.bridge.kmm.shared.di.bridgeClientkoinModules
 import org.sagebionetworks.bridge.kmm.shared.testDatabaseDriver
@@ -19,6 +20,12 @@ abstract class AbstractBaseIntegrationTest: BaseTest(), KoinTest {
         private val testModule = module {
             single { ResourceDatabaseHelper(testDatabaseDriver()) }
             single<BridgeConfig> { TestBridgeConfig() }
+            //Need to override for tests since HttpAndroidUtil requires a Context
+            single<HttpUtil> { object: HttpUtil {
+                override fun acceptLanguage(): String {
+                    return "en-US,en"
+                }
+            } }
 
         }
         init {

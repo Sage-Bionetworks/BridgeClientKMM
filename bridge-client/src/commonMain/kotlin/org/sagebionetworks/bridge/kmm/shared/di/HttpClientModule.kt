@@ -12,6 +12,7 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import org.sagebionetworks.bridge.kmm.shared.BridgeConfig
 import org.sagebionetworks.bridge.kmm.shared.apis.EtagFeature
+import org.sagebionetworks.bridge.kmm.shared.apis.HttpUtil
 import org.sagebionetworks.bridge.kmm.shared.apis.RefreshTokenFeature
 import org.sagebionetworks.bridge.kmm.shared.apis.SessionTokenFeature
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
@@ -19,7 +20,7 @@ import org.sagebionetworks.bridge.kmm.shared.repo.AuthenticationRepository
 
 fun httpClientModule(enableNetworkLogs: Boolean) = module {
     //HttpClient configured with session token and refresh token features for Bridge calls
-    single { createBridgeHttpClient(enableNetworkLogs, get(), get(), get()) }
+    single { createBridgeHttpClient(enableNetworkLogs, get(), get(), get(), get()) }
 
     //HttpClient configured for use with AuthenticationAPI, it needs its own HttpClient so as not to
     // include the re-authentication feature found in DefaultHttpClient, which would cause a dependency loop
@@ -35,7 +36,8 @@ private fun createBridgeHttpClient(
     enableNetworkLogs: Boolean,
     bridgeConfig: BridgeConfig,
     authenticationRepository: AuthenticationRepository,
-    etagStorageCache: ResourceDatabaseHelper
+    etagStorageCache: ResourceDatabaseHelper,
+    httpUtil: HttpUtil
 ) = HttpClient {
     val sessionTokenHeaderKey = "Bridge-Session"
 
@@ -63,11 +65,7 @@ private fun createBridgeHttpClient(
     }
 
     defaultRequest {
-        // temporarily hard code to avoid a 404 when retrieving AppConfig - liujoshua 2021-09-21
-        // TODO: Set Accept-Language based on device setting - liujoshua 2021-09-21
-        // A Feature is likely needed. For example, on Android we may need to respond to
-        // https://developer.android.com/reference/android/content/Intent.html#ACTION_LOCALE_CHANGED
-        header("Accept-Language", "en-US,en")
+        header("Accept-Language", httpUtil.acceptLanguage())
     }
 
     install(SessionTokenFeature) {

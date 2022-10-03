@@ -11,6 +11,8 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import org.sagebionetworks.bridge.kmm.shared.AndroidBridgeConfig
 import org.sagebionetworks.bridge.kmm.shared.BridgeConfig
+import org.sagebionetworks.bridge.kmm.shared.apis.HttpAndroidUtil
+import org.sagebionetworks.bridge.kmm.shared.apis.HttpUtil
 import org.sagebionetworks.bridge.kmm.shared.cache.BridgeResourceDatabase
 import org.sagebionetworks.bridge.kmm.shared.upload.CoroutineUploadWorker
 
@@ -24,5 +26,7 @@ actual val platformModule: Module = module {
     single<BridgeConfig> {AndroidBridgeConfig(get())}
 
     worker { CoroutineUploadWorker(get(), get(), get(), get()) }
+
+    single<HttpUtil> {HttpAndroidUtil(get())}
 
 }

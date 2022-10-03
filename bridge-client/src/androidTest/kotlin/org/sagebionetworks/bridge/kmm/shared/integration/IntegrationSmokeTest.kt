@@ -40,7 +40,7 @@ class IntegrationSmokeTest: AbstractBaseIntegrationTest() {
             assertEquals("BridgeClientKMM Integration Tests Study", studyInfo.name)
 
             // Set activity event that will trigger the schedule
-            val success = activityEventsRepo.createActivityEvent(studyId, "custom:integration-test-start", Clock.System.now())
+            val success = activityEventsRepo.createActivityEvent(studyId, "custom:integration-start-test", Clock.System.now())
             assertTrue(success)
 
             // Load adherence records

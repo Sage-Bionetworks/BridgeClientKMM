@@ -1,5 +1,7 @@
 package org.sagebionetworks.bridge.kmm.shared.repo
 
+import app.cash.sqldelight.coroutines.asFlow
+import app.cash.sqldelight.coroutines.mapToList
 import co.touchlab.kermit.Logger
 import co.touchlab.stately.ensureNeverFrozen
 import io.ktor.client.*
@@ -7,20 +9,23 @@ import io.ktor.client.plugins.*
 import io.ktor.http.*
 import io.ktor.util.network.*
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.sagebionetworks.bridge.kmm.shared.apis.SchedulesV2Api
 import org.sagebionetworks.bridge.kmm.shared.cache.*
-import org.sagebionetworks.bridge.kmm.shared.models.AdherenceRecord
+import org.sagebionetworks.bridge.kmm.shared.models.*
 import org.sagebionetworks.bridge.kmm.shared.models.AdherenceRecordList
-import org.sagebionetworks.bridge.kmm.shared.models.AdherenceRecordsSearch
-import org.sagebionetworks.bridge.kmm.shared.models.SortOrder
 
-class AdherenceRecordRepo(httpClient: HttpClient, databaseHelper: ResourceDatabaseHelper, backgroundScope: CoroutineScope) :
+class AdherenceRecordRepo(httpClient: HttpClient,
+                          databaseHelper: ResourceDatabaseHelper,
+                          backgroundScope: CoroutineScope) :
         AbstractResourceRepo(databaseHelper, backgroundScope) {
 
     init {
@@ -32,16 +37,40 @@ class AdherenceRecordRepo(httpClient: HttpClient, databaseHelper: ResourceDataba
         httpClient = httpClient
     )
 
+    private val dbQuery = databaseHelper.database.participantScheduleQueries
+
+    fun getAllCompletedCachedAssessmentAdherence(studyId: String): Flow<Map<String, List<AssessmentAdherenceRecord>>> {
+        return dbQuery.completedAssessmentAdherence(studyId).asFlow().mapToList(Dispatchers.Default).mapNotNull {
+            it.map {
+                AssessmentAdherenceRecord(
+                    sessionInstanceGuid = it.sessionInstanceGuid,
+                    assessmentInstanceGuid = it.asssessmentInstanceGuid,
+                    assessmentInfo = Json.decodeFromString(it.assessmentInfoJson),
+                    adherenceRecord = Json.decodeFromString<AdherenceRecord>(it.adherenceJson!!)
+                )
+            }.groupBy { record ->
+                record.assessmentInstanceGuid
+            }
+        }
+    }
+
     /**
      * Get all of the locally cached [AdherenceRecord]s.
      */
-    fun getAllCachedAdherenceRecords(studyId: String) : Flow<Map<String, List<AdherenceRecord>>> {
-        return database.getResourcesAsFlow(ResourceType.ADHERENCE_RECORD, studyId).mapNotNull { it.mapNotNull { resource -> resource.loadResource<AdherenceRecord>() }.groupBy { adherenceRecord -> adherenceRecord.instanceGuid } }
+    fun getAllCachedAdherenceRecords(studyId: String): Flow<Map<String, List<AdherenceRecord>>> {
+        return dbQuery.allAdherence(studyId).asFlow().mapToList(Dispatchers.Default).mapNotNull {
+            it.map {
+                Json.decodeFromString<AdherenceRecord>(it.adherenceJson)
+            }.groupBy { adherenceRecord ->
+                adherenceRecord.instanceGuid
+            }
+        }
     }
 
     /**
      * Get the locally cached [AdherenceRecord]s for the specified [instanceIds].
      */
+    @Deprecated("Uses old resource based cache, needs replaced with new implementation")
     fun getCachedAdherenceRecords(instanceIds: List<String>, studyId: String) : Map<String, List<AdherenceRecord>> {
         val list: List<AdherenceRecord> = database.getResourcesByIds(instanceIds, ResourceType.ADHERENCE_RECORD, studyId).mapNotNull { it.loadResource() }
         return list.groupBy { it.instanceGuid }
@@ -78,6 +107,7 @@ class AdherenceRecordRepo(httpClient: HttpClient, databaseHelper: ResourceDataba
     }
 
     private fun insertUpdate(adherenceRecord: AdherenceRecord, studyId: String) {
+        //TODO: Don't overwrite records that have needSave=true -nbrown 10/10/22
         val json = Json.encodeToString(adherenceRecord)
         val resource = Resource(
             identifier = adherenceRecord.instanceGuid,
@@ -87,8 +117,21 @@ class AdherenceRecordRepo(httpClient: HttpClient, databaseHelper: ResourceDataba
             json = json,
             lastUpdate = Clock.System.now().toEpochMilliseconds(),
             status = ResourceStatus.SUCCESS,
-            needSave = true)
+            needSave = false)
         database.insertUpdateResource(resource)
+        //Insert into new adherence specific table
+        dbQuery.insertUpdateAdherenceRecord(
+            studyId = studyId,
+            instanceGuid = adherenceRecord.instanceGuid,
+            startedOn = adherenceRecord.startedOn.toString(),
+            finishedOn = adherenceRecord.finishedOn?.toString(),
+            declined = adherenceRecord.declined,
+            adherenceEventTimestamp = adherenceRecord.eventTimestamp,
+            adherenceJson = Json.encodeToString(adherenceRecord),
+            status = ResourceStatus.SUCCESS,
+            needSave = false
+        )
+
     }
 
     /**
@@ -99,6 +142,7 @@ class AdherenceRecordRepo(httpClient: HttpClient, databaseHelper: ResourceDataba
         insertUpdate(adherenceRecord, studyId)
         backgroundScope.launch {
             processUpdates(studyId)
+            processUpdatesV2(studyId)
         }
 
     }
@@ -150,4 +194,68 @@ class AdherenceRecordRepo(httpClient: HttpClient, databaseHelper: ResourceDataba
 
     }
 
+    /**
+     * Save any locally cached [AdherenceRecord]s that haven't been uploaded to Bridge server.
+     * Any failures will remain in a needSave state and be tried again the next time.
+     */
+    private suspend fun processUpdatesV2(studyId: String) {
+        val recordsToUpload = dbQuery.selectAdherenceNeedSave(studyId).executeAsList()
+        val adherenceToUpload: List<AdherenceRecord> = recordsToUpload.mapNotNull { Json.decodeFromString(it.adherenceJson) }
+
+        if (adherenceToUpload.isEmpty()) return
+        var status = ResourceStatus.FAILED
+        var needSave = true
+        try {
+            scheduleV2Api.updateAdherenceRecords(studyId, adherenceToUpload)
+            status = ResourceStatus.SUCCESS
+            needSave = false
+        } catch (throwable: Throwable) {
+            println(throwable)
+            when (throwable) {
+                is ResponseException -> {
+                    when (throwable.response.status) {
+                        HttpStatusCode.Unauthorized -> {
+                            // 401 unauthorized
+                            // User hasn't authenticated or re-auth has failed.
+                        }
+                        HttpStatusCode.Gone -> {
+                            //410 Gone
+                            // The version of the client making the request no longer has access to this service.
+                            // The user must update their app in order to continue using Bridge.
+                        }
+                        HttpStatusCode.PreconditionFailed -> {
+                            //412 Not consented
+                        }
+                    }
+                }
+
+                is UnresolvedAddressException -> {
+                    //Internet connection error
+                    status = ResourceStatus.RETRY
+                }
+            }
+        }
+        for (resource in recordsToUpload) {
+            //val toUpdate = resource.copy(status = status, needSave = needSave)
+            dbQuery.insertUpdateAdherenceRecord(
+                studyId = studyId,
+                instanceGuid = resource.instanceGuid,
+                startedOn = resource.startedOn,
+                finishedOn = resource.finishedOn,
+                declined = resource.declined,
+                adherenceEventTimestamp = resource.adherenceEventTimestamp,
+                adherenceJson = resource.adherenceJson,
+                status = status,
+                needSave = needSave
+            )
+        }
+
     }
+}
+
+data class AssessmentAdherenceRecord(
+    val sessionInstanceGuid: String,
+    val assessmentInstanceGuid: String,
+    val assessmentInfo: AssessmentInfo,
+    val adherenceRecord: AdherenceRecord
+)

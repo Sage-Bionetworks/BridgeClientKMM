@@ -1,0 +1,193 @@
+import kotlinx.serialization.descriptors.PrimitiveKind.BOOLEAN;
+import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus;
+
+CREATE TABLE ScheduleMetadata (
+    studyId TEXT NOT NULL,
+    createdOn TEXT NOT NULL
+);
+
+selectScheduleMetadata:
+SELECT *
+FROM ScheduleMetadata
+WHERE studyId = ?;
+
+insertUpdateScheduleMetadata:
+INSERT OR REPLACE INTO ScheduleMetadata(studyId, createdOn)
+VALUES(?,?);
+
+CREATE TABLE ScheduledSessions (
+    studyId TEXT NOT NULL,
+    instanceGuid TEXT NOT NULL,
+    startDate TEXT NOT NULL, -- LocalDate
+    endDate TEXT NOT NULL,   -- LocalDate
+    startTime TEXT NOT NULL,
+    endTime TEXT NOT NULL,   -- Computed from expiration
+    studyBurstID TEXT,
+    startEventId TEXT,
+    startEventTimestamp TEXT,
+    persistent INTEGER AS kotlin.Boolean NOT NULL DEFAULT 0,
+    scheduledSessionJson TEXT NOT NULL,
+    sessionInfoJson TEXT NOT NULL,
+    PRIMARY KEY (studyId, instanceGuid)
+);
+
+CREATE TABLE ScheduledAssessments (
+    studyId TEXT NOT NULL,
+    sessionInstanceGuid TEXT NOT NULL,
+    asssessmentInstanceGuid TEXT NOT NULL,
+    guid TEXT NOT NULL,
+    identifier TEXT NOT NULL,
+    assessmentInfoJson TEXT NOT NULL,
+    PRIMARY KEY (studyId, asssessmentInstanceGuid)
+);
+
+CREATE TABLE AdherenceRecords (
+    studyId TEXT NOT NULL,
+    instanceGuid TEXT NOT NULL,
+    startedOn TEXT NOT NULL,
+    finishedOn TEXT,
+    declined INTEGER AS kotlin.Boolean NOT NULL DEFAULT 0,
+    adherenceEventTimestamp TEXT NOT NULL,
+    adherenceJson TEXT NOT NULL,
+    status TEXT AS ResourceStatus NOT NULL,
+    needSave INTEGER AS kotlin.Boolean NOT NULL DEFAULT 0,
+    PRIMARY KEY (studyId, instanceGuid, startedOn)
+);
+
+clearAll {
+    DELETE FROM ScheduledSessions;
+    DELETE FROM ScheduledAssessments;
+    DELETE FROM AdherenceRecords;
+    DELETE FROM ScheduledNotifications;
+}
+
+clearSchedule {
+    DELETE FROM ScheduledSessions
+    WHERE studyId = :studyId;
+    DELETE FROM ScheduledAssessments
+    WHERE studyId = :studyId;
+    DELETE FROM ScheduleMetadata
+    WHERE studyId = :studyId;
+}
+
+insertUpdateSession:
+INSERT OR REPLACE INTO ScheduledSessions(studyId, instanceGuid, startDate, endDate, startTime, endTime, studyBurstID, startEventId, startEventTimestamp, persistent, scheduledSessionJson, sessionInfoJson)
+VALUES(?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+insertUpdateScheduledAssessments:
+INSERT OR REPLACE INTO ScheduledAssessments(studyId, sessionInstanceGuid, asssessmentInstanceGuid, guid, identifier, assessmentInfoJson)
+VALUES(?,?,?,?,?,?);
+
+insertUpdateAdherenceRecord:
+INSERT OR REPLACE INTO AdherenceRecords(studyId, instanceGuid, startedOn, finishedOn, declined, adherenceEventTimestamp, adherenceJson, status, needSave)
+VALUES(?,?,?,?,?,?,?,?,?);
+
+-- Combine assessments and adherence into a single view
+CREATE VIEW scheduledAssessmentAdherence AS
+SELECT
+    ScheduledAssessments.*,
+    AdherenceRecords.instanceGuid,
+    AdherenceRecords.startedOn,
+    AdherenceRecords.finishedOn,
+    AdherenceRecords.declined,
+    AdherenceRecords.adherenceEventTimestamp,
+    AdherenceRecords.adherenceJson
+FROM
+    ScheduledAssessments
+LEFT JOIN AdherenceRecords ON ScheduledAssessments.asssessmentInstanceGuid = AdherenceRecords.instanceGuid;
+
+
+CREATE VIEW fullScheduledSessions AS
+SELECT
+    ScheduledSessions.*,
+    scheduledAssessmentAdherence.sessionInstanceGuid,
+    scheduledAssessmentAdherence.asssessmentInstanceGuid,
+    scheduledAssessmentAdherence.assessmentInfoJson,
+    scheduledAssessmentAdherence.startedOn,
+    scheduledAssessmentAdherence.finishedOn,
+    scheduledAssessmentAdherence.declined,
+    scheduledAssessmentAdherence.adherenceJson
+FROM
+    ScheduledSessions
+JOIN scheduledAssessmentAdherence ON ScheduledSessions.instanceGuid = scheduledAssessmentAdherence.sessionInstanceGuid;
+
+fullSessionsCount:
+SELECT COUNT()
+FROM fullScheduledSessions;
+
+sessionById:
+SELECT *
+FROM fullScheduledSessions
+WHERE studyId = ? AND sessionInstanceGuid = ?;
+
+-- Get today's future sessions
+todaySessions:
+SELECT *
+FROM fullScheduledSessions
+WHERE studyId = :studyId AND ((startDate <= :day AND endDate > :day) OR (endDate = :day AND endTime > :endTime));
+
+todayAndNextDayWithSessions:
+SELECT *
+FROM fullScheduledSessions
+WHERE fullScheduledSessions.studyId = :studyId AND (((startDate <= :day AND endDate > :day) OR (endDate = :day AND endTime > :endTime)) OR startDate IN (SELECT startDate
+    FROM fullScheduledSessions
+    WHERE startDate > :day
+    ORDER BY startDate ASC
+    LIMIT 1));
+
+allAdherence:
+SELECT *
+FROM AdherenceRecords
+WHERE studyId = ?;
+
+-- Get all finished assessment adherence records that aren't declined, can group by assessmentInstanceID in code
+completedAssessmentAdherence:
+SELECT *
+FROM scheduledAssessmentAdherence
+WHERE studyId = ? AND finishedOn IS NOT NULL AND declined = 0;
+
+allAssessmentAdherence:
+SELECT *
+FROM scheduledAssessmentAdherence
+WHERE studyId = ? AND finishedOn IS NOT NULL AND declined = 0;
+
+selectAdherenceNeedSave:
+SELECT *
+FROM AdherenceRecords
+WHERE studyId = ? AND needSave = 1;
+
+-- Get all study burst sessions, grouping and sorting can be done in code
+studyBurstSessions:
+SELECT *
+FROM fullScheduledSessions
+WHERE studyId = ? AND studyBurstID IS NOT NULL AND startEventId IS NOT NULL;
+
+-- Need to check if session is completed or not before displaying
+-- Keep a session level adherence record updated client side? Then can join Adherence record table...
+-- Keep table updated to only have notifications that need to be displayed?
+-- Have a isCompleted(sessionIntanceGuid) method on ScheduleTimelineRepo?
+-- Table will contain all potential notifications, including repeating ones expanded
+CREATE TABLE ScheduledNotifications (
+    studyId TEXT NOT NULL,
+    sessionInstanceGuid TEXT NOT NULL,
+    scheduleOn TEXT NOT NULL,           -- LocalDateTime
+    notificationInfoJson TEXT NOT NULL,
+    PRIMARY KEY (studyId, sessionInstanceGuid, scheduleOn)
+);
+
+insertUpdateNotifications:
+INSERT OR REPLACE INTO ScheduledNotifications(studyId, sessionInstanceGuid, scheduleOn, notificationInfoJson)
+VALUES(?,?,?,?);
+
+-- Get all future notifications, need to filter out completed sessions
+futureNotifications:
+SELECT *
+FROM ScheduledNotifications
+WHERE scheduleOn > ?;
+
+-- Filters out completed sessions
+futurePendingNotifications:
+SELECT ScheduledNotifications.*
+FROM ScheduledNotifications
+JOIN fullScheduledSessions ON ScheduledNotifications.sessionInstanceGuid = fullScheduledSessions.instanceGuid
+WHERE ScheduledNotifications.studyId = ? AND scheduleOn >= ? AND ((fullScheduledSessions.finishedOn IS NULL) AND (fullScheduledSessions.declined IS NULL OR fullScheduledSessions.declined = 0));

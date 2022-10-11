@@ -1,11 +1,13 @@
 package org.sagebionetworks.bridge.kmm.shared.repo
 
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.datetime.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.sagebionetworks.bridge.kmm.shared.BaseTest
+import org.sagebionetworks.bridge.kmm.shared.cache.ParticipantScheduleDatabase
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
 import org.sagebionetworks.bridge.kmm.shared.getTestClient
@@ -464,35 +466,39 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val eventTimeStamp = Clock.System.now().minus(DateTimeUnit.DAY, TimeZone.currentSystemDefault())
             val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
 
-            val resourceResult = repo.getSessionsForDay("testScheduledSessionsDay1", getTodayInstant()).firstOrNull { it is ResourceResult.Success }
+            val resourceResultV1 = repo.getSessionsForDay("testScheduledSessionsDay1", getTodayInstant()).firstOrNull { it is ResourceResult.Success }
+            val resourceResultV2 = repo.getSessionsForDayV2("testScheduledSessionsDay1", getTodayInstant()).firstOrNull { it is ResourceResult.Success }
+            val listOfResults = listOf(resourceResultV1, resourceResultV2)
 
-            assertTrue(resourceResult is ResourceResult.Success)
-            val sessionList = resourceResult.data.scheduledSessionWindows
-            assertNotNull(sessionList)
-            assertEquals(3, sessionList.size)
+            listOfResults.forEach { resourceResult ->
+                assertTrue(resourceResult is ResourceResult.Success)
+                val sessionList = resourceResult.data.scheduledSessionWindows
+                assertNotNull(sessionList)
+                assertEquals(3, sessionList.size)
 
-            //First session should be the 3 day session that started yesterday
-            val session1 = sessionList[0]
-            assertEquals("One time 3 day session", session1.sessionInfo.label)
-            val notification1 = session1.notifications?.firstOrNull()
-            assertNotNull(notification1)
-            //assertEquals(notification1.scheduleOn)
+                //First session should be the 3 day session that started yesterday
+                val session1 = sessionList[0]
+                assertEquals("One time 3 day session", session1.sessionInfo.label)
+                val notification1 = session1.notifications?.firstOrNull()
+                assertNotNull(notification1)
+                //assertEquals(notification1.scheduleOn)
 
-            //Second session should have started in current hour
-            val session2 = sessionList[1]
-            assertEquals("Daily Sessions", session2.sessionInfo.label)
-            assertEquals("XlZ3SrLpmEQ2E8PuUUcs7g", session2.instanceGuid)
-            assertFalse(session2.isInPast(getTodayInstant()))
-            assertTrue(session2.isAvailableNow(getTodayInstant()))
-            assertFalse(session2.isInFuture(getTodayInstant()))
+                //Second session should have started in current hour
+                val session2 = sessionList[1]
+                assertEquals("Daily Sessions", session2.sessionInfo.label)
+                assertEquals("XlZ3SrLpmEQ2E8PuUUcs7g", session2.instanceGuid)
+                assertFalse(session2.isInPast(getTodayInstant()))
+                assertTrue(session2.isAvailableNow(getTodayInstant()))
+                assertFalse(session2.isInFuture(getTodayInstant()))
 
-            //Third session will be starting next hour
-            val session3 = sessionList[2]
-            assertEquals("Daily Sessions", session3.sessionInfo.label)
-            assertEquals("-B_yTKp8eTGK7NY_qJ0UTA", session3.instanceGuid)
-            assertFalse(session3.isInPast(getTodayInstant()))
-            assertFalse(session3.isAvailableNow(getTodayInstant()))
-            assertTrue(session3.isInFuture(getTodayInstant()))
+                //Third session will be starting next hour
+                val session3 = sessionList[2]
+                assertEquals("Daily Sessions", session3.sessionInfo.label)
+                assertEquals("-B_yTKp8eTGK7NY_qJ0UTA", session3.instanceGuid)
+                assertFalse(session3.isInPast(getTodayInstant()))
+                assertFalse(session3.isAvailableNow(getTodayInstant()))
+                assertTrue(session3.isInFuture(getTodayInstant()))
+            }
         }
     }
 
@@ -501,33 +507,46 @@ class ScheduleTimelineRepoTest: BaseTest() {
         runTest {
             val eventTimeStamp = Clock.System.now().minus(DateTimeUnit.DAY, TimeZone.currentSystemDefault())
             val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
-
-            val resourceResult = repo.getSessionsForDay(
-                "testScheduledSessionsDay1TodayAndNotifications",
+            val studyId = "testScheduledSessionsDay1TodayAndNotifications"
+            val resourceResultV1 = repo.getSessionsForDay(
+                studyId,
                 getTodayInstant(),
                 true
             ).firstOrNull { it is ResourceResult.Success }
+            assertTrue(resourceResultV1 is ResourceResult.Success)
+            val resourceResultV2 = repo.getSessionsForDayV2(
+                studyId,
+                getTodayInstant(),
+                false
+            ).firstOrNull { it is ResourceResult.Success }
 
-            assertTrue(resourceResult is ResourceResult.Success)
-            val sessionList = resourceResult.data.scheduledSessionWindows
-            assertNotNull(sessionList)
-            assertEquals(3, sessionList.size)
+            val listOfResults = listOf(resourceResultV1, resourceResultV2)
 
-            //First session should be the 3 day session that started yesterday
-            val session1 = sessionList[0]
-            assertEquals("One time 3 day session", session1.sessionInfo.label)
+            listOfResults.forEach { resourceResult ->
 
-            //Second session should have started in current hour
-            val session2 = sessionList[1]
-            assertEquals("Daily Sessions", session2.sessionInfo.label)
-            assertEquals("XlZ3SrLpmEQ2E8PuUUcs7g", session2.instanceGuid)
+                assertTrue(resourceResult is ResourceResult.Success)
+                val sessionList = resourceResult.data.scheduledSessionWindows
+                assertNotNull(sessionList)
+                assertEquals(3, sessionList.size)
 
-            //Third session will be starting next hour
-            val session3 = sessionList[2]
-            assertEquals("Daily Sessions", session3.sessionInfo.label)
-            assertEquals("-B_yTKp8eTGK7NY_qJ0UTA", session3.instanceGuid)
+                //First session should be the 3 day session that started yesterday
+                val session1 = sessionList[0]
+                assertEquals("One time 3 day session", session1.sessionInfo.label)
 
-            val notifications = resourceResult.data.notifications
+                //Second session should have started in current hour
+                val session2 = sessionList[1]
+                assertEquals("Daily Sessions", session2.sessionInfo.label)
+                assertEquals("XlZ3SrLpmEQ2E8PuUUcs7g", session2.instanceGuid)
+
+                //Third session will be starting next hour
+                val session3 = sessionList[2]
+                assertEquals("Daily Sessions", session3.sessionInfo.label)
+                assertEquals("-B_yTKp8eTGK7NY_qJ0UTA", session3.instanceGuid)
+            }
+            val notificationsV2 = repo.participantScheduleDatabase.getCachedPendingNotifications(studyId, getTodayInstant())
+            assertEquals(9, notificationsV2.size)
+
+            val notifications = resourceResultV1.data.notifications
             assertNotNull(notifications)
             assertEquals(9, notifications.size)
         }
@@ -538,48 +557,63 @@ class ScheduleTimelineRepoTest: BaseTest() {
         runTest {
             val eventTimeStamp = Clock.System.now().minus(DateTimeUnit.DAY, TimeZone.currentSystemDefault())
             val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
-
-            val resourceResult = repo.getSessionsForDay(
-                "testScheduledSessionsDay1TodayAndTomorrow",
+            val studyId = "testScheduledSessionsDay1TodayAndTomorrow"
+            val resourceResultV1 = repo.getSessionsForDay(
+                studyId,
                 getTodayInstant(),
                 includeAllNotifications = true,
                 alwaysIncludeNextDay = true
             ).firstOrNull { it is ResourceResult.Success }
+            assertTrue(resourceResultV1 is ResourceResult.Success)
+            val resourceResultV2 = repo.getSessionsForDayV2(
+                studyId,
+                getTodayInstant(),
+                alwaysIncludeNextDay = true
+            ).firstOrNull { it is ResourceResult.Success }
 
-            assertTrue(resourceResult is ResourceResult.Success)
-            val sessionList = resourceResult.data.scheduledSessionWindows
-            assertNotNull(sessionList)
-            assertEquals(6, sessionList.size)
+            val listOfResults = listOf(resourceResultV1, resourceResultV2)
 
-            //First session should be the 3 day session that started yesterday
-            val session1 = sessionList[0]
-            assertEquals("One time 3 day session", session1.sessionInfo.label)
+            listOfResults.forEach { resourceResult ->
 
-            //Second session should have started in current hour
-            val session2 = sessionList[1]
-            assertEquals("Daily Sessions", session2.sessionInfo.label)
-            assertEquals("XlZ3SrLpmEQ2E8PuUUcs7g", session2.instanceGuid)
 
-            //Third session will be starting next hour
-            val session3 = sessionList[2]
-            assertEquals("Daily Sessions", session3.sessionInfo.label)
-            assertEquals("-B_yTKp8eTGK7NY_qJ0UTA", session3.instanceGuid)
+                assertTrue(resourceResult is ResourceResult.Success)
+                val sessionList = resourceResult.data.scheduledSessionWindows
+                assertNotNull(sessionList)
+                assertEquals(6, sessionList.size)
 
-            // Next day is shown b/c it was explicitly asked to be included
+                //First session should be the 3 day session that started yesterday
+                val session1 = sessionList[0]
+                assertEquals("One time 3 day session", session1.sessionInfo.label)
 
-            val session4 = sessionList[3]
-            assertEquals("Daily Sessions", session4.sessionInfo.label)
-            assertEquals("6YyBNuEPir0Vkd3a-crQbA", session4.instanceGuid)
+                //Second session should have started in current hour
+                val session2 = sessionList[1]
+                assertEquals("Daily Sessions", session2.sessionInfo.label)
+                assertEquals("XlZ3SrLpmEQ2E8PuUUcs7g", session2.instanceGuid)
 
-            val session5 = sessionList[4]
-            assertEquals("Daily Sessions", session5.sessionInfo.label)
-            assertEquals("CDWlxjraDB_yn_jUl0YagA", session5.instanceGuid)
+                //Third session will be starting next hour
+                val session3 = sessionList[2]
+                assertEquals("Daily Sessions", session3.sessionInfo.label)
+                assertEquals("-B_yTKp8eTGK7NY_qJ0UTA", session3.instanceGuid)
 
-            val session6 = sessionList[5]
-            assertEquals("Daily Sessions", session6.sessionInfo.label)
-            assertEquals("wSFtq35JbCog5s4TXXMNRw", session6.instanceGuid)
+                // Next day is shown b/c it was explicitly asked to be included
 
-            val notifications = resourceResult.data.notifications
+                val session4 = sessionList[3]
+                assertEquals("Daily Sessions", session4.sessionInfo.label)
+                assertEquals("6YyBNuEPir0Vkd3a-crQbA", session4.instanceGuid)
+
+                val session5 = sessionList[4]
+                assertEquals("Daily Sessions", session5.sessionInfo.label)
+                assertEquals("CDWlxjraDB_yn_jUl0YagA", session5.instanceGuid)
+
+                val session6 = sessionList[5]
+                assertEquals("Daily Sessions", session6.sessionInfo.label)
+                assertEquals("wSFtq35JbCog5s4TXXMNRw", session6.instanceGuid)
+            }
+
+            val notificationsV2 = repo.participantScheduleDatabase.getCachedPendingNotifications(studyId, getTodayInstant())
+            assertEquals(9, notificationsV2.size)
+
+            val notifications = resourceResultV1.data.notifications
             assertNotNull(notifications)
             assertEquals(9, notifications.size)
         }
@@ -591,45 +625,56 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val eventTimeStamp = Clock.System.now().minus(DateTimeUnit.DAY, TimeZone.currentSystemDefault())
             val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
 
-            val resourceResult = repo.getSessionsForDay(
+            val resourceResultV1 = repo.getSessionsForDay(
                 "testScheduledSessionsDay1TodayAndTomorrow_NoNotifications",
                 getTodayInstant(),
                 includeAllNotifications = false,
                 alwaysIncludeNextDay = true
             ).firstOrNull { it is ResourceResult.Success }
 
-            assertTrue(resourceResult is ResourceResult.Success)
-            val sessionList = resourceResult.data.scheduledSessionWindows
-            assertNotNull(sessionList)
-            assertEquals(6, sessionList.size)
+            val resourceResultV2 = repo.getSessionsForDayV2(
+                "testScheduledSessionsDay1TodayAndTomorrow_NoNotifications",
+                getTodayInstant(),
+                alwaysIncludeNextDay = true
+            ).firstOrNull { it is ResourceResult.Success }
 
-            //First session should be the 3 day session that started yesterday
-            val session1 = sessionList[0]
-            assertEquals("One time 3 day session", session1.sessionInfo.label)
+            val listOfResults = listOf(resourceResultV1, resourceResultV2)
+            listOfResults.forEach { resourceResult ->
 
-            //Second session should have started in current hour
-            val session2 = sessionList[1]
-            assertEquals("Daily Sessions", session2.sessionInfo.label)
-            assertEquals("XlZ3SrLpmEQ2E8PuUUcs7g", session2.instanceGuid)
+                assertTrue(resourceResult is ResourceResult.Success)
+                val sessionList = resourceResult.data.scheduledSessionWindows
 
-            //Third session will be starting next hour
-            val session3 = sessionList[2]
-            assertEquals("Daily Sessions", session3.sessionInfo.label)
-            assertEquals("-B_yTKp8eTGK7NY_qJ0UTA", session3.instanceGuid)
+                assertNotNull(sessionList)
+                assertEquals(6, sessionList.size)
 
-            // Next day is shown b/c it was explicitly asked to be included
+                //First session should be the 3 day session that started yesterday
+                val session1 = sessionList[0]
+                assertEquals("One time 3 day session", session1.sessionInfo.label)
 
-            val session4 = sessionList[3]
-            assertEquals("Daily Sessions", session4.sessionInfo.label)
-            assertEquals("6YyBNuEPir0Vkd3a-crQbA", session4.instanceGuid)
+                //Second session should have started in current hour
+                val session2 = sessionList[1]
+                assertEquals("Daily Sessions", session2.sessionInfo.label)
+                assertEquals("XlZ3SrLpmEQ2E8PuUUcs7g", session2.instanceGuid)
 
-            val session5 = sessionList[4]
-            assertEquals("Daily Sessions", session5.sessionInfo.label)
-            assertEquals("CDWlxjraDB_yn_jUl0YagA", session5.instanceGuid)
+                //Third session will be starting next hour
+                val session3 = sessionList[2]
+                assertEquals("Daily Sessions", session3.sessionInfo.label)
+                assertEquals("-B_yTKp8eTGK7NY_qJ0UTA", session3.instanceGuid)
 
-            val session6 = sessionList[5]
-            assertEquals("Daily Sessions", session6.sessionInfo.label)
-            assertEquals("wSFtq35JbCog5s4TXXMNRw", session6.instanceGuid)
+                // Next day is shown b/c it was explicitly asked to be included
+
+                val session4 = sessionList[3]
+                assertEquals("Daily Sessions", session4.sessionInfo.label)
+                assertEquals("6YyBNuEPir0Vkd3a-crQbA", session4.instanceGuid)
+
+                val session5 = sessionList[4]
+                assertEquals("Daily Sessions", session5.sessionInfo.label)
+                assertEquals("CDWlxjraDB_yn_jUl0YagA", session5.instanceGuid)
+
+                val session6 = sessionList[5]
+                assertEquals("Daily Sessions", session6.sessionInfo.label)
+                assertEquals("wSFtq35JbCog5s4TXXMNRw", session6.instanceGuid)
+            }
         }
     }
 
@@ -640,37 +685,41 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
 
             val todayInstant = getTodayInstant().plus(90, DateTimeUnit.MINUTE, TimeZone.currentSystemDefault())
-            val resourceResult = repo.getSessionsForDay("testScheduledSessionsDay1NoUpNextOnToday", todayInstant).firstOrNull { it is ResourceResult.Success }
+            val resourceResultV1 = repo.getSessionsForDay("testScheduledSessionsDay1NoUpNextOnToday", todayInstant, alwaysIncludeNextDay = true).firstOrNull { it is ResourceResult.Success }
+            val resourceResultV2 = repo.getSessionsForDayV2("testScheduledSessionsDay1NoUpNextOnToday", todayInstant, alwaysIncludeNextDay = true).firstOrNull { it is ResourceResult.Success }
 
-            assertTrue(resourceResult is ResourceResult.Success)
-            val sessionList = resourceResult.data.scheduledSessionWindows
-            assertNotNull(sessionList)
-            assertEquals(5, sessionList.size)
+            val listOfResults = listOf(resourceResultV1, resourceResultV2)
+            listOfResults.forEach { resourceResult ->
+                assertTrue(resourceResult is ResourceResult.Success)
+                val sessionList = resourceResult.data.scheduledSessionWindows
+                assertNotNull(sessionList)
+                assertEquals(5, sessionList.size)
 
-            //First session should be the 3 day session that started yesterday
-            val session1 = sessionList[0]
-            assertEquals("One time 3 day session", session1.sessionInfo.label)
-            assertFalse(session1.isCompleted)
+                //First session should be the 3 day session that started yesterday
+                val session1 = sessionList[0]
+                assertEquals("One time 3 day session", session1.sessionInfo.label)
+                assertFalse(session1.isCompleted)
 
-            //Second session should have started today
-            val session2 = sessionList[1]
-            assertEquals("Daily Sessions", session2.sessionInfo.label)
-            assertEquals("-B_yTKp8eTGK7NY_qJ0UTA", session2.instanceGuid)
-            assertFalse(session2.isCompleted)
+                //Second session should have started today
+                val session2 = sessionList[1]
+                assertEquals("Daily Sessions", session2.sessionInfo.label)
+                assertEquals("-B_yTKp8eTGK7NY_qJ0UTA", session2.instanceGuid)
+                assertFalse(session2.isCompleted)
 
-            // Next day is shown b/c the current day is finished or available
+                // Next day is shown b/c the current day is finished or available
 
-            val session3 = sessionList[2]
-            assertEquals("Daily Sessions", session3.sessionInfo.label)
-            assertEquals("6YyBNuEPir0Vkd3a-crQbA", session3.instanceGuid)
+                val session3 = sessionList[2]
+                assertEquals("Daily Sessions", session3.sessionInfo.label)
+                assertEquals("6YyBNuEPir0Vkd3a-crQbA", session3.instanceGuid)
 
-            val session4 = sessionList[3]
-            assertEquals("Daily Sessions", session4.sessionInfo.label)
-            assertEquals("CDWlxjraDB_yn_jUl0YagA", session4.instanceGuid)
+                val session4 = sessionList[3]
+                assertEquals("Daily Sessions", session4.sessionInfo.label)
+                assertEquals("CDWlxjraDB_yn_jUl0YagA", session4.instanceGuid)
 
-            val session5 = sessionList[4]
-            assertEquals("Daily Sessions", session5.sessionInfo.label)
-            assertEquals("wSFtq35JbCog5s4TXXMNRw", session5.instanceGuid)
+                val session5 = sessionList[4]
+                assertEquals("Daily Sessions", session5.sessionInfo.label)
+                assertEquals("wSFtq35JbCog5s4TXXMNRw", session5.instanceGuid)
+            }
         }
     }
 
@@ -683,45 +732,51 @@ class ScheduleTimelineRepoTest: BaseTest() {
             repo.adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)
 
             val todayInstant = getTodayInstant().plus(90, DateTimeUnit.MINUTE, TimeZone.currentSystemDefault())
-            val resourceResult = repo.getSessionsForDay(studyId, todayInstant).firstOrNull { it is ResourceResult.Success }
-            assertTrue(resourceResult is ResourceResult.Success)
-            val sessionList = resourceResult.data.scheduledSessionWindows
-            assertNotNull(sessionList)
-            assertEquals(6, sessionList.size)
+            val resourceResultV1 = repo.getSessionsForDay(studyId, todayInstant, alwaysIncludeNextDay = true).firstOrNull { it is ResourceResult.Success }
+            val resourceResultV2 = repo.getSessionsForDayV2(studyId, todayInstant, alwaysIncludeNextDay = true).firstOrNull { it is ResourceResult.Success }
 
-            //First session should be the 3 day session that started yesterday
-            val session1 = sessionList[0]
-            assertEquals("One time 3 day session", session1.sessionInfo.label)
-            assertTrue(session1.isCompleted)
+            val listOfResults = listOf(resourceResultV1, resourceResultV2)
+            listOfResults.forEach { resourceResult ->
+                assertTrue(resourceResult is ResourceResult.Success)
+                val sessionList = resourceResult.data.scheduledSessionWindows
 
-            //Second session should have started today
-            val session2 = sessionList[1]
-            assertEquals("Daily Sessions", session2.sessionInfo.label)
-            assertEquals("CDWlxjraDB_yn_jUl0YagA", session2.instanceGuid)
-            assertTrue(session2.isCompleted)
+                assertNotNull(sessionList)
+                assertEquals(5, sessionList.size)
 
-            //Third session should have started today
-            val session3 = sessionList[2]
-            assertEquals("Daily Sessions", session3.sessionInfo.label)
-            assertEquals("wSFtq35JbCog5s4TXXMNRw", session3.instanceGuid)
-            assertFalse(session3.isCompleted)
+                //First session should be the 3 day session that started yesterday
+                val session1 = sessionList[0]
+                assertEquals("One time 3 day session", session1.sessionInfo.label)
+                assertTrue(session1.isCompleted)
 
-            // Next day is shown b/c the current day is finished or available
+//                //Second session should have started today
+//                val session2 = sessionList[1]
+//                assertEquals("Daily Sessions", session2.sessionInfo.label)
+//                assertEquals("CDWlxjraDB_yn_jUl0YagA", session2.instanceGuid)
+//                assertTrue(session2.isCompleted)
 
-            //Fourth session will start tomorrow
-            val session4 = sessionList[3]
-            assertEquals("Daily Sessions", session4.sessionInfo.label)
-            assertEquals("T8X0XUUwUwcr3k6zEh7cBw", session4.instanceGuid)
+                //Third session should have started today
+                val session3 = sessionList[1]
+                assertEquals("Daily Sessions", session3.sessionInfo.label)
+                assertEquals("wSFtq35JbCog5s4TXXMNRw", session3.instanceGuid)
+                assertFalse(session3.isCompleted)
 
-            //Fifth session will start tomorrow
-            val session5 = sessionList[4]
-            assertEquals("Daily Sessions", session5.sessionInfo.label)
-            assertEquals("ud-UBuDNBFHDtDrx9YodFA", session5.instanceGuid)
+                // Next day is shown b/c the current day is finished or available
 
-            //Sixth session will start tomorrow
-            val session6 = sessionList[5]
-            assertEquals("Daily Sessions", session6.sessionInfo.label)
-            assertEquals("CukddPZ9eXREe7lxuL0cXQ", session6.instanceGuid)
+                //Fourth session will start tomorrow
+                val session4 = sessionList[2]
+                assertEquals("Daily Sessions", session4.sessionInfo.label)
+                assertEquals("T8X0XUUwUwcr3k6zEh7cBw", session4.instanceGuid)
+
+                //Fifth session will start tomorrow
+                val session5 = sessionList[3]
+                assertEquals("Daily Sessions", session5.sessionInfo.label)
+                assertEquals("ud-UBuDNBFHDtDrx9YodFA", session5.instanceGuid)
+
+                //Sixth session will start tomorrow
+                val session6 = sessionList[4]
+                assertEquals("Daily Sessions", session6.sessionInfo.label)
+                assertEquals("CukddPZ9eXREe7lxuL0cXQ", session6.instanceGuid)
+            }
         }
     }
 
@@ -730,23 +785,28 @@ class ScheduleTimelineRepoTest: BaseTest() {
         runTest {
             val eventTimeStamp = Clock.System.now().minus(3, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
             val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
-            val resourceResult = repo.getSessionsForDay("testScheduledSessionsDay3", getTodayInstant()).firstOrNull { it is ResourceResult.Success }
+            val resourceResultV1 = repo.getSessionsForDay("testScheduledSessionsDay3", getTodayInstant()).firstOrNull { it is ResourceResult.Success }
+            val resourceResultV2 = repo.getSessionsForDayV2("testScheduledSessionsDay3", getTodayInstant()).firstOrNull { it is ResourceResult.Success }
 
-            assertTrue(resourceResult is ResourceResult.Success)
-            val sessionList = resourceResult.data.scheduledSessionWindows
-            assertNotNull(sessionList)
-            assertEquals(2, sessionList.size)
+            val listOfResults = listOf(resourceResultV1, resourceResultV2)
+            listOfResults.forEach { resourceResult ->
+                assertTrue(resourceResult is ResourceResult.Success)
+                val sessionList = resourceResult.data.scheduledSessionWindows
 
-            //First session should have started in current hour
-            val session2 = sessionList[0]
-            assertEquals("Daily Sessions", session2.sessionInfo.label)
-            assertEquals("ud-UBuDNBFHDtDrx9YodFA", session2.instanceGuid)
-            assertFalse(session2.isCompleted)
+                assertNotNull(sessionList)
+                assertEquals(2, sessionList.size)
 
-            //Second session will be starting next hour
-            val session3 = sessionList[1]
-            assertEquals("Daily Sessions", session3.sessionInfo.label)
-            assertEquals("CukddPZ9eXREe7lxuL0cXQ", session3.instanceGuid)
+                //First session should have started in current hour
+                val session2 = sessionList[0]
+                assertEquals("Daily Sessions", session2.sessionInfo.label)
+                assertEquals("ud-UBuDNBFHDtDrx9YodFA", session2.instanceGuid)
+                assertFalse(session2.isCompleted)
+
+                //Second session will be starting next hour
+                val session3 = sessionList[1]
+                assertEquals("Daily Sessions", session3.sessionInfo.label)
+                assertEquals("CukddPZ9eXREe7lxuL0cXQ", session3.instanceGuid)
+            }
 
         }
     }
@@ -758,22 +818,28 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val eventTimeStamp = Clock.System.now().minus(3, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
             val repo = getTestScheduleTimelineRepo(adherenceRecordjson, timeStamp = eventTimeStamp)
             repo.adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)
-            val resourceResult = repo.getSessionsForDay(studyId, getTodayInstant()).firstOrNull { it is ResourceResult.Success }
-            assertTrue(resourceResult is ResourceResult.Success)
-            val sessionList = resourceResult.data.scheduledSessionWindows
-            assertNotNull(sessionList)
-            assertEquals(2, sessionList.size)
+            val resourceResultV1 = repo.getSessionsForDay(studyId, getTodayInstant()).firstOrNull { it is ResourceResult.Success }
+            val resourceResultV2 = repo.getSessionsForDayV2(studyId, getTodayInstant()).firstOrNull { it is ResourceResult.Success }
 
-            //First session should have started in current hour and be completed
-            val session2 = sessionList[0]
-            assertEquals("Daily Sessions", session2.sessionInfo.label)
-            assertEquals("ud-UBuDNBFHDtDrx9YodFA", session2.instanceGuid)
-            assertTrue(session2.isCompleted)
+            val listOfResults = listOf(resourceResultV1, resourceResultV2)
+            listOfResults.forEach { resourceResult ->
+                assertTrue(resourceResult is ResourceResult.Success)
+                val sessionList = resourceResult.data.scheduledSessionWindows
 
-            //Second session will be starting next hour
-            val session3 = sessionList[1]
-            assertEquals("Daily Sessions", session3.sessionInfo.label)
-            assertEquals("CukddPZ9eXREe7lxuL0cXQ", session3.instanceGuid)
+                assertNotNull(sessionList)
+                assertEquals(2, sessionList.size)
+
+                //First session should have started in current hour and be completed
+                val session2 = sessionList[0]
+                assertEquals("Daily Sessions", session2.sessionInfo.label)
+                assertEquals("ud-UBuDNBFHDtDrx9YodFA", session2.instanceGuid)
+                assertTrue(session2.isCompleted)
+
+                //Second session will be starting next hour
+                val session3 = sessionList[1]
+                assertEquals("Daily Sessions", session3.sessionInfo.label)
+                assertEquals("CukddPZ9eXREe7lxuL0cXQ", session3.instanceGuid)
+            }
 
         }
     }
@@ -783,12 +849,15 @@ class ScheduleTimelineRepoTest: BaseTest() {
         runTest {
             val eventTimeStamp = Clock.System.now().minus(4, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
             val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
-            val resourceResult = repo.getSessionsForDay("testScheduledSessionsDay4", getTodayInstant()).firstOrNull { it is ResourceResult.Success }
-
-            assertTrue(resourceResult is ResourceResult.Success)
-            val sessionList = resourceResult.data.scheduledSessionWindows
-            assertNotNull(sessionList)
-            assertTrue(sessionList.isEmpty())
+            val resourceResultV1 = repo.getSessionsForDay("testScheduledSessionsDay4", getTodayInstant()).firstOrNull { it is ResourceResult.Success }
+            val resourceResultV2 = repo.getSessionsForDayV2("testScheduledSessionsDay4", getTodayInstant()).firstOrNull { it is ResourceResult.Success }
+            val listOfResults = listOf(resourceResultV1, resourceResultV2)
+            listOfResults.forEach { resourceResult ->
+                assertTrue(resourceResult is ResourceResult.Success)
+                val sessionList = resourceResult.data.scheduledSessionWindows
+                assertNotNull(sessionList)
+                assertTrue(sessionList.isEmpty())
+            }
         }
     }
 
@@ -830,9 +899,18 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val studyId = "testPastSessionsDay2WithCompletion"
             val eventTimeStamp =
                 Clock.System.now().minus(2, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
-            val repo =
-                getTestScheduleTimelineRepo(adherenceRecordDay2json, timeStamp = eventTimeStamp)
+            val repo = getTestScheduleTimelineRepo(adherenceRecordDay2json, timeStamp = eventTimeStamp)
+            // Force a load of the schedule so it gets written to the cache
+            repo.loadRemoteTimeline(studyId)
+            // Load the adherence records so they get written to cache
             repo.adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)
+
+            val adherenceRecordsMap = repo.adherenceRecordRepo.getAllCompletedCachedAssessmentAdherence(studyId).firstOrNull()
+            assertNotNull(adherenceRecordsMap)
+            val records = adherenceRecordsMap.values.flatten()
+            assertEquals(2, records.size)
+            assertEquals("Assessment Test 1", records[0].assessmentInfo.label)
+            assertEquals("Shape-Color Sorting", records[1].assessmentInfo.label)
 
             val todayInstant =
                 getTodayInstant().plus(90, DateTimeUnit.MINUTE, TimeZone.currentSystemDefault())
@@ -2430,56 +2508,61 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp, timelineJson = getAnotherTimelineJson(eventTimeStamp))
 
             val now = getTodayInstant(17)
-            val resourceResult = repo.getSessionsForDay("sage-assessment-test", now).firstOrNull { it is ResourceResult.Success }
+            val resourceResultV1 = repo.getSessionsForDay("sage-assessment-test", now, alwaysIncludeNextDay = true).firstOrNull { it is ResourceResult.Success }
+            val resourceResultV2 = repo.getSessionsForDayV2("sage-assessment-test", now, alwaysIncludeNextDay = true).firstOrNull { it is ResourceResult.Success }
 
-            assertTrue(resourceResult is ResourceResult.Success)
-            val sessionList = resourceResult.data.scheduledSessionWindows
-            assertNotNull(sessionList)
-            assertEquals(6, sessionList.size)
+            val listOfResults = listOf(resourceResultV1, resourceResultV2)
+            listOfResults.forEach { resourceResult ->
 
-            //First session should be the first day session that is available at midnight
-            val session1 = sessionList[0]
-            assertEquals(getLocalDateTime(now, 0), session1.startDateTime)
-            assertEquals(getLocalDateTime(now, 0, 1), session1.endDateTime)
-            assertEquals(0, session1.startDateTime.hour)
-            assertEquals(0, session1.startDateTime.minute)
-            assertFalse(session1.hasStartTimeOfDay)
-            assertFalse(session1.hasEndTimeOfDay)
+                assertTrue(resourceResult is ResourceResult.Success)
+                val sessionList = resourceResult.data.scheduledSessionWindows
+                assertNotNull(sessionList)
+                assertEquals(6, sessionList.size)
 
-            // Second session should be the first day session that is available at 8:00 until end of study
-            val session2 = sessionList[1]
-            assertEquals(getLocalDateTime(now, 8), session2.startDateTime)
-            assertEquals(getLocalDateTime(now, 8, 14), session2.endDateTime)
-            assertTrue(session2.hasStartTimeOfDay)
-            assertFalse(session1.hasEndTimeOfDay)
+                //First session should be the first day session that is available at midnight
+                val session1 = sessionList[0]
+                assertEquals(getLocalDateTime(now, 0), session1.startDateTime)
+                assertEquals(getLocalDateTime(now, 0, 1), session1.endDateTime)
+                assertEquals(0, session1.startDateTime.hour)
+                assertEquals(0, session1.startDateTime.minute)
+                assertFalse(session1.hasStartTimeOfDay)
+                assertFalse(session1.hasEndTimeOfDay)
 
-            // Third session should be available tomorrow at 8:00AM for 1 hour
-            val session3 = sessionList[2]
-            assertEquals(getLocalDateTime(now, 8, 1), session3.startDateTime)
-            assertEquals(getLocalDateTime(now, 9, 1), session3.endDateTime)
-            assertTrue(session3.hasStartTimeOfDay)
-            assertTrue(session3.hasEndTimeOfDay)
+                // Second session should be the first day session that is available at 8:00 until end of study
+                val session2 = sessionList[1]
+                assertEquals(getLocalDateTime(now, 8), session2.startDateTime)
+                assertEquals(getLocalDateTime(now, 8, 14), session2.endDateTime)
+                assertTrue(session2.hasStartTimeOfDay)
+                assertFalse(session1.hasEndTimeOfDay)
 
-            // Fourth session should be available tomorrow at 12:00PM for 1 hour
-            val session4 = sessionList[3]
-            assertEquals(getLocalDateTime(now, 12, 1), session4.startDateTime)
-            assertEquals(getLocalDateTime(now, 13, 1), session4.endDateTime)
-            assertTrue(session4.hasStartTimeOfDay)
-            assertTrue(session4.hasEndTimeOfDay)
+                // Third session should be available tomorrow at 8:00AM for 1 hour
+                val session3 = sessionList[2]
+                assertEquals(getLocalDateTime(now, 8, 1), session3.startDateTime)
+                assertEquals(getLocalDateTime(now, 9, 1), session3.endDateTime)
+                assertTrue(session3.hasStartTimeOfDay)
+                assertTrue(session3.hasEndTimeOfDay)
 
-            // Fifth session should be available tomorrow at 4:00PM for 1 hour
-            val session5 = sessionList[4]
-            assertEquals(getLocalDateTime(now, 16, 1), session5.startDateTime)
-            assertEquals(getLocalDateTime(now, 17, 1), session5.endDateTime)
-            assertTrue(session5.hasStartTimeOfDay)
-            assertTrue(session5.hasEndTimeOfDay)
+                // Fourth session should be available tomorrow at 12:00PM for 1 hour
+                val session4 = sessionList[3]
+                assertEquals(getLocalDateTime(now, 12, 1), session4.startDateTime)
+                assertEquals(getLocalDateTime(now, 13, 1), session4.endDateTime)
+                assertTrue(session4.hasStartTimeOfDay)
+                assertTrue(session4.hasEndTimeOfDay)
 
-            // Sixth session should be available tomorrow at 8:00PM for 1 hour
-            val session6 = sessionList[5]
-            assertEquals(getLocalDateTime(now, 20, 1), session6.startDateTime)
-            assertEquals(getLocalDateTime(now, 21, 1), session6.endDateTime)
-            assertTrue(session6.hasStartTimeOfDay)
-            assertTrue(session6.hasEndTimeOfDay)
+                // Fifth session should be available tomorrow at 4:00PM for 1 hour
+                val session5 = sessionList[4]
+                assertEquals(getLocalDateTime(now, 16, 1), session5.startDateTime)
+                assertEquals(getLocalDateTime(now, 17, 1), session5.endDateTime)
+                assertTrue(session5.hasStartTimeOfDay)
+                assertTrue(session5.hasEndTimeOfDay)
+
+                // Sixth session should be available tomorrow at 8:00PM for 1 hour
+                val session6 = sessionList[5]
+                assertEquals(getLocalDateTime(now, 20, 1), session6.startDateTime)
+                assertEquals(getLocalDateTime(now, 21, 1), session6.endDateTime)
+                assertTrue(session6.hasStartTimeOfDay)
+                assertTrue(session6.hasEndTimeOfDay)
+            }
 
         }
     }
@@ -2845,6 +2928,9 @@ class ScheduleTimelineRepoTest: BaseTest() {
             // All activities within the one session have been completed,
             // so result should have nothing more to do and notifications empty.
             assertEquals(0, resourceResult.data.notifications.count(), "notifications=${resourceResult.data.notifications}")
+
+            val pendingNotifications = repo.participantScheduleDatabase.getCachedPendingNotifications(studyId, todayInstant)
+            assertEquals(0, pendingNotifications.count(), "notifications=${pendingNotifications}")
         }
     }
 

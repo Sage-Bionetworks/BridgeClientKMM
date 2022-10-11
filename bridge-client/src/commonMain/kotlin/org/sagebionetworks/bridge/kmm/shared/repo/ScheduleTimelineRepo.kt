@@ -2,6 +2,7 @@ package org.sagebionetworks.bridge.kmm.shared.repo
 
 import co.touchlab.stately.ensureNeverFrozen
 import io.ktor.client.*
+import io.ktor.util.collections.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -34,8 +35,14 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         ensureNeverFrozen()
     }
 
+    private var lastUpdate: MutableMap<String, Long> = mutableMapOf()
+
     private var scheduleApi = SchedulesV2Api(
         httpClient = httpClient
+    )
+
+    internal val participantScheduleDatabase = ParticipantScheduleDatabase(
+        databaseHelper = databaseHelper
     )
 
     private fun getCachedSchedule(studyId: String): ParticipantSchedule? {
@@ -43,6 +50,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
     }
 
     private fun updateCachedSchedule(participantSchedule: ParticipantSchedule, studyId: String) {
+        participantScheduleDatabase.cacheParticipantSchedule(studyId, participantSchedule)
         val resource = Resource(
             identifier = SCHEDULE_TIMELINE_ID + studyId,
             secondaryId = ResourceDatabaseHelper.DEFAULT_SECONDARY_ID,
@@ -76,9 +84,11 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         )
     }
 
-    private suspend fun loadRemoteTimeline(studyId: String): String {
+    internal suspend fun loadRemoteTimeline(studyId: String): String {
         var schedule = scheduleApi.getParticipantScheduleForSelf(studyId)
         schedule = scheduleMutator?.mutateParticipantSchedule(schedule) ?: schedule
+        lastUpdate.put(studyId, Clock.System.now().toEpochMilliseconds())
+        participantScheduleDatabase.cacheParticipantSchedule(studyId, schedule)
         backgroundScope.launch() {
             schedule.assessments?.let {
                 assessmentConfigRepo.loadAndCacheConfigs(it)
@@ -87,8 +97,19 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         return Json.encodeToString(schedule)
     }
 
+
+
+    internal suspend fun updateScheduleIfNeeded(studyId: String) {
+        val lu = lastUpdate.get(studyId)
+        if (lu == null || (lu + defaultUpdateFrequency < Clock.System.now().toEpochMilliseconds())) {
+            loadRemoteTimeline(studyId)
+        }
+    }
+
     internal fun clearCachedSchedule(studyId: String) {
         database.removeAllResources(ResourceType.PARTICIPANT_SCHEDULE, studyId)
+        participantScheduleDatabase.clearCachedSchedule(studyId)
+        lastUpdate.remove(studyId)
     }
 
     /**
@@ -109,8 +130,24 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
     }
 
     /**
+     * Get all the scheduled sessions for today that have not expired.
+     * @param studyId Study identifier
+     * @param includeAllNotifications Include all [ScheduledNotification]s
+     * @param alwaysIncludeNextDay Include the next day containing a [ScheduledSessionWindow]
+     */
+    fun getSessionsForTodayV2(studyId: String,
+                            alwaysIncludeNextDay: Boolean = true): Flow<ResourceResult<ScheduledSessionTimelineSlice>> {
+        return getSessionsForDayV2(
+            studyId = studyId,
+            instantInDay = Clock.System.now(),
+            alwaysIncludeNextDay,
+        )
+    }
+
+    /**
      * Get all sessions with a start time in the past.
      */
+    @Deprecated("Use AdherenceRecordRepo.getAllCompletedCachedAssessmentAdherence(studyId: String) to get history")
     fun getPastSessions(studyId: String, now: Instant = Clock.System.now()): Flow<ResourceResult<ScheduledSessionTimelineSlice>> {
         return combine(
             getTimeline(studyId),
@@ -131,6 +168,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
      * @param studyId the study identifier
      * @param now the current instant, or what you want to provide in testing.
      */
+    @Deprecated("This is only used by getStudyBurstSchedule, which has been replaced with a more optimized version")
     fun getFutureSessions(studyId: String, fromInstant: Instant = Clock.System.now())
         : Flow<ResourceResult<ScheduledSessionTimelineSlice>> {
 
@@ -235,9 +273,29 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         return ScheduledSessionTimelineSlice(
             instantInDay = instantInDay,
             timezone = timezone,
+            isLoaded = true,
             scheduledSessionWindows = schedules,
             notifications = emptyList()
         )
+    }
+
+    internal fun getSessionsForDayV2(
+        studyId: String,
+        instantInDay: Instant,
+        alwaysIncludeNextDay: Boolean = false
+    ): Flow<ResourceResult<ScheduledSessionTimelineSlice>> {
+        //TODO: Need to trigger check for updated schedule -nbrown 10/10/22
+        backgroundScope.launch {
+            updateScheduleIfNeeded(studyId)
+        }
+        return participantScheduleDatabase.getSessionsForDay(studyId, instantInDay, alwaysIncludeNextDay)
+            .map {
+                if (it.isLoaded) {
+                    ResourceResult.Success(it, ResourceStatus.SUCCESS)
+                } else {
+                    ResourceResult.InProgress
+                }
+            }
     }
 
     /**
@@ -349,6 +407,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         return ScheduledSessionTimelineSlice(
             instantInDay = instantInDay,
             timezone = timezone,
+            isLoaded = true,
             scheduledSessionWindows = schedules,
             notifications = notifications
         )
@@ -474,7 +533,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         }
 
         // Exit early if expired and not completed.
-        if (!filterType.includeExpired() && isExpired && !isCompleted) {
+        if (!filterType.includeExpired() && isExpired) {// && !isCompleted) {
             return null
         }
 
@@ -579,6 +638,7 @@ internal fun NotificationInfo.scheduleAt(instanceGuid: String,
 data class ScheduledSessionTimelineSlice (
     val instantInDay: Instant,
     val timezone: TimeZone,
+    val isLoaded: Boolean,
     val scheduledSessionWindows: List<ScheduledSessionWindow>,
     val notifications: List<ScheduledNotification>,
 )
@@ -640,6 +700,15 @@ data class ScheduledNotification(
     val scheduleOn: LocalDateTime,
     val repeatInterval: DateTimePeriod?,
     val repeatUntil: LocalDateTime?,
+    val allowSnooze: Boolean,
+    val message: NotificationMessage?,
+    val isTimeSensitive: Boolean = false,
+)
+
+@Serializable
+data class ScheduledNotificationV2(
+    val instanceGuid: String,
+    val scheduleOn: LocalDateTime,
     val allowSnooze: Boolean,
     val message: NotificationMessage?,
     val isTimeSensitive: Boolean = false,

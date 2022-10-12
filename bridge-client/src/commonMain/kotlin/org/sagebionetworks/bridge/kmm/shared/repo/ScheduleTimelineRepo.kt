@@ -35,8 +35,6 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         ensureNeverFrozen()
     }
 
-    private var lastUpdate: MutableMap<String, Long> = mutableMapOf()
-
     private var scheduleApi = SchedulesV2Api(
         httpClient = httpClient
     )
@@ -87,7 +85,6 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
     internal suspend fun loadRemoteTimeline(studyId: String): String {
         var schedule = scheduleApi.getParticipantScheduleForSelf(studyId)
         schedule = scheduleMutator?.mutateParticipantSchedule(schedule) ?: schedule
-        lastUpdate.put(studyId, Clock.System.now().toEpochMilliseconds())
         participantScheduleDatabase.cacheParticipantSchedule(studyId, schedule)
         backgroundScope.launch() {
             schedule.assessments?.let {
@@ -100,16 +97,22 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
 
 
     internal suspend fun updateScheduleIfNeeded(studyId: String) {
-        val lu = lastUpdate.get(studyId)
-        if (lu == null || (lu + defaultUpdateFrequency < Clock.System.now().toEpochMilliseconds())) {
-            loadRemoteTimeline(studyId)
+        val resourceIdentifier = SCHEDULE_TIMELINE_ID + studyId
+        val curResource = database.getResource(resourceIdentifier, ResourceType.PARTICIPANT_SCHEDULE, studyId )
+        if (curResource == null ||
+                    (curResource.lastUpdate + defaultUpdateFrequency < Clock.System.now().toEpochMilliseconds())) {
+            remoteLoadResource(database, resourceIdentifier, ResourceDatabaseHelper.DEFAULT_SECONDARY_ID,
+                resourceType = ResourceType.PARTICIPANT_SCHEDULE,
+                studyId = studyId,
+                curResource = curResource,
+                remoteLoad = { loadRemoteTimeline(studyId) }
+                )
         }
     }
 
     internal fun clearCachedSchedule(studyId: String) {
         database.removeAllResources(ResourceType.PARTICIPANT_SCHEDULE, studyId)
         participantScheduleDatabase.clearCachedSchedule(studyId)
-        lastUpdate.remove(studyId)
     }
 
     /**

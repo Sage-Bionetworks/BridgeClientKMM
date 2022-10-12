@@ -2944,7 +2944,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val resourceResultV1 = repo.getStudyBurstSchedule(studyId, timestamp)
                 .firstOrNull { it is ResourceResult.Success }
 
-            val resourceResultV2 = repo.getStudyBurstSchedule(studyId).firstOrNull { it is ResourceResult.Success }
+            val resourceResultV2 = repo.getStudyBurstScheduleV2(studyId).firstOrNull { it is ResourceResult.Success }
 
             val listOfResults = listOf(resourceResultV1, resourceResultV2)
             listOfResults.forEach { resourceResult ->

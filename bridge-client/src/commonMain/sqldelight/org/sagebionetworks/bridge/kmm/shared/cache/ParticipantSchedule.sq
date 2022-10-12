@@ -121,12 +121,12 @@ FROM fullScheduledSessions
 WHERE studyId = ? AND sessionInstanceGuid = ?;
 
 -- Get today's future sessions
-todaySessions:
+daySessions:
 SELECT *
 FROM fullScheduledSessions
 WHERE studyId = :studyId AND ((startDate <= :day AND endDate > :day) OR (endDate = :day AND endTime > :endTime));
 
-todayAndNextDayWithSessions:
+dayAndNextDayWithSessions:
 SELECT *
 FROM fullScheduledSessions
 WHERE fullScheduledSessions.studyId = :studyId AND (((startDate <= :day AND endDate > :day) OR (endDate = :day AND endTime > :endTime)) OR startDate IN (SELECT startDate

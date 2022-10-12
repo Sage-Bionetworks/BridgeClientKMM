@@ -2,17 +2,13 @@ package org.sagebionetworks.bridge.kmm.shared.cache
 
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
-import io.ktor.client.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import kotlinx.datetime.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.sagebionetworks.bridge.kmm.shared.apis.SchedulesV2Api
 import org.sagebionetworks.bridge.kmm.shared.models.*
 import org.sagebionetworks.bridge.kmm.shared.repo.*
 import kotlin.time.ExperimentalTime
@@ -21,26 +17,20 @@ class ParticipantScheduleDatabase(val databaseHelper: ResourceDatabaseHelper) {
 
     private val dbQuery = databaseHelper.database.participantScheduleQueries
 
-    internal fun getSessionsForToday(studyId: String,
-                            alwaysIncludeNextDay: Boolean = true,
-                            timezone: TimeZone = TimeZone.currentSystemDefault()): Flow<ScheduledSessionTimelineSlice> {
-        return getSessionsForDay(studyId, alwaysIncludeNextDay = alwaysIncludeNextDay, timezone = timezone)
-    }
-
     internal fun getSessionsForDay(studyId: String,
-                          day: Instant = Clock.System.now(),
-                          alwaysIncludeNextDay: Boolean = false,
-                          timezone: TimeZone = TimeZone.currentSystemDefault()): Flow<ScheduledSessionTimelineSlice> {
+                                   day: Instant = Clock.System.now(),
+                                   includeNextDay: Boolean = false,
+                                   timezone: TimeZone = TimeZone.currentSystemDefault()): Flow<ScheduledSessionTimelineSlice> {
         val nowDateTime = day.toLocalDateTime(timezone)
         val today = nowDateTime.date
         val nowTime = nowDateTime.time
 
-        if (alwaysIncludeNextDay) {
-            return dbQuery.todayAndNextDayWithSessions(studyId, today.toString(), nowTime.toString(), expandedSessionMapper).asFlow().mapToList(Dispatchers.Default).map {
+        if (includeNextDay) {
+            return dbQuery.dayAndNextDayWithSessions(studyId, today.toString(), nowTime.toString(), expandedSessionMapper).asFlow().mapToList(Dispatchers.Default).map {
                 getScheduledSessionTimelineSlice(studyId, day, timezone, it)
             }
         } else {
-            return dbQuery.todaySessions(studyId, today.toString(), nowTime.toString(), expandedSessionMapper).asFlow().mapToList(Dispatchers.Default).map {
+            return dbQuery.daySessions(studyId, today.toString(), nowTime.toString(), expandedSessionMapper).asFlow().mapToList(Dispatchers.Default).map {
                 getScheduledSessionTimelineSlice(studyId, day, timezone, it)
             }
         }
@@ -79,8 +69,10 @@ class ParticipantScheduleDatabase(val databaseHelper: ResourceDatabaseHelper) {
     }
 
     private fun getScheduledSessionTimelineSlice(studyId: String, instantInDay: Instant, timeZone: TimeZone, fullSessionsList: List<ExpandedScheduledSession>) : ScheduledSessionTimelineSlice {
+        // fullSessionsList has an entry for every assessment and adherence record every session
         val sessionWindows = fullSessionsList.groupBy { it.sessionInstanceGuid }
             .mapNotNull { (sessionInstanceGuid, assessments) ->
+                // assessments has an entry for every assessment and adherence record for a given session
                 extractScheduledSessionWindow(instantInDay, timeZone, assessments)
             }
         val createdOn = dbQuery.selectScheduleMetadata(studyId).executeAsOneOrNull()?.createdOn
@@ -100,6 +92,7 @@ class ParticipantScheduleDatabase(val databaseHelper: ResourceDatabaseHelper) {
         }
         val scheduleAssessmentList = session.groupBy { it.asssessmentInstanceGuid }
             .map {(instanceGuid, assessments) ->
+                // For persistent sessions we could have multiple adherence records per assessment
                 ScheduledAssessmentReference(
                     instanceGuid = instanceGuid,
                     studyId = assessments[0].studyId,
@@ -115,6 +108,7 @@ class ParticipantScheduleDatabase(val databaseHelper: ResourceDatabaseHelper) {
         val expirationInstant = startInstant.plus(scheduledSession.expiration, timezone)
         val endDateTime = expirationInstant.toLocalDateTime(timezone)
 
+        // TODO: Remove adding notifications which would allow removal instantInDay method argument -nbrown 10/12/22
         // Convert notifications, including for backwards compatibility
         val isCompleted = scheduleAssessmentList.all { it.isCompleted || it.isDeclined }
         val sessionInfo: SessionInfo = Json.decodeFromString(session[0].sessionInfoJson)
@@ -133,6 +127,7 @@ class ParticipantScheduleDatabase(val databaseHelper: ResourceDatabaseHelper) {
         )
     }
 
+    // Our own data class and mapper so we can reuse extraction code for getStudyBursts method
     data class ExpandedScheduledSession(
         public val studyId: String,
         public val instanceGuid: String,

@@ -162,10 +162,6 @@ SELECT *
 FROM fullScheduledSessions
 WHERE studyId = ? AND studyBurstID IS NOT NULL AND startEventId IS NOT NULL;
 
--- Need to check if session is completed or not before displaying
--- Keep a session level adherence record updated client side? Then can join Adherence record table...
--- Keep table updated to only have notifications that need to be displayed?
--- Have a isCompleted(sessionIntanceGuid) method on ScheduleTimelineRepo?
 -- Table will contain all potential notifications, including repeating ones expanded
 CREATE TABLE ScheduledNotifications (
     studyId TEXT NOT NULL,

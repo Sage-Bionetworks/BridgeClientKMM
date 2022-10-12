@@ -23,24 +23,24 @@ class ParticipantScheduleDatabase(val databaseHelper: ResourceDatabaseHelper) {
 
     internal fun getSessionsForToday(studyId: String,
                             alwaysIncludeNextDay: Boolean = true,
-                            timezone: TimeZone = TimeZone.currentSystemDefault()): Flow<ScheduledSessionTimelineSlice> {//Flow<ResourceResult<ScheduledSessionTimelineSlice>> {
+                            timezone: TimeZone = TimeZone.currentSystemDefault()): Flow<ScheduledSessionTimelineSlice> {
         return getSessionsForDay(studyId, alwaysIncludeNextDay = alwaysIncludeNextDay, timezone = timezone)
     }
 
     internal fun getSessionsForDay(studyId: String,
                           day: Instant = Clock.System.now(),
                           alwaysIncludeNextDay: Boolean = false,
-                          timezone: TimeZone = TimeZone.currentSystemDefault()): Flow<ScheduledSessionTimelineSlice> {//Flow<ResourceResult<ScheduledSessionTimelineSlice>> {
+                          timezone: TimeZone = TimeZone.currentSystemDefault()): Flow<ScheduledSessionTimelineSlice> {
         val nowDateTime = day.toLocalDateTime(timezone)
         val today = nowDateTime.date
         val nowTime = nowDateTime.time
 
         if (alwaysIncludeNextDay) {
-            return dbQuery.todayAndNextDayWithSessions(studyId, today.toString(), nowTime.toString()).asFlow().mapToList(Dispatchers.Default).map {
+            return dbQuery.todayAndNextDayWithSessions(studyId, today.toString(), nowTime.toString(), expandedSessionMapper).asFlow().mapToList(Dispatchers.Default).map {
                 getScheduledSessionTimelineSlice(studyId, day, timezone, it)
             }
         } else {
-            return dbQuery.todaySessions(studyId, today.toString(), nowTime.toString()).asFlow().mapToList(Dispatchers.Default).map {
+            return dbQuery.todaySessions(studyId, today.toString(), nowTime.toString(), expandedSessionMapper).asFlow().mapToList(Dispatchers.Default).map {
                 getScheduledSessionTimelineSlice(studyId, day, timezone, it)
             }
         }
@@ -50,13 +50,19 @@ class ParticipantScheduleDatabase(val databaseHelper: ResourceDatabaseHelper) {
         dbQuery.clearSchedule(studyId)
     }
 
-//    fun getStudyBurstSchedule(studyId: String,
-//                              timezone: TimeZone = TimeZone.currentSystemDefault())
-//            : Flow<ResourceResult<StudyBurstSchedule>> {
-//        val a = dbQuery.studyBurstSessions(studyId).asFlow().mapToList(Dispatchers.Default).map {
-//
-//        }
-//    }
+    internal fun getStudyBurstSchedule(studyId: String,
+                              timezone: TimeZone = TimeZone.currentSystemDefault())
+            : Flow<ResourceResult<StudyBurstSchedule>> {
+        return dbQuery.studyBurstSessions(studyId, expandedSessionMapper).asFlow().mapToList(Dispatchers.Default).map {
+            getScheduledSessionTimelineSlice(studyId, Clock.System.now(), timezone, it)
+        }.map {
+            if (it.isLoaded) {
+                ResourceResult.Success(StudyBurstSchedule(it), ResourceStatus.SUCCESS)
+            } else {
+                ResourceResult.InProgress
+            }
+        }
+    }
 
     fun getCachedPendingNotifications(studyId: String, nowInstant: Instant) : List<ScheduledNotificationV2> {
         val nowString = nowInstant.toLocalDateTime(TimeZone.currentSystemDefault()).toString()
@@ -72,7 +78,7 @@ class ParticipantScheduleDatabase(val databaseHelper: ResourceDatabaseHelper) {
         }
     }
 
-    private fun getScheduledSessionTimelineSlice(studyId: String, instantInDay: Instant, timeZone: TimeZone, fullSessionsList: List<FullScheduledSessions>) : ScheduledSessionTimelineSlice {
+    private fun getScheduledSessionTimelineSlice(studyId: String, instantInDay: Instant, timeZone: TimeZone, fullSessionsList: List<ExpandedScheduledSession>) : ScheduledSessionTimelineSlice {
         val sessionWindows = fullSessionsList.groupBy { it.sessionInstanceGuid }
             .mapNotNull { (sessionInstanceGuid, assessments) ->
                 extractScheduledSessionWindow(instantInDay, timeZone, assessments)
@@ -88,7 +94,7 @@ class ParticipantScheduleDatabase(val databaseHelper: ResourceDatabaseHelper) {
     }
 
     @OptIn(ExperimentalTime::class)
-    private fun extractScheduledSessionWindow(instantInDay: Instant, timezone: TimeZone, session: List<FullScheduledSessions>) : ScheduledSessionWindow? {
+    private fun extractScheduledSessionWindow(instantInDay: Instant, timezone: TimeZone, session: List<ExpandedScheduledSession>) : ScheduledSessionWindow? {
         if (session.isEmpty() || session[0].startEventTimestamp == null) {
             return null
         }
@@ -126,6 +132,92 @@ class ParticipantScheduleDatabase(val databaseHelper: ResourceDatabaseHelper) {
             notifications = if (notifications.isNullOrEmpty() || isCompleted) null else notifications.sortedBy { it.scheduleOn }
         )
     }
+
+    data class ExpandedScheduledSession(
+        public val studyId: String,
+        public val instanceGuid: String,
+        public val startDate: String,
+        public val endDate: String,
+        public val startTime: String,
+        public val endTime: String,
+        public val studyBurstID: String?,
+        public val startEventId: String?,
+        public val startEventTimestamp: String?,
+        public val persistent: Boolean,
+        public val scheduledSessionJson: String,
+        public val sessionInfoJson: String,
+        public val sessionInstanceGuid: String,
+        public val asssessmentInstanceGuid: String,
+        public val assessmentInfoJson: String,
+        public val startedOn: String?,
+        public val finishedOn: String?,
+        public val declined: Boolean?,
+        public val adherenceJson: String?,
+    )
+
+    val expandedSessionMapper: ((
+        studyId: String,
+        instanceGuid: String,
+        startDate: String,
+        endDate: String,
+        startTime: String,
+        endTime: String,
+        studyBurstID: String?,
+        startEventId: String?,
+        startEventTimestamp: String?,
+        persistent: Boolean,
+        scheduledSessionJson: String,
+        sessionInfoJson: String,
+        sessionInstanceGuid: String,
+        asssessmentInstanceGuid: String,
+        assessmentInfoJson: String,
+        startedOn: String?,
+        finishedOn: String?,
+        declined: Boolean?,
+        adherenceJson: String?,
+    ) -> ExpandedScheduledSession) = { studyId,
+                                       instanceGuid,
+                                       startDate,
+                                       endDate,
+                                       startTime,
+                                       endTime,
+                                       studyBurstID,
+                                       startEventId,
+                                       startEventTimestamp,
+                                       persistent,
+                                       scheduledSessionJson,
+                                       sessionInfoJson,
+                                       sessionInstanceGuid,
+                                       asssessmentInstanceGuid,
+                                       assessmentInfoJson,
+                                       startedOn,
+                                       finishedOn,
+                                       declined,
+                                       adherenceJson ->
+        ExpandedScheduledSession(
+            studyId,
+            instanceGuid,
+            startDate,
+            endDate,
+            startTime,
+            endTime,
+            studyBurstID,
+            startEventId,
+            startEventTimestamp,
+            persistent,
+            scheduledSessionJson,
+            sessionInfoJson,
+            sessionInstanceGuid,
+            asssessmentInstanceGuid,
+            assessmentInfoJson,
+            startedOn,
+            finishedOn,
+            declined,
+            adherenceJson
+        )
+    }
+
+
 
 
     internal fun cacheParticipantSchedule(studyId: String, schedule: ParticipantSchedule) {

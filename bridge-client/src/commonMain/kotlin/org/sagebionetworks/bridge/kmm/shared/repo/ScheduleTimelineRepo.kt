@@ -206,6 +206,17 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         }
     }
 
+    /**
+     * Get all the scheduled sessions for the study, organized by study burst.
+     * @param studyId Study identifier
+     * @param timezone provide a custom timezone if desired, i.e. for testing.
+     */
+    fun getStudyBurstScheduleV2(studyId: String,
+                              timezone: TimeZone = TimeZone.currentSystemDefault())
+            : Flow<ResourceResult<StudyBurstSchedule>> {
+        return participantScheduleDatabase.getStudyBurstSchedule(studyId, timezone)
+    }
+
     private fun extractFutureSessionsFromResults(
         timelineResult: ResourceResult<ParticipantSchedule>,
         studyId: String,

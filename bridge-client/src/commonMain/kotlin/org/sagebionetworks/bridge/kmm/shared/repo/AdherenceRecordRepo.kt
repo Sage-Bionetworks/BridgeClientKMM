@@ -11,7 +11,6 @@ import io.ktor.util.network.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
@@ -20,8 +19,10 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.sagebionetworks.bridge.kmm.shared.apis.SchedulesV2Api
 import org.sagebionetworks.bridge.kmm.shared.cache.*
-import org.sagebionetworks.bridge.kmm.shared.models.*
+import org.sagebionetworks.bridge.kmm.shared.models.AdherenceRecord
 import org.sagebionetworks.bridge.kmm.shared.models.AdherenceRecordList
+import org.sagebionetworks.bridge.kmm.shared.models.AdherenceRecordsSearch
+import org.sagebionetworks.bridge.kmm.shared.models.SortOrder
 
 class AdherenceRecordRepo(httpClient: HttpClient,
                           databaseHelper: ResourceDatabaseHelper,
@@ -39,17 +40,19 @@ class AdherenceRecordRepo(httpClient: HttpClient,
 
     private val dbQuery = databaseHelper.database.participantScheduleQueries
 
-    fun getAllCompletedCachedAssessmentAdherence(studyId: String): Flow<Map<String, List<AssessmentAdherenceRecord>>> {
+    fun getAllCompletedCachedAssessmentAdherence(studyId: String): Flow <List<AssessmentHistoryRecord>> {
         return dbQuery.completedAssessmentAdherence(studyId).asFlow().mapToList(Dispatchers.Default).mapNotNull {
             it.map {
-                AssessmentAdherenceRecord(
-                    sessionInstanceGuid = it.sessionInstanceGuid,
-                    assessmentInstanceGuid = it.asssessmentInstanceGuid,
+                val adherenceRecord = Json.decodeFromString<AdherenceRecord>(it.adherenceJson!!)
+                AssessmentHistoryRecord(
+                    instanceGuid = it.asssessmentInstanceGuid,
                     assessmentInfo = Json.decodeFromString(it.assessmentInfoJson),
-                    adherenceRecord = Json.decodeFromString<AdherenceRecord>(it.adherenceJson!!)
+                    startedOn = adherenceRecord.startedOn!!,
+                    finishedOn = adherenceRecord.finishedOn!!,
+                    clientTimeZone = adherenceRecord.clientTimeZone
                 )
-            }.groupBy { record ->
-                record.assessmentInstanceGuid
+            } .sortedBy {
+                it.finishedOn
             }
         }
     }
@@ -252,10 +255,3 @@ class AdherenceRecordRepo(httpClient: HttpClient,
 
     }
 }
-
-data class AssessmentAdherenceRecord(
-    val sessionInstanceGuid: String,
-    val assessmentInstanceGuid: String,
-    val assessmentInfo: AssessmentInfo,
-    val adherenceRecord: AdherenceRecord
-)

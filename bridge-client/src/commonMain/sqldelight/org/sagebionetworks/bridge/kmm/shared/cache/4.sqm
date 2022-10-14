@@ -1,0 +1,84 @@
+import kotlinx.serialization.descriptors.PrimitiveKind.BOOLEAN;
+import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus;
+
+CREATE TABLE ScheduleMetadata (
+    studyId TEXT NOT NULL,
+    createdOn TEXT NOT NULL
+);
+
+CREATE TABLE ScheduledSessions (
+    studyId TEXT NOT NULL,
+    instanceGuid TEXT NOT NULL,
+    startDate TEXT NOT NULL, -- LocalDate
+    endDate TEXT NOT NULL,   -- LocalDate
+    startTime TEXT NOT NULL,
+    endTime TEXT NOT NULL,   -- Computed from expiration
+    studyBurstID TEXT,
+    startEventId TEXT,
+    startEventTimestamp TEXT,
+    persistent INTEGER AS kotlin.Boolean NOT NULL DEFAULT 0,
+    scheduledSessionJson TEXT NOT NULL,
+    sessionInfoJson TEXT NOT NULL,
+    PRIMARY KEY (studyId, instanceGuid)
+);
+
+CREATE TABLE ScheduledAssessments (
+    studyId TEXT NOT NULL,
+    sessionInstanceGuid TEXT NOT NULL,
+    asssessmentInstanceGuid TEXT NOT NULL,
+    guid TEXT NOT NULL,
+    identifier TEXT NOT NULL,
+    assessmentInfoJson TEXT NOT NULL,
+    PRIMARY KEY (studyId, asssessmentInstanceGuid)
+);
+
+CREATE TABLE AdherenceRecords (
+    studyId TEXT NOT NULL,
+    instanceGuid TEXT NOT NULL,
+    startedOn TEXT NOT NULL,
+    finishedOn TEXT,
+    declined INTEGER AS kotlin.Boolean NOT NULL DEFAULT 0,
+    adherenceEventTimestamp TEXT NOT NULL,
+    adherenceJson TEXT NOT NULL,
+    status TEXT AS ResourceStatus NOT NULL,
+    needSave INTEGER AS kotlin.Boolean NOT NULL DEFAULT 0,
+    PRIMARY KEY (studyId, instanceGuid, startedOn)
+);
+
+CREATE TABLE ScheduledNotifications (
+    studyId TEXT NOT NULL,
+    sessionInstanceGuid TEXT NOT NULL,
+    scheduleOn TEXT NOT NULL,           -- LocalDateTime
+    notificationInfoJson TEXT NOT NULL,
+    PRIMARY KEY (studyId, sessionInstanceGuid, scheduleOn)
+);
+
+CREATE VIEW scheduledAssessmentAdherence AS
+SELECT
+    ScheduledAssessments.*,
+    AdherenceRecords.instanceGuid,
+    AdherenceRecords.startedOn,
+    AdherenceRecords.finishedOn,
+    AdherenceRecords.declined,
+    AdherenceRecords.adherenceEventTimestamp,
+    AdherenceRecords.adherenceJson
+FROM
+    ScheduledAssessments
+LEFT JOIN AdherenceRecords ON ScheduledAssessments.asssessmentInstanceGuid = AdherenceRecords.instanceGuid;
+
+
+CREATE VIEW fullScheduledSessions AS
+SELECT
+    ScheduledSessions.*,
+    scheduledAssessmentAdherence.sessionInstanceGuid,
+    scheduledAssessmentAdherence.asssessmentInstanceGuid,
+    scheduledAssessmentAdherence.assessmentInfoJson,
+    scheduledAssessmentAdherence.startedOn,
+    scheduledAssessmentAdherence.finishedOn,
+    scheduledAssessmentAdherence.declined,
+    scheduledAssessmentAdherence.adherenceJson
+FROM
+    ScheduledSessions
+JOIN scheduledAssessmentAdherence ON ScheduledSessions.instanceGuid = scheduledAssessmentAdherence.sessionInstanceGuid;
+
+DELETE FROM EtagCache; -- Clear etags so the new schedule cache gets filled correctly

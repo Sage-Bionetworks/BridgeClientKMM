@@ -70,6 +70,7 @@ class AdherenceRecordRepo(httpClient: HttpClient,
         }
     }
 
+    // TODO: Remove once this method is not longer being used by ScheduleTimelineRep -nbrown 10/17/22
     /**
      * Get the locally cached [AdherenceRecord]s for the specified [instanceIds].
      */
@@ -84,6 +85,9 @@ class AdherenceRecordRepo(httpClient: HttpClient,
      * For now this only requests records using the current timestamps.
      */
     suspend fun loadRemoteAdherenceRecords(studyId: String) : Boolean {
+        // First check to see if we have any records that need to be saved
+        processUpdates(studyId)
+        processUpdatesV2(studyId)
         val pageSize = 500
         var pageOffset = 0
         var adherenceRecordsSearch = AdherenceRecordsSearch(sortOrder = SortOrder.DESC, pageSize = pageSize, includeRepeats = true, currentTimestampsOnly = true)
@@ -104,14 +108,15 @@ class AdherenceRecordRepo(httpClient: HttpClient,
     private suspend fun loadAndCacheResults(studyId: String, adherenceRecordsSearch: AdherenceRecordsSearch) : AdherenceRecordList {
         val recordsResult = scheduleV2Api.searchForAdherenceRecords(studyId, adherenceRecordsSearch)
         for (record in recordsResult.items) {
-            insertUpdate(record, studyId)
+            insertUpdate(studyId, record, needSave = false)
         }
         return recordsResult
     }
 
-    private fun insertUpdate(adherenceRecord: AdherenceRecord, studyId: String) {
+    private fun insertUpdate(studyId: String, adherenceRecord: AdherenceRecord, needSave: Boolean) {
         //TODO: Don't overwrite records that have needSave=true -nbrown 10/10/22
         val json = Json.encodeToString(adherenceRecord)
+        //TODO: removing writing to resource table -nbrown 10/17/22
         val resource = Resource(
             identifier = adherenceRecord.instanceGuid,
             secondaryId = adherenceRecord.startedOn.toString(),
@@ -132,7 +137,7 @@ class AdherenceRecordRepo(httpClient: HttpClient,
             adherenceEventTimestamp = adherenceRecord.eventTimestamp,
             adherenceJson = Json.encodeToString(adherenceRecord),
             status = ResourceStatus.SUCCESS,
-            needSave = false
+            needSave = needSave
         )
 
     }
@@ -142,7 +147,7 @@ class AdherenceRecordRepo(httpClient: HttpClient,
      * to save to Bridge server.
      */
     fun createUpdateAdherenceRecord(adherenceRecord: AdherenceRecord, studyId: String) {
-        insertUpdate(adherenceRecord, studyId)
+        insertUpdate(studyId, adherenceRecord, needSave = true)
         backgroundScope.launch {
             processUpdates(studyId)
             processUpdatesV2(studyId)
@@ -154,6 +159,7 @@ class AdherenceRecordRepo(httpClient: HttpClient,
      * Save any locally cached [AdherenceRecord]s that haven't been uploaded to Bridge server.
      * Any failures will remain in a needSave state and be tried again the next time.
      */
+    //TODO: Remove in future release -nbrown 10/17/22
     private suspend fun processUpdates(studyId: String) {
         val resourcesToUpload = database.getResourcesNeedSave(ResourceType.ADHERENCE_RECORD, studyId)
         val records: List<AdherenceRecord> = resourcesToUpload.mapNotNull { it.loadResource() }

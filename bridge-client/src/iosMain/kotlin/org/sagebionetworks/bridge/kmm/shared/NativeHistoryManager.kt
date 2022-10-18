@@ -12,7 +12,7 @@ import org.sagebionetworks.bridge.kmm.shared.repo.*
 
 class NativeHistoryManager(
     private val studyId: String,
-    private val viewUpdate: (NativeScheduledSessionTimelineSlice) -> Unit
+    private val viewUpdate: (List<AssessmentHistoryRecord>) -> Unit
 ) : KoinComponent {
 
     private val repo : ScheduleTimelineRepo by inject(mode = LazyThreadSafetyMode.NONE)
@@ -21,10 +21,8 @@ class NativeHistoryManager(
 
     fun observeHistory() {
         scope.launch {
-            repo.getPastSessions(studyId).collect { timelineResource ->
-                (timelineResource as? ResourceResult.Success)?.data?.let { timelineSlice ->
-                    viewUpdate(timelineSlice.toNaive())
-                }
+            repo.adherenceRecordRepo.getAllCompletedCachedAssessmentAdherence(studyId).collect { historyList ->
+                viewUpdate(historyList)
             }
         }
     }

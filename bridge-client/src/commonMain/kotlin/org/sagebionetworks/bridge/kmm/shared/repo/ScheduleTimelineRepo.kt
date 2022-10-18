@@ -2,21 +2,17 @@ package org.sagebionetworks.bridge.kmm.shared.repo
 
 import co.touchlab.stately.ensureNeverFrozen
 import io.ktor.client.*
-import io.ktor.util.collections.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.datetime.*
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.sagebionetworks.bridge.kmm.shared.apis.SchedulesV2Api
 import org.sagebionetworks.bridge.kmm.shared.cache.*
 import org.sagebionetworks.bridge.kmm.shared.models.*
-import kotlin.math.roundToInt
 import kotlin.time.ExperimentalTime
 
 class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo,
@@ -94,9 +90,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         return Json.encodeToString(schedule)
     }
 
-
-
-    internal suspend fun updateScheduleIfNeeded(studyId: String) {
+    suspend fun updateScheduleIfNeeded(studyId: String) {
         val resourceIdentifier = SCHEDULE_TIMELINE_ID + studyId
         val curResource = database.getResource(resourceIdentifier, ResourceType.PARTICIPANT_SCHEDULE, studyId )
         if (curResource == null ||
@@ -118,187 +112,41 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
     /**
      * Get all the scheduled sessions for today that have not expired.
      * @param studyId Study identifier
-     * @param includeAllNotifications Include all [ScheduledNotification]s
      * @param alwaysIncludeNextDay Include the next day containing a [ScheduledSessionWindow]
      */
     fun getSessionsForToday(studyId: String,
-                            includeAllNotifications: Boolean = false,
                             alwaysIncludeNextDay: Boolean = true): Flow<ResourceResult<ScheduledSessionTimelineSlice>> {
         return getSessionsForDay(
             studyId = studyId,
             instantInDay = Clock.System.now(),
-            includeAllNotifications,
             alwaysIncludeNextDay,
         )
     }
 
-    /**
-     * Get all the scheduled sessions for today that have not expired.
-     * @param studyId Study identifier
-     * @param includeAllNotifications Include all [ScheduledNotification]s
-     * @param alwaysIncludeNextDay Include the next day containing a [ScheduledSessionWindow]
-     */
-    fun getSessionsForTodayV2(studyId: String,
-                            alwaysIncludeNextDay: Boolean = true): Flow<ResourceResult<ScheduledSessionTimelineSlice>> {
-        return getSessionsForDayV2(
-            studyId = studyId,
-            instantInDay = Clock.System.now(),
-            alwaysIncludeNextDay,
-        )
+    fun getCachedPendingNotifications(studyId: String, nowInstant: Instant) : List<ScheduledNotificationV2> {
+        return participantScheduleDatabase.getCachedPendingNotifications(studyId, nowInstant)
     }
 
-    /**
-     * Get all sessions with a start time in the past.
-     */
-    @Deprecated("Use AdherenceRecordRepo.getAllCompletedCachedAssessmentAdherence(studyId: String) to get history")
-    fun getPastSessions(studyId: String, now: Instant = Clock.System.now()): Flow<ResourceResult<ScheduledSessionTimelineSlice>> {
-        return combine(
-            getTimeline(studyId),
-            //Need to include call to get AdherenceRecords as part of the combine.
-            //This will trigger the flow to emit a new value anytime the AdherenceRecords change.
-            adherenceRecordRepo.getAllCachedAdherenceRecords(studyId)
-        ) { timeLineResource, _ ->
-            extractPastSessionsFromResults(
-                timeLineResource,
-                studyId,
-                now,
-            )
-        }
-    }
-
-    /**
-     * Get all sessions with a start time after the date provided for now.
-     * @param studyId the study identifier
-     * @param now the current instant, or what you want to provide in testing.
-     */
-    @Deprecated("This is only used by getStudyBurstSchedule, which has been replaced with a more optimized version")
-    fun getFutureSessions(studyId: String, fromInstant: Instant = Clock.System.now())
-        : Flow<ResourceResult<ScheduledSessionTimelineSlice>> {
-
-        return getTimeline(studyId).map {
-            extractFutureSessionsFromResults(it, studyId, fromInstant)
-        }
-    }
-
-    /**
-     * Get all the scheduled sessions for the study, organized by study burst.
-     * @param studyId Study identifier
-     * @param userJoinedDate the instant the user joined the study
-     * @param timezone provide a custom timzone if desired, i.e. for testing.
-     */
-    fun getStudyBurstSchedule(studyId: String,
-                              userJoinedDate: Instant,
-                              timezone: TimeZone = TimeZone.currentSystemDefault())
-            : Flow<ResourceResult<StudyBurstSchedule>> {
-
-        // Sessions may be scheduled on the day the user joined,
-        // so use one day before their joined date to include these sessions as well.
-        val oneDayBeforeJoin = userJoinedDate.minus(1, DateTimeUnit.DAY, timezone)
-        return getFutureSessions(studyId, oneDayBeforeJoin).map {
-            when (it) {
-                is ResourceResult.Success -> {
-                    ResourceResult.Success(StudyBurstSchedule(it.data), ResourceStatus.SUCCESS)
-                }
-                is ResourceResult.Failed -> {
-                    ResourceResult.Failed(ResourceStatus.FAILED)
-                }
-                else -> {
-                    ResourceResult.InProgress
-                }
-            }
-        }
-    }
 
     /**
      * Get all the scheduled sessions for the study, organized by study burst.
      * @param studyId Study identifier
      * @param timezone provide a custom timezone if desired, i.e. for testing.
      */
-    fun getStudyBurstScheduleV2(studyId: String,
+    fun getStudyBurstSchedule(studyId: String,
                               timezone: TimeZone = TimeZone.currentSystemDefault())
             : Flow<ResourceResult<StudyBurstSchedule>> {
+        backgroundScope.launch {
+            updateScheduleIfNeeded(studyId)
+        }
         return participantScheduleDatabase.getStudyBurstSchedule(studyId, timezone)
     }
 
-    private fun extractFutureSessionsFromResults(
-        timelineResult: ResourceResult<ParticipantSchedule>,
-        studyId: String,
-        instantInDay: Instant,
-    ): ResourceResult<ScheduledSessionTimelineSlice> {
-        return extractSessionsFromResults(timelineResult, studyId, instantInDay, WindowFilterType.Future)
-    }
-
-    private fun extractPastSessionsFromResults(
-        timelineResult: ResourceResult<ParticipantSchedule>,
-        studyId: String,
-        instantInDay: Instant,
-    ): ResourceResult<ScheduledSessionTimelineSlice> {
-        return extractSessionsFromResults(timelineResult, studyId, instantInDay, WindowFilterType.Past)
-    }
-
-    private fun extractSessionsFromResults(
-        timelineResult: ResourceResult<ParticipantSchedule>,
-        studyId: String,
-        instantInDay: Instant,
-        filterType: WindowFilterType
-    ): ResourceResult<ScheduledSessionTimelineSlice> {
-        if (timelineResult is ResourceResult.Success) {
-            return ResourceResult.Success(extractSessions(
-                timeline = timelineResult.data,
-                studyId = studyId,
-                instantInDay = instantInDay,
-                filterType = filterType
-            ), ResourceStatus.SUCCESS)
-        } else if (timelineResult is ResourceResult.Failed) {
-            return ResourceResult.Failed(ResourceStatus.FAILED)
-        } else {
-            return ResourceResult.InProgress
-        }
-    }
-
-    private fun extractSessions(
-        timeline: ParticipantSchedule,
-        studyId: String,
-        instantInDay: Instant,
-        filterType: WindowFilterType,
-        timezone: TimeZone = TimeZone.currentSystemDefault(),
-    ): ScheduledSessionTimelineSlice {
-
-        // Extract sessions
-        val windows = extractSessionWindows(
-            timeline,
-            instantInDay,
-            studyId,
-            filterType,
-            false,
-            timezone
-        ).sortedBy { it.startDateTime }
-
-        // Build the timeline slice
-        val today = instantInDay.toLocalDateTime(timezone)
-        val schedules = mutableListOf<ScheduledSessionWindow>()
-
-        windows.forEach { window ->
-            if (window.startDateTime <= today || filterType == WindowFilterType.Future) {
-                schedules.add(window)
-            }
-        }
-
-        return ScheduledSessionTimelineSlice(
-            instantInDay = instantInDay,
-            timezone = timezone,
-            isLoaded = true,
-            scheduledSessionWindows = schedules,
-            notifications = emptyList()
-        )
-    }
-
-    internal fun getSessionsForDayV2(
+    internal fun getSessionsForDay(
         studyId: String,
         instantInDay: Instant,
         alwaysIncludeNextDay: Boolean = false
     ): Flow<ResourceResult<ScheduledSessionTimelineSlice>> {
-        //TODO: Need to trigger check for updated schedule -nbrown 10/10/22
         backgroundScope.launch {
             updateScheduleIfNeeded(studyId)
         }
@@ -312,297 +160,6 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
             }
     }
 
-    /**
-     * Used for testing so that we can specify a consistent point in time.
-     */
-    internal fun getSessionsForDay(
-        studyId: String,
-        instantInDay: Instant,
-        includeAllNotifications: Boolean = false,
-        alwaysIncludeNextDay: Boolean = false,
-    ): Flow<ResourceResult<ScheduledSessionTimelineSlice>> {
-        return combine(
-            getTimeline(studyId),
-            //Need to include call to get AdherenceRecords as part of the combine.
-            //This will trigger the flow to emit a new value anytime the AdherenceRecords change.
-            adherenceRecordRepo.getAllCachedAdherenceRecords(studyId)
-        ) { timeLineResource, _ ->
-            extractSessionsForDayFromResults(
-                timeLineResource,
-                studyId,
-                instantInDay,
-                includeAllNotifications,
-                alwaysIncludeNextDay,
-            )
-        }
-    }
-
-    private fun extractSessionsForDayFromResults(
-        timelineResult: ResourceResult<ParticipantSchedule>,
-        studyId: String,
-        instantInDay: Instant,
-        includeAllNotifications: Boolean,
-        alwaysIncludeNextDay: Boolean,
-    ): ResourceResult<ScheduledSessionTimelineSlice> {
-        if (timelineResult is ResourceResult.Success) {
-            return ResourceResult.Success(extractSessionsForDay(
-                timelineResult.data,
-                instantInDay,
-                studyId,
-                includeAllNotifications,
-                alwaysIncludeNextDay,
-            ), ResourceStatus.SUCCESS)
-        } else if (timelineResult is ResourceResult.Failed) {
-            return ResourceResult.Failed(ResourceStatus.FAILED)
-        } else {
-            return ResourceResult.InProgress
-        }
-
-    }
-
-    /**
-     * Extract the scheduled sessions from the [Timeline] for the day specified by [instantInDay].
-     * The returned list of [ScheduledSessionWindow]s will include all sessions that are active on the
-     * day specified by [instantInDay]. Sessions that expire before [instantInDay] will be excluded.
-     */
-    @OptIn(ExperimentalTime::class)
-    private fun extractSessionsForDay(
-        timeline: ParticipantSchedule,
-        instantInDay: Instant,
-        studyId: String,
-        includeAllNotifications: Boolean,
-        alwaysIncludeNextDay: Boolean,
-        timezone: TimeZone = TimeZone.currentSystemDefault(),
-    ): ScheduledSessionTimelineSlice {
-
-        // Extract for today
-        val windows = extractSessionWindows(
-            timeline,
-            instantInDay,
-            studyId,
-            if (includeAllNotifications) WindowFilterType.TodayAndNotifications else WindowFilterType.Today,
-            alwaysIncludeNextDay,
-            timezone
-        ).sortedBy { it.startDateTime }
-
-        // Build the timeline slice
-        var upNext: LocalDate? = null
-        val today = instantInDay.toLocalDateTime(timezone)
-        val schedules = mutableListOf<ScheduledSessionWindow>()
-        val notifications = mutableListOf<ScheduledNotification>()
-
-        run loop@ {
-            windows.forEach { window ->
-
-                when {
-                    // Include in available now if already started.
-                    (window.startDateTime <= today) ||
-                            (alwaysIncludeNextDay && window.startDateTime.date == today.date) -> {
-                        schedules.add(window)
-                    }
-
-                    // else include in up next if this is for the next window of time
-                    // (either later today or next day with a schedule).
-                    upNext == null || upNext == window.startDateTime.date -> {
-                        upNext = window.startDateTime.date
-                        schedules.add(window)
-                    }
-
-                    // If we aren't adding notifications then we have found everything
-                    // we need so exit the loop.
-                    else -> if (!includeAllNotifications) return@loop
-                }
-                // Add the notifications
-                notifications.addAll(window.notifications ?: emptyList())
-            }
-        }
-        notifications.sortBy { it.scheduleOn }
-
-        return ScheduledSessionTimelineSlice(
-            instantInDay = instantInDay,
-            timezone = timezone,
-            isLoaded = true,
-            scheduledSessionWindows = schedules,
-            notifications = notifications
-        )
-    }
-
-    @OptIn(ExperimentalTime::class)
-    private fun extractSessionWindows(
-        timeline: ParticipantSchedule,
-        instantInDay: Instant,
-        studyId: String,
-        filterType: WindowFilterType,
-        alwaysIncludeNextDay: Boolean,
-        timezone: TimeZone,
-    ): List<ScheduledSessionWindow> {
-
-        // Set up maps so that we are iterating through each set only once before switching
-        // to using a hashmap.
-        val assessmentInfoMap = timeline.assessments?.associateBy({ it.key }, { it }) ?: return emptyList()
-        val scheduleSessionMap = timeline.schedule?.groupBy { it.refGuid } ?: return emptyList()
-        val eventMap = timeline.eventTimestamps
-        val sessions = timeline.sessions ?: emptyList()
-
-        // Get date portion of instantInDay
-        val day: LocalDate = instantInDay.toLocalDateTime(timezone).date
-
-        val foundState = FoundWindowState()
-        return sessions.mapNotNull { session ->
-            val scheduledSessionList = scheduleSessionMap[session.guid]
-            if (scheduledSessionList == null) {
-                null
-            } else {
-                //Map the schedules to windows
-                scheduledSessionList.mapNotNull { scheduledSession ->
-                    createScheduledSessionWindow(
-                        scheduledSession,
-                        filterType,
-                        alwaysIncludeNextDay,
-                        day,
-                        instantInDay,
-                        studyId,
-                        assessmentInfoMap,
-                        session,
-                        eventMap,
-                        timezone,
-                        foundState
-                    )
-                }
-            }
-        }.flatten()
-    }
-
-    // Work-around for Kotlin not having inout variables. syoung 06/25/2021
-    private class FoundWindowState(var foundToday: Boolean = false, var nextDay: LocalDate? = null)
-
-    internal enum class WindowFilterType {
-        Future, Past, Today, Notifications, TodayAndNotifications;
-
-        fun isToday() = listOf(Today, TodayAndNotifications).contains(this)
-        fun includeCompleted() = listOf(Today, TodayAndNotifications, Past).contains(this)
-        fun isNotifications() = listOf(Notifications, TodayAndNotifications).contains(this)
-        fun includeExpired() = listOf(Past).contains(this)
-    }
-
-    /**
-     * This is pulled out into a function to make it a little easier to read and to
-     * allow for using explicit returns in the `mapNotNull` method. I find mapping
-     * functions in Kotlin with early exits difficult to grok. syoung 06/24/2021
-     */
-    @ExperimentalTime
-    private fun createScheduledSessionWindow(
-        scheduledSession: ScheduledSession,
-        filterType: WindowFilterType,
-        alwaysIncludeNextDay: Boolean,
-        day: LocalDate,
-        instantInDay: Instant,
-        studyId: String,
-        assessmentInfoMap: Map<String, AssessmentInfo>,
-        session: SessionInfo,
-        eventMap: Map<String,Instant>?,
-        timezone: TimeZone,
-        foundState: FoundWindowState,
-    ): ScheduledSessionWindow? {
-        val eventTimestamp = eventMap?.get(scheduledSession.startEventId) ?: return null
-
-        fun rulesForNotifications() =
-            scheduledSession.startDate >= day && !session.notifications.isNullOrEmpty()
-        fun rulesForAvailableToday() =
-            (scheduledSession.startDate <= day && scheduledSession.endDate >= day)
-        fun rulesForToday(startDate: LocalDate? = null) = when {
-            foundState.foundToday && !alwaysIncludeNextDay -> rulesForAvailableToday()
-            startDate != null && foundState.nextDay != null -> startDate <= foundState.nextDay!!
-            else -> scheduledSession.endDate >= day
-        }
-        // Exit early if this schedule is not in the range that we are looking for
-        if (!when (filterType) {
-            WindowFilterType.Notifications -> rulesForNotifications()
-            WindowFilterType.Future -> scheduledSession.startDate > day
-            WindowFilterType.Past -> scheduledSession.startDate <= day
-            WindowFilterType.Today -> rulesForToday()
-            WindowFilterType.TodayAndNotifications -> rulesForToday() || rulesForNotifications()
-        }) {
-            return null
-        }
-
-        // LocalTime support is hopefully coming: https://github.com/Kotlin/kotlinx-datetime/issues/57#issuecomment-800287971
-        // Construct a startDateTime from today and startTime
-        val startDateTimeString =
-            scheduledSession.startDate.toString() + "T" + scheduledSession.startTime
-        val startDateTime = LocalDateTime.parse(startDateTimeString)
-
-        val startInstant = startDateTime.toInstant(timezone)
-        val expirationInstant = startInstant.plus(scheduledSession.expiration, timezone)
-
-        val endDateTime = expirationInstant.toLocalDateTime(timezone)
-        val isExpired = (expirationInstant < instantInDay)
-
-        // Exit early if all the assessments are completed and this filtering does
-        // not include them.
-        val assessments = mapAssessments(scheduledSession, studyId, assessmentInfoMap)
-        val isCompleted = assessments.all { it.isCompleted || it.isDeclined }
-        if (!filterType.includeCompleted() && isCompleted) {
-            return null
-        }
-
-        // Exit early if expired and not completed.
-        if (!filterType.includeExpired() && isExpired) {// && !isCompleted) {
-            return null
-        }
-
-        // If we are filtering for today schedules and one was found that is available today
-        // but *not* available NOW then track that.
-        if (rulesForAvailableToday() && startInstant > instantInDay) {
-            foundState.foundToday = true
-        } else if (alwaysIncludeNextDay && scheduledSession.startDate > day &&
-            (foundState.nextDay == null || foundState.nextDay!! > scheduledSession.startDate)) {
-            foundState.nextDay = scheduledSession.startDate
-        }
-
-        // Convert notifications
-        val notifications = session.notifications?.mapNotNull {
-            it.scheduleAt(scheduledSession.instanceGuid, instantInDay, startDateTime, endDateTime, scheduledSession.expiration.days == 0)
-        }
-        // Exit early if this is only getting future notifications and there aren't any.
-        if (notifications.isNullOrEmpty() &&
-            filterType.isNotifications() &&
-            (!filterType.isToday() || !rulesForToday(scheduledSession.startDate))) {
-            return null
-        }
-
-        return ScheduledSessionWindow(
-            scheduledSession = scheduledSession,
-            sessionInfo = session,
-            assessments = assessments,
-            eventTimestamp = eventTimestamp,
-            startDateTime = startDateTime,
-            endDateTime = endDateTime,
-            notifications = if (notifications.isNullOrEmpty() || isCompleted) null else notifications.sortedBy { it.scheduleOn }
-        )
-    }
-
-    private fun mapAssessments(
-        scheduledSession: ScheduledSession,
-        studyId: String,
-        assessmentInfoMap: Map<String, AssessmentInfo>
-    ): List<ScheduledAssessmentReference> {
-
-        val adherenceRecords = adherenceRecordRepo.getCachedAdherenceRecords(
-            scheduledSession.assessments.map { it.instanceGuid },
-            studyId
-        )
-
-        return scheduledSession.assessments.map { assessment ->
-            val recordsList = adherenceRecords[assessment.instanceGuid]
-            ScheduledAssessmentReference(
-                instanceGuid = assessment.instanceGuid,
-                studyId = studyId,
-                assessmentInfo = assessmentInfoMap[assessment.refKey]!!,
-                adherenceRecordList = recordsList ?: emptyList()
-            )
-        }
-    }
 }
 
 @ExperimentalTime

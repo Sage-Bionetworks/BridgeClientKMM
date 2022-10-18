@@ -77,8 +77,8 @@ open class HistoryViewModel : NSObject, ObservableObject {
             self.records = previewRecords
         }
         else {
-            self.historyManager = NativeHistoryManager(studyId: studyId) { timelineSlice in
-                self.records = timelineSlice.scheduledSessionWindows
+            self.historyManager = NativeHistoryManager(studyId: studyId) { historyList in
+                self.records = historyList
                     .flatMap { $0.history() }
                     .sorted(by: { $0.finishedOn > $1.finishedOn })
             }
@@ -87,28 +87,20 @@ open class HistoryViewModel : NSObject, ObservableObject {
     }
 }
 
-extension NativeScheduledSessionWindow {
-    fileprivate func history() -> [AssessmentRecord] {
-        self.assessments.flatMap { $0.history() }
-    }
-}
-
-extension NativeScheduledAssessment {
-    fileprivate func history() -> [AssessmentRecord] {
-        self.adherenceRecords?.compactMap { record in
-            guard let startedOn = record.startedOn, let finishedOn = record.finishedOn else { return nil }
+extension AssessmentHistoryRecord {
+    fileprivate func history() -> AssessmentRecord {
             return AssessmentRecord(assessmentInfo: self.assessmentInfo,
                                      instanceGuid: self.instanceGuid,
-                                     startedOn: startedOn,
-                                     finishedOn: finishedOn,
-                                     timeZone: record.timezoneIdentifier.map { TimeZone(identifier: $0) ?? .current },
-                                     clientData: record.clientDataJson())
-        } ?? []
+                                    startedOn: self.startedOn.dateValue,
+                                    finishedOn: self.finishedOn.dateValue,
+                                    timeZone: self.clientTimeZone.map { TimeZone(identifier: $0) ?? .current },
+                                    clientData: self.clientDataJson())
     }
 }
 
+
 /// The `AssessmentRecord` is an `Identifiable` object that wraps a Kotlin Native
-/// ``AdherenceRecord`` for use in showing completed assessments.
+/// ``AssessmentHistoryRecord`` for use in showing completed assessments.
 public struct AssessmentRecord : Identifiable {
     public let id: String
     

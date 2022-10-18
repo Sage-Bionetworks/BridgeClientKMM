@@ -7,6 +7,7 @@ import org.sagebionetworks.bridge.kmm.shared.models.AdherenceRecord
 import org.sagebionetworks.bridge.kmm.shared.models.AppConfig
 import org.sagebionetworks.bridge.kmm.shared.models.Study
 import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
+import org.sagebionetworks.bridge.kmm.shared.repo.AssessmentHistoryRecord
 import platform.Foundation.*
 
 // TODO: syoung 09/08/2021 Deprecate this class and use Generic JsonDecoder below
@@ -99,6 +100,10 @@ fun AdherenceRecord.clientDataJson() : NSData? {
 }
 
 fun NativeAdherenceRecord.clientDataJson() : NSData? {
+    return this.clientData?.toString()?.toNSData()
+}
+
+fun AssessmentHistoryRecord.clientDataJson() : NSData? {
     return this.clientData?.toString()?.toNSData()
 }
 

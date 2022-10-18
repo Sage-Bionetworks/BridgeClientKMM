@@ -59,6 +59,7 @@ clearAll {
     DELETE FROM ScheduledAssessments;
     DELETE FROM AdherenceRecords;
     DELETE FROM ScheduledNotifications;
+    DELETE FROM ScheduleMetadata;
 }
 
 clearSchedule {

@@ -843,12 +843,11 @@ class ScheduleTimelineRepoTest: BaseTest() {
             // Load the adherence records so they get written to cache
             repo.adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)
 
-            val adherenceRecordsMap = repo.adherenceRecordRepo.getAllCompletedCachedAssessmentAdherence(studyId).firstOrNull()
-            assertNotNull(adherenceRecordsMap)
-            val records = adherenceRecordsMap.values.flatten()
-            assertEquals(2, records.size)
-            assertEquals("Assessment Test 1", records[0].assessmentInfo.label)
-            assertEquals("Shape-Color Sorting", records[1].assessmentInfo.label)
+            val adherenceRecords = repo.adherenceRecordRepo.getAllCompletedCachedAssessmentAdherence(studyId).firstOrNull()
+            assertNotNull(adherenceRecords)
+            assertEquals(2, adherenceRecords.size)
+            assertEquals("Assessment Test 1", adherenceRecords[0].assessmentInfo.label)
+            assertEquals("Shape-Color Sorting", adherenceRecords[1].assessmentInfo.label)
 
 //            val todayInstant =
 //                getTodayInstant().plus(90, DateTimeUnit.MINUTE, TimeZone.currentSystemDefault())

@@ -245,7 +245,6 @@ class AdherenceRecordRepo(httpClient: HttpClient,
             }
         }
         for (resource in recordsToUpload) {
-            //val toUpdate = resource.copy(status = status, needSave = needSave)
             dbQuery.insertUpdateAdherenceRecord(
                 studyId = studyId,
                 instanceGuid = resource.instanceGuid,

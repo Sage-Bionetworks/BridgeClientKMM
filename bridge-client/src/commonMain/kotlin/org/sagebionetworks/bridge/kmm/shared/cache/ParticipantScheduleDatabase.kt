@@ -229,19 +229,14 @@ class ParticipantScheduleDatabase(val databaseHelper: ResourceDatabaseHelper) {
         val sessions = schedule.sessions ?: emptyList()
 
         val sessionWindowsList = sessions.mapNotNull { session ->
-            val scheduledSessionList = scheduleSessionMap[session.guid]
-            if (scheduledSessionList == null) {
-                null
-            } else {
-                scheduledSessionList.mapNotNull { scheduledSession ->
-                    createScheduledSessionWindow(
-                        studyId = studyId,
-                        scheduledSession = scheduledSession,
-                        session = session,
-                        assessmentInfoMap = assessmentInfoMap,
-                        eventMap = eventMap
-                    )
-                }
+            scheduleSessionMap[session.guid]?.mapNotNull { scheduledSession ->
+                createScheduledSessionWindow(
+                    studyId = studyId,
+                    scheduledSession = scheduledSession,
+                    session = session,
+                    assessmentInfoMap = assessmentInfoMap,
+                    eventMap = eventMap
+                )
             }
         }.flatten()
 

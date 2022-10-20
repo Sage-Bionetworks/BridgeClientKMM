@@ -799,38 +799,6 @@ class ScheduleTimelineRepoTest: BaseTest() {
         }
     }
 
-//    @Test
-//    fun testPastSessionsDay0() {
-//        runTest {
-//            val eventTimeStamp = Clock.System.now()
-//            //         Clock.System.now().minus(DateTimeUnit.DAY, TimeZone.currentSystemDefault())
-//            val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
-//            val resourceResult = repo.getPastSessions("testPastSessionsDay0", getTodayInstant())
-//                .firstOrNull { it is ResourceResult.Success }
-//
-//            assertTrue(resourceResult is ResourceResult.Success)
-//            val sessionList = resourceResult.data.scheduledSessionWindows
-//            assertNotNull(sessionList)
-//            assertEquals(3, sessionList.size)
-//        }
-//    }
-
-//    @Test
-//    fun testPastSessionsDay1() {
-//        runTest {
-//            val eventTimeStamp =
-//                Clock.System.now().minus(1, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
-//            val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
-//            val resourceResult = repo.getPastSessions("testPastSessionsDay1", getTodayInstant())
-//                .firstOrNull { it is ResourceResult.Success }
-//
-//            assertTrue(resourceResult is ResourceResult.Success)
-//            val sessionList = resourceResult.data.scheduledSessionWindows
-//            assertNotNull(sessionList)
-//            assertEquals(6, sessionList.size)
-//        }
-//    }
-
     @Test
     fun testPastSessionsDay2WithCompletion() {
         runTest {
@@ -849,107 +817,10 @@ class ScheduleTimelineRepoTest: BaseTest() {
             assertEquals("Assessment Test 1", adherenceRecords[0].assessmentInfo.label)
             assertEquals("Shape-Color Sorting", adherenceRecords[1].assessmentInfo.label)
 
-//            val todayInstant =
-//                getTodayInstant().plus(90, DateTimeUnit.MINUTE, TimeZone.currentSystemDefault())
-//            val resourceResult = repo.getPastSessions(studyId, todayInstant)
-//                .firstOrNull { it is ResourceResult.Success }
-//            assertTrue(resourceResult is ResourceResult.Success)
-//            val sessionList = resourceResult.data.scheduledSessionWindows
-//            assertNotNull(sessionList)
-//            assertEquals(10, sessionList.size)
-//            val historyRecordsList = sessionList.flatMap {
-//                it.assessments.flatMap { assessment -> assessment.history() }
-//            }.sortedBy { it.finishedOn }
-//
-//            assertEquals(2, historyRecordsList.size)
-//
-//            val record1 = historyRecordsList[0]
-//            assertEquals("Assessment Test 1", record1.assessmentInfo.label)
-//
-//            val record2 = historyRecordsList[1]
-//            assertEquals("Shape-Color Sorting", record2.assessmentInfo.label)
         }
     }
 
-//    @Test
-//    fun testPastSessionsDay4() {
-//        runTest {
-//            val eventTimeStamp =
-//                Clock.System.now().minus(4, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
-//            val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
-//            val resourceResult = repo.getPastSessions("testPastSessionsDay4", getTodayInstant())
-//                .firstOrNull { it is ResourceResult.Success }
-//
-//            assertTrue(resourceResult is ResourceResult.Success)
-//            val sessionList = resourceResult.data.scheduledSessionWindows
-//            assertNotNull(sessionList)
-//            assertEquals(13, sessionList.size)
-//        }
-//    }
 
-//    @Test
-//    fun testFutureSessionsDayBefore0() {
-//        runTest {
-//            val eventTimeStamp = Clock.System.now()
-//            val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
-//            val resourceResult = repo.getFutureSessions("testPastSessionsDay0",
-//                getTodayInstant().minus(1, DateTimeUnit.DAY, TimeZone.currentSystemDefault()))
-//                .firstOrNull { it is ResourceResult.Success }
-//
-//            assertTrue(resourceResult is ResourceResult.Success)
-//            val sessionList = resourceResult.data.scheduledSessionWindows
-//            assertNotNull(sessionList)
-//            assertEquals(13, sessionList.size)
-//        }
-//    }
-
-//    @Test
-//    fun testFutureSessionsDay0() {
-//        runTest {
-//            val eventTimeStamp = Clock.System.now()
-//            //         Clock.System.now().minus(DateTimeUnit.DAY, TimeZone.currentSystemDefault())
-//            val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
-//            val resourceResult = repo.getFutureSessions("testPastSessionsDay0", getTodayInstant())
-//                .firstOrNull { it is ResourceResult.Success }
-//
-//            assertTrue(resourceResult is ResourceResult.Success)
-//            val sessionList = resourceResult.data.scheduledSessionWindows
-//            assertNotNull(sessionList)
-//            assertEquals(9, sessionList.size)
-//        }
-//    }
-
-//    @Test
-//    fun testFutureSessionsDay1() {
-//        runTest {
-//            val eventTimeStamp =
-//                Clock.System.now().minus(1, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
-//            val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
-//            val resourceResult = repo.getFutureSessions("testPastSessionsDay1", getTodayInstant())
-//                .firstOrNull { it is ResourceResult.Success }
-//
-//            assertTrue(resourceResult is ResourceResult.Success)
-//            val sessionList = resourceResult.data.scheduledSessionWindows
-//            assertNotNull(sessionList)
-//            assertEquals(6, sessionList.size)
-//        }
-//    }
-
-//    @Test
-//    fun testFutureSessionsDay4() {
-//        runTest {
-//            val eventTimeStamp =
-//                Clock.System.now().minus(4, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
-//            val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
-//            val resourceResult = repo.getFutureSessions("testPastSessionsDay4", getTodayInstant())
-//                .firstOrNull { it is ResourceResult.Success }
-//
-//            assertTrue(resourceResult is ResourceResult.Success)
-//            val sessionList = resourceResult.data.scheduledSessionWindows
-//            assertNotNull(sessionList)
-//            assertEquals(0, sessionList.size)
-//        }
-//    }
 
     private fun getAnotherTimelineJson(eventTimestamp: Instant) : String {
         val localDate = eventTimestamp.toLocalDateTime(TimeZone.currentSystemDefault()).date

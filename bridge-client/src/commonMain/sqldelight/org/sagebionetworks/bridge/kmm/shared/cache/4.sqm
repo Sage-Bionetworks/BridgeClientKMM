@@ -25,11 +25,11 @@ CREATE TABLE ScheduledSessions (
 CREATE TABLE ScheduledAssessments (
     studyId TEXT NOT NULL,
     sessionInstanceGuid TEXT NOT NULL,
-    asssessmentInstanceGuid TEXT NOT NULL,
+    assessmentInstanceGuid TEXT NOT NULL,
     guid TEXT NOT NULL,
     identifier TEXT NOT NULL,
     assessmentInfoJson TEXT NOT NULL,
-    PRIMARY KEY (studyId, asssessmentInstanceGuid)
+    PRIMARY KEY (studyId, assessmentInstanceGuid)
 );
 
 CREATE TABLE AdherenceRecords (
@@ -64,14 +64,14 @@ SELECT
     AdherenceRecords.adherenceJson
 FROM
     ScheduledAssessments
-LEFT JOIN AdherenceRecords ON ScheduledAssessments.asssessmentInstanceGuid = AdherenceRecords.instanceGuid;
+LEFT JOIN AdherenceRecords ON ScheduledAssessments.assessmentInstanceGuid = AdherenceRecords.instanceGuid;
 
 
 CREATE VIEW fullScheduledSessions AS
 SELECT
     ScheduledSessions.*,
     scheduledAssessmentAdherence.sessionInstanceGuid,
-    scheduledAssessmentAdherence.asssessmentInstanceGuid,
+    scheduledAssessmentAdherence.assessmentInstanceGuid,
     scheduledAssessmentAdherence.assessmentInfoJson,
     scheduledAssessmentAdherence.startedOn,
     scheduledAssessmentAdherence.finishedOn,

@@ -45,7 +45,7 @@ class AdherenceRecordRepo(httpClient: HttpClient,
             it.map {
                 val adherenceRecord = Json.decodeFromString<AdherenceRecord>(it.adherenceJson!!)
                 AssessmentHistoryRecord(
-                    instanceGuid = it.asssessmentInstanceGuid,
+                    instanceGuid = it.assessmentInstanceGuid,
                     assessmentInfo = Json.decodeFromString(it.assessmentInfoJson),
                     startedOn = adherenceRecord.startedOn!!,
                     finishedOn = adherenceRecord.finishedOn!!,

@@ -90,7 +90,7 @@ class ParticipantScheduleDatabase(val databaseHelper: ResourceDatabaseHelper) {
         if (session.isEmpty() || session[0].startEventTimestamp == null) {
             return null
         }
-        val scheduleAssessmentList = session.groupBy { it.asssessmentInstanceGuid }
+        val scheduleAssessmentList = session.groupBy { it.assessmentInstanceGuid }
             .map {(instanceGuid, assessments) ->
                 // For persistent sessions we could have multiple adherence records per assessment
                 ScheduledAssessmentReference(
@@ -142,7 +142,7 @@ class ParticipantScheduleDatabase(val databaseHelper: ResourceDatabaseHelper) {
         public val scheduledSessionJson: String,
         public val sessionInfoJson: String,
         public val sessionInstanceGuid: String,
-        public val asssessmentInstanceGuid: String,
+        public val assessmentInstanceGuid: String,
         public val assessmentInfoJson: String,
         public val startedOn: String?,
         public val finishedOn: String?,
@@ -164,7 +164,7 @@ class ParticipantScheduleDatabase(val databaseHelper: ResourceDatabaseHelper) {
         scheduledSessionJson: String,
         sessionInfoJson: String,
         sessionInstanceGuid: String,
-        asssessmentInstanceGuid: String,
+        assessmentInstanceGuid: String,
         assessmentInfoJson: String,
         startedOn: String?,
         finishedOn: String?,
@@ -183,7 +183,7 @@ class ParticipantScheduleDatabase(val databaseHelper: ResourceDatabaseHelper) {
                                        scheduledSessionJson,
                                        sessionInfoJson,
                                        sessionInstanceGuid,
-                                       asssessmentInstanceGuid,
+                                       assessmentInstanceGuid,
                                        assessmentInfoJson,
                                        startedOn,
                                        finishedOn,
@@ -203,7 +203,7 @@ class ParticipantScheduleDatabase(val databaseHelper: ResourceDatabaseHelper) {
             scheduledSessionJson,
             sessionInfoJson,
             sessionInstanceGuid,
-            asssessmentInstanceGuid,
+            assessmentInstanceGuid,
             assessmentInfoJson,
             startedOn,
             finishedOn,
@@ -273,7 +273,7 @@ class ParticipantScheduleDatabase(val databaseHelper: ResourceDatabaseHelper) {
                     dbQuery.insertUpdateScheduledAssessments(
                         studyId = studyId,
                         sessionInstanceGuid = it.scheduledSession.instanceGuid,
-                        asssessmentInstanceGuid = assessment.instanceGuid,
+                        assessmentInstanceGuid = assessment.instanceGuid,
                         guid = assessment.assessmentInfo.guid,
                         identifier = assessment.assessmentInfo.identifier,
                         assessmentInfoJson = Json.encodeToString(assessment.assessmentInfo),

@@ -2,6 +2,7 @@ package org.sagebionetworks.bridge.kmm.shared
 
 import co.touchlab.sqliter.DatabaseConfiguration
 import co.touchlab.sqliter.createDatabaseManager
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
@@ -25,14 +26,16 @@ class NativeTimelineStudyBurstManager(
     private val updateFailed: (() -> Unit)?
 ) : AbstractNativeTimelineManager(studyId, scheduleMutator) {
 
+    var scheduleJob: Job? = null
+
     fun refreshStudyBurstSchedule(userJoinedDate: Instant) {
-        runCatching { scope.cancel() }
+        runCatching { scheduleJob?.cancel() }
         observeStudyBurstSchedule(false, userJoinedDate)
     }
 
     fun observeStudyBurstSchedule(isNewLogin: Boolean,
                                   userJoinedDate: Instant) {
-        scope.launch {
+        scheduleJob = scope.launch {
             if (isNewLogin) {
                 if (!adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)) {
                     updateFailed?.invoke()
@@ -72,8 +75,10 @@ class NativeTimelineManager(
         viewUpdate = viewUpdate
     )
 
+    var todayJob: Job? = null
+
     fun observeTodaySchedule(isNewLogin: Boolean) {
-        scope.launch {
+        todayJob = scope.launch {
             if (isNewLogin) {
                 adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)
             }
@@ -86,7 +91,7 @@ class NativeTimelineManager(
     }
 
     fun refreshTodaySchedule() {
-        runCatching { scope.cancel() }
+        runCatching { todayJob?.cancel() }
         observeTodaySchedule(false)
     }
 }

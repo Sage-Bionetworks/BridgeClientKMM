@@ -72,12 +72,12 @@ class AdherenceRecordRepo(httpClient: HttpClient, databaseHelper: ResourceDataba
     private suspend fun loadAndCacheResults(studyId: String, adherenceRecordsSearch: AdherenceRecordsSearch) : AdherenceRecordList {
         val recordsResult = scheduleV2Api.searchForAdherenceRecords(studyId, adherenceRecordsSearch)
         for (record in recordsResult.items) {
-            insertUpdate(record, studyId)
+            insertUpdate(studyId, record, false)
         }
         return recordsResult
     }
 
-    private fun insertUpdate(adherenceRecord: AdherenceRecord, studyId: String) {
+    private fun insertUpdate(studyId: String, adherenceRecord: AdherenceRecord, needSave: Boolean) {
         val json = Json.encodeToString(adherenceRecord)
         val resource = Resource(
             identifier = adherenceRecord.instanceGuid,
@@ -87,7 +87,7 @@ class AdherenceRecordRepo(httpClient: HttpClient, databaseHelper: ResourceDataba
             json = json,
             lastUpdate = Clock.System.now().toEpochMilliseconds(),
             status = ResourceStatus.SUCCESS,
-            needSave = true)
+            needSave = needSave)
         database.insertUpdateResource(resource)
     }
 
@@ -96,7 +96,7 @@ class AdherenceRecordRepo(httpClient: HttpClient, databaseHelper: ResourceDataba
      * to save to Bridge server.
      */
     fun createUpdateAdherenceRecord(adherenceRecord: AdherenceRecord, studyId: String) {
-        insertUpdate(adherenceRecord, studyId)
+        insertUpdate(studyId, adherenceRecord, true)
         backgroundScope.launch {
             processUpdates(studyId)
         }

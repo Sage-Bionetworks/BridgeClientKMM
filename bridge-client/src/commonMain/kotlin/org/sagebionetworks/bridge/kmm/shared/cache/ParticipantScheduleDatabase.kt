@@ -68,6 +68,20 @@ class ParticipantScheduleDatabase(val databaseHelper: ResourceDatabaseHelper) {
         }
     }
 
+    fun getCachedPendingNotificationsCollapsed(studyId: String, nowInstant: Instant) : List<ScheduledNotificationV2> {
+        val nowString = nowInstant.toLocalDateTime(TimeZone.currentSystemDefault()).toString()
+        val notificationList = dbQuery.groupedFuturePendingNotifications(studyId, nowString).executeAsList().toSet().toList()
+        return notificationList.map {
+            val notifInfo: NotificationInfo = Json.decodeFromString(it.notificationInfoJson)
+            ScheduledNotificationV2(
+                instanceGuid = it.sessionInstanceGuid,
+                scheduleOn = it.scheduleOn!!.toLocalDateTime(),
+                allowSnooze = notifInfo.allowSnooze?: false,
+                message = notifInfo.message
+            )
+        }
+    }
+
     private fun getScheduledSessionTimelineSlice(studyId: String, instantInDay: Instant, timeZone: TimeZone, fullSessionsList: List<ExpandedScheduledSession>) : ScheduledSessionTimelineSlice {
         // fullSessionsList has an entry for every assessment and adherence record every session
         val sessionWindows = fullSessionsList.groupBy { it.sessionInstanceGuid }
@@ -287,6 +301,8 @@ class ParticipantScheduleDatabase(val databaseHelper: ResourceDatabaseHelper) {
                         studyId = studyId,
                         sessionInstanceGuid = it.scheduledSession.instanceGuid,
                         scheduleOn = firstInstant.toLocalDateTime(timezone).toString(),
+                        repeatInterval = notificationInfo.interval,
+                        repeatUntil = endDateTime.toString(),
                         notificationInfoJson = Json.encodeToString(notificationInfo)
                     )
                     val intervalPeriod = notificationInfo.interval?.let { DateTimePeriod.parse(it) }
@@ -297,6 +313,8 @@ class ParticipantScheduleDatabase(val databaseHelper: ResourceDatabaseHelper) {
                                 studyId = studyId,
                                 sessionInstanceGuid = it.scheduledSession.instanceGuid,
                                 scheduleOn = firstInstant.toLocalDateTime(timezone).toString(),
+                                repeatInterval = notificationInfo.interval,
+                                repeatUntil = endDateTime.toString(),
                                 notificationInfoJson = Json.encodeToString(notificationInfo)
                             )
                             firstInstant = firstInstant.plus(intervalPeriod, timezone)

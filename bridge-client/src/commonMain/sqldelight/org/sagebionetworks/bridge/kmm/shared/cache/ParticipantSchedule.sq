@@ -168,13 +168,15 @@ CREATE TABLE ScheduledNotifications (
     studyId TEXT NOT NULL,
     sessionInstanceGuid TEXT NOT NULL,
     scheduleOn TEXT NOT NULL,           -- LocalDateTime
+    repeatInterval TEXT,    -- DateTimePeriod?,
+    repeatUntil TEXT,       -- LocalDateTime?,
     notificationInfoJson TEXT NOT NULL,
     PRIMARY KEY (studyId, sessionInstanceGuid, scheduleOn)
 );
 
 insertUpdateNotifications:
-INSERT OR REPLACE INTO ScheduledNotifications(studyId, sessionInstanceGuid, scheduleOn, notificationInfoJson)
-VALUES(?,?,?,?);
+INSERT OR REPLACE INTO ScheduledNotifications(studyId, sessionInstanceGuid, scheduleOn, repeatInterval, repeatUntil, notificationInfoJson)
+VALUES(?,?,?,?,?,?);
 
 -- Get all future notifications, need to filter out completed sessions
 futureNotifications:
@@ -188,3 +190,11 @@ SELECT ScheduledNotifications.*
 FROM ScheduledNotifications
 JOIN fullScheduledSessions ON ScheduledNotifications.sessionInstanceGuid = fullScheduledSessions.instanceGuid
 WHERE ScheduledNotifications.studyId = ? AND scheduleOn >= ? AND ((fullScheduledSessions.finishedOn IS NULL) AND (fullScheduledSessions.declined IS NULL OR fullScheduledSessions.declined = 0));
+
+-- Filters out completed sessions and only returns first instance of recurring notifications
+groupedFuturePendingNotifications:
+SELECT ScheduledNotifications.sessionInstanceGuid, min(scheduleOn) AS scheduleOn, repeatInterval, repeatUntil, notificationInfoJson
+FROM ScheduledNotifications
+JOIN fullScheduledSessions ON ScheduledNotifications.sessionInstanceGuid = fullScheduledSessions.instanceGuid
+WHERE ScheduledNotifications.studyId = ? AND scheduleOn >= ? AND ((fullScheduledSessions.finishedOn IS NULL) AND (fullScheduledSessions.declined IS NULL OR fullScheduledSessions.declined = 0))
+GROUP BY ScheduledNotifications.sessionInstanceGuid;

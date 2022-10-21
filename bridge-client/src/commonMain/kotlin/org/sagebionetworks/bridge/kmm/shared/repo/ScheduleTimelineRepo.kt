@@ -127,6 +127,10 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         return participantScheduleDatabase.getCachedPendingNotifications(studyId, nowInstant)
     }
 
+    fun getCachedPendingNotificationsCollapsed(studyId: String, nowInstant: Instant) : List<ScheduledNotificationV2> {
+        return participantScheduleDatabase.getCachedPendingNotificationsCollapsed(studyId, nowInstant)
+    }
+
 
     /**
      * Get all the scheduled sessions for the study, organized by study burst.

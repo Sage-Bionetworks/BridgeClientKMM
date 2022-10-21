@@ -45,10 +45,13 @@ CREATE TABLE AdherenceRecords (
     PRIMARY KEY (studyId, instanceGuid, startedOn)
 );
 
+-- Table will contain all potential notifications, including repeating ones expanded
 CREATE TABLE ScheduledNotifications (
     studyId TEXT NOT NULL,
     sessionInstanceGuid TEXT NOT NULL,
     scheduleOn TEXT NOT NULL,           -- LocalDateTime
+    repeatInterval TEXT,    -- DateTimePeriod?,
+    repeatUntil TEXT,       -- LocalDateTime?,
     notificationInfoJson TEXT NOT NULL,
     PRIMARY KEY (studyId, sessionInstanceGuid, scheduleOn)
 );

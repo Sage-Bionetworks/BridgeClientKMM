@@ -30,6 +30,7 @@ class NativeTimelineStudyBurstManager(
 
     fun refreshStudyBurstSchedule(userJoinedDate: Instant) {
         runCatching { scheduleJob?.cancel() }
+        scheduleJob = null
         observeStudyBurstSchedule(false, userJoinedDate)
     }
 
@@ -92,6 +93,7 @@ class NativeTimelineManager(
 
     fun refreshTodaySchedule() {
         runCatching { todayJob?.cancel() }
+        todayJob = null
         observeTodaySchedule(false)
     }
 }

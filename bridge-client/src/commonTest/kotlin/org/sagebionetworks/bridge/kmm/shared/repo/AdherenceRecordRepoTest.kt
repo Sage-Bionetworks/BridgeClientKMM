@@ -3,12 +3,10 @@ package org.sagebionetworks.bridge.kmm.shared.repo
 import kotlinx.coroutines.MainScope
 import org.sagebionetworks.bridge.kmm.shared.BaseTest
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
+import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
 import org.sagebionetworks.bridge.kmm.shared.getTestClient
 import org.sagebionetworks.bridge.kmm.shared.testDatabaseDriver
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class AdherenceRecordRepoTest: BaseTest() {
 
@@ -43,6 +41,9 @@ class AdherenceRecordRepoTest: BaseTest() {
             assertNotNull(record)
             assertEquals(instanceGuid, record.instanceGuid)
             val db = repo.database
+            val resource = db.getResource(instanceGuid, ResourceType.ADHERENCE_RECORD, studyId)
+            assertNotNull(resource)
+            assertFalse(resource.needSave)
             db.clearDatabase()
         }
     }

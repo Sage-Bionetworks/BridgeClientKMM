@@ -10,6 +10,7 @@ import kotlinx.serialization.json.Json
 import org.sagebionetworks.bridge.kmm.shared.apis.AssessmentsApi
 import org.sagebionetworks.bridge.kmm.shared.cache.*
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper.Companion.APP_WIDE_STUDY_ID
+import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper.Companion.DEFAULT_SECONDARY_ID
 import org.sagebionetworks.bridge.kmm.shared.models.AssessmentConfig
 import org.sagebionetworks.bridge.kmm.shared.models.AssessmentInfo
 
@@ -49,7 +50,7 @@ class AssessmentConfigRepo(httpClient: HttpClient, databaseHelper: ResourceDatab
     fun getAssessmentConfig(assessmentInfo: AssessmentInfo): Flow<ResourceResult<AssessmentConfig>> {
         return getResourceById(
             identifier = assessmentInfo.guid,
-            secondaryId = assessmentInfo.identifier,
+            secondaryId = DEFAULT_SECONDARY_ID,
             resourceType = ResourceType.ASSESSMENT_CONFIG,
             remoteLoad = { loadRemoteAssessmentConfig(assessmentInfo) },
             studyId = APP_WIDE_STUDY_ID
@@ -66,7 +67,7 @@ class AssessmentConfigRepo(httpClient: HttpClient, databaseHelper: ResourceDatab
             remoteLoadResource(
                 database = database,
                 identifier = assessment.guid,
-                secondaryId = assessment.identifier,
+                secondaryId = DEFAULT_SECONDARY_ID,
                 resourceType = ResourceType.ASSESSMENT_CONFIG,
                 studyId = APP_WIDE_STUDY_ID,
                 curResource = curResource,

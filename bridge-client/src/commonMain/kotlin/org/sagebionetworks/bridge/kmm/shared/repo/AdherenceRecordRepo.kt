@@ -217,6 +217,15 @@ class AdherenceRecordRepo(httpClient: HttpClient,
      */
     private suspend fun processUpdatesV2(studyId: String) {
         val recordsToUpload = dbQuery.selectAdherenceNeedSave(studyId).executeAsList()
+        if (recordsToUpload.isEmpty()) return
+        val chunkedList = recordsToUpload.chunked(25)
+        for (records in chunkedList) {
+            processUpdatesV2(studyId, records)
+        }
+    }
+
+    private suspend fun processUpdatesV2(studyId: String, adherenceToUpload: List<AdherenceRecords>) {
+        val recordsToUpload = dbQuery.selectAdherenceNeedSave(studyId).executeAsList()
         val adherenceToUpload: List<AdherenceRecord> = recordsToUpload.mapNotNull { Json.decodeFromString(it.adherenceJson) }
 
         if (adherenceToUpload.isEmpty()) return

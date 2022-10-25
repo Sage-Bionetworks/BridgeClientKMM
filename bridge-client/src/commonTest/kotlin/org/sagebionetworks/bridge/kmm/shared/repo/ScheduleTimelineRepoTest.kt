@@ -499,6 +499,50 @@ class ScheduleTimelineRepoTest: BaseTest() {
     }
 
     @Test
+    fun testScheduledSessionsDay0TodayAndNotifications() {
+        runTest {
+            val eventTimeStamp =
+                Clock.System.now()
+            val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
+            val studyId = "testScheduledSessionsDay0TodayAndNotifications"
+            val resourceResult = repo.getSessionsForDay(
+                studyId,
+                getTodayInstant(),
+                false
+            ).firstOrNull { it is ResourceResult.Success }
+
+            assertTrue(resourceResult is ResourceResult.Success)
+            val sessionList = resourceResult.data.scheduledSessionWindows
+            assertNotNull(sessionList)
+            assertEquals(3, sessionList.size)
+
+            //First session should be the 3 day session that started yesterday
+            val session1 = sessionList[0]
+            assertEquals("One time 3 day session", session1.sessionInfo.label)
+
+            //Second session should have started in current hour
+            val session2 = sessionList[1]
+            assertEquals("Daily Sessions", session2.sessionInfo.label)
+            assertEquals("QaqwdxDjRc5FzUIAhBHRwA", session2.instanceGuid)
+
+            //Third session will be starting next hour
+            val session3 = sessionList[2]
+            assertEquals("Daily Sessions", session3.sessionInfo.label)
+            assertEquals("SL97UWo1ZQEA1tQKKVFkUA", session3.instanceGuid)
+
+            val notificationsV2 = repo.getCachedPendingNotifications(studyId, getTodayInstant())
+            assertEquals(13, notificationsV2.size)
+            assertNotEquals(notificationsV2.size, notificationsV2.distinctBy { it.instanceGuid }.size)
+
+            // GroupedNotifications should only return first instance of recurring notifications
+            val groupedNotifications =
+                repo.getCachedPendingNotificationsCollapsed(studyId, getTodayInstant())
+            assertEquals(12, groupedNotifications.size)
+            assertEquals(groupedNotifications.size, groupedNotifications.distinctBy { it.instanceGuid }.size)
+        }
+    }
+
+    @Test
     fun testScheduledSessionsDay1TodayAndNotifications() {
         runTest {
             val eventTimeStamp = Clock.System.now().minus(DateTimeUnit.DAY, TimeZone.currentSystemDefault())
@@ -529,9 +573,11 @@ class ScheduleTimelineRepoTest: BaseTest() {
             assertEquals("Daily Sessions", session3.sessionInfo.label)
             assertEquals("-B_yTKp8eTGK7NY_qJ0UTA", session3.instanceGuid)
 
-            val notificationsV2 = repo.participantScheduleDatabase.getCachedPendingNotifications(studyId, getTodayInstant())
+            val notificationsV2 = repo.getCachedPendingNotifications(studyId, getTodayInstant())
             assertEquals(9, notificationsV2.size)
 
+            val groupedNotifications = repo.getCachedPendingNotificationsCollapsed(studyId, getTodayInstant())
+            assertEquals(9, groupedNotifications.size)
         }
     }
 
@@ -580,8 +626,11 @@ class ScheduleTimelineRepoTest: BaseTest() {
             assertEquals("Daily Sessions", session6.sessionInfo.label)
             assertEquals("wSFtq35JbCog5s4TXXMNRw", session6.instanceGuid)
 
-            val notificationsV2 = repo.participantScheduleDatabase.getCachedPendingNotifications(studyId, getTodayInstant())
+            val notificationsV2 = repo.getCachedPendingNotifications(studyId, getTodayInstant())
             assertEquals(9, notificationsV2.size)
+
+            val groupedNotifications = repo.getCachedPendingNotificationsCollapsed(studyId, getTodayInstant())
+            assertEquals(9, groupedNotifications.size)
 
         }
     }

@@ -54,28 +54,32 @@ class ParticipantScheduleDatabase(val databaseHelper: ResourceDatabaseHelper) {
         }
     }
 
-    fun getCachedPendingNotifications(studyId: String, nowInstant: Instant) : List<ScheduledNotificationV2> {
+    fun getCachedPendingNotifications(studyId: String, nowInstant: Instant) : List<ScheduledNotification> {
         val nowString = nowInstant.toLocalDateTime(TimeZone.currentSystemDefault()).toString()
         val notificationList = dbQuery.futurePendingNotifications(studyId, nowString).executeAsList().toSet().toList()
         return notificationList.map {
             val notifInfo: NotificationInfo = Json.decodeFromString(it.notificationInfoJson)
-            ScheduledNotificationV2(
+            ScheduledNotification(
                 instanceGuid = it.sessionInstanceGuid,
                 scheduleOn = it.scheduleOn.toLocalDateTime(),
+                repeatInterval = it.repeatInterval?.toDateTimePeriod(),
+                repeatUntil = it.repeatUntil?.toLocalDateTime(),
                 allowSnooze = notifInfo.allowSnooze?: false,
                 message = notifInfo.message
             )
         }
     }
 
-    fun getCachedPendingNotificationsCollapsed(studyId: String, nowInstant: Instant) : List<ScheduledNotificationV2> {
+    fun getCachedPendingNotificationsCollapsed(studyId: String, nowInstant: Instant) : List<ScheduledNotification> {
         val nowString = nowInstant.toLocalDateTime(TimeZone.currentSystemDefault()).toString()
         val notificationList = dbQuery.groupedFuturePendingNotifications(studyId, nowString).executeAsList().toSet().toList()
         return notificationList.map {
             val notifInfo: NotificationInfo = Json.decodeFromString(it.notificationInfoJson)
-            ScheduledNotificationV2(
+            ScheduledNotification(
                 instanceGuid = it.sessionInstanceGuid,
                 scheduleOn = it.scheduleOn!!.toLocalDateTime(),
+                repeatInterval = it.repeatInterval?.toDateTimePeriod(),
+                repeatUntil = it.repeatUntil?.toLocalDateTime(),
                 allowSnooze = notifInfo.allowSnooze?: false,
                 message = notifInfo.message
             )

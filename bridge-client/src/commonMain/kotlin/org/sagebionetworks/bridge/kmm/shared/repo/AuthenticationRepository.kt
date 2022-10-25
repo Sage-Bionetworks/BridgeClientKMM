@@ -203,9 +203,11 @@ class AuthenticationRepository(
                 success = true
             } catch (err: Throwable) {
                 Logger.e("Error requesting reAuth", err)
-                if (err is ResponseException) {
-                    // We got a response from Bridge and it was an error.
-                    // Clear the cached session
+                if (err is ResponseException && (err.response.status == HttpStatusCode.Unauthorized ||
+                            err.response.status == HttpStatusCode.Forbidden ||
+                            err.response.status == HttpStatusCode.NotFound ||
+                            err.response.status == HttpStatusCode.Locked)) {
+                    // Should clear session for auth related errors: 401, 403, 404, 423
                     database.removeResource(USER_SESSION_ID, ResourceType.USER_SESSION_INFO, APP_WIDE_STUDY_ID)
                 } else {
                     // Some sort of network error leave the session alone so we can try again

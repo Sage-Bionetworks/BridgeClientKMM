@@ -109,6 +109,14 @@ class AdherenceRecordRepo(httpClient: HttpClient, databaseHelper: ResourceDataba
      */
     private suspend fun processUpdates(studyId: String) {
         val resourcesToUpload = database.getResourcesNeedSave(ResourceType.ADHERENCE_RECORD, studyId)
+        if (resourcesToUpload.isEmpty()) return
+        val chunkedList = resourcesToUpload.chunked(25)
+        for (resources in chunkedList) {
+            processUpdates(studyId, resources)
+        }
+    }
+
+    private suspend fun processUpdates(studyId: String, resourcesToUpload: List<Resource>) {
         val records: List<AdherenceRecord> = resourcesToUpload.mapNotNull { it.loadResource() }
         if (records.isEmpty()) return
         var status = ResourceStatus.FAILED

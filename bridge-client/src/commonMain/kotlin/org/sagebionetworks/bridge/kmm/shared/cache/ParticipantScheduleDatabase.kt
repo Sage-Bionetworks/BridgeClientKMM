@@ -70,19 +70,20 @@ class ParticipantScheduleDatabase(val databaseHelper: ResourceDatabaseHelper) {
         }
     }
 
-    fun getCachedPendingNotificationsCollapsed(studyId: String, nowInstant: Instant) : List<ScheduledNotification> {
+    fun getCachedPendingNotificationsCollapsed(studyId: String, nowInstant: Instant) : Flow<List<ScheduledNotification>> {
         val nowString = nowInstant.toLocalDateTime(TimeZone.currentSystemDefault()).toString()
-        val notificationList = dbQuery.groupedFuturePendingNotifications(studyId, nowString).executeAsList().toSet().toList()
-        return notificationList.map {
-            val notifInfo: NotificationInfo = Json.decodeFromString(it.notificationInfoJson)
-            ScheduledNotification(
-                instanceGuid = it.sessionInstanceGuid,
-                scheduleOn = it.scheduleOn!!.toLocalDateTime(),
-                repeatInterval = it.repeatInterval?.toDateTimePeriod(),
-                repeatUntil = it.repeatUntil?.toLocalDateTime(),
-                allowSnooze = notifInfo.allowSnooze?: false,
-                message = notifInfo.message
-            )
+        return dbQuery.groupedFuturePendingNotifications(studyId, nowString).asFlow().mapToList(Dispatchers.Default).map {
+            it.toSet().toList().map { notif ->
+                val notifInfo: NotificationInfo = Json.decodeFromString(notif.notificationInfoJson)
+                ScheduledNotification(
+                    instanceGuid = notif.sessionInstanceGuid,
+                    scheduleOn = notif.scheduleOn!!.toLocalDateTime(),
+                    repeatInterval = notif.repeatInterval?.toDateTimePeriod(),
+                    repeatUntil = notif.repeatUntil?.toLocalDateTime(),
+                    allowSnooze = notifInfo.allowSnooze ?: false,
+                    message = notifInfo.message
+                )
+            }
         }
     }
 

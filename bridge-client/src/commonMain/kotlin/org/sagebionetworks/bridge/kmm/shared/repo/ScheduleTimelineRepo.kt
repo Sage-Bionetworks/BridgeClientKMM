@@ -127,7 +127,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         return participantScheduleDatabase.getCachedPendingNotifications(studyId, nowInstant)
     }
 
-    fun getCachedPendingNotificationsCollapsed(studyId: String, nowInstant: Instant) : List<ScheduledNotification> {
+    fun getCachedPendingNotificationsCollapsed(studyId: String, nowInstant: Instant) : Flow<List<ScheduledNotification>> {
         return participantScheduleDatabase.getCachedPendingNotificationsCollapsed(studyId, nowInstant)
     }
 

@@ -161,11 +161,6 @@ open class AbstractTodayTimelineViewModel : NSObject, ObservableObject, Schedule
                 DispatchQueue.main.async {
                     self.today = timelineSlice.instantInDay
                     self.schedules = timelineSlice.scheduledSessionWindows
-                    // syoung 07/08/2021 Ideally, we will get to a point where the database does work to parse
-                    // the timeline and allow using a separate manager for getting the notifications. For now,
-                    // since this is a somewhat expensive operation, return the notifications with the "today"
-                    // schedules.
-                    self.bridgeManager.localNotificationManager.setupNotifications(timelineSlice.notifications)
                 }
             }
             self.timelineManager.observeTodaySchedule(isNewLogin: isNewLogin)

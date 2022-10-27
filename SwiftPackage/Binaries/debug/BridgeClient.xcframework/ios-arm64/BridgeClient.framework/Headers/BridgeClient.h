@@ -362,6 +362,7 @@ __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("NativeReportManager")))
 @interface BridgeClientNativeReportManager : BridgeClientBase <BridgeClientKoin_coreKoinComponent>
 - (instancetype)initWithStudyId:(NSString *)studyId __attribute__((swift_name("init(studyId:)"))) __attribute__((objc_designated_initializer));
+- (void)fetchCachedReportsIdentifier:(NSString *)identifier startDateTime:(NSDate *)startDateTime endDateTime:(NSDate *)endDateTime callBack:(void (^)(NSArray<BridgeClientNativeParticipantDataRecord *> *))callBack __attribute__((swift_name("fetchCachedReports(identifier:startDateTime:endDateTime:callBack:)")));
 - (void)fetchReportsIdentifier:(NSString *)identifier startDateTime:(NSDate *)startDateTime endDateTime:(NSDate *)endDateTime callBack:(void (^)(NSArray<BridgeClientNativeParticipantDataRecord *> *))callBack __attribute__((swift_name("fetchReports(identifier:startDateTime:endDateTime:callBack:)")));
 
 /**

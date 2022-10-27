@@ -21,10 +21,29 @@ class NativeReportManager (
     private val scope = MainScope()
 
     fun fetchReports(identifier: String, startDateTime: NSDate, endDateTime: NSDate, callBack: (List<NativeParticipantDataRecord>) -> Unit) {
+        _fetchReports(identifier, startDateTime, endDateTime, true, callBack)
+    }
+
+    fun fetchCachedReports(identifier: String, startDateTime: NSDate, endDateTime: NSDate, callBack: (List<NativeParticipantDataRecord>) -> Unit) {
+        _fetchReports(identifier, startDateTime, endDateTime, false, callBack)
+    }
+
+    private fun _fetchReports(identifier: String, startDateTime: NSDate, endDateTime: NSDate, loadFromServer: Boolean, callBack: (List<NativeParticipantDataRecord>) -> Unit) {
         scope.launch {
-            reportRepo.loadRemoteReports(studyId, identifier, startTime = startDateTime.toKotlinInstant(), endTime = endDateTime.toKotlinInstant())
+            val lowerBound = startDateTime.toKotlinInstant()
+            val upperBound = endDateTime.toKotlinInstant()
+            if (loadFromServer) {
+                reportRepo.loadRemoteReports(
+                    studyId,
+                    identifier,
+                    startTime = lowerBound,
+                    endTime = upperBound
+                )
+            }
             val records = reportRepo.getCachedReports(studyId, identifier).mapNotNull { report ->
-                report.dateTime?.let { NativeParticipantDataRecord(identifier, it.toNSDate(), report.data) }
+                report.dateTime?.let {
+                   if (lowerBound <= it && it < upperBound) NativeParticipantDataRecord(identifier, it.toNSDate(), report.data) else null
+                }
             }
             callBack(records)
         }

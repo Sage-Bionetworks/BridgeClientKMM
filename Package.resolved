@@ -47,15 +47,6 @@
         }
       },
       {
-        "package": "SageResearch",
-        "repositoryURL": "https://github.com/Sage-Bionetworks/SageResearch.git",
-        "state": {
-          "branch": null,
-          "revision": "609d7ffd86024f1db94391c9aad1b908020536c3",
-          "version": "4.4.0"
-        }
-      },
-      {
         "package": "SharedMobileUI",
         "repositoryURL": "https://github.com/Sage-Bionetworks/SharedMobileUI-AppleOS.git",
         "state": {

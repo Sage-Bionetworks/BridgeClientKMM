@@ -14,7 +14,8 @@ enum class ResourceType {
     ACTIVITY_EVENTS_LIST, //No longer needed
     ADHERENCE_RECORD,
     STUDY,
-    STUDY_INFO
+    STUDY_INFO,
+    PARTICIPANT_REPORT
 }
 
 enum class ResourceStatus {

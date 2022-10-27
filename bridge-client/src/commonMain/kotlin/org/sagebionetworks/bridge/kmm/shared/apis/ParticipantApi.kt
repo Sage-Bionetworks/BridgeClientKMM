@@ -5,10 +5,11 @@ package org.sagebionetworks.bridge.kmm.shared.apis
 
 
 import io.ktor.client.*
+import io.ktor.client.request.*
+import io.ktor.http.*
+import kotlinx.datetime.Instant
+import org.sagebionetworks.bridge.kmm.shared.models.*
 import org.sagebionetworks.bridge.kmm.shared.models.Message
-import org.sagebionetworks.bridge.kmm.shared.models.ParticipantData
-import org.sagebionetworks.bridge.kmm.shared.models.StudyParticipant
-import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
 
 internal class ParticipantApi(basePath: String = BASE_PATH, httpClient: HttpClient) : AbstractApi(basePath, httpClient) {
 
@@ -56,6 +57,42 @@ internal class ParticipantApi(basePath: String = BASE_PATH, httpClient: HttpClie
     suspend fun updateUsersParticipantRecord(studyParticipant: StudyParticipant) : UserSessionInfo {
         return postData(studyParticipant, "v3/participants/self")
     }
+
+    /**
+     * Get a series of report records for a specific date and time range for the caller (this API uses dates and times and not just dates; use a standard time of day portion like “T00:00:00.000Z” if a time portion is unnecessary, being sure to create and retrieve records with the same set time).
+     *
+     * @param studyId Study identifier
+     * @param identifier identifier
+     * @param startTime
+     * @param endTime
+     * @param offsetKey next page start key for pagination (optional)
+     * @param pageSize maximum number of records in each returned page (optional, default to 50)
+     * @return ForwardCursorReportDataListComposed
+     */
+    suspend fun getUsersStudyParticipantReport(studyId: String, identifier: String, startTime: Instant, endTime: Instant, offsetKey: String?, pageSize: Int?) : ForwardCursorReportDataList {
+        val parameters = mutableMapOf<String, String>()
+        with(parameters) {
+            put("startTime", startTime.toString())
+            put("endTime", endTime.toString())
+            offsetKey?.let { put("offsetKey", it) }
+            pageSize?.let { put("pageSize", it.toString()) }
+        }
+        return getData("v5/studies/$studyId/participants/self/reports/$identifier", queryParams = parameters)
+    }
+
+    /**
+     * Add a participant report for a single date and time for the caller (this API uses dates and times and not just dates; use a standard time of day portion like “T00:00:00.000Z” if a time portion is unnecessary, being sure to create and retrieve records with the same set time).
+     *
+     * @param studyId Study identifier
+     * @param identifier identifier
+     * @param reportData
+     * @return Message
+     */
+    suspend fun saveUsersStudyParticipantReportRecord(studyId: String, identifier: String, reportData: ReportData) : Message {
+        return postData( reportData,"v5/studies/$studyId/participants/self/reports/$identifier")
+    }
+
+
 
 }
 

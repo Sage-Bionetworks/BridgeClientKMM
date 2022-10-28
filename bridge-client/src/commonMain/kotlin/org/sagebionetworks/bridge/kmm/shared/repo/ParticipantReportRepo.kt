@@ -6,8 +6,12 @@ import io.ktor.client.*
 import io.ktor.client.plugins.*
 import io.ktor.http.*
 import io.ktor.util.network.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
@@ -28,9 +32,15 @@ class ParticipantReportRepo(httpClient: HttpClient,
         ensureNeverFrozen()
     }
 
-    internal var participantApi = ParticipantApi(
+    private var participantApi = ParticipantApi(
         httpClient = httpClient
     )
+
+    private var processUpdatesJob : Job? = null
+
+    private val updatesFlow: MutableStateFlow<Pair<String?, Instant?>> = MutableStateFlow(Pair(null, null))
+
+
 
     /**
      * Get all cached reports associated with the given identifier
@@ -75,10 +85,20 @@ class ParticipantReportRepo(httpClient: HttpClient,
      */
     fun createUpdateReport(report: Report, studyId: String, identifier: String) {
         insertUpdate(studyId, identifier, report.toReportData(), true)
-        backgroundScope.launch {
-            processUpdates(studyId)
-        }
+        runProcessLocalUpdates(studyId)
+    }
 
+    private fun runProcessLocalUpdates(studyId: String) {
+        if (processUpdatesJob == null) {
+            processUpdatesJob = backgroundScope.launch {
+                updatesFlow.collect { pair ->
+                    pair.first?.let {
+                        processUpdates(it)
+                    }
+                }
+            }
+        }
+        updatesFlow.value = Pair(studyId, Clock.System.now())
     }
 
     private fun insertUpdate(studyId: String, identifier: String, reportData: ReportData, needSave: Boolean) {

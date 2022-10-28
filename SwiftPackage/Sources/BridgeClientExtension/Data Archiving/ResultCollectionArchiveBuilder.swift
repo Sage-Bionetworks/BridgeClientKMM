@@ -32,6 +32,7 @@
 
 import Foundation
 import JsonModel
+import ResultModel
 
 public protocol ResultCollectionArchivable : FileArchivable {
     var identifier: String { get }

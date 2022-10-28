@@ -33,6 +33,7 @@
 
 import SwiftUI
 import JsonModel
+import ResultModel
 import AssessmentModel
 import AssessmentModelUI
 import BridgeClientExtension

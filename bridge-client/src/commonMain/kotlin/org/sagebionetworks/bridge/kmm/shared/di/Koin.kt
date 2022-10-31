@@ -40,6 +40,7 @@ val commonModule = module {
     single<AppConfigRepo> { AppConfigRepo(get(), get(), get(named("background")), get()) }
     single<StudyRepo> { StudyRepo(get(), get(), get(), get(named("background"))) }
     single<ParticipantRepo> { ParticipantRepo(get(), get(), get(named("background")), get()) }
+    single<ParticipantReportRepo> { ParticipantReportRepo(get(), get(), get(named("background"))) }
     single<LocalJsonDataCache> {LocalJsonDataCache(get())}
 
 }

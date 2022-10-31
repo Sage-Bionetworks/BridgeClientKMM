@@ -17,7 +17,6 @@ let package = Package(
                 "BridgeClient",
                 "BridgeClientExtension",
                 "BridgeClientUI",
-                "BridgeToSageResearch",
             ]),
         .library(
             name: "BridgeClientAppExtension",
@@ -35,15 +34,12 @@ let package = Package(
         .package(name: "BridgeArchiver",
                  url: "https://github.com/Sage-Bionetworks/BridgeArchiver-Swift.git",
                  from: "0.3.0"),
-        .package(name: "SageResearch",
-                 url: "https://github.com/Sage-Bionetworks/SageResearch.git",
-                 from: "4.4.0"),
         .package(name: "JsonModel",
                  url: "https://github.com/Sage-Bionetworks/JsonModel-Swift.git",
-                 from: "1.4.9"),
+                 "1.6.0"..<"3.0.0"),
         .package(name: "AssessmentModel",
                  url: "https://github.com/Sage-Bionetworks/AssessmentModelKMM.git",
-                 from: "0.7.3"),
+                 from: "0.9.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -83,16 +79,5 @@ let package = Package(
                         "BridgeClientUI",
                     ],
                     path: "SwiftPackage/Tests/BridgeClientUITests"),
-        
-        .target(name: "BridgeToSageResearch",
-                dependencies: [
-                    "BridgeClient",
-                    "BridgeClientExtension",
-                    "BridgeClientUI",
-                    "JsonModel",
-                    .product(name: "Research", package: "SageResearch"),
-                    .product(name: "ResearchUI", package: "SageResearch"),
-                ],
-                path: "SwiftPackage/Sources/BridgeToSageResearch"),
     ]
 )

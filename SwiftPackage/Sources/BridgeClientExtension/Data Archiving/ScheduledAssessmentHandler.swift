@@ -33,6 +33,7 @@
 import Foundation
 import BridgeClient
 import JsonModel
+import ResultModel
 
 /// Light-weight protocol for handling state of a displayed assessment.
 /// - Note: All the methods within this protocol are marked as `@MainActor` which means that they are

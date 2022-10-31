@@ -62,6 +62,10 @@ class ResourceDatabaseHelper(sqlDriver: SqlDriver) : EtagStorageCache {
         return dbQuery.selectResourceById(id, type, studyId).executeAsOneOrNull()
     }
 
+    internal fun getResourcesById(id: String, type: ResourceType, studyId: String): List<Resource> {
+        return dbQuery.selectResourceById(id, type, studyId).executeAsList()
+    }
+
     internal fun getResourcesBySecondaryId(secondaryId: String, type: ResourceType, studyId: String): List<Resource> {
         return dbQuery.selectResourceBySecondaryId(secondaryId, type, studyId).executeAsList()
     }

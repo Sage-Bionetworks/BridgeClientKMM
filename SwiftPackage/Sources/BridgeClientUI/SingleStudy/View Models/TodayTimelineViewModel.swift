@@ -34,6 +34,7 @@ import SwiftUI
 import BridgeClient
 import BridgeClientExtension
 import JsonModel
+import ResultModel
 
 fileprivate let kUserSessionIdKey = "userSessionId"
 

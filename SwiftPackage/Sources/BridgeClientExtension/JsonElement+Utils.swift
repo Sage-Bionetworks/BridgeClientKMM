@@ -34,6 +34,7 @@
 import Foundation
 import BridgeClient
 import JsonModel
+import ResultModel
 
 extension JsonModel.JsonSerializable {
     public func toBridgeClientJsonElement() -> BridgeClient.Kotlinx_serialization_jsonJsonElement? {
@@ -47,7 +48,7 @@ extension JsonModel.JsonSerializable {
     }
 }
 
-extension JsonModel.AssessmentResult {
+extension AssessmentResult {
     public func toBridgeClientJsonElement() -> BridgeClient.Kotlinx_serialization_jsonJsonElement? {
         do {
             let data = try self.jsonEncodedData()

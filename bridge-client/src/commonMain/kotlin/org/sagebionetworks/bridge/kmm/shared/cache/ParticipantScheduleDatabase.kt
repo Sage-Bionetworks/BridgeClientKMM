@@ -67,25 +67,77 @@ class ParticipantScheduleDatabase(val databaseHelper: ResourceDatabaseHelper) {
                 allowSnooze = notifInfo.allowSnooze?: false,
                 message = notifInfo.message
             )
-        }
+        }.sortedBy { it.scheduleOn }
     }
 
     fun getCachedPendingNotificationsCollapsed(studyId: String, nowInstant: Instant) : Flow<List<ScheduledNotification>> {
         val nowString = nowInstant.toLocalDateTime(TimeZone.currentSystemDefault()).toString()
-        return dbQuery.groupedFuturePendingNotifications(studyId, nowString).asFlow().mapToList(Dispatchers.Default).map {
-            it.toSet().toList().map { notif ->
-                val notifInfo: NotificationInfo = Json.decodeFromString(notif.notificationInfoJson)
+        return dbQuery.futurePendingNotifications(studyId, nowString).asFlow().mapToList(Dispatchers.Default).map { fullList ->
+            fullList.groupBy {
+                it.sessionInstanceGuid
+            }.values.map { fullSessionList ->
+                val sessionNotifications = mutableListOf<ScheduledNotifications>()
+                // Add all notifications that don't have a repeat interval
+                sessionNotifications.addAll(fullSessionList.filter { it.repeatInterval == null })
+                // Add first notification with a repeatInterval, session is only allowed to have 1 repeating notification
+                sessionNotifications.firstOrNull { it.repeatInterval != null }?.let {
+                    sessionNotifications.add(it)
+                }
+                sessionNotifications.map {
+                    val notifInfo: NotificationInfo = Json.decodeFromString(it.notificationInfoJson)
+                    ScheduledNotification(
+                        instanceGuid = it.sessionInstanceGuid,
+                        scheduleOn = it.scheduleOn.toLocalDateTime(),
+                        repeatInterval = it.repeatInterval?.toDateTimePeriod(),
+                        repeatUntil = it.repeatUntil?.toLocalDateTime(),
+                        allowSnooze = notifInfo.allowSnooze ?: false,
+                        message = notifInfo.message
+                    )
+                }
+            }.flatten().sortedBy { it.scheduleOn }
+        }
+    }
+
+    private fun collapseNotifications(fullList: List<ScheduledNotifications>) : List<ScheduledNotification> {
+        return fullList.groupBy {
+            it.sessionInstanceGuid
+        }.values.map { fullSessionList ->
+            val sessionNotifications = mutableListOf<ScheduledNotifications>()
+            // Add all notifications that don't have a repeat interval
+            sessionNotifications.addAll(fullSessionList.filter { it.repeatInterval == null })
+            // Add first notification with a repeatInterval, session is only allowed to have 1 repeating notification
+            sessionNotifications.add(sessionNotifications.first { it.repeatInterval != null })
+            return sessionNotifications.map {
+                val notifInfo: NotificationInfo = Json.decodeFromString(it.notificationInfoJson)
                 ScheduledNotification(
-                    instanceGuid = notif.sessionInstanceGuid,
-                    scheduleOn = notif.scheduleOn!!.toLocalDateTime(),
-                    repeatInterval = notif.repeatInterval?.toDateTimePeriod(),
-                    repeatUntil = notif.repeatUntil?.toLocalDateTime(),
-                    allowSnooze = notifInfo.allowSnooze ?: false,
+                    instanceGuid = it.sessionInstanceGuid,
+                    scheduleOn = it.scheduleOn.toLocalDateTime(),
+                    repeatInterval = it.repeatInterval?.toDateTimePeriod(),
+                    repeatUntil = it.repeatUntil?.toLocalDateTime(),
+                    allowSnooze = notifInfo.allowSnooze?: false,
                     message = notifInfo.message
                 )
             }
+
         }
     }
+
+//    fun getCachedPendingNotificationsCollapsed(studyId: String, nowInstant: Instant) : Flow<List<ScheduledNotification>> {
+//        val nowString = nowInstant.toLocalDateTime(TimeZone.currentSystemDefault()).toString()
+//        return dbQuery.groupedFuturePendingNotifications(studyId, nowString).asFlow().mapToList(Dispatchers.Default).map {
+//            it.toSet().toList().map { notif ->
+//                val notifInfo: NotificationInfo = Json.decodeFromString(notif.notificationInfoJson)
+//                ScheduledNotification(
+//                    instanceGuid = notif.sessionInstanceGuid,
+//                    scheduleOn = notif.scheduleOn!!.toLocalDateTime(),
+//                    repeatInterval = notif.repeatInterval?.toDateTimePeriod(),
+//                    repeatUntil = notif.repeatUntil?.toLocalDateTime(),
+//                    allowSnooze = notifInfo.allowSnooze ?: false,
+//                    message = notifInfo.message
+//                )
+//            }
+//        }
+//    }
 
     private fun getScheduledSessionTimelineSlice(studyId: String, instantInDay: Instant, timeZone: TimeZone, fullSessionsList: List<ExpandedScheduledSession>) : ScheduledSessionTimelineSlice {
         // fullSessionsList has an entry for every assessment and adherence record every session

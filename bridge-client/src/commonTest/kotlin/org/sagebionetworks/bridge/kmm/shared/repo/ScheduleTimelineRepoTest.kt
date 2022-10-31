@@ -537,7 +537,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
             // GroupedNotifications should only return first instance of recurring notifications
             val groupedNotifications =
                 repo.getCachedPendingNotificationsCollapsed(studyId, getTodayInstant()).first()
-            assertEquals(12, groupedNotifications.size)
+            assertEquals(11, groupedNotifications.size)
             assertEquals(groupedNotifications.size, groupedNotifications.distinctBy { it.instanceGuid }.size)
         }
     }
@@ -577,7 +577,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
             assertEquals(9, notificationsV2.size)
 
             val groupedNotifications = repo.getCachedPendingNotificationsCollapsed(studyId, getTodayInstant()).first()
-            assertEquals(9, groupedNotifications.size)
+            assertEquals(8, groupedNotifications.size)
         }
     }
 
@@ -630,7 +630,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
             assertEquals(9, notificationsV2.size)
 
             val groupedNotifications = repo.getCachedPendingNotificationsCollapsed(studyId, getTodayInstant()).first()
-            assertEquals(9, groupedNotifications.size)
+            assertEquals(8, groupedNotifications.size)
 
         }
     }

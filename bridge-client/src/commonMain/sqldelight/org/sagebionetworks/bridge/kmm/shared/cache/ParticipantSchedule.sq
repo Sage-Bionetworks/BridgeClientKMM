@@ -189,7 +189,8 @@ futurePendingNotifications:
 SELECT ScheduledNotifications.*
 FROM ScheduledNotifications
 JOIN fullScheduledSessions ON ScheduledNotifications.sessionInstanceGuid = fullScheduledSessions.instanceGuid
-WHERE ScheduledNotifications.studyId = ? AND scheduleOn >= ? AND ((fullScheduledSessions.finishedOn IS NULL) AND (fullScheduledSessions.declined IS NULL OR fullScheduledSessions.declined = 0));
+WHERE ScheduledNotifications.studyId = ? AND scheduleOn >= ? AND ((fullScheduledSessions.finishedOn IS NULL) AND (fullScheduledSessions.declined IS NULL OR fullScheduledSessions.declined = 0))
+ORDER BY scheduleOn ASC;
 
 -- Filters out completed sessions and only returns first instance of recurring notifications
 groupedFuturePendingNotifications:

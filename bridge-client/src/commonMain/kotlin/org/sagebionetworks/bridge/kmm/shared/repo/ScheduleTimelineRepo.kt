@@ -280,15 +280,6 @@ data class ScheduledNotification(
     val isTimeSensitive: Boolean = false,
 )
 
-@Serializable
-data class ScheduledNotificationV2(
-    val instanceGuid: String,
-    val scheduleOn: LocalDateTime,
-    val allowSnooze: Boolean,
-    val message: NotificationMessage?,
-    val isTimeSensitive: Boolean = false,
-)
-
 data class AssessmentHistoryRecord (
     val instanceGuid: String,
     val assessmentInfo: AssessmentInfo,

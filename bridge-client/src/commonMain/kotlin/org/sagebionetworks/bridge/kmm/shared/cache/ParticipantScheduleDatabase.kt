@@ -80,7 +80,7 @@ class ParticipantScheduleDatabase(val databaseHelper: ResourceDatabaseHelper) {
                 // Add all notifications that don't have a repeat interval
                 sessionNotifications.addAll(fullSessionList.filter { it.repeatInterval == null })
                 // Add first notification with a repeatInterval, session is only allowed to have 1 repeating notification
-                sessionNotifications.firstOrNull { it.repeatInterval != null }?.let {
+                fullSessionList.firstOrNull { it.repeatInterval != null }?.let {
                     sessionNotifications.add(it)
                 }
                 sessionNotifications.map {

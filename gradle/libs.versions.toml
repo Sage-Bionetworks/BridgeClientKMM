@@ -14,7 +14,7 @@ sqlDelight = "2.0.0-alpha04"
 koin = "3.1.5"
 okio = "3.0.0"
 kermit = "1.0.0"
-androidWorkManager = "2.6.0"
+androidWorkManager = "2.7.1"
 androidxLifecycle = "2.2.0"
 
 [libraries]

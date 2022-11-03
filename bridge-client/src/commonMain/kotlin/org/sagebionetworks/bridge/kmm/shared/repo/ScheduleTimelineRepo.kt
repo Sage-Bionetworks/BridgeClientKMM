@@ -407,7 +407,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         Future, Past, Today, Notifications, TodayAndNotifications;
 
         fun isToday() = listOf(Today, TodayAndNotifications).contains(this)
-        fun includeCompleted() = listOf(Today, TodayAndNotifications, Past).contains(this)
+        fun includeCompleted() = listOf(Today, TodayAndNotifications, Past, Future).contains(this)
         fun isNotifications() = listOf(Notifications, TodayAndNotifications).contains(this)
         fun includeExpired() = listOf(Past).contains(this)
     }

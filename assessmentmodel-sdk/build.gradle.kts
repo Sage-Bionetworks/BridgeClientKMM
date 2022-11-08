@@ -2,6 +2,7 @@ plugins {
     id("com.android.library")
     kotlin("android")
     id("kotlin-android")
+    kotlin("plugin.serialization")
     id ("maven-publish")
     id("org.jetbrains.dokka")
 }

@@ -480,7 +480,7 @@ public final class TodayTimelineAssessment : ObservableObject, Identifiable {
     
     // WARNING: Do not expose publicly. This initializer is *not* threadsafe and
     // must only be called on the main thread. - syoung 10/25/2021
-    init(_ assessment: NativeScheduledAssessment, isEnabled: Bool = true) {
+    public init(_ assessment: NativeScheduledAssessment, isEnabled: Bool = true) {
         self.instanceGuid = assessment.instanceGuid
         self.assessment = assessment
         self.isCompleted = assessment.isCompleted

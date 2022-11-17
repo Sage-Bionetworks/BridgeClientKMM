@@ -36,6 +36,7 @@ public protocol AssessmentInfoExtension {
 /// functions should only ever be called from the main thread.
 public struct AssessmentInfoMap {
     private let mappings: [String : Mapping]
+    private let defaultColor: Color
     
     private struct Mapping {
         let title: Text
@@ -50,7 +51,8 @@ public struct AssessmentInfoMap {
         return formatter
     }()
     
-    public init(extensions: [AssessmentInfoExtension] = []) {
+    public init(extensions: [AssessmentInfoExtension] = [], defaultColor: Color = .accentColor) {
+        self.defaultColor = defaultColor
         self.mappings = extensions.reduce([String : Mapping]()) { (dict, input) -> [String : Mapping] in
             var dict = dict
             dict[input.assessmentIdentifier] = Mapping(title: input.title(), icon: input.icon(), color: input.color())
@@ -65,7 +67,7 @@ public struct AssessmentInfoMap {
     
     /// The mapped icon to use for a given assessment when displaying an `AssessmentTimelineCardView`.
     public func icon(for info: BridgeClient.AssessmentInfo) -> ContentImage {
-        mappings[info.assessmentId]?.icon ?? ContentImage(icon: info.iconKey)
+        mappings[info.assessmentId]?.icon ?? ContentImage(icon: info.iconKey, isList: true)
     }
     
     /// The mapped color to use for a given assessment when displaying an `AssessmentTimelineCardView`.
@@ -75,7 +77,7 @@ public struct AssessmentInfoMap {
             return color
         }
         else {
-            return mappings[info.assessmentId]?.color ?? Color.accentColor
+            return mappings[info.assessmentId]?.color ?? defaultColor
         }
     }
     

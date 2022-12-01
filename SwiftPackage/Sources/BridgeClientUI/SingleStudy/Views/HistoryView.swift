@@ -9,12 +9,27 @@ import SharedMobileUI
 public struct HistoryView: View {
     @EnvironmentObject private var bridgeManager: SingleStudyAppManager
     @StateObject private var viewModel: HistoryViewModel = .init()
-    @SwiftUI.Environment(\.assessmentInfoMap) private var assessmentInfoMap: AssessmentInfoMap
-
+    
     private let previewRecords: [AssessmentRecord]
     
     public init(_ previewRecords: [AssessmentRecord] = []) {
         self.previewRecords = previewRecords
+    }
+    
+    public var body: some View {
+        HistoryWrapperView(viewModel: viewModel)
+            .onAppear {
+                viewModel.onAppear(studyId: bridgeManager.studyId!, previewRecords: previewRecords)
+            }
+    }
+}
+
+public struct HistoryWrapperView: View {
+    @ObservedObject private var viewModel: HistoryViewModel
+    @SwiftUI.Environment(\.assessmentInfoMap) private var assessmentInfoMap: AssessmentInfoMap
+
+    public init(viewModel: HistoryViewModel) {
+        self.viewModel = viewModel
     }
     
     public var body: some View {
@@ -40,9 +55,6 @@ public struct HistoryView: View {
                     }// end scrollview
                 }
             }
-        }
-        .onAppear {
-            viewModel.onAppear(studyId: bridgeManager.studyId!, previewRecords: previewRecords)
         }
     }
     

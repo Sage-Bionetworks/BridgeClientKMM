@@ -6,11 +6,14 @@ import SwiftUI
 import BridgeClient
 import BridgeClientExtension
 
+public final class SingleStudyAppManager : AbstractSingleStudyAppManager {
+}
+
 /// An app manager that can be used with apps that require participants to be signed in to a single study
 /// at a time. The timeline and history for a participant are calculated for a given study. While they *could*
 /// be part of more than one study, only one study is the "main" study that is tracked for these kinds of
 /// events.
-public final class SingleStudyAppManager : BridgeClientAppManager {
+open class AbstractSingleStudyAppManager : BridgeClientAppManager {
     
     /// The identifier of the current study.
     public var studyId: String? {
@@ -96,23 +99,15 @@ public final class SingleStudyAppManager : BridgeClientAppManager {
     }
     
     override public func updateAppState() {
-        if appConfig.isLaunching {
-            appState = .launching
-        }
-        else if !userSessionInfo.isAuthenticated {
-            appState = .login
-        }
-        else if study == nil {
+        let state = getAppState()
+        if state >= .onboarding, study == nil {
             // syoung 09/14/2021 On iOS 14.4, SwiftUI is not recognizing and updating on
             // changes to the study object and is hanging on the launch screen. Instead,
             // use the `appState` published property to manage the state of the root view.
             appState = .launching
         }
-        else if !isOnboardingFinished {
-            appState = .onboarding
-        }
         else {
-            appState = .main
+            appState = state
         }
     }
 }

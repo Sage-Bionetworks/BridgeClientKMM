@@ -16,6 +16,21 @@ public struct TodayView: View {
     }
     
     public var body: some View {
+        TodayWrapperView(viewModel: viewModel)
+            .onAppear {
+                viewModel.onAppear(bridgeManager: bridgeManager, previewSchedules: previewSchedules)
+            }
+    }
+}
+
+public struct TodayWrapperView: View {
+    @ObservedObject private var viewModel: TodayTimelineViewModel
+    
+    public init(viewModel: TodayTimelineViewModel) {
+        self.viewModel = viewModel
+    }
+    
+    public var body: some View {
         ScreenBackground {
             VStack {
                 dateHeader()
@@ -49,9 +64,6 @@ public struct TodayView: View {
                     }
                 }// end scrollview
             }
-        }
-        .onAppear {
-            viewModel.onAppear(bridgeManager: bridgeManager, previewSchedules: previewSchedules)
         }
     }
     

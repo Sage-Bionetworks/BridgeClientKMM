@@ -187,6 +187,25 @@ class AuthenticationRepository(
         return ResourceResult.Failed(ResourceStatus.FAILED)
     }
 
+    suspend fun signUpEmail(email: String, password: String) : Boolean {
+        val signUp = SignUp(
+            appId = bridgeConfig.appId,
+            email = email,
+            password = password
+        )
+        return signUp(signUp)
+    }
+
+    private suspend fun signUp(signUp: SignUp) : Boolean {
+        try {
+            val message = authenticationApi.signUp(signUp)
+            return true
+        } catch (err: Throwable) {
+            Logger.e("Error signUp", err)
+        }
+        return false
+    }
+
     suspend fun reAuth() : Boolean {
         val sessionInfo = session()
         return sessionInfo?.reauthToken?.let {

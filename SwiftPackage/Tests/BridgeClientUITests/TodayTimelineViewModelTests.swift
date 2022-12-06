@@ -275,6 +275,7 @@ extension AssessmentInfo {
                   minutesToComplete: 3,
                   colorScheme: nil,
                   configUrl: "http://foo.org",
+                  imageResource: nil,
                   type: "AssessmentInfo")
     }
 }

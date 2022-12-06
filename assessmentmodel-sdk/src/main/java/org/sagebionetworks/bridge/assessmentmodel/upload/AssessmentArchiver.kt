@@ -39,11 +39,8 @@ class AssessmentArchiver(
         // Iterate through all the results within this collection and add if they are `JsonFileArchivableResult`.
         addBranchResults(assessmentResult)
 
-        //Add assessment result file
-        Logger.d("Writing result for assessment ${assessmentResult.identifier}")
-        val resultString =
-
         //Add assessment result file to archive
+        Logger.d("Writing result for assessment ${assessmentResult.identifier}")
         archiveBuilder.addDataFile(JsonArchiveFile(
             assessmentResultFilename,
             assessmentResult.endDateTime?.toJodaDateTime(),

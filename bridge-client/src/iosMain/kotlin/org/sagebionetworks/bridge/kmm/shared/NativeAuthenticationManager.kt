@@ -9,6 +9,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus
+import org.sagebionetworks.bridge.kmm.shared.models.SharingScope
 import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
 import org.sagebionetworks.bridge.kmm.shared.repo.AuthenticationRepository
 import org.sagebionetworks.bridge.kmm.shared.repo.ParticipantRepo
@@ -90,6 +91,24 @@ open class NativeAuthenticationManager(
                 is ResourceResult.Failed -> callBack(null, userSessionResult.status)
                 else -> {}  // do nothing if in progress
             }
+        }
+    }
+
+    fun signUpEmail(email: String, password: String,
+                    testUser: Boolean,
+                    sharingScope: SharingScope?,
+                    dataGroups: List<String>?,
+                    studyIds: List<String>?, callBack: (Boolean) -> Unit) {
+        scope.launch {
+            val signUpResult = authManager.signUpEmail(email, password, testUser, sharingScope, dataGroups, studyIds)
+            callBack(signUpResult)
+        }
+    }
+
+    fun signUpEmail(email: String, password: String, callBack: (Boolean) -> Unit) {
+        scope.launch {
+            val signUpResult = authManager.signUpEmail(email, password)
+            callBack(signUpResult)
         }
     }
 

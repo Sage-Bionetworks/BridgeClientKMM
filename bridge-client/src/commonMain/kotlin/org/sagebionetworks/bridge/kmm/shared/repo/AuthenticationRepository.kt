@@ -187,11 +187,19 @@ class AuthenticationRepository(
         return ResourceResult.Failed(ResourceStatus.FAILED)
     }
 
-    suspend fun signUpEmail(email: String, password: String) : Boolean {
+    suspend fun signUpEmail(email: String,
+                            password: String,
+                            testUser: Boolean = false,
+                            sharingScope: SharingScope? = null,
+                            dataGroups: List<String>? = null,
+                            studyIds: List<String>? = null) : Boolean {
         val signUp = SignUp(
             appId = bridgeConfig.appId,
             email = email,
-            password = password
+            password = password,
+            sharingScope = sharingScope ?: SharingScope.SPONSORS_AND_PARTNERS,
+            dataGroups = if (testUser) ((dataGroups ?: listOf()) + listOf("test_user")).distinct() else dataGroups,
+            studyIds = studyIds
         )
         return signUp(signUp)
     }

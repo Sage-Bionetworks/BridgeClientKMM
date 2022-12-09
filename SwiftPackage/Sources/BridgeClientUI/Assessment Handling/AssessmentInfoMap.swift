@@ -91,8 +91,7 @@ public struct AssessmentInfoMap {
 extension BridgeClient.AssessmentInfo {
     fileprivate var assessmentId: String { identifier }
     fileprivate var iconKey: SageResourceImage.Name {
-        // TODO: syoung 05/19/2022 Support getting the resource image key from the AssessmentInfo object.
-        SageResourceImage.Name.allCases.first!
+        self.imageResource.flatMap { SageResourceImage.Name(rawValue: $0.name) } ?? .allCases.first!
     }
 }
 

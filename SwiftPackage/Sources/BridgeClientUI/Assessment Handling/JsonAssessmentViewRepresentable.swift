@@ -8,10 +8,9 @@ import BridgeClient
 import BridgeClientExtension
 import JsonModel
 
-/// This class can be used as a pointer or using `public final` and implementing a subclass that implements the protocol
-/// for showing a view controller from SwiftUI. It is intended as a "minimum bar" for adding a third-party assessment to an app
-/// where the data is uploaded to bridge and an adherence record is update.
-open class JsonAssessmentViewRepresentable { // : UIViewControllerRepresentable {
+/// This class can be used as a delegate for a view controller that displays an assessment. It is intended as a "minimum bar" for
+/// adding a third-party assessment to an app where the data is uploaded to bridge and an adherence record is update.
+open class JsonAssessmentViewRepresentable {
     public let scheduleInfo: AssessmentScheduleInfo
     public let handler: ScheduledAssessmentHandler
     public let startedOn: Date = Date()

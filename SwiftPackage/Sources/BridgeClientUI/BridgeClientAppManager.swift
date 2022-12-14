@@ -8,6 +8,7 @@ import BridgeClientExtension
 import JsonModel
 
 fileprivate let kOnboardingStateKey = "isOnboardingFinished"
+fileprivate let kLoginStateKey = "hasLoggedIn"
 
 /// This class is intended to be used as the `BridgeClient` app singleton. It manages login, app state,
 /// app configuration, user configuration, notifications, and uploading files to Bridge services. It is intended
@@ -68,7 +69,7 @@ open class BridgeClientAppManager : UploadAppManager {
     ///        }
     ///    }
     /// ```
-    public enum AppState : String {
+    public enum AppState : String, StringEnumSet, Comparable {
         case launching, login, onboarding, main
     }
     
@@ -80,6 +81,13 @@ open class BridgeClientAppManager : UploadAppManager {
         didSet {
             UserDefaults.standard.set(isOnboardingFinished, forKey: kOnboardingStateKey)
             updateAppState()
+        }
+    }
+    
+    /// Has the participant previously logged in successfully?
+    @Published public var hasLoggedIn: Bool = UserDefaults.standard.bool(forKey: kLoginStateKey) {
+        didSet {
+            UserDefaults.standard.set(hasLoggedIn, forKey: kLoginStateKey)
         }
     }
     
@@ -107,26 +115,49 @@ open class BridgeClientAppManager : UploadAppManager {
         }
     }
     
+    /// Login with the given email and password.
+    ///
+    /// - Parameters:
+    ///   - email: The external ID to use as the signin credentials.
+    ///   - password: The password to use as the signin credentials.
+    ///   - completion: The completion handler that is called with the server response.
+    public final func loginWithEmail(_ email: String, password: String, completion: @escaping ((BridgeClient.ResourceStatus) -> Void)) {
+        self.authManager.signInEmail(userName: email, password: password) { (userSessionInfo, status) in
+            guard status == ResourceStatus.success || status == ResourceStatus.failed else { return }
+            Task {
+                await self.setUserSessionInfo(userSessionInfo)
+                completion(status)
+            }
+        }
+    }
+    
     /// Sign out the current user.
     override open func signOut() {
         localNotificationManager.clearAll()
         super.signOut()
         isOnboardingFinished = false
+        hasLoggedIn = false
     }
     
     // @Protected - Only this class should call this method and only subclasses should implement.
     override open func updateAppState() {
+        appState = getAppState()
+    }
+    
+    public final func getAppState() -> AppState {
         if appConfig.isLaunching {
-            appState = .launching
+            return .launching
         }
         else if !userSessionInfo.isAuthenticated {
-            appState = .login
+            // check if the userSessionInfo is not finished loading
+            return hasLoggedIn ? .launching : .login
         }
         else if !isOnboardingFinished {
-            appState = .onboarding
+            hasLoggedIn = true
+            return .onboarding
         }
         else {
-            appState = .main
+            return .main
         }
     }
 }

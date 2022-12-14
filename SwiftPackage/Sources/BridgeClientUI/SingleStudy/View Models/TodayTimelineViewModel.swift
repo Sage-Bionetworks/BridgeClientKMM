@@ -62,7 +62,7 @@ open class AbstractTodayTimelineViewModel : NSObject, ObservableObject, Schedule
     /// Today timelines use a one-to-one mapping to a single study and are not designed to support participants who
     /// are in more than one study. As such, this connects to an instance (or subclass) of a `SingleStudyAppManager`.
     /// The view that uses this model must hook up the manager - typically by calling `onAppear()`.
-    public private(set) var bridgeManager: SingleStudyAppManager!
+    public private(set) var bridgeManager: AbstractSingleStudyAppManager!
     
     public private(set) var timelineManager: NativeTimelineManager! {
         willSet {
@@ -111,7 +111,7 @@ open class AbstractTodayTimelineViewModel : NSObject, ObservableObject, Schedule
     /// initialization.
     /// 
     /// - Parameter bridgeManager: The bridge manager for this app.
-    open func onAppear(bridgeManager: SingleStudyAppManager, previewSchedules: [NativeScheduledSessionWindow] = []) {
+    open func onAppear(bridgeManager: AbstractSingleStudyAppManager, previewSchedules: [NativeScheduledSessionWindow] = []) {
         // Exit early if nothing has changed.
         guard self.bridgeManager == nil ||
               self.studyId != bridgeManager.studyId ||

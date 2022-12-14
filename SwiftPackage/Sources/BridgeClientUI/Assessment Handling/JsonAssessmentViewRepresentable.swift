@@ -9,7 +9,7 @@ import BridgeClientExtension
 import JsonModel
 
 /// This class can be used as a delegate for a view controller that displays an assessment. It is intended as a "minimum bar" for
-/// adding a third-party assessment to an app where the data is uploaded to bridge and an adherence record is update.
+/// adding a third-party assessment to an app where the data is uploaded to bridge and an adherence record is updated.
 open class JsonAssessmentViewRepresentable {
     public let scheduleInfo: AssessmentScheduleInfo
     public let handler: ScheduledAssessmentHandler

@@ -171,7 +171,9 @@ open class UploadAppManager : ObservableObject {
     ///
     /// - Parameter builder: The archive builder.
     public final func encryptAndUpload(using builder: ArchiveBuilder) {
-        isUploading = true
+        OperationQueue.main.addOperation {
+            self.isUploading = true
+        }
         uploadProcessor.encryptAndUpload(using: builder)
     }
     
@@ -179,7 +181,9 @@ open class UploadAppManager : ObservableObject {
     ///
     /// - Parameter archives: The archives to encrypt and upload.
     public final func encryptAndUpload(_ archives: [DataArchive]) {
-        isUploading = true
+        OperationQueue.main.addOperation {
+            self.isUploading = true
+        }
         uploadProcessor.encryptAndUpload(archives)
     }
 }

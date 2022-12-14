@@ -99,7 +99,7 @@ open class AbstractSingleStudyAppManager : BridgeClientAppManager {
     }
     
     override public func updateAppState() {
-        let state = getAppState()
+        let state = fetchAppState()
         if state >= .onboarding, study == nil {
             // syoung 09/14/2021 On iOS 14.4, SwiftUI is not recognizing and updating on
             // changes to the study object and is hanging on the launch screen. Instead,

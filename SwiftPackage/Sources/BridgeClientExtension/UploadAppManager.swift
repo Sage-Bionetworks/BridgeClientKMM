@@ -9,6 +9,7 @@ import JsonModel
 
 public let kPreviewStudyId = "xcode_preview"
 public let kStudyIdKey = "studyId"
+fileprivate let kLoginStateKey = "hasLoggedIn"
 
 open class UploadAppManager : ObservableObject {
 
@@ -73,6 +74,16 @@ open class UploadAppManager : ObservableObject {
     @MainActor
     public final func setUserSessionInfo(_ session: UserSessionInfo?) {
         self.session = session
+        if session?.authenticated ?? false {
+            self.hasLoggedIn = true
+        }
+    }
+    
+    /// Has the participant previously logged in successfully?
+    lazy public private(set) var hasLoggedIn: Bool = sharedUserDefaults.bool(forKey: kLoginStateKey) {
+        didSet {
+            sharedUserDefaults.set(hasLoggedIn, forKey: kLoginStateKey)
+        }
     }
     
     private var appConfigManager: NativeAppConfigManager!
@@ -157,9 +168,11 @@ open class UploadAppManager : ObservableObject {
     }
     
     /// Sign out the current user.
+    @MainActor
     open func signOut() {
         authManager.signOut()
         self.session = nil
+        self.hasLoggedIn = true
     }
     
     // @Protected - Only this class should call this method and only subclasses should implement.

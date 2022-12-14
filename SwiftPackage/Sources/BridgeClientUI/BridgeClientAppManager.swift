@@ -8,7 +8,6 @@ import BridgeClientExtension
 import JsonModel
 
 fileprivate let kOnboardingStateKey = "isOnboardingFinished"
-fileprivate let kLoginStateKey = "hasLoggedIn"
 
 /// This class is intended to be used as the `BridgeClient` app singleton. It manages login, app state,
 /// app configuration, user configuration, notifications, and uploading files to Bridge services. It is intended
@@ -83,14 +82,7 @@ open class BridgeClientAppManager : UploadAppManager {
             updateAppState()
         }
     }
-    
-    /// Has the participant previously logged in successfully?
-    @Published public var hasLoggedIn: Bool = UserDefaults.standard.bool(forKey: kLoginStateKey) {
-        didSet {
-            UserDefaults.standard.set(hasLoggedIn, forKey: kLoginStateKey)
-        }
-    }
-    
+
     /// The local notification manager is a singleton that can be set up as the notification delegate (to handle snoozing).
     lazy public var localNotificationManager : LocalNotificationManager = LocalNotificationManager()
     
@@ -136,15 +128,14 @@ open class BridgeClientAppManager : UploadAppManager {
         localNotificationManager.clearAll()
         super.signOut()
         isOnboardingFinished = false
-        hasLoggedIn = false
     }
     
     // @Protected - Only this class should call this method and only subclasses should implement.
     override open func updateAppState() {
-        appState = getAppState()
+        appState = fetchAppState()
     }
     
-    public final func getAppState() -> AppState {
+    public final func fetchAppState() -> AppState {
         if appConfig.isLaunching {
             return .launching
         }
@@ -153,7 +144,6 @@ open class BridgeClientAppManager : UploadAppManager {
             return hasLoggedIn ? .launching : .login
         }
         else if !isOnboardingFinished {
-            hasLoggedIn = true
             return .onboarding
         }
         else {

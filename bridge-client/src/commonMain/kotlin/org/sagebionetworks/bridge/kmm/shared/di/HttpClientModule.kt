@@ -24,7 +24,7 @@ fun httpClientModule(enableNetworkLogs: Boolean) = module {
 
     //HttpClient configured for use with AuthenticationAPI, it needs its own HttpClient so as not to
     // include the re-authentication feature found in DefaultHttpClient, which would cause a dependency loop
-    single<HttpClient>(named("authHttpClient")) { createHttpClient(enableNetworkLogs, get()) }
+    single<HttpClient>(named("authHttpClient")) { createHttpClient(enableNetworkLogs, get(), get()) }
 
 }
 
@@ -91,7 +91,7 @@ private fun createBridgeHttpClient(
     }
 }
 
-private fun createHttpClient(enableNetworkLogs: Boolean, bridgeConfig: BridgeConfig) = HttpClient {
+private fun createHttpClient(enableNetworkLogs: Boolean, bridgeConfig: BridgeConfig, httpUtil: HttpUtil) = HttpClient {
 
     install(UserAgent) {
         agent = bridgeConfig.userAgent
@@ -112,6 +112,9 @@ private fun createHttpClient(enableNetworkLogs: Boolean, bridgeConfig: BridgeCon
                 }
             }
         }
+    }
+    defaultRequest {
+        header("Accept-Language", httpUtil.acceptLanguage())
     }
 
     expectSuccess = false //Turns off automatic response code validation

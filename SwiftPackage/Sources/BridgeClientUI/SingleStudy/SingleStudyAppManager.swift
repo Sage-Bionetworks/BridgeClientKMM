@@ -16,22 +16,22 @@ public final class SingleStudyAppManager : AbstractSingleStudyAppManager {
 open class AbstractSingleStudyAppManager : BridgeClientAppManager {
     
     /// The identifier of the current study.
-    public var studyId: String? {
+    public final var studyId: String? {
         study?.identifier
     }
     
     /// The study is an observer that can be populated and/or updated with either a `BridgeClient.StudyInfo`
     /// object or a `BridgeClient.Study` object. This object is threadsafe and observable.
-    @Published public var study: StudyObserver? {
+    @Published open var study: StudyObserver? {
         didSet {
             sharedUserDefaults.set(study?.id, forKey: kStudyIdKey)
         }
     }
     
     /// Has the participant "completed" this study?
-    @Published public var isStudyComplete: Bool = false
+    @Published open var isStudyComplete: Bool = false
     
-    override public func didUpdateUserSessionInfo() {
+    override open func didUpdateUserSessionInfo() {
         super.didUpdateUserSessionInfo()
         updateStudy()
     }
@@ -47,12 +47,12 @@ open class AbstractSingleStudyAppManager : BridgeClientAppManager {
         }
     }
     
-    public override func appWillFinishLaunching(_ launchOptions: [UIApplication.LaunchOptionsKey : Any]?) {
+    open override func appWillFinishLaunching(_ launchOptions: [UIApplication.LaunchOptionsKey : Any]?) {
         super.appWillFinishLaunching(launchOptions)
         updateStudy()
     }
     
-    public override func signOut() {
+    open override func signOut() {
         try? studyManager?.onCleared()
         studyManager = nil
         study = nil
@@ -98,7 +98,7 @@ open class AbstractSingleStudyAppManager : BridgeClientAppManager {
         self.studyManager!.observeStudy()
     }
     
-    override public func updateAppState() {
+    override open func updateAppState() {
         let state = fetchAppState()
         if state >= .onboarding, study == nil {
             // syoung 09/14/2021 On iOS 14.4, SwiftUI is not recognizing and updating on

@@ -142,12 +142,6 @@ open class UploadAppManager : ObservableObject {
         #endif
         KoinKt.doInitKoin(enableNetworkLogs: enableNetworkLogs)
         
-        // Hook up app config
-        self.appConfigManager = NativeAppConfigManager() { appConfig, _ in
-            self.config = appConfig ?? self.config
-        }
-        self.appConfigManager.observeAppConfig()
-        
         // Hook up user session info
         self.authManager = NativeAuthenticationManager() { userSessionInfo in
             guard userSessionInfo == nil || !userSessionInfo!.isEqual(userSessionInfo) else { return }
@@ -155,6 +149,12 @@ open class UploadAppManager : ObservableObject {
         }
         self.session = self.authManager.session()
         self.authManager.observeUserSessionInfo()
+        
+        // Hook up app config
+        self.appConfigManager = NativeAppConfigManager() { appConfig, _ in
+            self.config = appConfig ?? self.config
+        }
+        self.appConfigManager.observeAppConfig()
         
         // Update the app state
         updateAppState()
@@ -172,7 +172,7 @@ open class UploadAppManager : ObservableObject {
     open func signOut() {
         authManager.signOut()
         self.session = nil
-        self.hasLoggedIn = true
+        self.hasLoggedIn = false
     }
     
     // @Protected - Only this class should call this method and only subclasses should implement.

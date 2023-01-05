@@ -200,6 +200,7 @@ __attribute__((swift_name("IOSBridgeConfig")))
 @property (readonly) int32_t appVersion __attribute__((swift_name("appVersion")));
 @property (readonly) NSString *appVersionName __attribute__((swift_name("appVersionName")));
 @property (readonly) BridgeClientPlatformConfigBridgeEnvironment *bridgeEnvironment __attribute__((swift_name("bridgeEnvironment")));
+@property (readonly) NSString * _Nullable defaultConsentGuid __attribute__((swift_name("defaultConsentGuid")));
 @property (readonly) NSString *deviceName __attribute__((swift_name("deviceName")));
 @property (readonly) NSString *osName __attribute__((swift_name("osName")));
 @property (readonly) NSString *osVersion __attribute__((swift_name("osVersion")));
@@ -210,6 +211,7 @@ __attribute__((swift_name("IOSPlatformConfig")))
 @protocol BridgeClientIOSPlatformConfig <BridgeClientPlatformConfig>
 @required
 @property (readonly) NSString * _Nullable appGroupIdentifier __attribute__((swift_name("appGroupIdentifier")));
+@property (readonly) NSString * _Nullable defaultConsentGuid __attribute__((swift_name("defaultConsentGuid")));
 @end;
 
 __attribute__((objc_subclassing_restricted))
@@ -327,7 +329,7 @@ __attribute__((swift_name("NativeAuthenticationManager")))
 - (void)signInExternalIdExternalId:(NSString *)externalId password:(NSString * _Nullable)password callBack:(void (^)(BridgeClientUserSessionInfo * _Nullable, BridgeClientResourceStatus *))callBack __attribute__((swift_name("signInExternalId(externalId:password:callBack:)")));
 - (void)signOut __attribute__((swift_name("signOut()")));
 - (void)signUpEmailEmail:(NSString *)email password:(NSString *)password callBack:(void (^)(BridgeClientBoolean *))callBack __attribute__((swift_name("signUpEmail(email:password:callBack:)")));
-- (void)signUpEmailEmail:(NSString *)email password:(NSString *)password testUser:(BOOL)testUser sharingScope:(BridgeClientSharingScope * _Nullable)sharingScope dataGroups:(NSArray<NSString *> * _Nullable)dataGroups studyIds:(NSArray<NSString *> * _Nullable)studyIds callBack:(void (^)(BridgeClientBoolean *))callBack __attribute__((swift_name("signUpEmail(email:password:testUser:sharingScope:dataGroups:studyIds:callBack:)")));
+- (void)signUpEmailEmail:(NSString *)email password:(NSString *)password testUser:(BOOL)testUser dataGroups:(NSArray<NSString *> * _Nullable)dataGroups name:(NSString * _Nullable)name sharingScope:(BridgeClientSharingScope * _Nullable)sharingScope callBack:(void (^)(BridgeClientBoolean *))callBack __attribute__((swift_name("signUpEmail(email:password:testUser:dataGroups:name:sharingScope:callBack:)")));
 - (void)updateParticipantRecord:(BridgeClientParticipantRepoUpdateParticipantRecord *)record __attribute__((swift_name("updateParticipant(record:)")));
 @end;
 
@@ -2880,21 +2882,9 @@ __attribute__((swift_name("AuthenticationRepository")))
  @note This method converts instances of CancellationException to errors.
  Other uncaught Kotlin exceptions are fatal.
 */
-- (void)signUpEmailEmail:(NSString *)email password:(NSString *)password testUser:(BOOL)testUser sharingScope:(BridgeClientSharingScope * _Nullable)sharingScope dataGroups:(NSArray<NSString *> * _Nullable)dataGroups studyIds:(NSArray<NSString *> * _Nullable)studyIds completionHandler:(void (^)(BridgeClientBoolean * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("signUpEmail(email:password:testUser:sharingScope:dataGroups:studyIds:completionHandler:)")));
+- (void)signUpEmailEmail:(NSString *)email password:(NSString *)password testUser:(BOOL)testUser name:(NSString * _Nullable)name sharingScope:(BridgeClientSharingScope * _Nullable)sharingScope dataGroups:(NSArray<NSString *> * _Nullable)dataGroups completionHandler:(void (^)(BridgeClientBoolean * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("signUpEmail(email:password:testUser:name:sharingScope:dataGroups:completionHandler:)")));
 @property (readonly) id<BridgeClientBridgeConfig> bridgeConfig __attribute__((swift_name("bridgeConfig")));
 @property (readonly) BridgeClientResourceDatabaseHelper *database __attribute__((swift_name("database")));
-@end;
-
-__attribute__((objc_subclassing_restricted))
-__attribute__((swift_name("ConsentRepo")))
-@interface BridgeClientConsentRepo : BridgeClientBase
-- (instancetype)initWithHttpClient:(BridgeClientKtor_client_coreHttpClient *)httpClient __attribute__((swift_name("init(httpClient:)"))) __attribute__((objc_designated_initializer));
-
-/**
- @note This method converts instances of CancellationException to errors.
- Other uncaught Kotlin exceptions are fatal.
-*/
-- (void)createConsentSignatureSubpopulationGuid:(NSString *)subpopulationGuid scope:(BridgeClientSharingScope *)scope completionHandler:(void (^)(BridgeClientUserSessionInfo * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("createConsentSignature(subpopulationGuid:scope:completionHandler:)")));
 @end;
 
 __attribute__((objc_subclassing_restricted))
@@ -2902,6 +2892,12 @@ __attribute__((swift_name("ParticipantRepo")))
 @interface BridgeClientParticipantRepo : BridgeClientAbstractResourceRepo
 - (instancetype)initWithHttpClient:(BridgeClientKtor_client_coreHttpClient *)httpClient databaseHelper:(BridgeClientResourceDatabaseHelper *)databaseHelper backgroundScope:(id<BridgeClientKotlinx_coroutines_coreCoroutineScope>)backgroundScope authenticationRepo:(BridgeClientAuthenticationRepository *)authenticationRepo __attribute__((swift_name("init(httpClient:databaseHelper:backgroundScope:authenticationRepo:)"))) __attribute__((objc_designated_initializer));
 - (instancetype)initWithDatabase:(BridgeClientResourceDatabaseHelper *)database backgroundScope:(id<BridgeClientKotlinx_coroutines_coreCoroutineScope>)backgroundScope __attribute__((swift_name("init(database:backgroundScope:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
+
+/**
+ @note This method converts instances of CancellationException to errors.
+ Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)createConsentSignatureSubpopulationGuid:(NSString *)subpopulationGuid completionHandler:(void (^)(BridgeClientResourceResult<BridgeClientUserSessionInfo *> * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("createConsentSignature(subpopulationGuid:completionHandler:)")));
 - (void)updateParticipantRecord:(BridgeClientParticipantRepoUpdateParticipantRecord *)record __attribute__((swift_name("updateParticipant(record:)")));
 @end;
 

@@ -1,5 +1,6 @@
 package org.sagebionetworks.bridge.kmm.shared.repo
 
+import co.touchlab.kermit.Logger
 import co.touchlab.stately.ensureNeverFrozen
 import io.ktor.client.*
 import io.ktor.client.plugins.*
@@ -13,10 +14,8 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import org.sagebionetworks.bridge.kmm.shared.apis.ParticipantApi
 import org.sagebionetworks.bridge.kmm.shared.cache.*
-import org.sagebionetworks.bridge.kmm.shared.models.Phone
-import org.sagebionetworks.bridge.kmm.shared.models.SharingScope
-import org.sagebionetworks.bridge.kmm.shared.models.StudyParticipant
-import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
+import org.sagebionetworks.bridge.kmm.shared.models.*
+import org.sagebionetworks.bridge.kmm.shared.models.ConsentSignature
 
 class ParticipantRepo(httpClient: HttpClient,
                       databaseHelper: ResourceDatabaseHelper,
@@ -61,6 +60,27 @@ class ParticipantRepo(httpClient: HttpClient,
         backgroundScope.launch {
             processLocalUpdates()
         }
+    }
+
+    suspend fun createConsentSignature(subpopulationGuid: String): ResourceResult<UserSessionInfo> {
+        try {
+            val sessionInfo = authenticationRepo.session()
+            val name = sessionInfo?.let {
+                listOfNotNull(it.firstName, it.lastName).joinToString(" ").ifEmpty { null }
+            } ?: "Name"
+            val scope = sessionInfo?.sharingScope ?: SharingScope.SPONSORS_AND_PARTNERS
+            val consentSignature = ConsentSignature(name = name, scope = scope)
+            val userSession = participantApi.createConsentSignature(subpopulationGuid, consentSignature)
+            authenticationRepo.updateCachedSession(null, userSession)
+            return ResourceResult.Success(userSession, ResourceStatus.SUCCESS)
+        } catch (err: Throwable) {
+            database.removeResource(
+                AuthenticationRepository.USER_SESSION_ID, ResourceType.USER_SESSION_INFO,
+                ResourceDatabaseHelper.APP_WIDE_STUDY_ID
+            )
+            Logger.e("Error adding consent", err)
+        }
+        return ResourceResult.Failed(ResourceStatus.FAILED)
     }
 
     internal suspend fun processLocalUpdates() {

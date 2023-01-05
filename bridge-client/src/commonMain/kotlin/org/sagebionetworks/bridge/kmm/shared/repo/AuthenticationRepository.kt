@@ -190,16 +190,16 @@ class AuthenticationRepository(
     suspend fun signUpEmail(email: String,
                             password: String,
                             testUser: Boolean = false,
+                            name: String? = null,
                             sharingScope: SharingScope? = null,
-                            dataGroups: List<String>? = null,
-                            studyIds: List<String>? = null) : Boolean {
+                            dataGroups: List<String>? = null) : Boolean {
         val signUp = SignUp(
             appId = bridgeConfig.appId,
             email = email,
             password = password,
+            lastName = name,
             sharingScope = sharingScope ?: SharingScope.SPONSORS_AND_PARTNERS,
-            dataGroups = if (testUser) ((dataGroups ?: listOf()) + listOf("test_user")).distinct() else dataGroups,
-            studyIds = studyIds
+            dataGroups = if (testUser) ((dataGroups ?: listOf()) + listOf("test_user")).distinct() else dataGroups
         )
         return signUp(signUp)
     }
@@ -249,7 +249,7 @@ class AuthenticationRepository(
     }
 
 
-    private fun updateCachedSession(oldUserSessionInfo: UserSessionInfo?, newUserSession: UserSessionInfo) {
+    internal fun updateCachedSession(oldUserSessionInfo: UserSessionInfo?, newUserSession: UserSessionInfo) {
         val oldSessionResource = sessionResource()
         var toCacheSession = newUserSession
         var needSave = false

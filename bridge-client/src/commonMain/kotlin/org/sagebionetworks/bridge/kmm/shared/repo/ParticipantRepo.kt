@@ -74,10 +74,6 @@ class ParticipantRepo(httpClient: HttpClient,
             authenticationRepo.updateCachedSession(null, userSession)
             return ResourceResult.Success(userSession, ResourceStatus.SUCCESS)
         } catch (err: Throwable) {
-            database.removeResource(
-                AuthenticationRepository.USER_SESSION_ID, ResourceType.USER_SESSION_INFO,
-                ResourceDatabaseHelper.APP_WIDE_STUDY_ID
-            )
             Logger.e("Error adding consent", err)
         }
         return ResourceResult.Failed(ResourceStatus.FAILED)

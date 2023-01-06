@@ -92,7 +92,15 @@ internal class ParticipantApi(basePath: String = BASE_PATH, httpClient: HttpClie
         return postData( reportData,"v5/studies/$studyId/participants/self/reports/$identifier")
     }
 
-
-
+    /**
+     * Consent to this subpopulation by submitting a signature
+     * Agree to the terms of participant represented by this subpopulation, by submitting a  signature to the Bridge server.
+     * @param subpopulationGuid Subpopulation GUID
+     * @param consentSignature A consent signature
+     * @return UserSessionInfo
+     */
+    suspend fun createConsentSignature(subpopulationGuid: String, consentSignature: ConsentSignature) : UserSessionInfo {
+        return postData(consentSignature, "v3/subpopulations/$subpopulationGuid/consents/signature")
+    }
 }
 

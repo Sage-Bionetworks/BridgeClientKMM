@@ -3,7 +3,6 @@ package org.sagebionetworks.bridge.kmm.shared
 import io.ktor.http.*
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -77,7 +76,24 @@ open class NativeAuthenticationManager(
     fun signInEmail(userName: String, password: String, callBack: (UserSessionInfo?, ResourceStatus) -> Unit) {
         scope.launch {
             when(val userSessionResult = authManager.signInEmail(email = userName, password = password)) {
-                is ResourceResult.Success -> callBack(userSessionResult.data, userSessionResult.status)
+                is ResourceResult.Success -> {
+                    val consentGuid = IOSBridgeConfig.defaultConsentGuid
+                    if ((consentGuid == null) ||
+                        (userSessionResult.data.consentStatuses?.get(consentGuid)?.consented == true)) {
+                        callBack(userSessionResult.data, userSessionResult.status)
+                    }
+                    else {
+                        when(val consentResult = participantManager.createConsentSignature(consentGuid)) {
+                            is ResourceResult.Success -> callBack(consentResult.data, consentResult.status)
+                            is ResourceResult.Failed -> {
+                                // If consent fails during sign in then need to sign the participant out and try again.
+                                authManager.signOut()
+                                callBack(null, userSessionResult.status)
+                            }
+                            else -> {}  // do nothing if in progress
+                        }
+                    }
+                }
                 is ResourceResult.Failed -> callBack(null, userSessionResult.status)
                 else -> {}  // do nothing if in progress
             }
@@ -96,11 +112,19 @@ open class NativeAuthenticationManager(
 
     fun signUpEmail(email: String, password: String,
                     testUser: Boolean,
-                    sharingScope: SharingScope?,
                     dataGroups: List<String>?,
-                    studyIds: List<String>?, callBack: (Boolean) -> Unit) {
+                    name: String?,
+                    sharingScope: SharingScope?,
+                    callBack: (Boolean) -> Unit) {
         scope.launch {
-            val signUpResult = authManager.signUpEmail(email, password, testUser, sharingScope, dataGroups, studyIds)
+            val signUpResult = authManager.signUpEmail(
+                email = email,
+                password = password,
+                testUser = testUser,
+                name = name,
+                sharingScope = sharingScope,
+                dataGroups = dataGroups
+            )
             callBack(signUpResult)
         }
     }

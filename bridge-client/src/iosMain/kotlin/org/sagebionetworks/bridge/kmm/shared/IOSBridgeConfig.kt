@@ -5,6 +5,7 @@ import kotlin.native.concurrent.freeze
 
 interface IOSPlatformConfig : PlatformConfig {
     val appGroupIdentifier: String?
+    val defaultConsentGuid: String?
 }
 
 object IOSBridgeConfig  : BridgeConfig {
@@ -28,6 +29,8 @@ object IOSBridgeConfig  : BridgeConfig {
 
     val appGroupIdentifier: String?
         get() = platformConfig.appGroupIdentifier
+    val defaultConsentGuid: String?
+        get() = platformConfig.defaultConsentGuid
     override val appId: String
         get() = platformConfig.appId
     override val appName: String
@@ -55,5 +58,7 @@ internal data class PlatformConfigImpl(
     override val bridgeEnvironment: PlatformConfig.BridgeEnvironment = PlatformConfig.BridgeEnvironment.PRODUCTION,
     override val osVersion: String = "Unknown",
     override val deviceName: String = "Unknown",
-    override val osName: String = "iOS") : IOSPlatformConfig
+    override val osName: String = "iOS",
+    override val defaultConsentGuid: String? = null,
+) : IOSPlatformConfig
 

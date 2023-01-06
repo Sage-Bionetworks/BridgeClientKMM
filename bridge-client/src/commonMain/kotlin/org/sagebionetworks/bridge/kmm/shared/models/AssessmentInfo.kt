@@ -56,6 +56,8 @@ data class AssessmentInfo (
     /* The URL to download the configuration associated with this assessment. */
     @SerialName("configUrl")
     val configUrl: String,
+    @SerialName("imageResource")
+    val imageResource: ImageResource? = null,
     /* AssessmentInfo */
     @SerialName("type")
     val type: String? = null

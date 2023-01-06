@@ -1,34 +1,6 @@
 //
 //  TodayTimelineViewModel.swift
 //
-//  Copyright © 2021-2022 Sage Bionetworks. All rights reserved.
-//
-// Redistribution and use in source and binary forms, with or without modification,
-// are permitted provided that the following conditions are met:
-//
-// 1.  Redistributions of source code must retain the above copyright notice, this
-// list of conditions and the following disclaimer.
-//
-// 2.  Redistributions in binary form must reproduce the above copyright notice,
-// this list of conditions and the following disclaimer in the documentation and/or
-// other materials provided with the distribution.
-//
-// 3.  Neither the name of the copyright holder(s) nor the names of any contributors
-// may be used to endorse or promote products derived from this software without
-// specific prior written permission. No license is granted to the trademarks of
-// the copyright holders even if such marks are included in this software.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
-// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 import SwiftUI
 import BridgeClient
@@ -90,7 +62,7 @@ open class AbstractTodayTimelineViewModel : NSObject, ObservableObject, Schedule
     /// Today timelines use a one-to-one mapping to a single study and are not designed to support participants who
     /// are in more than one study. As such, this connects to an instance (or subclass) of a `SingleStudyAppManager`.
     /// The view that uses this model must hook up the manager - typically by calling `onAppear()`.
-    public private(set) var bridgeManager: SingleStudyAppManager!
+    public private(set) var bridgeManager: AbstractSingleStudyAppManager!
     
     public private(set) var timelineManager: NativeTimelineManager! {
         willSet {
@@ -139,7 +111,7 @@ open class AbstractTodayTimelineViewModel : NSObject, ObservableObject, Schedule
     /// initialization.
     /// 
     /// - Parameter bridgeManager: The bridge manager for this app.
-    open func onAppear(bridgeManager: SingleStudyAppManager, previewSchedules: [NativeScheduledSessionWindow] = []) {
+    open func onAppear(bridgeManager: AbstractSingleStudyAppManager, previewSchedules: [NativeScheduledSessionWindow] = []) {
         // Exit early if nothing has changed.
         guard self.bridgeManager == nil ||
               self.studyId != bridgeManager.studyId ||
@@ -503,7 +475,7 @@ public final class TodayTimelineAssessment : ObservableObject, Identifiable {
     
     // WARNING: Do not expose publicly. This initializer is *not* threadsafe and
     // must only be called on the main thread. - syoung 10/25/2021
-    init(_ assessment: NativeScheduledAssessment, isEnabled: Bool = true) {
+    public init(_ assessment: NativeScheduledAssessment, isEnabled: Bool = true) {
         self.instanceGuid = assessment.instanceGuid
         self.assessment = assessment
         self.isCompleted = assessment.isCompleted

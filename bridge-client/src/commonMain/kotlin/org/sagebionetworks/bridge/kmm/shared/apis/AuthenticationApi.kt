@@ -61,6 +61,16 @@ internal class AuthenticationApi(basePath: String = BASE_PATH, httpClient: HttpC
         return postData(signIn, "v3/auth/signIn")
     }
 
+    /**
+     *
+     * If an app uses email addresses to identify account holders, the user will normally be sent  an email with a link to verify his or her email address before the account will be activated.  If an account exists with the given email or phone number, this method will still return 201  in order to prevent \&quot;account enumeration\&quot; security breaches. When this happens, an \&quot;account  already exists\&quot; email will be sent to the account holder, notifying them that another attempt  was made to create an account with their email or phone number.  Only basic credentials are necessary to sign up (email or phone number, and appId), but all the  information that can be provided for a participant&#39;s account, can be submitted as part of sign up.
+     * @param signUp Sign up information
+     * @return Message
+     */
+    suspend fun signUp(signUp: SignUp) : Message {
+        return postData(signUp, "v3/auth/signUp")
+    }
+
     suspend fun signOut(sessionInfo: UserSessionInfo) : Message {
         val builder = HttpRequestBuilder()
 

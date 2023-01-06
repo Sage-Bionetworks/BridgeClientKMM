@@ -1,34 +1,6 @@
 //
 //  BridgeClientAppManager.swift
 //
-//  Copyright © 2021-2022 Sage Bionetworks. All rights reserved.
-//
-// Redistribution and use in source and binary forms, with or without modification,
-// are permitted provided that the following conditions are met:
-//
-// 1.  Redistributions of source code must retain the above copyright notice, this
-// list of conditions and the following disclaimer.
-//
-// 2.  Redistributions in binary form must reproduce the above copyright notice,
-// this list of conditions and the following disclaimer in the documentation and/or
-// other materials provided with the distribution.
-//
-// 3.  Neither the name of the copyright holder(s) nor the names of any contributors
-// may be used to endorse or promote products derived from this software without
-// specific prior written permission. No license is granted to the trademarks of
-// the copyright holders even if such marks are included in this software.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
-// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 import SwiftUI
 import BridgeClient
@@ -96,7 +68,7 @@ open class BridgeClientAppManager : UploadAppManager {
     ///        }
     ///    }
     /// ```
-    public enum AppState : String {
+    public enum AppState : String, StringEnumSet, Comparable {
         case launching, login, onboarding, main
     }
     
@@ -110,7 +82,7 @@ open class BridgeClientAppManager : UploadAppManager {
             updateAppState()
         }
     }
-    
+
     /// The local notification manager is a singleton that can be set up as the notification delegate (to handle snoozing).
     lazy public var localNotificationManager : LocalNotificationManager = LocalNotificationManager()
     
@@ -135,6 +107,22 @@ open class BridgeClientAppManager : UploadAppManager {
         }
     }
     
+    /// Login with the given email and password.
+    ///
+    /// - Parameters:
+    ///   - email: The external ID to use as the signin credentials.
+    ///   - password: The password to use as the signin credentials.
+    ///   - completion: The completion handler that is called with the server response.
+    public final func loginWithEmail(_ email: String, password: String, completion: @escaping ((BridgeClient.ResourceStatus) -> Void)) {
+        self.authManager.signInEmail(userName: email, password: password) { (userSessionInfo, status) in
+            guard status == ResourceStatus.success || status == ResourceStatus.failed else { return }
+            Task {
+                await self.setUserSessionInfo(userSessionInfo)
+                completion(status)
+            }
+        }
+    }
+    
     /// Sign out the current user.
     override open func signOut() {
         localNotificationManager.clearAll()
@@ -144,17 +132,22 @@ open class BridgeClientAppManager : UploadAppManager {
     
     // @Protected - Only this class should call this method and only subclasses should implement.
     override open func updateAppState() {
+        appState = fetchAppState()
+    }
+    
+    public final func fetchAppState() -> AppState {
         if appConfig.isLaunching {
-            appState = .launching
+            return .launching
         }
         else if !userSessionInfo.isAuthenticated {
-            appState = .login
+            // check if the userSessionInfo is not finished loading
+            return hasLoggedIn ? .launching : .login
         }
         else if !isOnboardingFinished {
-            appState = .onboarding
+            return .onboarding
         }
         else {
-            appState = .main
+            return .main
         }
     }
 }

@@ -2,34 +2,6 @@
 //  UploadAppManager.swift
 //
 //
-//  Copyright © 2021-2022 Sage Bionetworks. All rights reserved.
-//
-// Redistribution and use in source and binary forms, with or without modification,
-// are permitted provided that the following conditions are met:
-//
-// 1.  Redistributions of source code must retain the above copyright notice, this
-// list of conditions and the following disclaimer.
-//
-// 2.  Redistributions in binary form must reproduce the above copyright notice,
-// this list of conditions and the following disclaimer in the documentation and/or
-// other materials provided with the distribution.
-//
-// 3.  Neither the name of the copyright holder(s) nor the names of any contributors
-// may be used to endorse or promote products derived from this software without
-// specific prior written permission. No license is granted to the trademarks of
-// the copyright holders even if such marks are included in this software.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
-// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 import Foundation
 import BridgeClient
@@ -37,6 +9,7 @@ import JsonModel
 
 public let kPreviewStudyId = "xcode_preview"
 public let kStudyIdKey = "studyId"
+fileprivate let kLoginStateKey = "hasLoggedIn"
 
 open class UploadAppManager : ObservableObject {
 
@@ -101,6 +74,16 @@ open class UploadAppManager : ObservableObject {
     @MainActor
     public final func setUserSessionInfo(_ session: UserSessionInfo?) {
         self.session = session
+        if session?.authenticated ?? false {
+            self.hasLoggedIn = true
+        }
+    }
+    
+    /// Has the participant previously logged in successfully?
+    lazy public private(set) var hasLoggedIn: Bool = sharedUserDefaults.bool(forKey: kLoginStateKey) {
+        didSet {
+            sharedUserDefaults.set(hasLoggedIn, forKey: kLoginStateKey)
+        }
     }
     
     private var appConfigManager: NativeAppConfigManager!
@@ -116,8 +99,8 @@ open class UploadAppManager : ObservableObject {
     ///   - pemPath: The path to the pem file (as an embedded resource) to use for encrypting uploads. The pem file can be downloaded
     ///     from the [Bridge Study Manager](https://research.sagebridge.org) by going "Server Settings -> Settings"
     ///     and tapping on the button labeled "Download CMS Public Key..." and saving the file to a secure location.
-    public convenience init(appId: String, appGroupId: String? = nil, pemPath: String? = nil) {
-        self.init(platformConfig: PlatformConfigImpl(appId: appId, appGroupIdentifier: appGroupId), pemPath: pemPath)
+    public convenience init(appId: String, appGroupId: String? = nil, pemPath: String? = nil, defaultConsentGuid: String? = nil) {
+        self.init(platformConfig: PlatformConfigImpl(appId: appId, appGroupIdentifier: appGroupId, defaultConsentGuid: defaultConsentGuid), pemPath: pemPath)
     }
     
     /// Initialize the bridge manager with a custom platform config.
@@ -159,12 +142,6 @@ open class UploadAppManager : ObservableObject {
         #endif
         KoinKt.doInitKoin(enableNetworkLogs: enableNetworkLogs)
         
-        // Hook up app config
-        self.appConfigManager = NativeAppConfigManager() { appConfig, _ in
-            self.config = appConfig ?? self.config
-        }
-        self.appConfigManager.observeAppConfig()
-        
         // Hook up user session info
         self.authManager = NativeAuthenticationManager() { userSessionInfo in
             guard userSessionInfo == nil || !userSessionInfo!.isEqual(userSessionInfo) else { return }
@@ -172,6 +149,12 @@ open class UploadAppManager : ObservableObject {
         }
         self.session = self.authManager.session()
         self.authManager.observeUserSessionInfo()
+        
+        // Hook up app config
+        self.appConfigManager = NativeAppConfigManager() { appConfig, _ in
+            self.config = appConfig ?? self.config
+        }
+        self.appConfigManager.observeAppConfig()
         
         // Update the app state
         updateAppState()
@@ -185,9 +168,11 @@ open class UploadAppManager : ObservableObject {
     }
     
     /// Sign out the current user.
+    @MainActor
     open func signOut() {
         authManager.signOut()
         self.session = nil
+        self.hasLoggedIn = false
     }
     
     // @Protected - Only this class should call this method and only subclasses should implement.
@@ -199,7 +184,9 @@ open class UploadAppManager : ObservableObject {
     ///
     /// - Parameter builder: The archive builder.
     public final func encryptAndUpload(using builder: ArchiveBuilder) {
-        isUploading = true
+        OperationQueue.main.addOperation {
+            self.isUploading = true
+        }
         uploadProcessor.encryptAndUpload(using: builder)
     }
     
@@ -207,7 +194,9 @@ open class UploadAppManager : ObservableObject {
     ///
     /// - Parameter archives: The archives to encrypt and upload.
     public final func encryptAndUpload(_ archives: [DataArchive]) {
-        isUploading = true
+        OperationQueue.main.addOperation {
+            self.isUploading = true
+        }
         uploadProcessor.encryptAndUpload(archives)
     }
 }

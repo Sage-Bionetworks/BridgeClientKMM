@@ -1,34 +1,6 @@
 //
 //  AssessmentInfoMap.swift
 //
-//  Copyright © 2021-2022 Sage Bionetworks. All rights reserved.
-//
-// Redistribution and use in source and binary forms, with or without modification,
-// are permitted provided that the following conditions are met:
-//
-// 1.  Redistributions of source code must retain the above copyright notice, this
-// list of conditions and the following disclaimer.
-//
-// 2.  Redistributions in binary form must reproduce the above copyright notice,
-// this list of conditions and the following disclaimer in the documentation and/or
-// other materials provided with the distribution.
-//
-// 3.  Neither the name of the copyright holder(s) nor the names of any contributors
-// may be used to endorse or promote products derived from this software without
-// specific prior written permission. No license is granted to the trademarks of
-// the copyright holders even if such marks are included in this software.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
-// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 import SwiftUI
 import BridgeClient
@@ -64,6 +36,7 @@ public protocol AssessmentInfoExtension {
 /// functions should only ever be called from the main thread.
 public struct AssessmentInfoMap {
     private let mappings: [String : Mapping]
+    private let defaultColor: Color
     
     private struct Mapping {
         let title: Text
@@ -78,7 +51,8 @@ public struct AssessmentInfoMap {
         return formatter
     }()
     
-    public init(extensions: [AssessmentInfoExtension] = []) {
+    public init(extensions: [AssessmentInfoExtension] = [], defaultColor: Color = .accentColor) {
+        self.defaultColor = defaultColor
         self.mappings = extensions.reduce([String : Mapping]()) { (dict, input) -> [String : Mapping] in
             var dict = dict
             dict[input.assessmentIdentifier] = Mapping(title: input.title(), icon: input.icon(), color: input.color())
@@ -93,7 +67,7 @@ public struct AssessmentInfoMap {
     
     /// The mapped icon to use for a given assessment when displaying an `AssessmentTimelineCardView`.
     public func icon(for info: BridgeClient.AssessmentInfo) -> ContentImage {
-        mappings[info.assessmentId]?.icon ?? ContentImage(icon: info.iconKey)
+        mappings[info.assessmentId]?.icon ?? ContentImage(icon: info.iconKey, isList: true)
     }
     
     /// The mapped color to use for a given assessment when displaying an `AssessmentTimelineCardView`.
@@ -103,7 +77,7 @@ public struct AssessmentInfoMap {
             return color
         }
         else {
-            return mappings[info.assessmentId]?.color ?? Color.accentColor
+            return mappings[info.assessmentId]?.color ?? defaultColor
         }
     }
     
@@ -117,8 +91,7 @@ public struct AssessmentInfoMap {
 extension BridgeClient.AssessmentInfo {
     fileprivate var assessmentId: String { identifier }
     fileprivate var iconKey: SageResourceImage.Name {
-        // TODO: syoung 05/19/2022 Support getting the resource image key from the AssessmentInfo object.
-        SageResourceImage.Name.allCases.first!
+        self.imageResource.flatMap { SageResourceImage.Name(rawValue: $0.name) } ?? .allCases.first!
     }
 }
 

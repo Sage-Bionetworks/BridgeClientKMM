@@ -85,7 +85,11 @@ open class NativeAuthenticationManager(
                     else {
                         when(val consentResult = participantManager.createConsentSignature(consentGuid)) {
                             is ResourceResult.Success -> callBack(consentResult.data, consentResult.status)
-                            is ResourceResult.Failed -> callBack(null, userSessionResult.status)
+                            is ResourceResult.Failed -> {
+                                // If consent fails during sign in then need to sign the participant out and try again.
+                                authManager.signOut()
+                                callBack(null, userSessionResult.status)
+                            }
                             else -> {}  // do nothing if in progress
                         }
                     }

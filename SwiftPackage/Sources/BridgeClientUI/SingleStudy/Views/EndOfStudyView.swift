@@ -7,19 +7,19 @@ import SharedMobileUI
 
 public struct EndOfStudyView: View {
     @EnvironmentObject var bridgeManager: SingleStudyAppManager
-    
+ 
     private let waitMessage = EndOfStudyStatusView(
         image: "Uploading",
         isBehind: true,
         offset: 55.0,
         title: LocalizedStringKey("Hang tight..."),
-        detail: LocalizedStringKey("Please don't close the app quite yet. We're uploading your contributions to the cloud."))
+        detail: LocalizedStringKey("Please don’t close the app quite yet. We’re uploading your contributions to the cloud."))
     private let allDoneMessage = EndOfStudyStatusView(
         image:"End of Study",
         isBehind: false,
         offset: 120.0,
         title: LocalizedStringKey("Well done!"),
-        detail: LocalizedStringKey("You've completed the study.\n\nThank you for your contributions."))
+        detail: LocalizedStringKey("You’ve completed the study.\n\nThank you for your contributions."))
     
     public init() {}
     

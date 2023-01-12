@@ -13,6 +13,9 @@
 /* return Text("Current activities", bundle: .module) */
 "Current activities" = "Current activities";
 
+/* Text("Done") */
+"Done" = "Done";
+
 /* return Text("Email", bundle: .module) */
 "Email" = "Email";
 
@@ -40,8 +43,11 @@
 /* Text("Hello, World!") */
 "Hello, World!" = "Hello, World!";
 
-/* Text("IRB Protocol ID: ", bundle: .module) + Text(viewModel.study?.irbProtocolId ?? "") */
-"IRB Protocol ID: " = "IRB Protocol ID: ";
+/* Text("IRB Protocol ID: ", bundle: .module) + Text(bridgeManager.study?.protocolInfo?.protocolId ?? "") */
+"IRB Protocol ID:" = "IRB Protocol ID:";
+
+/* return Text("IRB/Ethics Board of Record", bundle: .module) */
+"IRB/Ethics Board of Record" = "IRB/Ethics Board of Record";
 
 /* return Text("Institution", bundle: .module) */
 "Institution" = "Institution";
@@ -49,14 +55,14 @@
 /* return Text("Investigator", bundle: .module) */
 "Investigator" = "Investigator";
 
-/* withdrawalRow(Text("Participant ID: ", bundle: .module), viewModel.participantId ?? "") */
-"Participant ID: " = "Participant ID: ";
+/* withdrawalRow(Text("Participant ID: ", bundle: .module), participantId) */
+"Participant ID:" = "Participant ID:";
 
 /* return Text("Phone", bundle: .module) */
 "Phone" = "Phone";
 
-/* detail: LocalizedStringKey("Please don't close the app quite yet. We're uploading your contributions to the cloud.")) */
-"Please don't close the app quite yet. We're uploading your contributions to the cloud." = "Please don't close the app quite yet. We're uploading your contributions to the cloud.";
+/* detail: LocalizedStringKey("Please don’t close the app quite yet. We’re uploading your contributions to the cloud.")) */
+"Please don’t close the app quite yet. We’re uploading your contributions to the cloud." = "Please don’t close the app quite yet. We’re uploading your contributions to the cloud.";
 
 /* return Text("Principal Investigator", bundle: .module) */
 "Principal Investigator" = "Principal Investigator";
@@ -64,8 +70,8 @@
 /* Text("Privacy Notice", bundle: .module) */
 "Privacy Notice" = "Privacy Notice";
 
-/* withdrawalRow(Text("Registration Phone Number: ", bundle: .module), phone.nationalFormat ?? phone.number) */
-"Registration Phone Number: " = "Registration Phone Number: ";
+/* withdrawalRow(Text("Registration Phone Number: ", bundle: .module), phone) */
+"Registration Phone Number:" = "Registration Phone Number: ";
 
 /* Label("Review Privacy Notice", image: "privacy.notice.icon", bundle: .module) */
 "Review Privacy Notice" = "Review Privacy Notice";
@@ -76,11 +82,14 @@
 /* Button("Scroll Up", bundle: .module) { */
 "Scroll Up" = "Scroll Up";
 
-/* withdrawalRow(Text("Study ID: ", bundle: .module), bridgeManager.studyId!) */
+/* withdrawalRow(Text("Study ID: ", bundle: .module), studyId) */
 "Study ID: " = "Study ID: ";
 
 /* return Text("Study Support", bundle: .module) */
 "Study Support" = "Study Support";
+
+/* return Text("Technical Support", bundle: .module) */
+"Technical Support" = "Technical Support";
 
 /* Text("Thank you for your contributions!", bundle: .module) */
 "Thank you for your contributions!" = "Thank you for your contributions!";
@@ -97,8 +106,8 @@
 /* Text("We will", bundle: .module) */
 "We will" = "We will";
 
-/* Text("We won't", bundle: .module) */
-"We won't" = "We won't";
+/* Text("We won’t", bundle: .module) */
+"We won’t" = "We won’t";
 
 /* title: LocalizedStringKey("Well done!"), */
 "Well done!" = "Well done!";
@@ -106,14 +115,14 @@
 /* Text("You can", bundle: .module) */
 "You can" = "You can";
 
-/* detail: LocalizedStringKey("You've completed the study.\n\nThank you for your contributions.")) */
-"You've completed the study.\n\nThank you for your contributions." = "You've completed the study.\n\nThank you for your contributions.";
-
 /* section(title: Text("Your Participant Rights", bundle: .module), */
 "Your Participant Rights" = "Your Participant Rights";
 
 /* Text("Your completed activities will be shown here.", bundle: .module) */
 "Your completed activities will be shown here." = "Your completed activities will be shown here.";
+
+/* detail: LocalizedStringKey("You’ve completed the study.\n\nThank you for your contributions.")) */
+"You’ve completed the study.\n\nThank you for your contributions." = "You’ve completed the study.\n\nThank you for your contributions.";
 
 /* Text("minutes", bundle: .module) */
 "minutes" = "minutes";
@@ -124,5 +133,14 @@
 /* Text("scroll", bundle: .module) */
 "scroll" = "scroll";
 
-/* return String.localizedStringWithFormat(NSLocalizedString("today at %@", comment: ""), */
+/* return String(format: NSLocalizedString("today at %@", bundle: .module, comment: ""), */
 "today at %@" = "today at %@";
+
+/* sectionTitle(format: NSLocalizedString("Expired: %@", bundle: .module, comment: ""), */
+"Expired: %@" = "Expired: %@";
+
+/* sectionTitle(format: NSLocalizedString("Opens: %@", bundle: .module, comment: ""), */
+"Opens: %@" = "Opens: %@";
+
+/* sectionTitle(format: NSLocalizedString("Due: %@", bundle: .module, comment: ""), */
+"Due: %@" = "Due: %@";

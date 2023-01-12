@@ -34,8 +34,8 @@ extension Date {
             return DateFormatter.localizedString(from: self, dateStyle: .medium, timeStyle: .none)
         }
         else if self.isToday {
-            return String.localizedStringWithFormat(NSLocalizedString("today at %@", comment: ""),
-                                                    DateFormatter.localizedString(from: self, dateStyle: .none, timeStyle: .short))
+            return String(format: NSLocalizedString("today at %@", bundle: .module, comment: ""),
+                          DateFormatter.localizedString(from: self, dateStyle: .none, timeStyle: .short))
         }
         else {
             return DateFormatter.localizedString(from: self, dateStyle: .medium, timeStyle: .short)

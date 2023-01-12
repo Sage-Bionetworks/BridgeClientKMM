@@ -202,7 +202,7 @@ public struct StudyContact : Hashable, Identifiable {
         case .investigator:
             return Text("Investigator", bundle: .module)
         case .irb:
-            return Text("IRB/Board of Ethics", bundle: .module)
+            return Text("IRB/Ethics Board of Record", bundle: .module)
         case .principalInvestigator:
             return Text("Principal Investigator", bundle: .module)
         case .sponsor:

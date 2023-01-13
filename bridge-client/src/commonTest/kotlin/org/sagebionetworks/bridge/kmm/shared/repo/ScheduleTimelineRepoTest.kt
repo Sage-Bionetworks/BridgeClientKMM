@@ -465,7 +465,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
         runTest {
             val eventTimeStamp = Clock.System.now().minus(DateTimeUnit.DAY, TimeZone.currentSystemDefault())
             val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
-
+            repo.updateScheduleIfNeeded("testScheduledSessionsDay1")
             val resourceResult = repo.getSessionsForDay("testScheduledSessionsDay1", getTodayInstant()).firstOrNull { it is ResourceResult.Success }
 
             assertTrue(resourceResult is ResourceResult.Success)
@@ -504,6 +504,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val eventTimeStamp =
                 Clock.System.now()
             val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
+            repo.updateScheduleIfNeeded("testScheduledSessionsDay0TodayAndNotifications")
             val studyId = "testScheduledSessionsDay0TodayAndNotifications"
             val resourceResult = repo.getSessionsForDay(
                 studyId,
@@ -548,6 +549,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val eventTimeStamp = Clock.System.now().minus(DateTimeUnit.DAY, TimeZone.currentSystemDefault())
             val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
             val studyId = "testScheduledSessionsDay1TodayAndNotifications"
+            repo.updateScheduleIfNeeded(studyId)
             val resourceResult = repo.getSessionsForDay(
                 studyId,
                 getTodayInstant(),
@@ -587,6 +589,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val eventTimeStamp = Clock.System.now().minus(DateTimeUnit.DAY, TimeZone.currentSystemDefault())
             val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
             val studyId = "testScheduledSessionsDay1TodayAndTomorrow"
+            repo.updateScheduleIfNeeded(studyId)
             val resourceResult = repo.getSessionsForDay(
                 studyId,
                 getTodayInstant(),
@@ -640,7 +643,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
         runTest {
             val eventTimeStamp = Clock.System.now().minus(DateTimeUnit.DAY, TimeZone.currentSystemDefault())
             val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
-
+            repo.updateScheduleIfNeeded("testScheduledSessionsDay1TodayAndTomorrow_NoNotifications")
             val resourceResult = repo.getSessionsForDay(
                 "testScheduledSessionsDay1TodayAndTomorrow_NoNotifications",
                 getTodayInstant(),
@@ -689,6 +692,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
         runTest {
             val eventTimeStamp = Clock.System.now().minus(DateTimeUnit.DAY, TimeZone.currentSystemDefault())
             val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
+            repo.updateScheduleIfNeeded("testScheduledSessionsDay1NoUpNextOnToday")
 
             val todayInstant = getTodayInstant().plus(90, DateTimeUnit.MINUTE, TimeZone.currentSystemDefault())
             val resourceResult = repo.getSessionsForDay("testScheduledSessionsDay1NoUpNextOnToday", todayInstant, alwaysIncludeNextDay = true).firstOrNull { it is ResourceResult.Success }
@@ -732,6 +736,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val eventTimeStamp = Clock.System.now().minus(2, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
             val repo = getTestScheduleTimelineRepo(adherenceRecordDay2json, timeStamp = eventTimeStamp)
             repo.adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)
+            repo.updateScheduleIfNeeded(studyId)
 
             val todayInstant = getTodayInstant().plus(90, DateTimeUnit.MINUTE, TimeZone.currentSystemDefault())
             val resourceResult = repo.getSessionsForDay(studyId, todayInstant, alwaysIncludeNextDay = true).firstOrNull { it is ResourceResult.Success }
@@ -783,6 +788,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
         runTest {
             val eventTimeStamp = Clock.System.now().minus(3, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
             val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
+            repo.updateScheduleIfNeeded("testScheduledSessionsDay3")
             val resourceResult = repo.getSessionsForDay("testScheduledSessionsDay3", getTodayInstant()).firstOrNull { it is ResourceResult.Success }
 
             assertTrue(resourceResult is ResourceResult.Success)
@@ -812,6 +818,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
             val eventTimeStamp = Clock.System.now().minus(3, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
             val repo = getTestScheduleTimelineRepo(adherenceRecordjson, timeStamp = eventTimeStamp)
             repo.adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)
+            repo.updateScheduleIfNeeded(studyId)
             val resourceResult = repo.getSessionsForDay(studyId, getTodayInstant()).firstOrNull { it is ResourceResult.Success }
 
             assertTrue(resourceResult is ResourceResult.Success)
@@ -839,6 +846,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
         runTest {
             val eventTimeStamp = Clock.System.now().minus(4, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
             val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
+            repo.loadRemoteTimeline("testScheduledSessionsDay4")
             val resourceResult = repo.getSessionsForDay("testScheduledSessionsDay4", getTodayInstant()).firstOrNull { it is ResourceResult.Success }
 
             assertTrue(resourceResult is ResourceResult.Success)
@@ -2363,6 +2371,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
         runTest {
             val eventTimeStamp = Clock.System.now()
             val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp, timelineJson = getAnotherTimelineJson(eventTimeStamp))
+            repo.updateScheduleIfNeeded("sage-assessment-test")
 
             val now = getTodayInstant(17)
             val resourceResult = repo.getSessionsForDay("sage-assessment-test", now, alwaysIncludeNextDay = true).firstOrNull { it is ResourceResult.Success }

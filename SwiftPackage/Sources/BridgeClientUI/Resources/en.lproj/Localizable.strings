@@ -40,9 +40,6 @@
 /* title: LocalizedStringKey("Hang tight..."), */
 "Hang tight..." = "Hang tight...";
 
-/* Text("Hello, World!") */
-"Hello, World!" = "Hello, World!";
-
 /* Text("IRB Protocol ID: ", bundle: .module) + Text(bridgeManager.study?.protocolInfo?.protocolId ?? "") */
 "IRB Protocol ID:" = "IRB Protocol ID:";
 

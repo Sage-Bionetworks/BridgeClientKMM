@@ -79,8 +79,8 @@
 /* Button("Scroll Up", bundle: .module) { */
 "Scroll Up" = "Scroll Up";
 
-/* withdrawalRow(Text("Study ID: ", bundle: .module), studyId) */
-"Study ID: " = "Study ID: ";
+/* withdrawalRow(Text("Study ID:", bundle: .module), studyId) */
+"Study ID:" = "Study ID:";
 
 /* return Text("Study Support", bundle: .module) */
 "Study Support" = "Study Support";

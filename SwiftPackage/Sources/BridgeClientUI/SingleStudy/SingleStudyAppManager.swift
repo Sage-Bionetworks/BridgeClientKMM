@@ -37,6 +37,7 @@ open class AbstractSingleStudyAppManager : BridgeClientAppManager {
     }
 
     private var studyManager: NativeStudyManager?
+    private var notificationManager: NativeScheduledNotificationManager?
 
     public override init(platformConfig: IOSPlatformConfig, pemPath: String? = nil) {
         super.init(platformConfig: platformConfig, pemPath: pemPath)
@@ -50,6 +51,15 @@ open class AbstractSingleStudyAppManager : BridgeClientAppManager {
     open override func appWillFinishLaunching(_ launchOptions: [UIApplication.LaunchOptionsKey : Any]?) {
         super.appWillFinishLaunching(launchOptions)
         updateStudy()
+        // Schedule notifications
+        try? notificationManager?.onCleared()
+        notificationManager = .init()
+        
+        if (studyId != nil) {
+            notificationManager?.observeNotifications(studyId: studyId!) { notificationList in
+                self.localNotificationManager.setupNotifications(notificationList)
+            }
+        }
     }
     
     open override func signOut() {
@@ -57,6 +67,8 @@ open class AbstractSingleStudyAppManager : BridgeClientAppManager {
         studyManager = nil
         study = nil
         observedStudyId = nil
+        try? notificationManager?.onCleared()
+        notificationManager = nil
         super.signOut()
     }
     

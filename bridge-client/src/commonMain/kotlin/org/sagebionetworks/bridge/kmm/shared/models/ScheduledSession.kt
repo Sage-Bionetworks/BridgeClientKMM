@@ -13,9 +13,12 @@ package org.sagebionetworks.bridge.kmm.shared.models
 
 import kotlinx.datetime.DateTimePeriod
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
 import kotlinx.serialization.Serializable
 
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Transient
 
 /**
  * An individual session instance the participant should perform as part of the study. The `refGuid` property will refer to a session in the list of sessions in this timeline. The `instanceGuid` is a unique GUID to identify any data that is generated from the execution of this scheduled session. This allows scientists to contextualize data based on when it was gathered in the execution of the study’s schedule. Further details about how a client should interpret a timeline can be found at the Bridge developer portal.
@@ -57,7 +60,7 @@ data class ScheduledSession (
 
     // startTime is a var so that apps (DIAN) that define this client side can change it -nbrown 7/8/22
     @SerialName("startTime")
-    var startTime: String,
+    var startTime: LocalTime,
 
     @SerialName("delayTime")
     val delayTime: String? = null,
@@ -92,6 +95,10 @@ data class ScheduledSession (
     @SerialName("type")
     val type: String? = null
 
-)
+) {
+    @Transient
+    val startDateTime = LocalDateTime(startDate, startTime)
+
+}
 
 

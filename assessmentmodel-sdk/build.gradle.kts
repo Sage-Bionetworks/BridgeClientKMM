@@ -37,7 +37,7 @@ android {
 
 
 dependencies {
-        val assessmentVersion = "0.7.2"
+        val assessmentVersion = "0.10.1"
         api(project(":bridge-client"))
         api("org.sagebionetworks.assessmentmodel:assessmentModel:$assessmentVersion")
 

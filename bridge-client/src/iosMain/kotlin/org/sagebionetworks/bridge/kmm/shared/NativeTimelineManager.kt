@@ -42,7 +42,7 @@ class NativeTimelineStudyBurstManager(
                     updateFailed?.invoke()
                 }
             }
-            repo.getStudyBurstSchedule(studyId, userJoinedDate).collect { timelineResource ->
+            repo.getStudyBurstSchedule(studyId).collect { timelineResource ->
                 (timelineResource as? ResourceResult.Success)?.data?.let { schedule ->
                     viewUpdated(schedule.toNative())
                 } ?: run {
@@ -83,7 +83,7 @@ class NativeTimelineManager(
             if (isNewLogin) {
                 adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)
             }
-            repo.getSessionsForToday(studyId, includeAllNotifications, alwaysIncludeNextDay).collect { timelineResource ->
+            repo.getSessionsForToday(studyId, alwaysIncludeNextDay).collect { timelineResource ->
                 (timelineResource as? ResourceResult.Success)?.data?.let { timelineSlice ->
                     viewUpdate(timelineSlice.toNaive())
                 }

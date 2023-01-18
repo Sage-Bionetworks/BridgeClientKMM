@@ -6,6 +6,7 @@ import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.datetime.LocalDateTime
@@ -30,6 +31,7 @@ class ResourceDatabaseHelper(sqlDriver: SqlDriver) : EtagStorageCache {
 
     internal val database = BridgeResourceDatabase(
         sqlDriver,
+        AdherenceRecords.Adapter(EnumColumnAdapter()),
         JsonData.Adapter(
             jsonAdapter = serializableColumnAdapter<JsonElement>(),
             expireAdapter = serializableColumnAdapter<LocalDateTime>(),
@@ -49,10 +51,11 @@ class ResourceDatabaseHelper(sqlDriver: SqlDriver) : EtagStorageCache {
             dbQuery.removeAllEtags()
         }
         database.localDataCacheQueries.removeAllJsonData()
+        database.participantScheduleQueries.clearAll()
     }
 
     internal fun getResourceAsFlow(id: String, type: ResourceType, studyId: String): Flow<Resource?> {
-        return dbQuery.selectResourceById(id, type, studyId).asFlow().mapToOneOrNull().distinctUntilChanged(areEquivalent = {old, new -> old == new })
+        return dbQuery.selectResourceById(id, type, studyId).asFlow().mapToOneOrNull(Dispatchers.Default).distinctUntilChanged(areEquivalent = {old, new -> old == new })
     }
 
     internal fun getResource(id: String, type: ResourceType, studyId: String): Resource? {
@@ -95,7 +98,7 @@ class ResourceDatabaseHelper(sqlDriver: SqlDriver) : EtagStorageCache {
     }
 
     internal fun getResourcesAsFlow(type: ResourceType, studyId: String): Flow<List<Resource>> {
-        return dbQuery.selectAllResourcesByType(type, studyId).asFlow().mapToList().distinctUntilChanged(areEquivalent = {old, new -> old == new })
+        return dbQuery.selectAllResourcesByType(type, studyId).asFlow().mapToList(Dispatchers.Default).distinctUntilChanged(areEquivalent = {old, new -> old == new })
     }
 
     internal fun getResources(type: ResourceType, studyId: String): List<Resource> {

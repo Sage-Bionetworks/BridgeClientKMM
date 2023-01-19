@@ -290,13 +290,13 @@ public struct ContactAndSupportView: View {
             let studyId = bridgeManager.study?.identifier ?? ""
             if let phone = bridgeManager.userSessionInfo.phone {
                 withdrawalHeader(Text("To withdraw from this study, you’ll need the Study ID and the phone number you registered with:", bundle: .module))
-                withdrawalRow(Text("Study ID: ", bundle: .module), studyId)
-                withdrawalRow(Text("Registration Phone Number: ", bundle: .module), phone)
+                withdrawalRow(Text("Study ID:", bundle: .module), studyId)
+                withdrawalRow(Text("Registration Phone Number:", bundle: .module), phone)
             }
             else if let participantId = bridgeManager.userSessionInfo.participantId(for: studyId) {
                 withdrawalHeader(Text("To withdraw from this study, you’ll need the following info:", bundle: .module))
-                withdrawalRow(Text("Study ID: ", bundle: .module), studyId)
-                withdrawalRow(Text("Participant ID: ", bundle: .module), participantId)
+                withdrawalRow(Text("Study ID:", bundle: .module), studyId)
+                withdrawalRow(Text("Participant ID:", bundle: .module), participantId)
             }
             else {
                 EmptyView()
@@ -319,7 +319,7 @@ public struct ContactAndSupportView: View {
     }
     
     private func withdrawalRow(_ label: Text, _ value: String) -> Text {
-        label.bold() + Text(value)
+        label.bold() + Text(" ") + Text(value)
     }
 }
 

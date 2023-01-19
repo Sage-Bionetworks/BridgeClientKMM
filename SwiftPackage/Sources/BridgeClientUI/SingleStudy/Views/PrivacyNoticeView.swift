@@ -93,7 +93,7 @@ public struct PrivacyNoticeView: View {
                     case .weWill:
                         Text("We will", bundle: .module)
                     case .weWont:
-                        Text("We won't", bundle: .module)
+                        Text("We won’t", bundle: .module)
                     case .youCan:
                         Text("You can", bundle: .module)
                     }

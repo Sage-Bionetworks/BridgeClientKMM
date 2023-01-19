@@ -52,7 +52,7 @@ public struct TodayWrapperView: View {
                             else if state == .availableNow, !viewModel.isLoading {
                                 ZStack {
                                     Image(decorative: "available_complete", bundle: .module)
-                                    Text("nice, you’re all up to date!", bundle: .module)
+                                    Text("Nice, you’re all up to date!", bundle: .module)
                                         // TODO: syoung 09/23/2021 Cut the image so that I can make this text dynamic.
                                         .font(.playfairDisplayFont(fixedSize: 18))
                                 }
@@ -116,11 +116,14 @@ public struct TodayWrapperView: View {
             if !session.dateString.isEmpty {
                 switch session.state {
                 case .expired:
-                    sectionTitle("Expired:  \(session.dateString)", "locked_icon")
+                    sectionTitle(format: NSLocalizedString("Expired: %@", bundle: .module, comment: ""),
+                                 session.dateString, "locked_icon")
                 case .upNext:
-                    sectionTitle("Opens:  \(session.dateString)", "locked_icon")
+                    sectionTitle(format: NSLocalizedString("Opens: %@", bundle: .module, comment: ""),
+                                 session.dateString, "locked_icon")
                 default:
-                    sectionTitle("Due:  \(session.dateString)", "timer_icon")
+                    sectionTitle(format: NSLocalizedString("Due: %@", bundle: .module, comment: ""),
+                                 session.dateString, "timer_icon")
                 }
             }
         }
@@ -128,9 +131,9 @@ public struct TodayWrapperView: View {
     }
     
     @ViewBuilder
-    private func sectionTitle(_ textValue: LocalizedStringKey, _ imageName: String) -> some View {
+    private func sectionTitle(format: String, _ dateString: String, _ imageName: String) -> some View {
         Image(decorative: imageName, bundle: .module)
-        Text(textValue, bundle: .module)
+        Text(String(format: format, dateString))
             .font(DesignSystem.fontRules.headerFont(at: 7))
             .foregroundColor(.sageBlack)
             .fixedSize()

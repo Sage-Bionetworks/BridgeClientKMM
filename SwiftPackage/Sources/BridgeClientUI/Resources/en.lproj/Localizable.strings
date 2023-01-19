@@ -124,8 +124,8 @@
 /* Text("minutes", bundle: .module) */
 "minutes" = "minutes";
 
-/* Text("nice, you’re all up to date!", bundle: .module) */
-"nice, you’re all up to date!" = "nice, you’re all up to date!";
+/* Text("Nice, you’re all up to date!", bundle: .module) */
+"Nice, you’re all up to date!" = "Nice, you’re all up to date!";
 
 /* Text("scroll", bundle: .module) */
 "scroll" = "scroll";

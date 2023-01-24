@@ -22,9 +22,9 @@ public struct StudyInfoView: View {
         public func title() -> Text {
             switch self {
             case .about:
-                return Text("ABOUT THE STUDY", bundle: .module)
+                return Text("ABOUT_THE_STUDY", bundle: .module)
             case .contact:
-                return Text("CONTACT & SUPPORT", bundle: .module)
+                return Text("CONTACT_AND_SUPPORT", bundle: .module)
             }
         }
     }

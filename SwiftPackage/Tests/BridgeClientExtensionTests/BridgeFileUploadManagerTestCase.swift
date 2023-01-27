@@ -58,6 +58,22 @@ extension BridgeFileUploadManagerTestCaseTyped {
         BackgroundNetworkManager.sessionDelegateQueue.addOperations([setMockSession], waitUntilFinished: true)
         savedDelay = BridgeFileUploadManager.shared.delayForRetry
         BridgeFileUploadManager.shared.delayForRetry = 0 // don't delay retries for tests
+        
+        // Clear user defaults - may have leftover cruft from previous failed test run
+        let bfum = BridgeFileUploadManager.shared
+        let defaults = bfum.userDefaults
+        defaults.set(nil, forKey: bfum.retryUploadsKey)
+        defaults.set(nil, forKey: bfum.bridgeFileUploadsKey)
+        defaults.set(nil, forKey: bfum.uploadURLsRequestedKey)
+        defaults.set(nil, forKey: bfum.uploadingToS3Key)
+        defaults.set(nil, forKey: bfum.notifyingBridgeUploadSucceededKey)
+        
+        // Remove all temp files - may have leftover cruft from previous failed test run
+        if let items = try? FileManager.default.contentsOfDirectory(at: self.uploadApi.tempUploadDirURL, includingPropertiesForKeys: nil, options: []) {
+            items.forEach {
+                try? FileManager.default.removeItem(at: $0)
+            }
+        }
     }
 
     func genericTearDown() {

@@ -85,7 +85,7 @@ public struct TodayWrapperView: View {
     private func availabilityText(_ state: TodayTimelineSession.SessionState) -> Text {
         switch state {
         case .availableNow:
-            return Text("Current activities", bundle: .module)
+            return Text("CURRENT_ACTIVITIES", bundle: .module)
         case .upNext:
             return Text("Up next", bundle: .module)
         case .completed:

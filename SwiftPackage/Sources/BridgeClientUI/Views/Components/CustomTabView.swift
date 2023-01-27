@@ -159,6 +159,7 @@ public struct CustomTabView<Tab : TabItem, Content : View>: View {
                 .padding(.top, imageTopOffset)
                 .frame(height: buttonSize - imageTopOffset, alignment: .top)
                 titles[tab]!
+                    .textCase(placement == .top ? .uppercase : nil)
                     .font(buttonFont[isSelected])
                     .foregroundColor(buttonColor[isSelected])
                     .scaledToFit()

@@ -1,17 +1,17 @@
-/* return Text("ABOUT THE STUDY", bundle: .module) */
-"ABOUT THE STUDY" = "ABOUT THE STUDY";
+/* return Text("ABOUT_THE_STUDY", bundle: .module) */
+"ABOUT_THE_STUDY" = "About the Study";
 
 /* Label("Back", systemImage: "arrow.left", bundle: .module) */
 "Back" = "Back";
 
-/* return Text("CONTACT & SUPPORT", bundle: .module) */
-"CONTACT & SUPPORT" = "CONTACT & SUPPORT";
+/* return Text("CONTACT_AND_SUPPORT", bundle: .module) */
+"CONTACT_AND_SUPPORT" = "Contact & Support";
 
 /* return Text("Completed", bundle: .module) */
 "Completed" = "Completed";
 
-/* return Text("Current activities", bundle: .module) */
-"Current activities" = "Current activities";
+/* return Text("CURRENT_ACTIVITIES", bundle: .module) */
+"CURRENT_ACTIVITIES" = "Current activities";
 
 /* Text("Done") */
 "Done" = "Done";

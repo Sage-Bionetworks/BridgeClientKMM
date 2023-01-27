@@ -1,4 +1,5 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import com.android.zipflinger.Sources.dir
 import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
@@ -167,6 +168,21 @@ publishing {
                 username = System.getenv("artifactoryUser")
                 password = System.getenv("artifactoryPwd")
             }
+        }
+    }
+}
+
+
+
+tasks.register("createSwiftPackage") {
+    description = "Creates a Swift package to distribute an XCFramework"
+
+    dependsOn("assembleBridgeClientXCFramework")
+
+    doLast {
+        copy {
+            from(layout.buildDirectory.dir("XCFrameworks"))
+            into("$rootDir/SwiftPackage/Binaries/")
         }
     }
 }

@@ -27,7 +27,7 @@ object SqliteDriverFactory {
             return NativeSqliteDriver(schema, name)
         }
         else {
-            Logger.i("Creating db at $path")
+            Logger.i("Creating or opening db at $path")
 
             try {
 

@@ -30,7 +30,7 @@ class AdherenceRecordRepoTest: BaseTest() {
     fun testAdherenceRepo() {
         runTest {
             val studyId = "testId"
-            val repo = AdherenceRecordRepo(getTestClient(json), ResourceDatabaseHelper(testDatabaseDriver()), MainScope())
+            val repo = AdherenceRecordRepo(getTestClient(json), null, ResourceDatabaseHelper(testDatabaseDriver()), MainScope())
 
             assertTrue(repo.loadRemoteAdherenceRecords(studyId))
             val recordMap = repo.getCachedAdherenceRecords(listOf(instanceGuid), studyId)

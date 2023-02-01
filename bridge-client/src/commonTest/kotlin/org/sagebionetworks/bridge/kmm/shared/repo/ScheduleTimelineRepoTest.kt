@@ -443,7 +443,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
     }
 
     private fun getTestScheduleTimelineRepo(adherenceRecordJson: String = "", timeStamp: Instant, timelineJson: String = getScheduleJson(timeStamp) ) : ScheduleTimelineRepo {
-        val adherenceRecordRepo = AdherenceRecordRepo(getTestClient(adherenceRecordJson), databaseHelper, MainScope())
+        val adherenceRecordRepo = AdherenceRecordRepo(getTestClient(adherenceRecordJson), null, databaseHelper, MainScope())
         val configJson = "{\n" +
                 "  \"config\": {},\n" +
                 "  \"createdOn\": \"2020-08-28T14:28:13.386Z\",\n" +

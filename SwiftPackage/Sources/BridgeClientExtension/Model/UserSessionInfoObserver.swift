@@ -23,6 +23,12 @@ public final class UserSessionInfoObserver : ObservableObject {
     
     public init() {}
     
+    /// Whether or not this observer has been loaded.
+    @Published public var isLaunching: Bool = true
+    
+    /// Error returned by BridgeClient when failed to get the user session info.
+    @Published public var loginError: String?
+    
     /// Whether or not the session is authenticated.
     @Published public var isAuthenticated: Bool = false
     
@@ -100,7 +106,8 @@ public final class UserSessionInfoObserver : ObservableObject {
     @Published public var notifyByEmail: Bool?
     
     private func copyFrom(_ newValue: UserSessionInfo?) {
-        self.isAuthenticated = newValue?.authenticated ?? false
+        self.isLaunching = false
+        self.isAuthenticated = newValue?.authenticated ?? (newValue?.reauthToken != nil)
         self.firstName = newValue?.firstName
         self.lastName = newValue?.lastName
         self.createdOn = newValue?.createdOn.flatMap { ISO8601TimestampFormatter.date(from: $0) }

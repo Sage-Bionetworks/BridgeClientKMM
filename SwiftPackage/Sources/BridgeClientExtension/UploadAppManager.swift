@@ -9,17 +9,34 @@ import JsonModel
 
 public let kPreviewStudyId = "xcode_preview"
 public let kStudyIdKey = "studyId"
-fileprivate let kLoginStateKey = "hasLoggedIn"
+fileprivate let kUserSessionIdKey = "userSessionId"
 
 open class UploadAppManager : ObservableObject {
-
-    /// Is this manager used for previewing the app? (Unit tests, SwiftUI Preview, etc.)
-    public let isPreview: Bool
     
     /// The configuration bits that need to be set on the 'BridgeClient.xcframework' in order to connect to
     /// Bridge services.
     public let platformConfig: IOSPlatformConfig
     
+    /// Is this manager used for previewing the app? (Unit tests, SwiftUI Preview, etc.)
+    public let isPreview: Bool
+    
+    /// The UserDefaults that should be used for this app.
+    public var sharedUserDefaults: UserDefaults
+    
+    /// Has the participant previously logged in successfully (either now or previously)?
+    public var hasLoggedIn: Bool {
+        userSessionId != nil
+    }
+    
+    /// Is this a new login?
+    public var isNewLogin: Bool = true
+    
+    /// Store the last user session id used for login.
+    var userSessionId: String? {
+        get { sharedUserDefaults.string(forKey: kUserSessionIdKey) }
+        set { sharedUserDefaults.set(newValue, forKey: kUserSessionIdKey) }
+    }
+
     /// The path to the pem file that is used to encrypt data being uploaded to Bridge.
     ///
     /// - Note: Data should be encrypted so that it is not stored insecurely on the phone (while waiting
@@ -33,8 +50,6 @@ open class UploadAppManager : ObservableObject {
     
     /// Is the app currently uploading results or user files? This status is maintained and updated by BridgeFileUploadManager.
     @Published public var isUploading: Bool = false
-    
-    public var sharedUserDefaults: UserDefaults
     
     /// A threadsafe observer for the `BridgeClient.UserSessionInfo` for the current user.
     public let appConfig: AppConfigObserver = .init()
@@ -74,15 +89,8 @@ open class UploadAppManager : ObservableObject {
     @MainActor
     public final func setUserSessionInfo(_ session: UserSessionInfo?) {
         self.session = session
-        if session?.authenticated ?? false {
-            self.hasLoggedIn = true
-        }
-    }
-    
-    /// Has the participant previously logged in successfully?
-    lazy public private(set) var hasLoggedIn: Bool = sharedUserDefaults.bool(forKey: kLoginStateKey) {
-        didSet {
-            sharedUserDefaults.set(hasLoggedIn, forKey: kLoginStateKey)
+        if session?.authenticated ?? false, let identifier = session?.id {
+            self.userSessionId = identifier
         }
     }
     
@@ -110,17 +118,21 @@ open class UploadAppManager : ObservableObject {
     ///   - pemPath: The path to the location of the pem file to use when encrypting uploads.
     public init(platformConfig: IOSPlatformConfig, pemPath: String? = nil) {
         let pemPath = pemPath ?? Bundle.main.path(forResource: platformConfig.appId, ofType: "pem")
-        uploadProcessor = .init(pemPath: pemPath)
+        self.uploadProcessor = .init(pemPath: pemPath)
+        self.title = platformConfig.localizedAppName
         self.platformConfig = platformConfig
-        self.title = self.platformConfig.localizedAppName
+        
         self.isPreview = (platformConfig.appId == kPreviewStudyId)
         if !self.isPreview {
+            self.sharedUserDefaults = platformConfig.appGroupIdentifier.flatMap { .init(suiteName: $0) } ?? .standard
             IOSBridgeConfig().initialize(platformConfig: self.platformConfig)
-            self.sharedUserDefaults = self.platformConfig.appGroupIdentifier.flatMap { .init(suiteName: $0) } ?? .standard
         }
         else {
             self.sharedUserDefaults = UserDefaults.standard
         }
+
+        // Is this a new login (in which case we need to get the adherence records)
+        self.isNewLogin = (self.userSessionId == nil)
 
         // Set up the background network manager singleton and make us its app manager
         let bnm = BackgroundNetworkManager.shared
@@ -147,7 +159,9 @@ open class UploadAppManager : ObservableObject {
             guard userSessionInfo == nil || !userSessionInfo!.isEqual(userSessionInfo) else { return }
             self.session = userSessionInfo
         }
-        self.session = self.authManager.session()
+        let userState = self.authManager.sessionState()
+        self.userSessionInfo.loginError = userState.error
+        self.session = userState.sessionInfo
         self.authManager.observeUserSessionInfo()
         
         // Hook up app config
@@ -169,13 +183,28 @@ open class UploadAppManager : ObservableObject {
     
     /// Sign out the current user.
     @MainActor
-    open func signOut() {
+    public final func signOut() {
+        willSignOut()
         authManager.signOut()
         self.session = nil
-        self.hasLoggedIn = false
+        self.userSessionId = nil
+        self.isNewLogin = true
+        didSignOut()
     }
     
-    // @Protected - Only this class should call this method and only subclasses should implement.
+    /// The current user will sign out.
+    /// @Protected - Only this class should call this method and only subclasses should implement.
+    @MainActor
+    open func willSignOut() {
+    }
+    
+    /// The current user did sign out.
+    /// @Protected - Only this class should call this method and only subclasses should implement.
+    @MainActor
+    open func didSignOut() {
+    }
+    
+    /// @Protected - Only this class should call this method and only subclasses should implement.
     open func updateAppState() {
         // Do nothing. Allows subclass override setup and app state changes.
     }

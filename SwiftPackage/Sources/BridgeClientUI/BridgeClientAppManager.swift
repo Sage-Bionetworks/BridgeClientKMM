@@ -123,11 +123,11 @@ open class BridgeClientAppManager : UploadAppManager {
         }
     }
     
-    /// Sign out the current user.
-    override open func signOut() {
+    // @Protected - Only this class should call this method and only subclasses should implement.
+    override open func willSignOut() {
         localNotificationManager.clearAll()
-        super.signOut()
         isOnboardingFinished = false
+        super.willSignOut()
     }
     
     // @Protected - Only this class should call this method and only subclasses should implement.
@@ -136,12 +136,11 @@ open class BridgeClientAppManager : UploadAppManager {
     }
     
     public final func fetchAppState() -> AppState {
-        if appConfig.isLaunching {
+        if appConfig.isLaunching || userSessionInfo.isLaunching {
             return .launching
         }
         else if !userSessionInfo.isAuthenticated {
-            // check if the userSessionInfo is not finished loading
-            return hasLoggedIn ? .launching : .login
+            return .login
         }
         else if !isOnboardingFinished {
             return .onboarding

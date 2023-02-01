@@ -21,6 +21,9 @@ open class DataArchive : NSObject, Identifiable {
     
     private let archiver: BridgeArchiver
     
+    /// The schedule used to start this task (if any).
+    public let schedule: AssessmentScheduleInfo?
+    
     /// Has the archive been zipped?
     public final internal(set) var isCompleted: Bool = false
     
@@ -32,10 +35,11 @@ open class DataArchive : NSObject, Identifiable {
         archiver.files
     }
     
-    public init?(identifier: String) {
+    public init?(identifier: String, schedule: AssessmentScheduleInfo? = nil) {
         guard let archiver = BridgeArchiver() else { return nil }
         self.archiver = archiver
         self.identifier = identifier
+        self.schedule = schedule
         super.init()
     }
     

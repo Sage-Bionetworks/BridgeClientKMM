@@ -199,6 +199,31 @@ open class UploadAppManager : ObservableObject {
         }
         uploadProcessor.encryptAndUpload(archives)
     }
+    
+    func notifyUIOfBridgeError(_ value: Int32, description: String) {
+        DispatchQueue.main.async {
+            self.authManager.notifyUIOfBridgeError(statusCode: .init(value: value, description: description))
+        }
+    }
+    
+    func reauthenticate(_ completion: @escaping (Bool) -> Void) {
+        DispatchQueue.main.async {
+            guard let authManager = self.authManager else {
+                debugPrint("AuthManager has not been initialized. Cannot reauthenticate.")
+                completion(false)
+                return
+            }
+            
+            authManager.reauth { error in
+                if let error = error {
+                    // Assume BridgeClientKMM will have handled any 410 or 412 error appropriately.
+                    self.userSessionInfo.loginError = "Reauth Failed: \(error.message ?? "Unknown Error")"
+                    debugPrint("Session token auto-refresh failed: \(String(describing: error))")
+                }
+                completion(error == nil)
+            }
+        }
+    }
 }
 
 final class ArchiveUploadProcessor {
@@ -268,18 +293,23 @@ final class ArchiveUploadProcessor {
     
     @MainActor
     private func _upload(archive: DataArchive, encrypted: Bool) async {
-        let exporterV3Metadata: JsonElement? = (archive as? AbstractResultArchive)?.schedule.map { schedule in
-            .object([
-                "instanceGuid": schedule.instanceGuid,
-                "eventTimestamp": schedule.session.eventTimestamp
-            ])
-        }
-        let extras = StudyDataUploadExtras(encrypted: encrypted, metadata: exporterV3Metadata, zipped: true)
         let id = archive.identifier
         guard let url = archive.encryptedURL else {
             debugPrint("WARNING! Cannot upload \(id)")
             return
         }
+        _uploadEncrypted(id: archive.identifier, url: url, schedule: archive.schedule)
+    }
+    
+    @MainActor
+    private func _uploadEncrypted(id: String, url: URL, schedule: AssessmentScheduleInfo?) {
+        let exporterV3Metadata: JsonElement? = schedule.map { schedule in
+            .object([
+                "instanceGuid": schedule.instanceGuid,
+                "eventTimestamp": schedule.session.eventTimestamp
+            ])
+        }
+        let extras = StudyDataUploadExtras(encrypted: true, metadata: exporterV3Metadata, zipped: true)
         StudyDataUploadAPI.shared.upload(fileId: id, fileUrl: url, contentType: "application/zip", extras: extras)
         do {
             try FileManager.default.removeItem(at: url)

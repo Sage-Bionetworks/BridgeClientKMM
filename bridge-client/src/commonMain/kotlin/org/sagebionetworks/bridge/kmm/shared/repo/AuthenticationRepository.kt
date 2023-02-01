@@ -214,34 +214,39 @@ class AuthenticationRepository(
         return false
     }
 
-    suspend fun reAuth() : Boolean {
+    suspend fun reAuth() : Boolean = reAuthWithError().first
+
+    suspend fun reAuthWithError() : Pair<Boolean, Error?> {
         val sessionInfo = session()
-        return sessionInfo?.reauthToken?.let {
+        return sessionInfo?.reauthToken?.let { reauthToken ->
             val signIn = SignIn(
                 appId = bridgeConfig.appId,
                 email = sessionInfo.email,
                 externalId = sessionInfo.externalId,
-                reauthToken = it
+                reauthToken = reauthToken
             )
             var success = false
+            var responseError: Error? = null
             try {
                 val userSession = authenticationApi.reauthenticate(signIn)
                 updateCachedSession(sessionInfo, userSession)
                 success = true
             } catch (err: Throwable) {
+                responseError = Error(err.message ?: "Error requesting reAuth: $err")
                 Logger.e("Error requesting reAuth", err)
                 if (err is ResponseException && (err.response.status == HttpStatusCode.Unauthorized ||
                             err.response.status == HttpStatusCode.Forbidden ||
                             err.response.status == HttpStatusCode.NotFound ||
                             err.response.status == HttpStatusCode.Locked)) {
                     // Should clear session for auth related errors: 401, 403, 404, 423
+                    Logger.i("User reauth failed. Removing user session.")
                     database.removeResource(USER_SESSION_ID, ResourceType.USER_SESSION_INFO, APP_WIDE_STUDY_ID)
                 } else {
                     // Some sort of network error leave the session alone so we can try again
                 }
             }
-            success
-        } ?: false
+            Pair(success, responseError)
+        } ?: Pair(false, Error("reAuth token is null"))
     }
 
     fun notifyUIOfBridgeError(statusCode: HttpStatusCode) {

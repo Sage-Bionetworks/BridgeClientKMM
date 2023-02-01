@@ -239,8 +239,13 @@ class AuthenticationRepository(
                             err.response.status == HttpStatusCode.NotFound ||
                             err.response.status == HttpStatusCode.Locked)) {
                     // Should clear session for auth related errors: 401, 403, 404, 423
-                    Logger.i("User reauth failed. Removing user session.")
-                    database.removeResource(USER_SESSION_ID, ResourceType.USER_SESSION_INFO, APP_WIDE_STUDY_ID)
+                    Logger.i("User reauth failed. Removing user session token.")
+                    val newSession = sessionInfo.copy(
+                        reauthToken = null,
+                        authenticated = false,
+                        sessionToken = ""
+                    )
+                    updateCachedSession(null, newSession)
                 } else {
                     // Some sort of network error leave the session alone so we can try again
                 }
@@ -273,6 +278,11 @@ class AuthenticationRepository(
             //New session doesn't have re-auth token, so keep old one
             toCacheSession = newUserSession.copy(reauthToken = oldUserSessionInfo.reauthToken)
         }
+        // TODO: syoung 02/01/2022 Test this before uncommenting.
+//        val previousSession = oldSessionResource?.loadResource<UserSessionInfo>()
+//        if (previousSession != null && previousSession.id != newUserSession.id) {
+//            database.clearDatabase()
+//        }
         val resource = Resource(
             identifier = USER_SESSION_ID,
             secondaryId = ResourceDatabaseHelper.DEFAULT_SECONDARY_ID,
@@ -291,6 +301,7 @@ class AuthenticationRepository(
         }
     }
 
-
 }
+
+
 

@@ -32,12 +32,7 @@ class MockBridgeClientAppManager : UploadAppManager {
         mockAuthManager
     }
     
-    override var session: UserSessionInfo? {
-        set {
-            mockAuthManager.mockUserSessionInfo = newValue
-        }
-        get {
-            mockAuthManager.session()
-        }
+    override var sessionToken: String? {
+        mockAuthManager.mockUserSessionInfo?.sessionToken
     }
 }

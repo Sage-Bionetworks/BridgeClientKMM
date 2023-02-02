@@ -87,40 +87,9 @@ open class BridgeClientAppManager : UploadAppManager {
     lazy public var localNotificationManager : LocalNotificationManager = LocalNotificationManager()
     
     /// **Required:** This method should be called by the app delegate when the app is launching in either `willLaunch` or `didLaunch`.
+    @MainActor
     open func appWillFinishLaunching(_ launchOptions: [UIApplication.LaunchOptionsKey : Any]? ) {
         setup()
-    }
-    
-    /// Login with the given external ID and password.
-    ///
-    /// - Parameters:
-    ///   - externalId: The external ID to use as the signin credentials.
-    ///   - password: The password to use as the signin credentials.
-    ///   - completion: The completion handler that is called with the server response.
-    public final func loginWithExternalId(_ externalId: String, password: String, completion: @escaping ((BridgeClient.ResourceStatus) -> Void)) {
-        self.authManager.signInExternalId(externalId: externalId, password: password) { (userSessionInfo, status) in
-            guard status == ResourceStatus.success || status == ResourceStatus.failed else { return }
-            Task {
-                await self.setUserSessionInfo(userSessionInfo)
-                completion(status)
-            }
-        }
-    }
-    
-    /// Login with the given email and password.
-    ///
-    /// - Parameters:
-    ///   - email: The external ID to use as the signin credentials.
-    ///   - password: The password to use as the signin credentials.
-    ///   - completion: The completion handler that is called with the server response.
-    public final func loginWithEmail(_ email: String, password: String, completion: @escaping ((BridgeClient.ResourceStatus) -> Void)) {
-        self.authManager.signInEmail(userName: email, password: password) { (userSessionInfo, status) in
-            guard status == ResourceStatus.success || status == ResourceStatus.failed else { return }
-            Task {
-                await self.setUserSessionInfo(userSessionInfo)
-                completion(status)
-            }
-        }
     }
     
     // @Protected - Only this class should call this method and only subclasses should implement.
@@ -136,7 +105,7 @@ open class BridgeClientAppManager : UploadAppManager {
     }
     
     public final func fetchAppState() -> AppState {
-        if appConfig.isLaunching || userSessionInfo.isLaunching {
+        if appConfig.isLaunching || userSessionInfo.loginState == .launching {
             return .launching
         }
         else if !userSessionInfo.isAuthenticated {

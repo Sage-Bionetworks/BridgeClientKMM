@@ -71,26 +71,50 @@ open class UploadAppManager : ObservableObject {
     /// A threadsafe observer for the `BridgeClient.UserSessionInfo` for the current user.
     public let userSessionInfo: UserSessionInfoObserver = .init()
     
+    private(set) var sessionToken: String?
+    
     // Do not expose publicly. This class is not threadsafe.
-    var session: UserSessionInfo? {
-        didSet {
-            userSessionInfo.userSessionInfo = session
-            uploadProcessor.isTestUser = userSessionInfo.dataGroups?.contains("test_user") ?? false
-            didUpdateUserSessionInfo()
-            updateAppState()
-        }
-    }
+    private var session: UserSessionInfo?
     
     /// Called when the `BridgeClient.UserSessionInfo` is updated.
     open func didUpdateUserSessionInfo() {
         // Do nothing. Allows subclass override of `session.didSet`.
     }
     
+    enum UpdateUserSessionType : Int {
+        case launch, login, signout, observed
+    }
+    
+    /// Call to set up the user session before callback from the observer fires.
     @MainActor
-    public final func setUserSessionInfo(_ session: UserSessionInfo?) {
+    public final func handleUserLogin(_ session: UserSessionInfo?) {
+        updateUserSessionStatus(session, updateType: .login)
+    }
+    
+    @MainActor
+    final func updateUserSessionStatus(_ session: UserSessionInfo?, updateType: UpdateUserSessionType) {
+        if updateType == .observed, let oldSession = self.session, oldSession.isEqual(session) {
+            // If the old session and the new session haven't changed and the message was sent by the observer,
+            // then just return without updating state.
+            return
+        }
+        
         self.session = session
-        if session?.authenticated ?? false, let identifier = session?.id {
-            self.userSessionId = identifier
+        self.isNewLogin = updateType == .login || updateType == .signout
+        self.sessionToken = session.flatMap { $0.sessionToken.isEmpty ? nil : $0.sessionToken }
+        self.uploadProcessor.isTestUser = session?.dataGroups?.contains("test_user") ?? false
+        if updateType == .login {
+            // If this is a login, then update the user session state
+            self.userSessionId = session?.id
+        }
+        self.userSessionInfo.userSessionInfo = session
+        if updateType == .observed || updateType == .launch,
+            userSessionInfo.loginState == .reauthFailed {
+            handleReauthFailed()
+        }
+        else {
+            didUpdateUserSessionInfo()
+            updateAppState()
         }
     }
     
@@ -144,6 +168,7 @@ open class UploadAppManager : ObservableObject {
     }
     
     /// **Required:** This method should be called by the app delegate when the app is launching in either `willLaunch` or `didLaunch`.
+    @MainActor
     public func setup() {
 
         // Initialize koin
@@ -154,41 +179,81 @@ open class UploadAppManager : ObservableObject {
         #endif
         KoinKt.doInitKoin(enableNetworkLogs: enableNetworkLogs)
         
-        // Hook up user session info
-        self.authManager = NativeAuthenticationManager() { userSessionInfo in
-            guard userSessionInfo == nil || !userSessionInfo!.isEqual(userSessionInfo) else { return }
-            self.session = userSessionInfo
-        }
-        let userState = self.authManager.sessionState()
-        self.userSessionInfo.loginError = userState.error
-        self.session = userState.sessionInfo
-        self.authManager.observeUserSessionInfo()
-        
         // Hook up app config
         self.appConfigManager = NativeAppConfigManager() { appConfig, _ in
             self.config = appConfig ?? self.config
         }
         self.appConfigManager.observeAppConfig()
         
-        // Update the app state
-        updateAppState()
+        // Hook up user session info
+        self.authManager = NativeAuthenticationManager() { userSessionInfo in
+            self.updateUserSessionStatus(userSessionInfo, updateType: .observed)
+        }
+        let userState = self.authManager.sessionState()
+        self.userSessionInfo.loginError = userState.error
+        self.updateUserSessionStatus(userState.sessionInfo, updateType: .launch)
+        self.authManager.observeUserSessionInfo()
     }
     
     /// **Required:** This method should be called by the app delegate in the implementation of
     /// `application(:, handleEventsForBackgroundURLSession:, completionHandler:)` and is used to
     /// restore a background upload session.
+    @MainActor
     public final func handleEvents(for backgroundSession: String, completionHandler: @escaping () -> Void) {
         BackgroundNetworkManager.shared.restore(backgroundSession: backgroundSession, completionHandler: completionHandler)
+    }
+    
+    /// Login with the given external ID and password.
+    ///
+    /// - Parameters:
+    ///   - externalId: The external ID to use as the signin credentials.
+    ///   - password: The password to use as the signin credentials.
+    ///   - completion: The completion handler that is called with the server response.
+    public final func loginWithExternalId(_ externalId: String, password: String, completion: @escaping ((BridgeClient.ResourceStatus) -> Void)) {
+        self.authManager.signInExternalId(externalId: externalId, password: password) { (userSessionInfo, status) in
+            self.finishSignIn(userSessionInfo: userSessionInfo, status: status, completion: completion)
+        }
+    }
+    
+    /// Login with the given email and password.
+    ///
+    /// - Parameters:
+    ///   - email: The external ID to use as the signin credentials.
+    ///   - password: The password to use as the signin credentials.
+    ///   - completion: The completion handler that is called with the server response.
+    public final func loginWithEmail(_ email: String, password: String, completion: @escaping ((BridgeClient.ResourceStatus) -> Void)) {
+        self.authManager.signInEmail(userName: email, password: password) { (userSessionInfo, status) in
+            self.finishSignIn(userSessionInfo: userSessionInfo, status: status, completion: completion)
+        }
+    }
+    
+    final func finishSignIn(userSessionInfo: UserSessionInfo?, status: BridgeClient.ResourceStatus, completion: @escaping ((BridgeClient.ResourceStatus) -> Void)) {
+        guard status == ResourceStatus.success || status == ResourceStatus.failed else { return }
+        Task {
+            await self.handleUserLogin(userSessionInfo)
+            completion(status)
+        }
+    }
+    
+    /// If the app gets into a state where reauth fails, default behavior is to sign out the participant and clear their data. If the app wants to attempt restoring
+    /// user state, then the app should override this method and implement custom behavior.
+    ///
+    /// @Protected - Only this class should call this method and only subclasses should implement.
+    @MainActor
+    open func handleReauthFailed() {
+        if (userSessionInfo.loginError == nil) {
+            debugPrint("Failed to reauthenticate user. Signing out...")
+            userSessionInfo.loginError = "Failed to reauthenticate user. Signing out..."
+        }
+        signOut()
     }
     
     /// Sign out the current user.
     @MainActor
     public final func signOut() {
         willSignOut()
+        updateUserSessionStatus(nil, updateType: .signout)
         authManager.signOut()
-        self.session = nil
-        self.userSessionId = nil
-        self.isNewLogin = true
         didSignOut()
     }
     

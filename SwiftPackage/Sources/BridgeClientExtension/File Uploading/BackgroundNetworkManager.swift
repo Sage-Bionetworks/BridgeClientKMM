@@ -275,7 +275,7 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
         var retry = Int(request.value(forHTTPHeaderField: retryCountHeader) ?? "") ?? 0
         guard retry < maxRetries else { return false }
         
-        guard let sessionToken = appManager.authManager!.session()?.sessionToken else {
+        guard let sessionToken = appManager.sessionToken else {
             debugPrint("Unable to retry task--not signed in (auth manager's UserSessionInfo is nil)")
             return false
         }

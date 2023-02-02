@@ -50,7 +50,7 @@ class ParticipantFileUploadAPITests : XCTestCase, BridgeFileUploadManagerTestCas
         XCTAssertNotNil(participantFile, "SBBParticipantFileUploadRequestFailed notification userInfo has no ParticipantFile object at '\(pfua.participantFileKey)'")
     }
     
-    func uploadSucceeded503RetriedTests(userInfo: [AnyHashable : Any]) {
+    func uploadSucceededRetriedTests(userInfo: [AnyHashable : Any]) {
         let pfua = ParticipantFileUploadAPI.shared
         let fileId = userInfo[pfua.fileIdKey] as? String
         XCTAssertNotNil(fileId, "SBBParticipantFileUploaded notification userInfo has no file id string at '\(pfua.fileIdKey)'")
@@ -66,6 +66,10 @@ class ParticipantFileUploadAPITests : XCTestCase, BridgeFileUploadManagerTestCas
     
     func testUploadRequestFails_503() {
         tryUploadRequestFailsInitial503_ServerDown()
+    }
+    
+    func testUploadRequestFails_401_ReauthSuccess() {
+        tryUploadRequestFails401_ReauthSucceeded()
     }
     
     func testUploadFileToBridgeWhenS3RespondsShouldRetry_403() {

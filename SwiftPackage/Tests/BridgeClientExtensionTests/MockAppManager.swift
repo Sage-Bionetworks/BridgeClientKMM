@@ -6,9 +6,19 @@
 @testable import BridgeClient
 @testable import BridgeClientExtension
 
+// TODO: syoung 02/02/2022 Figure out how to test these conditions.
+enum MockReauthError : String, Error {
+    case notConnected, invalidReauthToken
+}
+
 // MARK: MockAuthManager
 class MockAuthManager : NativeAuthenticationManager {
-    fileprivate var mockUserSessionInfo: UserSessionInfo? = UserSessionInfo(sessionToken: "not-a-real-session-token", reauthToken: "not-a-real-reauth-token")
+    fileprivate var mockUserSessionInfo: UserSessionInfo?
+    
+    func reset() {
+        mockUserSessionInfo = UserSessionInfo(sessionToken: "not-a-real-session-token", reauthToken: "not-a-real-reauth-token")
+        mockReauthError = nil
+    }
     
     override func session() -> UserSessionInfo? {
         return mockUserSessionInfo
@@ -17,11 +27,7 @@ class MockAuthManager : NativeAuthenticationManager {
     override func notifyUIOfBridgeError(statusCode: Ktor_httpHttpStatusCode) {
         print("Test would notify UI of Bridge status code \(statusCode) here")
     }
-    
-    enum MockReauthError : String, Error {
-        case notConnected, invalidReauthToken
-    }
-    
+
     var mockReauthError: MockReauthError?
     override func reauth(completion: @escaping (KotlinError?) -> Void) {
         let mockError = mockReauthError.map {
@@ -52,9 +58,5 @@ class MockBridgeClientAppManager : UploadAppManager {
     
     override var authManager: NativeAuthenticationManager! {
         mockAuthManager
-    }
-    
-    override var sessionToken: String? {
-        mockAuthManager.mockUserSessionInfo?.sessionToken
     }
 }

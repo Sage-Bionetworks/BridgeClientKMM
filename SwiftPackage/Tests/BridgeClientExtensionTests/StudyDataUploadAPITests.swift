@@ -48,7 +48,7 @@ class StudyDataUploadAPITests : XCTestCase, BridgeFileUploadManagerTestCaseTyped
         XCTAssertNotNil(fileName, "SBBStudyFileUploadRequestFailed notification userInfo has no file name string at '\(sdua.fileNameKey)'")
     }
     
-    func uploadSucceeded503RetriedTests(userInfo: [AnyHashable : Any]) {
+    func uploadSucceededRetriedTests(userInfo: [AnyHashable : Any]) {
         let sdua = StudyDataUploadAPI.shared
         let fileName = userInfo[sdua.fileNameKey] as? String
         XCTAssertNotNil(fileName, "SBBStudyFileUploaded notification userInfo has no file name string at '\(sdua.fileNameKey)'")
@@ -60,6 +60,10 @@ class StudyDataUploadAPITests : XCTestCase, BridgeFileUploadManagerTestCaseTyped
     
     func testUploadRequestFails_503() {
         tryUploadRequestFailsInitial503_ServerDown()
+    }
+    
+    func testUploadRequestFails_401_ReauthSuccess() {
+        tryUploadRequestFails401_ReauthSucceeded()
     }
     
     func testUploadFileToBridgeWhenS3RespondsShouldRetry_403() {

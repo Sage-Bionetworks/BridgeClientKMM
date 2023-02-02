@@ -71,7 +71,9 @@ open class UploadAppManager : ObservableObject {
     /// A threadsafe observer for the `BridgeClient.UserSessionInfo` for the current user.
     public let userSessionInfo: UserSessionInfoObserver = .init()
     
-    private(set) var sessionToken: String?
+    var sessionToken: String? {
+        authManager.session().flatMap { $0.sessionToken.isEmpty ? nil : $0.sessionToken }
+    }
     
     // Do not expose publicly. This class is not threadsafe.
     private var session: UserSessionInfo?
@@ -101,7 +103,6 @@ open class UploadAppManager : ObservableObject {
         
         self.session = session
         self.isNewLogin = updateType == .login || updateType == .signout
-        self.sessionToken = session.flatMap { $0.sessionToken.isEmpty ? nil : $0.sessionToken }
         self.uploadProcessor.isTestUser = session?.dataGroups?.contains("test_user") ?? false
         if updateType == .login {
             // If this is a login, then update the user session state
@@ -235,17 +236,13 @@ open class UploadAppManager : ObservableObject {
         }
     }
     
-    /// If the app gets into a state where reauth fails, default behavior is to sign out the participant and clear their data. If the app wants to attempt restoring
-    /// user state, then the app should override this method and implement custom behavior.
+    /// If the app gets into a state where reauth fails, default behavior is to do nothing. App developer is responsible for overriding this
+    /// and handling however is appropriate for their app.
     ///
     /// @Protected - Only this class should call this method and only subclasses should implement.
     @MainActor
     open func handleReauthFailed() {
-        if (userSessionInfo.loginError == nil) {
-            debugPrint("Failed to reauthenticate user. Signing out...")
-            userSessionInfo.loginError = "Failed to reauthenticate user. Signing out..."
-        }
-        signOut()
+        // Default is to do nothing. App must decide how to handle this.
     }
     
     /// Sign out the current user.

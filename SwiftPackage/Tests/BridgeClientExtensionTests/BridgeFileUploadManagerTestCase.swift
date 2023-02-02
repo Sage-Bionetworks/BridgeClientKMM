@@ -32,11 +32,7 @@ protocol BridgeFileUploadManagerTestCase : XCTWaiterDelegate {
     var uploadExtras: Codable? { get }
     
     func uploadRequestFailed412Tests(userInfo: [AnyHashable : Any])
-    func uploadSucceeded503RetriedTests(userInfo: [AnyHashable : Any])
-    
-//    func testUploadRequestFails()
-//    func testUploadFileToBridgeWhenS3RespondsWithVariousFailuresThatShouldRetryLater()
-//    func testUploadFileToBridgeHappyPath()
+    func uploadSucceededRetriedTests(userInfo: [AnyHashable : Any])
 }
 
 protocol BridgeFileUploadManagerTestCaseTyped: BridgeFileUploadManagerTestCase {
@@ -49,6 +45,7 @@ extension BridgeFileUploadManagerTestCaseTyped {
         let bnm = BackgroundNetworkManager.shared
         savedAppManager = bnm.appManager
         bnm.appManager = mockAppManager
+        mockAppManager.mockAuthManager.reset()
         savedSession = bnm.backgroundSession()
         mockURLSession.mockDelegate = savedSession!.delegate
         mockURLSession.mockDelegateQueue = savedSession!.delegateQueue
@@ -197,7 +194,7 @@ extension BridgeFileUploadManagerTestCaseTyped {
         let expectRetried = XCTestExpectation(description: "503: retry later")
         let observer503Retried = NotificationCenter.default.addObserver(forName: uploadSucceededNotification, object: nil, queue: nil) { notification in
             if let userInfo = notification.userInfo {
-                self.uploadSucceeded503RetriedTests(userInfo: userInfo)
+                self.uploadSucceededRetriedTests(userInfo: userInfo)
             }
             else {
                 XCTAssert(false, "\(self.uploadSucceededNotification) notification has no userInfo")
@@ -333,6 +330,158 @@ extension BridgeFileUploadManagerTestCaseTyped {
         NotificationCenter.default.removeObserver(observer503NotRetried)
         NotificationCenter.default.removeObserver(observer503RetriedButS3Failed)
 
+    }
+    
+    func tryUploadRequestFails401_ReauthSucceeded() {
+        let responseJson = ["message": "session token expired"]
+        let endpoint = requestEndpoint
+        let mimeType = "image/jpeg"
+        guard let downloadFileUrl = Bundle.module.url(forResource: "failed-upload-request-response", withExtension: "json") else {
+            XCTAssert(false, "Unable to find test response file 'failed-upload-request-response.json' for upload api \(self.uploadApi.apiString) upload failure tests")
+            return
+        }
+        let bfum = BridgeFileUploadManager.shared
+        var tempCopyUrl: URL?
+        
+        // NOTE: If I move this block any further up in the function, it causes a compiler crash. Not
+        // a syntax error, an actual crash of the compiler. ¯\_(ツ)_/¯ ~emm 2021-07-08
+        guard let uploadFileUrl = Bundle.module.url(forResource: "cat", withExtension: "jpg") else {
+            XCTAssert(false, "Unable to find test image 'cat.jpg' for upload api \(self.uploadApi.apiString) upload failure tests")
+            return
+        }
+        
+        // test initially fails due to session token expired (401)
+        // -- set up initial 401 response, and add observer for eventual success
+        mockURLSession.set(json: responseJson, responseCode: 401, for: endpoint, httpMethod: "POST")
+        mockURLSession.set(downloadFileUrl: downloadFileUrl, error: nil, for: endpoint, httpMethod: "POST")
+       
+        let expectRetried = XCTestExpectation(description: "401: reauth")
+        let observerRetried = NotificationCenter.default.addObserver(forName: uploadSucceededNotification, object: nil, queue: nil) { notification in
+            
+            debugPrint("Received Notification: uploadSucceededNotification")
+            
+            if let userInfo = notification.userInfo {
+                self.uploadSucceededRetriedTests(userInfo: userInfo)
+            }
+            else {
+                XCTAssert(false, "\(self.uploadSucceededNotification) notification has no userInfo")
+            }
+                
+            XCTAssertNotNil(tempCopyUrl, "Temp file copy URL is nil")
+            if let tempCopyUrl = tempCopyUrl {
+                let shouldStillExist = self.uploadApi.notifiesBridgeWhenUploaded
+                self.check(file: tempCopyUrl, willRetry: false, stillExists: shouldStillExist, message: "Should no longer be in retry queue upon successful retry after initial 401 error", cleanUpAfter: true)
+            }
+            
+            // make sure we didn't generate any spurious uploads or retries
+            let defaults = BridgeFileUploadManager.shared.userDefaults
+            let retryUploads = defaults.dictionary(forKey: bfum.retryUploadsKey)
+            let fileUploads = defaults.dictionary(forKey: bfum.bridgeFileUploadsKey)
+            let uploadRequests = defaults.dictionary(forKey: bfum.uploadURLsRequestedKey)
+            let uploadsToS3 = defaults.dictionary(forKey: bfum.uploadingToS3Key)
+            let notifyingBridge = defaults.dictionary(forKey: bfum.notifyingBridgeUploadSucceededKey)
+            XCTAssert(retryUploads?.count ?? 0 == 0, "Spurious files left in retryUploads map: \(retryUploads!)")
+            XCTAssert(fileUploads?.count ?? 0 == 0, "Spurious files left in bridgeFileUploads map: \(fileUploads!)")
+            XCTAssert(uploadRequests?.count ?? 0 == 0, "Spurious files left in uploadURLsRequested map: \(uploadRequests!)")
+            XCTAssert(uploadsToS3?.count ?? 0 == 0, "Spurious files left in uploadingToS3 map: \(uploadsToS3!)")
+            XCTAssert(notifyingBridge?.count ?? 0 == 0, "Spurious files left in notifyingBridge map: \(notifyingBridge!)")
+
+            // make sure we didn't leave any unreferenced files lying around in the temp upload dir
+            let items = try! FileManager.default.contentsOfDirectory(atPath: self.uploadApi.tempUploadDirURL.path)
+            if self.uploadApi.notifiesBridgeWhenUploaded {
+                XCTAssert(items.count == 1, "Expected exactly one file to be in temp upload dir:\n\(items)")
+            }
+            else {
+                XCTAssert(items.count == 0, "Files left hanging around in temp upload dir:\n\(items)")
+            }
+            
+            // make sure all the mock response stuff got "used up"
+            for key in self.keysEmptyAfterUpload(for: self.mockURLSession.jsonForEndpoints) {
+                let responses = self.mockURLSession.jsonForEndpoints[key] as? [Any]
+                XCTAssert(responses?.count ?? 0 == 0, "Mock URLSession still has mock json response(s):\n\(self.mockURLSession.jsonForEndpoints)")
+            }
+            for key in self.keysEmptyAfterUpload(for: self.mockURLSession.codesforEndpoints) {
+                let responses = self.mockURLSession.codesforEndpoints[key] as? [Any]
+                XCTAssert(responses?.count ?? 0 == 0, "Mock URLSession still has mock response code(s):\n\(self.mockURLSession.codesforEndpoints)")
+            }
+            for key in self.keysEmptyAfterUpload(for: self.mockURLSession.URLsForEndpoints) {
+                let responses = self.mockURLSession.URLsForEndpoints[key] as? [Any]
+                XCTAssert(responses?.count ?? 0 == 0, "Mock URLSession still has (a) mock downloaded response file URL(s):\n\(self.mockURLSession.URLsForEndpoints)")
+            }
+            for key in self.keysEmptyAfterUpload(for: self.mockURLSession.errorsForEndpoints) {
+                let responses = self.mockURLSession.errorsForEndpoints[key] as? [Any]
+                XCTAssert(responses?.count ?? 0 == 0, "Mock URLSession still has (a) mock error code(s):\n\(self.mockURLSession.errorsForEndpoints)")
+            }
+
+            expectRetried.fulfill()
+        }
+        
+        let observerNotRetried = NotificationCenter.default.addObserver(forName: uploadRequestFailedNotification, object: nil, queue: nil) { notification in
+            XCTAssert(false, "initial 401 treated as unrecoverable, not retried")
+            expectRetried.fulfill()
+        }
+        
+        let observerRetriedButS3Failed = NotificationCenter.default.addObserver(forName: uploadToS3FailedNotification, object: nil, queue: nil) { notification in
+            XCTAssert(false, "initial 401 retried, but mock upload to S3 failed")
+            expectRetried.fulfill()
+        }
+        
+        // -- now set up the responses for the retry attempt so they're ready to go when it happens.
+        let s3url = "/not-a-real-pre-signed-S3-url"
+        guard let successResponseUrl = Bundle.module.url(forResource: self.uploadRequestSuccessResponseFile, withExtension: "json") else {
+            XCTAssert(false, "Unable to find test response file '\(self.uploadRequestSuccessResponseFile).json' for upload api \(self.uploadApi.apiString) upload failure tests")
+            return
+        }
+
+        self.mockURLSession.setJsonFromFile(named: self.uploadRequestSuccessResponseFile, responseCode: 201, for: endpoint, httpMethod: "POST")
+        self.mockURLSession.set(downloadFileUrl: successResponseUrl, error: nil, for: endpoint, httpMethod: "POST")
+        
+        // -- set up the S3 upload success response
+        self.mockURLSession.set(json: [:], responseCode: 200, for: s3url, httpMethod: "PUT")
+        
+        // -- set up the "upload completed" api call response
+        if self.uploadApi.notifiesBridgeWhenUploaded {
+            guard let uploadOnlyMetadata = self.uploadApi.uploadMetadata(for: self.testFileId, fileUrl: uploadFileUrl, mimeType: mimeType, extras: self.uploadExtras) else {
+                XCTAssert(false, "Failed to create test upload metadata for \(self.uploadApi.apiString) upload failure test retry attempt in order to get the notifyBridgeUrlString")
+                return
+            }
+            var jsonData: Data
+            do {
+                jsonData = try Data(contentsOf: successResponseUrl)
+            } catch let err {
+                XCTAssert(false, "Error getting contents of \(successResponseUrl) as Data: \(err)")
+                return
+            }
+            guard let uploadMetadata = self.uploadApi.update(metadata: uploadOnlyMetadata, with: jsonData) else {
+                XCTAssert(false, "Failed to update upload metadata with json from mock upload request response")
+                return
+            }
+            guard let uploadCompleteResponseUrl = Bundle.module.url(forResource: "upload-complete-response", withExtension: "json") else {
+                XCTAssert(false, "Unable to find upload complete response file 'upload-complete-response.json' for \(self.uploadApi.apiString) upload failure test retry attempt")
+                return
+            }
+            guard let notifyBridgeUrlString = self.uploadApi.notifyBridgeUrlString(for: uploadMetadata) else {
+                XCTAssert(false, "Unable to build notifyBridgeUrlString from uploadMetadata \(uploadMetadata)")
+                return
+            }
+            let notifyBridgeEndpoint = "/\(notifyBridgeUrlString)"
+            self.mockURLSession.set(json: [:], responseCode: 200, for: notifyBridgeEndpoint, httpMethod: "POST")
+            self.mockURLSession.set(downloadFileUrl: uploadCompleteResponseUrl, error: nil, for: notifyBridgeEndpoint, httpMethod: "POST")
+        }
+        
+        // -- start the upload attempt. This should get a 401 Session token expired response initially.
+        //    queue up the file for 'later' retry. In the test environment, the delay is set to 0 so
+        //    it should happen immediately.
+        tempCopyUrl = uploadApi.uploadInternal(fileId: testFileId, fileUrl: uploadFileUrl, contentType: mimeType, extras: uploadExtras)
+        XCTAssertNotNil(tempCopyUrl, "Temp file url is nil when testing upload request retrying after initial 401 from upload api \(self.uploadApi.apiString)")
+        
+        // NOTE: for a successful reauth, retry should happen automatically.
+        
+        // -- wait here until everything above has worked its way through.
+        XCTWaiter(delegate: self).wait(for: [expectRetried], timeout: 5.0)
+        NotificationCenter.default.removeObserver(observerRetried)
+        NotificationCenter.default.removeObserver(observerNotRetried)
+        NotificationCenter.default.removeObserver(observerRetriedButS3Failed)
     }
     
     func tryUploadFileToBridgeWhenS3Responds(status: Int) {

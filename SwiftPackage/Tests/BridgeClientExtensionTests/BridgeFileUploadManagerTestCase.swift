@@ -34,9 +34,9 @@ protocol BridgeFileUploadManagerTestCase : XCTWaiterDelegate {
     func uploadRequestFailed412Tests(userInfo: [AnyHashable : Any])
     func uploadSucceeded503RetriedTests(userInfo: [AnyHashable : Any])
     
-    func testUploadRequestFails()
-    func testUploadFileToBridgeWhenS3RespondsWithVariousFailuresThatShouldRetryLater()
-    func testUploadFileToBridgeHappyPath()
+//    func testUploadRequestFails()
+//    func testUploadFileToBridgeWhenS3RespondsWithVariousFailuresThatShouldRetryLater()
+//    func testUploadFileToBridgeHappyPath()
 }
 
 protocol BridgeFileUploadManagerTestCaseTyped: BridgeFileUploadManagerTestCase {
@@ -124,7 +124,7 @@ extension BridgeFileUploadManagerTestCaseTyped {
         }
     }
     
-    func tryUploadRequestFails() {
+    func tryUploadRequestFails412_Consent() {
         // test fails unrecoverably due to not consented (412)
         let responseJson = ["message": "try again later"]
         let endpoint = requestEndpoint
@@ -135,7 +135,6 @@ extension BridgeFileUploadManagerTestCaseTyped {
         }
         mockURLSession.set(json: responseJson, responseCode: 412, for: endpoint, httpMethod: "POST")
         mockURLSession.set(downloadFileUrl: downloadFileUrl, error: nil, for: endpoint, httpMethod: "POST")
-        let bfum = BridgeFileUploadManager.shared
         let expect412 = XCTestExpectation(description: "412: not consented, don't retry")
         var tempCopyUrl: URL?
         
@@ -171,6 +170,25 @@ extension BridgeFileUploadManagerTestCaseTyped {
         
         XCTWaiter(delegate: self).wait(for: [expect412], timeout: 5.0)
         NotificationCenter.default.removeObserver(observer412)
+    }
+    
+    func tryUploadRequestFailsInitial503_ServerDown() {
+        let responseJson = ["message": "try again later"]
+        let endpoint = requestEndpoint
+        let mimeType = "image/jpeg"
+        guard let downloadFileUrl = Bundle.module.url(forResource: "failed-upload-request-response", withExtension: "json") else {
+            XCTAssert(false, "Unable to find test response file 'failed-upload-request-response.json' for upload api \(self.uploadApi.apiString) upload failure tests")
+            return
+        }
+        let bfum = BridgeFileUploadManager.shared
+        var tempCopyUrl: URL?
+        
+        // NOTE: If I move this block any further up in the function, it causes a compiler crash. Not
+        // a syntax error, an actual crash of the compiler. ¯\_(ツ)_/¯ ~emm 2021-07-08
+        guard let uploadFileUrl = Bundle.module.url(forResource: "cat", withExtension: "jpg") else {
+            XCTAssert(false, "Unable to find test image 'cat.jpg' for upload api \(self.uploadApi.apiString) upload failure tests")
+            return
+        }
         
         // test initially fails due to server down (503) but succeeds on retry
         // -- set up initial 503 response, and add observer for eventual success
@@ -317,14 +335,7 @@ extension BridgeFileUploadManagerTestCaseTyped {
 
     }
     
-    func tryUploadFileToBridgeWhenS3RespondsWithVariousFailuresThatShouldRetryLater() {
-        testUploadFileToBridgeWhenS3Responds(status: 403)
-        testUploadFileToBridgeWhenS3Responds(status: 409)
-        testUploadFileToBridgeWhenS3Responds(status: 500)
-        testUploadFileToBridgeWhenS3Responds(status: 503)
-    }
-    
-    func testUploadFileToBridgeWhenS3Responds(status: Int) {
+    func tryUploadFileToBridgeWhenS3Responds(status: Int) {
         let s3url = "/not-a-real-pre-signed-S3-url"
         let mimeType = "image/jpeg"
         let endpoint = requestEndpoint

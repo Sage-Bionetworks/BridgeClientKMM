@@ -210,39 +210,22 @@ open class UploadAppManager : ObservableObject {
         BackgroundNetworkManager.shared.restore(backgroundSession: backgroundSession, completionHandler: completionHandler)
     }
     
-    /// Login with the given external ID and password.
-    ///
-    /// - Parameters:
-    ///   - externalId: The external ID to use as the signin credentials.
-    ///   - password: The password to use as the signin credentials.
-    ///   - completion: The completion handler that is called with the server response.
-    public final func loginWithExternalId(_ externalId: String, password: String, completion: @escaping ((BridgeClient.ResourceStatus) -> Void)) {
-        self.authManager.signInExternalId(externalId: externalId, password: password) { (userSessionInfo, status) in
-            self.finishSignIn(userSessionInfo: userSessionInfo, status: status, completion: completion)
+    /// Wrapper used to allow `BridgeClientAppManager` to call through to a single sign-in handler.
+    public final func signInOrReauth(email: String?, externalId: String?, password: String, completion: @escaping ((BridgeClient.ResourceStatus) -> Void)) {
+        if let email = email {
+            self.authManager.signInEmail(userName: email, password: password) { (userSessionInfo, status) in
+                self.finishSignIn(userSessionInfo: userSessionInfo, status: status, completion: completion)
+            }
         }
-    }
-    
-    /// Login with the given email and password.
-    ///
-    /// - Parameters:
-    ///   - email: The external ID to use as the signin credentials.
-    ///   - password: The password to use as the signin credentials.
-    ///   - completion: The completion handler that is called with the server response.
-    public final func loginWithEmail(_ email: String, password: String, completion: @escaping ((BridgeClient.ResourceStatus) -> Void)) {
-        self.authManager.signInEmail(userName: email, password: password) { (userSessionInfo, status) in
-            self.finishSignIn(userSessionInfo: userSessionInfo, status: status, completion: completion)
+        else if let externalId: String {
+            self.authManager.signInExternalId(externalId: externalId, password: password) { (userSessionInfo, status) in
+                self.finishSignIn(userSessionInfo: userSessionInfo, status: status, completion: completion)
+            }
         }
-    }
-    
-    /// Reauthenticate with the given password
-    ///
-    /// - Parameters:
-    ///   - password: The password to use as the signin credentials.
-    ///   - completion: The completion handler that is called with the server response.
-    @MainActor
-    public final func reauthWithCredentials(password: String, completion: @escaping ((BridgeClient.ResourceStatus) -> Void)) {
-        self.authManager.reauthWithCredentials(password: password) { (userSessionInfo, status) in
-            self.finishSignIn(userSessionInfo: userSessionInfo, status: status, completion: completion)
+        else {
+            self.authManager.reauthWithCredentials(password: password) { (userSessionInfo, status) in
+                self.finishSignIn(userSessionInfo: userSessionInfo, status: status, completion: completion)
+            }
         }
     }
     

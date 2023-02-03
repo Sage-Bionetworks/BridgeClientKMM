@@ -27,7 +27,7 @@ data class UploadFile (
         return UploadRequest(
             name = filePath.subSequence(filePath.lastIndexOf("/")+1, filePath.length).toString(),
             contentLength = fileLength,
-            contentMd5 = md5Hash,
+            contentMd5 = md5Hash.trim(), //Old md5 algorithm was sometimes including newline character at end, trim() is to fix old stuck uploads -nbrown 1/20/23
             contentType = contentType,
             encrypted = encrypted,
             metadata = metadata,

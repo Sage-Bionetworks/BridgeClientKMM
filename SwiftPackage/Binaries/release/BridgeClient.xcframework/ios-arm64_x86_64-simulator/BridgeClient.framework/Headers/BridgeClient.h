@@ -374,6 +374,11 @@ __attribute__((swift_name("NativeReportManager")))
 /**
  * @note This method converts all Kotlin exceptions to errors.
 */
+- (BOOL)updateInsertReports:(NSArray<BridgeClientNativeParticipantDataRecord *> *)reports identifier:(NSString *)identifier error:(NSError * _Nullable * _Nullable)error __attribute__((swift_name("updateInsert(reports:identifier:)")));
+
+/**
+ * @note This method converts all Kotlin exceptions to errors.
+*/
 - (BOOL)updateInsertReport:(BridgeClientNativeParticipantDataRecord *)report error:(NSError * _Nullable * _Nullable)error __attribute__((swift_name("updateInsert(report:)")));
 @end
 
@@ -3489,6 +3494,7 @@ __attribute__((swift_name("ParticipantReportRepo")))
 - (instancetype)initWithHttpClient:(BridgeClientKtor_client_coreHttpClient *)httpClient databaseHelper:(BridgeClientResourceDatabaseHelper *)databaseHelper backgroundScope:(id<BridgeClientKotlinx_coroutines_coreCoroutineScope>)backgroundScope __attribute__((swift_name("init(httpClient:databaseHelper:backgroundScope:)"))) __attribute__((objc_designated_initializer));
 - (instancetype)initWithDatabase:(BridgeClientResourceDatabaseHelper *)database backgroundScope:(id<BridgeClientKotlinx_coroutines_coreCoroutineScope>)backgroundScope __attribute__((swift_name("init(database:backgroundScope:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
 - (void)createUpdateReportReport:(BridgeClientReport *)report studyId:(NSString *)studyId identifier:(NSString *)identifier __attribute__((swift_name("createUpdateReport(report:studyId:identifier:)")));
+- (void)createUpdateReportsReports:(NSArray<BridgeClientReport *> *)reports studyId:(NSString *)studyId identifier:(NSString *)identifier __attribute__((swift_name("createUpdateReports(reports:studyId:identifier:)")));
 - (NSArray<BridgeClientReport *> *)getCachedReportsStudyId:(NSString *)studyId identifier:(NSString *)identifier __attribute__((swift_name("getCachedReports(studyId:identifier:)")));
 
 /**

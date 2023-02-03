@@ -58,6 +58,18 @@ class NativeReportManager (
             throw Throwable(err.message)
         }
     }
+
+    @Throws(Throwable::class)
+    fun updateInsert(reports: List<NativeParticipantDataRecord>, identifier: String) {
+        try {
+            val uploadReports = reports.map {
+                Report(it.data.jsonObject, it.dateTime.toKotlinInstant(), studyId)
+            }
+            reportRepo.createUpdateReports(uploadReports, studyId, identifier)
+        } catch (err: Exception) {
+            throw Throwable(err.message)
+        }
+    }
 }
 
 data class NativeParticipantDataRecord(

@@ -175,6 +175,28 @@ class AuthenticationRepository(
         return signIn(signIn)
     }
 
+    suspend fun reauthWithCredentials(password: String) : ResourceResult<UserSessionInfo> {
+        val sessionInfo = session() ?: return ResourceResult.Failed(ResourceStatus.FAILED)
+        val signIn = SignIn(
+            appId = bridgeConfig.appId,
+            email = sessionInfo.email,
+            externalId = sessionInfo.externalId,
+            password = password
+        )
+        return try {
+            val userSession = authenticationApi.signIn(signIn)
+            updateCachedSession(null, userSession)
+            ResourceResult.Success(userSession, ResourceStatus.SUCCESS)
+        } catch (err: Throwable) {
+            Logger.e("Error requesting reAuth with stored password", err)
+            if (err is ResponseException && err.response.status == HttpStatusCode.NotFound) {
+                ResourceResult.Failed(ResourceStatus.FAILED)
+            } else {
+                ResourceResult.Failed(ResourceStatus.RETRY)
+            }
+        }
+    }
+
     private suspend fun signIn(signIn: SignIn) : ResourceResult<UserSessionInfo> {
         try {
             val userSession = authenticationApi.signIn(signIn)

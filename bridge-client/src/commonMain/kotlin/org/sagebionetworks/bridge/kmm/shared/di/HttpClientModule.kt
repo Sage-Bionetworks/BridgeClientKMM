@@ -16,6 +16,7 @@ import org.sagebionetworks.bridge.kmm.shared.apis.HttpUtil
 import org.sagebionetworks.bridge.kmm.shared.apis.RefreshTokenFeature
 import org.sagebionetworks.bridge.kmm.shared.apis.SessionTokenFeature
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
+import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
 import org.sagebionetworks.bridge.kmm.shared.repo.AuthenticationRepository
 
 fun httpClientModule(enableNetworkLogs: Boolean) = module {
@@ -73,7 +74,7 @@ private fun createBridgeHttpClient(
         sessionTokenProvider = object : SessionTokenFeature.SessionTokenProvider {
 
             override fun getSessionToken(): String? {
-                return authenticationRepository.session()?.sessionToken
+                return authenticationRepository.session()?.sessionToken?.ifEmpty { null }
             }
         }
     }
@@ -83,11 +84,10 @@ private fun createBridgeHttpClient(
         }
         isCredentialsActual = fun(request: HttpRequest): Boolean {
             authenticationRepository.session()?.sessionToken?.let {
-                return it.equals(request.headers.get(sessionTokenHeaderKey))
+                return it.isNotEmpty() && it.equals(request.headers.get(sessionTokenHeaderKey))
             }
             return true
         }
-
     }
 }
 

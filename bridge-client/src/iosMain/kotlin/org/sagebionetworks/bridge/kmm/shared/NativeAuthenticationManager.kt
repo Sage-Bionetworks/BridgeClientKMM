@@ -121,6 +121,23 @@ open class NativeAuthenticationManager(
         }
     }
 
+    /**
+     * Attempt to reauthorize the participant using their stored password.
+     * @return
+     * - `success` if sign in succeeded
+     * - `failed` if the username/password is no longer valid
+     * - `retry` if sign in failed, but should be retried later (poor network connection)
+     */
+    fun reauthWithCredentials(password: String, callBack: (UserSessionInfo?, ResourceStatus) -> Unit) {
+        scope.launch {
+            when(val userSessionResult = authManager.reauthWithCredentials(password)) {
+                is ResourceResult.Success -> callBack(userSessionResult.data, userSessionResult.status)
+                is ResourceResult.Failed -> callBack(null, userSessionResult.status)
+                else -> {}  // do nothing if in progress
+            }
+        }
+    }
+
     fun signUpEmail(email: String, password: String,
                     testUser: Boolean,
                     dataGroups: List<String>?,

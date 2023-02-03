@@ -115,7 +115,12 @@ internal class UploadManager(
     }
 
     private suspend fun loadRemoteUploadSession(uploadRequest: UploadRequest): String {
-        return Json.encodeToString(uploadsApi.requestUploadSession(uploadRequest))
+        try {
+            return Json.encodeToString(uploadsApi.requestUploadSession(uploadRequest))
+        } catch (throwable: Throwable) {
+            Logger.e("Error trying to get upload session", throwable)
+            throw throwable
+        }
     }
 
     private suspend fun uploadToS3(uploadFile: UploadFile, uploadSession: UploadSession) {

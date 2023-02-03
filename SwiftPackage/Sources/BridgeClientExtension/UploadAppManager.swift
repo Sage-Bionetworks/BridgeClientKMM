@@ -102,21 +102,27 @@ open class UploadAppManager : ObservableObject {
         }
         
         self.session = session
-        self.isNewLogin = updateType == .login || updateType == .signout
+        self.isNewLogin = (updateType == .login || updateType == .signout)
         self.uploadProcessor.isTestUser = session?.dataGroups?.contains("test_user") ?? false
         if updateType == .login {
-            // If this is a login, then update the user session state
+            // If this is a login, then update the stored user session id
             self.userSessionId = session?.id
         }
+        else if updateType == .signout {
+            // If this is a signout, then nil out the stored user session id
+            self.userSessionId = nil
+        }
         self.userSessionInfo.userSessionInfo = session
+        
+        // If this app has custom handling of a failure to reauthenticate, then exit early.
         if updateType == .observed || updateType == .launch,
-            userSessionInfo.loginState == .reauthFailed {
-            handleReauthFailed()
+           userSessionInfo.loginState == .reauthFailed,
+           handleReauthFailed() {
+           return
         }
-        else {
-            didUpdateUserSessionInfo()
-            updateAppState()
-        }
+
+        didUpdateUserSessionInfo()
+        updateAppState()
     }
     
     private var appConfigManager: NativeAppConfigManager!
@@ -228,10 +234,24 @@ open class UploadAppManager : ObservableObject {
         }
     }
     
+    /// Reauthenticate with the given password
+    ///
+    /// - Parameters:
+    ///   - password: The password to use as the signin credentials.
+    ///   - completion: The completion handler that is called with the server response.
+    @MainActor
+    public final func reauthWithCredentials(password: String, completion: @escaping ((BridgeClient.ResourceStatus) -> Void)) {
+        self.authManager.reauthWithCredentials(password: password) { (userSessionInfo, status) in
+            self.finishSignIn(userSessionInfo: userSessionInfo, status: status, completion: completion)
+        }
+    }
+    
     final func finishSignIn(userSessionInfo: UserSessionInfo?, status: BridgeClient.ResourceStatus, completion: @escaping ((BridgeClient.ResourceStatus) -> Void)) {
-        guard status == ResourceStatus.success || status == ResourceStatus.failed else { return }
+        guard status != .pending else { return }
         Task {
-            await self.handleUserLogin(userSessionInfo)
+            if status == .success || status == .failed {
+                await self.handleUserLogin(userSessionInfo)
+            }
             completion(status)
         }
     }
@@ -240,9 +260,11 @@ open class UploadAppManager : ObservableObject {
     /// and handling however is appropriate for their app.
     ///
     /// @Protected - Only this class should call this method and only subclasses should implement.
+    /// - Returns: `true` if *this* app will handle reauth failures, otherwise `false` to use default handling (show login)
     @MainActor
-    open func handleReauthFailed() {
+    open func handleReauthFailed() -> Bool {
         // Default is to do nothing. App must decide how to handle this.
+        false
     }
     
     /// Sign out the current user.

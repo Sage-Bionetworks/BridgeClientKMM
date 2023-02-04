@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/Sage-Bionetworks/AssessmentModelKMM.git",
         "state": {
           "branch": null,
-          "revision": "1e538110e87f2fec3f6d3a063491401ac8511ba8",
-          "version": "0.9.0"
+          "revision": "3e9991bdbe297f8be13ce95d51dd83d099ad0699",
+          "version": "0.11.0"
         }
       },
       {
@@ -51,8 +51,8 @@
         "repositoryURL": "https://github.com/Sage-Bionetworks/SharedMobileUI-AppleOS.git",
         "state": {
           "branch": null,
-          "revision": "a3c4ff73d2b222d5a246f617d5c2b062eb3abfe4",
-          "version": "0.17.0"
+          "revision": "02192711c7f739df823bf187bd1b4cad9fe921c1",
+          "version": "0.19.0"
         }
       },
       {

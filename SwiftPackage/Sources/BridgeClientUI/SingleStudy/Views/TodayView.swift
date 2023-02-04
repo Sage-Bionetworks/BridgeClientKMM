@@ -54,7 +54,7 @@ public struct TodayWrapperView: View {
                                     Image(decorative: "available_complete", bundle: .module)
                                     Text("Nice, you’re all up to date!", bundle: .module)
                                         // TODO: syoung 09/23/2021 Cut the image so that I can make this text dynamic.
-                                        .font(.playfairDisplayFont(fixedSize: 18))
+                                        .font(.latoFont(fixedSize: 18))
                                 }
                                 .padding(.vertical, 24)
                             }

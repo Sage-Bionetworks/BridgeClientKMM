@@ -69,6 +69,7 @@ open class AbstractSingleStudyAppManager : BridgeClientAppManager {
         observedStudyId = nil
         try? notificationManager?.onCleared()
         notificationManager = nil
+        super.willSignOut()
     }
     
     private var observedStudyId: String?

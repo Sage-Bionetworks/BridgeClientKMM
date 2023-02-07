@@ -63,7 +63,7 @@ open class NativeAuthenticationManager(
         return try {
             UserSessionState(authManager.session())
         } catch (err: Exception) {
-            Logger.e("Failed tp retrieve session", err)
+            Logger.e("Failed to retrieve session", err)
             UserSessionState(error = err.message ?: "Unknown error")
         }
     }

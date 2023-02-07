@@ -9,17 +9,34 @@ import JsonModel
 
 public let kPreviewStudyId = "xcode_preview"
 public let kStudyIdKey = "studyId"
-fileprivate let kLoginStateKey = "hasLoggedIn"
+fileprivate let kUserSessionIdKey = "userSessionId"
 
 open class UploadAppManager : ObservableObject {
-
-    /// Is this manager used for previewing the app? (Unit tests, SwiftUI Preview, etc.)
-    public let isPreview: Bool
     
     /// The configuration bits that need to be set on the 'BridgeClient.xcframework' in order to connect to
     /// Bridge services.
     public let platformConfig: IOSPlatformConfig
     
+    /// Is this manager used for previewing the app? (Unit tests, SwiftUI Preview, etc.)
+    public let isPreview: Bool
+    
+    /// The UserDefaults that should be used for this app.
+    public var sharedUserDefaults: UserDefaults
+    
+    /// Has the participant previously logged in successfully (either now or previously)?
+    public var hasLoggedIn: Bool {
+        userSessionId != nil
+    }
+    
+    /// Is this a new login?
+    public var isNewLogin: Bool = true
+    
+    /// Store the last user session id used for login.
+    var userSessionId: String? {
+        get { sharedUserDefaults.string(forKey: kUserSessionIdKey) }
+        set { sharedUserDefaults.set(newValue, forKey: kUserSessionIdKey) }
+    }
+
     /// The path to the pem file that is used to encrypt data being uploaded to Bridge.
     ///
     /// - Note: Data should be encrypted so that it is not stored insecurely on the phone (while waiting
@@ -33,8 +50,6 @@ open class UploadAppManager : ObservableObject {
     
     /// Is the app currently uploading results or user files? This status is maintained and updated by BridgeFileUploadManager.
     @Published public var isUploading: Bool = false
-    
-    public var sharedUserDefaults: UserDefaults
     
     /// A threadsafe observer for the `BridgeClient.UserSessionInfo` for the current user.
     public let appConfig: AppConfigObserver = .init()
@@ -56,34 +71,58 @@ open class UploadAppManager : ObservableObject {
     /// A threadsafe observer for the `BridgeClient.UserSessionInfo` for the current user.
     public let userSessionInfo: UserSessionInfoObserver = .init()
     
-    // Do not expose publicly. This class is not threadsafe.
-    var session: UserSessionInfo? {
-        didSet {
-            userSessionInfo.userSessionInfo = session
-            uploadProcessor.isTestUser = userSessionInfo.dataGroups?.contains("test_user") ?? false
-            didUpdateUserSessionInfo()
-            updateAppState()
-        }
+    var sessionToken: String? {
+        authManager.session().flatMap { $0.sessionToken.isEmpty ? nil : $0.sessionToken }
     }
+    
+    // Do not expose publicly. This class is not threadsafe.
+    private var session: UserSessionInfo?
     
     /// Called when the `BridgeClient.UserSessionInfo` is updated.
     open func didUpdateUserSessionInfo() {
         // Do nothing. Allows subclass override of `session.didSet`.
     }
     
-    @MainActor
-    public final func setUserSessionInfo(_ session: UserSessionInfo?) {
-        self.session = session
-        if session?.authenticated ?? false {
-            self.hasLoggedIn = true
-        }
+    enum UpdateUserSessionType : Int {
+        case launch, login, signout, observed
     }
     
-    /// Has the participant previously logged in successfully?
-    lazy public private(set) var hasLoggedIn: Bool = sharedUserDefaults.bool(forKey: kLoginStateKey) {
-        didSet {
-            sharedUserDefaults.set(hasLoggedIn, forKey: kLoginStateKey)
+    /// Call to set up the user session before callback from the observer fires.
+    @MainActor
+    public final func handleUserLogin(_ session: UserSessionInfo?) {
+        updateUserSessionStatus(session, updateType: .login)
+    }
+    
+    @MainActor
+    final func updateUserSessionStatus(_ session: UserSessionInfo?, updateType: UpdateUserSessionType) {
+        if updateType == .observed, let oldSession = self.session, oldSession.isEqual(session) {
+            // If the old session and the new session haven't changed and the message was sent by the observer,
+            // then just return without updating state.
+            return
         }
+        
+        self.session = session
+        self.isNewLogin = (updateType == .login || updateType == .signout)
+        self.uploadProcessor.isTestUser = session?.dataGroups?.contains("test_user") ?? false
+        if updateType == .login {
+            // If this is a login, then update the stored user session id
+            self.userSessionId = session?.id
+        }
+        else if updateType == .signout {
+            // If this is a signout, then nil out the stored user session id
+            self.userSessionId = nil
+        }
+        self.userSessionInfo.userSessionInfo = session
+        
+        // If this app has custom handling of a failure to reauthenticate, then exit early.
+        if updateType == .observed || updateType == .launch,
+           userSessionInfo.loginState == .reauthFailed,
+           handleReauthFailed() {
+           return
+        }
+
+        didUpdateUserSessionInfo()
+        updateAppState()
     }
     
     private var appConfigManager: NativeAppConfigManager!
@@ -110,17 +149,21 @@ open class UploadAppManager : ObservableObject {
     ///   - pemPath: The path to the location of the pem file to use when encrypting uploads.
     public init(platformConfig: IOSPlatformConfig, pemPath: String? = nil) {
         let pemPath = pemPath ?? Bundle.main.path(forResource: platformConfig.appId, ofType: "pem")
-        uploadProcessor = .init(pemPath: pemPath)
+        self.uploadProcessor = .init(pemPath: pemPath)
+        self.title = platformConfig.localizedAppName
         self.platformConfig = platformConfig
-        self.title = self.platformConfig.localizedAppName
+        
         self.isPreview = (platformConfig.appId == kPreviewStudyId)
         if !self.isPreview {
+            self.sharedUserDefaults = platformConfig.appGroupIdentifier.flatMap { .init(suiteName: $0) } ?? .standard
             IOSBridgeConfig().initialize(platformConfig: self.platformConfig)
-            self.sharedUserDefaults = self.platformConfig.appGroupIdentifier.flatMap { .init(suiteName: $0) } ?? .standard
         }
         else {
             self.sharedUserDefaults = UserDefaults.standard
         }
+
+        // Is this a new login (in which case we need to get the adherence records)
+        self.isNewLogin = (self.userSessionId == nil)
 
         // Set up the background network manager singleton and make us its app manager
         let bnm = BackgroundNetworkManager.shared
@@ -132,6 +175,7 @@ open class UploadAppManager : ObservableObject {
     }
     
     /// **Required:** This method should be called by the app delegate when the app is launching in either `willLaunch` or `didLaunch`.
+    @MainActor
     public func setup() {
 
         // Initialize koin
@@ -142,40 +186,92 @@ open class UploadAppManager : ObservableObject {
         #endif
         KoinKt.doInitKoin(enableNetworkLogs: enableNetworkLogs)
         
-        // Hook up user session info
-        self.authManager = NativeAuthenticationManager() { userSessionInfo in
-            guard userSessionInfo == nil || !userSessionInfo!.isEqual(userSessionInfo) else { return }
-            self.session = userSessionInfo
-        }
-        self.session = self.authManager.session()
-        self.authManager.observeUserSessionInfo()
-        
         // Hook up app config
         self.appConfigManager = NativeAppConfigManager() { appConfig, _ in
             self.config = appConfig ?? self.config
         }
         self.appConfigManager.observeAppConfig()
         
-        // Update the app state
-        updateAppState()
+        // Hook up user session info
+        self.authManager = NativeAuthenticationManager() { userSessionInfo in
+            self.updateUserSessionStatus(userSessionInfo, updateType: .observed)
+        }
+        let userState = self.authManager.sessionState()
+        self.userSessionInfo.loginError = userState.error
+        self.updateUserSessionStatus(userState.sessionInfo, updateType: .launch)
+        self.authManager.observeUserSessionInfo()
     }
     
     /// **Required:** This method should be called by the app delegate in the implementation of
     /// `application(:, handleEventsForBackgroundURLSession:, completionHandler:)` and is used to
     /// restore a background upload session.
+    @MainActor
     public final func handleEvents(for backgroundSession: String, completionHandler: @escaping () -> Void) {
         BackgroundNetworkManager.shared.restore(backgroundSession: backgroundSession, completionHandler: completionHandler)
     }
     
-    /// Sign out the current user.
-    @MainActor
-    open func signOut() {
-        authManager.signOut()
-        self.session = nil
-        self.hasLoggedIn = false
+    /// Wrapper used to allow `BridgeClientAppManager` to call through to a single sign-in handler.
+    public final func signInOrReauth(email: String?, externalId: String?, password: String, completion: @escaping ((BridgeClient.ResourceStatus) -> Void)) {
+        if let email = email {
+            self.authManager.signInEmail(userName: email, password: password) { (userSessionInfo, status) in
+                self.finishSignIn(userSessionInfo: userSessionInfo, status: status, completion: completion)
+            }
+        }
+        else if let externalId: String {
+            self.authManager.signInExternalId(externalId: externalId, password: password) { (userSessionInfo, status) in
+                self.finishSignIn(userSessionInfo: userSessionInfo, status: status, completion: completion)
+            }
+        }
+        else {
+            self.authManager.reauthWithCredentials(password: password) { (userSessionInfo, status) in
+                self.finishSignIn(userSessionInfo: userSessionInfo, status: status, completion: completion)
+            }
+        }
     }
     
-    // @Protected - Only this class should call this method and only subclasses should implement.
+    final func finishSignIn(userSessionInfo: UserSessionInfo?, status: BridgeClient.ResourceStatus, completion: @escaping ((BridgeClient.ResourceStatus) -> Void)) {
+        guard status != .pending else { return }
+        Task {
+            if status == .success || status == .failed {
+                await self.handleUserLogin(userSessionInfo)
+            }
+            completion(status)
+        }
+    }
+    
+    /// If the app gets into a state where reauth fails, default behavior is to do nothing. App developer is responsible for overriding this
+    /// and handling however is appropriate for their app.
+    ///
+    /// @Protected - Only this class should call this method and only subclasses should implement.
+    /// - Returns: `true` if *this* app will handle reauth failures, otherwise `false` to use default handling (show login)
+    @MainActor
+    open func handleReauthFailed() -> Bool {
+        // Default is to do nothing. App must decide how to handle this.
+        false
+    }
+    
+    /// Sign out the current user.
+    @MainActor
+    public final func signOut() {
+        willSignOut()
+        updateUserSessionStatus(nil, updateType: .signout)
+        authManager.signOut()
+        didSignOut()
+    }
+    
+    /// The current user will sign out.
+    /// @Protected - Only this class should call this method and only subclasses should implement.
+    @MainActor
+    open func willSignOut() {
+    }
+    
+    /// The current user did sign out.
+    /// @Protected - Only this class should call this method and only subclasses should implement.
+    @MainActor
+    open func didSignOut() {
+    }
+    
+    /// @Protected - Only this class should call this method and only subclasses should implement.
     open func updateAppState() {
         // Do nothing. Allows subclass override setup and app state changes.
     }
@@ -198,6 +294,31 @@ open class UploadAppManager : ObservableObject {
             self.isUploading = true
         }
         uploadProcessor.encryptAndUpload(archives)
+    }
+    
+    func notifyUIOfBridgeError(_ value: Int32, description: String) {
+        DispatchQueue.main.async {
+            self.authManager.notifyUIOfBridgeError(statusCode: .init(value: value, description: description))
+        }
+    }
+    
+    func reauthenticate(_ completion: @escaping (Bool) -> Void) {
+        DispatchQueue.main.async {
+            guard let authManager = self.authManager else {
+                debugPrint("AuthManager has not been initialized. Cannot reauthenticate.")
+                completion(false)
+                return
+            }
+            
+            authManager.reauth { error in
+                if let error = error {
+                    // Assume BridgeClientKMM will have handled any 410 or 412 error appropriately.
+                    self.userSessionInfo.loginError = "Reauth Failed: \(error.message ?? "Unknown Error")"
+                    debugPrint("Session token auto-refresh failed: \(String(describing: error))")
+                }
+                completion(error == nil)
+            }
+        }
     }
 }
 
@@ -268,18 +389,23 @@ final class ArchiveUploadProcessor {
     
     @MainActor
     private func _upload(archive: DataArchive, encrypted: Bool) async {
-        let exporterV3Metadata: JsonElement? = (archive as? AbstractResultArchive)?.schedule.map { schedule in
-            .object([
-                "instanceGuid": schedule.instanceGuid,
-                "eventTimestamp": schedule.session.eventTimestamp
-            ])
-        }
-        let extras = StudyDataUploadExtras(encrypted: encrypted, metadata: exporterV3Metadata, zipped: true)
         let id = archive.identifier
         guard let url = archive.encryptedURL else {
             debugPrint("WARNING! Cannot upload \(id)")
             return
         }
+        _uploadEncrypted(id: archive.identifier, url: url, schedule: archive.schedule)
+    }
+    
+    @MainActor
+    private func _uploadEncrypted(id: String, url: URL, schedule: AssessmentScheduleInfo?) {
+        let exporterV3Metadata: JsonElement? = schedule.map { schedule in
+            .object([
+                "instanceGuid": schedule.instanceGuid,
+                "eventTimestamp": schedule.session.eventTimestamp
+            ])
+        }
+        let extras = StudyDataUploadExtras(encrypted: true, metadata: exporterV3Metadata, zipped: true)
         StudyDataUploadAPI.shared.upload(fileId: id, fileUrl: url, contentType: "application/zip", extras: extras)
         do {
             try FileManager.default.removeItem(at: url)

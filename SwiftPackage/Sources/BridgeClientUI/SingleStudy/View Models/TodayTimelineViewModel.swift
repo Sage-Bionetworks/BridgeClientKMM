@@ -8,8 +8,6 @@ import BridgeClientExtension
 import JsonModel
 import ResultModel
 
-fileprivate let kUserSessionIdKey = "userSessionId"
-
 /// This is a view model that can be used to back the data presented to the user for a schedule timeline.
 ///
 /// The default view implementation is the ``TodayView``. That design supports *either* permanently
@@ -115,18 +113,14 @@ open class AbstractTodayTimelineViewModel : NSObject, ObservableObject, Schedule
         // Exit early if nothing has changed.
         guard self.bridgeManager == nil ||
               self.studyId != bridgeManager.studyId ||
-              self.userSessionId != bridgeManager.userSessionInfo.identifier
+              bridgeManager.isNewLogin
         else {
             return
         }
         
-        // Store whether or not this is a new login
-        let isNewLogin = self.userSessionId != bridgeManager.userSessionInfo.identifier
-        
         // Set new values
         self.bridgeManager = bridgeManager
         self.studyId = bridgeManager.studyId ?? kPreviewStudyId
-        self.userSessionId = bridgeManager.userSessionInfo.identifier
         
         // Update views
         if !bridgeManager.isPreview {
@@ -136,16 +130,11 @@ open class AbstractTodayTimelineViewModel : NSObject, ObservableObject, Schedule
                     self.schedules = timelineSlice.scheduledSessionWindows
                 }
             }
-            self.timelineManager.observeTodaySchedule(isNewLogin: isNewLogin)
+            self.timelineManager.observeTodaySchedule(isNewLogin: bridgeManager.isNewLogin)
         }
         else {
             self.schedules = previewSchedules
         }
-    }
-    
-    var userSessionId: String? {
-        get { bridgeManager?.sharedUserDefaults.string(forKey: kUserSessionIdKey) }
-        set { bridgeManager?.sharedUserDefaults.set(newValue, forKey: kUserSessionIdKey) }
     }
     
     private func updateSessionState() {

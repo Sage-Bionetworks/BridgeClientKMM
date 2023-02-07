@@ -7,6 +7,10 @@ import Foundation
 import BridgeClient
 import JsonModel
 
+public enum UserSessionLoginState : Int {
+    case launching, signedOut, authenticated, reauthFailed
+}
+
 /// This is a threadsafe wrapper for the Kotlin class ``BridgeClient.UserSessionInfo``.
 public final class UserSessionInfoObserver : ObservableObject {
     
@@ -22,6 +26,12 @@ public final class UserSessionInfoObserver : ObservableObject {
     private var _userSessionInfo : UserSessionInfo?
     
     public init() {}
+    
+    /// Whether or not this observer has been loaded.
+    @Published public var loginState: UserSessionLoginState = .launching
+    
+    /// Error returned by BridgeClient when failed to get the user session info.
+    @Published public var loginError: String?
     
     /// Whether or not the session is authenticated.
     @Published public var isAuthenticated: Bool = false
@@ -100,7 +110,8 @@ public final class UserSessionInfoObserver : ObservableObject {
     @Published public var notifyByEmail: Bool?
     
     private func copyFrom(_ newValue: UserSessionInfo?) {
-        self.isAuthenticated = newValue?.authenticated ?? false
+        self.loginState = newValue.map { $0.sessionToken.isEmpty ? .reauthFailed : .authenticated } ?? .signedOut
+        self.isAuthenticated = newValue?.authenticated ?? (newValue?.reauthToken != nil)
         self.firstName = newValue?.firstName
         self.lastName = newValue?.lastName
         self.createdOn = newValue?.createdOn.flatMap { ISO8601TimestampFormatter.date(from: $0) }

@@ -6,6 +6,7 @@
 import Foundation
 import JsonModel
 import ResultModel
+import BridgeClient
 
 open class AssessmentArchiveBuilder : ResultArchiveBuilder {
 
@@ -35,7 +36,7 @@ open class AssessmentArchiveBuilder : ResultArchiveBuilder {
                  dataGroups: [String]? = nil,
                  v2Format: BridgeUploaderInfoV2.FormatVersion = .v2_generic) {
         self.assessmentResult = assessmentResult
-        self.adherenceData = adherenceData
+        self.adherenceData = adherenceData?.appendingClientInfo()
         self.outputDirectory = outputDirectory
         guard let archive = StudyDataUploadArchive(identifier: assessmentResult.identifier,
                                                    schemaIdentifier: schemaIdentifier ?? assessmentResult.schemaIdentifier,
@@ -145,5 +146,30 @@ open class AssessmentArchiveBuilder : ResultArchiveBuilder {
                                 identifier: result.identifier,
                                 jsonSchema: result.jsonSchema)
         return (data, fileInfo)
+    }
+}
+
+fileprivate extension Dictionary where Key == String, Value == JsonSerializable {
+    
+    mutating func setIfNil(_ key: Key, _ value: Value) {
+        guard self[key] == nil else { return }
+        self[key] = value
+    }
+}
+
+fileprivate extension JsonSerializable {
+    
+    func appendingClientInfo() -> JsonSerializable {
+        guard let json = self as? [String : JsonSerializable]
+        else {
+            return self
+        }
+        let platform = IOSBridgeConfig()
+        var dictionary = json
+        dictionary.setIfNil("osName", platform.osName)
+        dictionary.setIfNil("deviceName", platform.deviceName)
+        dictionary.setIfNil("osVersion", platform.osVersion)
+        dictionary.setIfNil("appVersion", platform.appVersion)
+        return dictionary
     }
 }

@@ -87,6 +87,7 @@ open class BridgeClientAppManager : UploadAppManager {
     lazy public var localNotificationManager : LocalNotificationManager = LocalNotificationManager()
     
     /// **Required:** This method should be called by the app delegate when the app is launching in either `willLaunch` or `didLaunch`.
+    @MainActor
     open func appWillFinishLaunching(_ launchOptions: [UIApplication.LaunchOptionsKey : Any]? ) {
         setup()
     }
@@ -98,13 +99,7 @@ open class BridgeClientAppManager : UploadAppManager {
     ///   - password: The password to use as the signin credentials.
     ///   - completion: The completion handler that is called with the server response.
     public final func loginWithExternalId(_ externalId: String, password: String, completion: @escaping ((BridgeClient.ResourceStatus) -> Void)) {
-        self.authManager.signInExternalId(externalId: externalId, password: password) { (userSessionInfo, status) in
-            guard status == ResourceStatus.success || status == ResourceStatus.failed else { return }
-            Task {
-                await self.setUserSessionInfo(userSessionInfo)
-                completion(status)
-            }
-        }
+        self.signInOrReauth(email: nil, externalId: externalId, password: password, completion: completion)
     }
     
     /// Login with the given email and password.
@@ -114,20 +109,23 @@ open class BridgeClientAppManager : UploadAppManager {
     ///   - password: The password to use as the signin credentials.
     ///   - completion: The completion handler that is called with the server response.
     public final func loginWithEmail(_ email: String, password: String, completion: @escaping ((BridgeClient.ResourceStatus) -> Void)) {
-        self.authManager.signInEmail(userName: email, password: password) { (userSessionInfo, status) in
-            guard status == ResourceStatus.success || status == ResourceStatus.failed else { return }
-            Task {
-                await self.setUserSessionInfo(userSessionInfo)
-                completion(status)
-            }
-        }
+        self.signInOrReauth(email: email, externalId: nil, password: password, completion: completion)
     }
     
-    /// Sign out the current user.
-    override open func signOut() {
+    /// Reauthenticate with the given password
+    ///
+    /// - Parameters:
+    ///   - password: The password to use as the signin credentials.
+    ///   - completion: The completion handler that is called with the server response.
+    public final func reauthWithCredentials(password: String, completion: @escaping ((BridgeClient.ResourceStatus) -> Void)) {
+        self.signInOrReauth(email: nil, externalId: nil, password: password, completion: completion)
+    }
+    
+    // @Protected - Only this class should call this method and only subclasses should implement.
+    override open func willSignOut() {
         localNotificationManager.clearAll()
-        super.signOut()
         isOnboardingFinished = false
+        super.willSignOut()
     }
     
     // @Protected - Only this class should call this method and only subclasses should implement.
@@ -136,12 +134,11 @@ open class BridgeClientAppManager : UploadAppManager {
     }
     
     public final func fetchAppState() -> AppState {
-        if appConfig.isLaunching {
+        if appConfig.isLaunching || userSessionInfo.loginState == .launching {
             return .launching
         }
         else if !userSessionInfo.isAuthenticated {
-            // check if the userSessionInfo is not finished loading
-            return hasLoggedIn ? .launching : .login
+            return .login
         }
         else if !isOnboardingFinished {
             return .onboarding

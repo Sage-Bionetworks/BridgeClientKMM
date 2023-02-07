@@ -175,6 +175,28 @@ class AuthenticationRepository(
         return signIn(signIn)
     }
 
+    suspend fun reauthWithCredentials(password: String) : ResourceResult<UserSessionInfo> {
+        val sessionInfo = session() ?: return ResourceResult.Failed(ResourceStatus.FAILED)
+        val signIn = SignIn(
+            appId = bridgeConfig.appId,
+            email = sessionInfo.email,
+            externalId = sessionInfo.externalId,
+            password = password
+        )
+        return try {
+            val userSession = authenticationApi.signIn(signIn)
+            updateCachedSession(null, userSession)
+            ResourceResult.Success(userSession, ResourceStatus.SUCCESS)
+        } catch (err: Throwable) {
+            Logger.e("Error requesting reAuth with stored password", err)
+            if (err is ResponseException && err.response.status == HttpStatusCode.NotFound) {
+                ResourceResult.Failed(ResourceStatus.FAILED)
+            } else {
+                ResourceResult.Failed(ResourceStatus.RETRY)
+            }
+        }
+    }
+
     private suspend fun signIn(signIn: SignIn) : ResourceResult<UserSessionInfo> {
         try {
             val userSession = authenticationApi.signIn(signIn)
@@ -214,34 +236,44 @@ class AuthenticationRepository(
         return false
     }
 
-    suspend fun reAuth() : Boolean {
+    suspend fun reAuth() : Boolean = reAuthWithError().first
+
+    suspend fun reAuthWithError() : Pair<Boolean, Error?> {
         val sessionInfo = session()
-        return sessionInfo?.reauthToken?.let {
+        return sessionInfo?.reauthToken?.let { reauthToken ->
             val signIn = SignIn(
                 appId = bridgeConfig.appId,
                 email = sessionInfo.email,
                 externalId = sessionInfo.externalId,
-                reauthToken = it
+                reauthToken = reauthToken
             )
             var success = false
+            var responseError: Error? = null
             try {
                 val userSession = authenticationApi.reauthenticate(signIn)
                 updateCachedSession(sessionInfo, userSession)
                 success = true
             } catch (err: Throwable) {
+                responseError = Error(err.message ?: "Error requesting reAuth: $err")
                 Logger.e("Error requesting reAuth", err)
                 if (err is ResponseException && (err.response.status == HttpStatusCode.Unauthorized ||
                             err.response.status == HttpStatusCode.Forbidden ||
                             err.response.status == HttpStatusCode.NotFound ||
                             err.response.status == HttpStatusCode.Locked)) {
                     // Should clear session for auth related errors: 401, 403, 404, 423
-                    database.removeResource(USER_SESSION_ID, ResourceType.USER_SESSION_INFO, APP_WIDE_STUDY_ID)
+                    Logger.i("User reauth failed. Removing user session token.")
+                    val newSession = sessionInfo.copy(
+                        reauthToken = null,
+                        authenticated = false,
+                        sessionToken = ""
+                    )
+                    updateCachedSession(null, newSession)
                 } else {
                     // Some sort of network error leave the session alone so we can try again
                 }
             }
-            success
-        } ?: false
+            Pair(success, responseError)
+        } ?: Pair(false, Error("reAuth token is null"))
     }
 
     fun notifyUIOfBridgeError(statusCode: HttpStatusCode) {
@@ -268,6 +300,11 @@ class AuthenticationRepository(
             //New session doesn't have re-auth token, so keep old one
             toCacheSession = newUserSession.copy(reauthToken = oldUserSessionInfo.reauthToken)
         }
+        // TODO: syoung 02/01/2022 Test this before uncommenting.
+//        val previousSession = oldSessionResource?.loadResource<UserSessionInfo>()
+//        if (previousSession != null && previousSession.id != newUserSession.id) {
+//            database.clearDatabase()
+//        }
         val resource = Resource(
             identifier = USER_SESSION_ID,
             secondaryId = ResourceDatabaseHelper.DEFAULT_SECONDARY_ID,
@@ -286,6 +323,7 @@ class AuthenticationRepository(
         }
     }
 
-
 }
+
+
 

@@ -1,5 +1,6 @@
 package org.sagebionetworks.bridge.kmm.shared
 
+import co.touchlab.kermit.Logger
 import io.ktor.http.*
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
@@ -36,10 +37,11 @@ open class NativeAuthenticationManager(
 
     open fun reauth(completion: (Error?) -> Unit) {
         scope.launch {
-            when(authManager.reAuth()) {
-                true -> completion(null)
-                // TODO: have reAuth return the actual error instead of a bool? ~emm 2021-07-27
-                false -> completion(Error(message = "reAuth failed"))
+            val response = authManager.reAuthWithError()
+            if (response.first) {
+                completion(null)
+            } else {
+                completion(response.second ?: Error("reAuth failed. Unknown cause."))
             }
         }
     }
@@ -52,8 +54,17 @@ open class NativeAuthenticationManager(
         return try {
             authManager.session()
         } catch (err: Exception) {
-            println("Failed to retrieve session: ${err.message}")
+            Logger.e("Failed to retrieve session", err)
             null
+        }
+    }
+
+    fun sessionState() : UserSessionState {
+        return try {
+            UserSessionState(authManager.session())
+        } catch (err: Exception) {
+            Logger.e("Failed to retrieve session", err)
+            UserSessionState(error = err.message ?: "Unknown error")
         }
     }
 
@@ -110,6 +121,23 @@ open class NativeAuthenticationManager(
         }
     }
 
+    /**
+     * Attempt to reauthorize the participant using their stored password.
+     * @return
+     * - `success` if sign in succeeded
+     * - `failed` if the username/password is no longer valid
+     * - `retry` if sign in failed, but should be retried later (poor network connection)
+     */
+    fun reauthWithCredentials(password: String, callBack: (UserSessionInfo?, ResourceStatus) -> Unit) {
+        scope.launch {
+            when(val userSessionResult = authManager.reauthWithCredentials(password)) {
+                is ResourceResult.Success -> callBack(userSessionResult.data, userSessionResult.status)
+                is ResourceResult.Failed -> callBack(null, userSessionResult.status)
+                else -> {}  // do nothing if in progress
+            }
+        }
+    }
+
     fun signUpEmail(email: String, password: String,
                     testUser: Boolean,
                     dataGroups: List<String>?,
@@ -151,3 +179,5 @@ open class NativeAuthenticationManager(
         }
     }
 }
+
+data class UserSessionState(val sessionInfo: UserSessionInfo? = null, val error: String? = null)

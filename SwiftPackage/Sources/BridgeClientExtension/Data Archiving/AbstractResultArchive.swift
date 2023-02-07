@@ -19,10 +19,7 @@ public final class StudyDataUploadArchive : AbstractResultArchive {
 
 /// An abstract class for archiving result data.
 open class AbstractResultArchive : DataArchive {
-    
-    /// The schedule used to start this task (if any).
-    public let schedule: AssessmentScheduleInfo?
-    
+
     /// The schema info for this archive.
     public let schemaIdentifier: String?
     public let schemaRevision: Int?
@@ -53,10 +50,9 @@ open class AbstractResultArchive : DataArchive {
         self.schemaIdentifier = schemaIdentifier
         self.schemaRevision = schemaRevision
         self.dataGroups = dataGroups
-        self.schedule = schedule
         self.isPlaceholder = isPlaceholder
         self.v2Format = v2Format
-        super.init(identifier: identifier)
+        super.init(identifier: identifier, schedule: schedule)
     }
     
     /// Close the archive with optional metadata from a task result.

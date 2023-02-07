@@ -48,22 +48,41 @@ class StudyDataUploadAPITests : XCTestCase, BridgeFileUploadManagerTestCaseTyped
         XCTAssertNotNil(fileName, "SBBStudyFileUploadRequestFailed notification userInfo has no file name string at '\(sdua.fileNameKey)'")
     }
     
-    func uploadSucceeded503RetriedTests(userInfo: [AnyHashable : Any]) {
+    func uploadSucceededRetriedTests(userInfo: [AnyHashable : Any]) {
         let sdua = StudyDataUploadAPI.shared
         let fileName = userInfo[sdua.fileNameKey] as? String
         XCTAssertNotNil(fileName, "SBBStudyFileUploaded notification userInfo has no file name string at '\(sdua.fileNameKey)'")
     }
     
-    func testUploadRequestFails() {
-        self.tryUploadRequestFails()
+    func testUploadRequestFails_412() {
+        tryUploadRequestFails412_Consent()
     }
     
-    func testUploadFileToBridgeWhenS3RespondsWithVariousFailuresThatShouldRetryLater() {
-        self.tryUploadFileToBridgeWhenS3RespondsWithVariousFailuresThatShouldRetryLater()
+    func testUploadRequestFails_503() {
+        tryUploadRequestFailsInitial503_ServerDown()
+    }
+    
+    func testUploadRequestFails_401_ReauthSuccess() {
+        tryUploadRequestFails401_ReauthSucceeded()
+    }
+    
+    func testUploadFileToBridgeWhenS3RespondsShouldRetry_403() {
+        tryUploadFileToBridgeWhenS3Responds(status: 403)
+    }
+    
+    func testUploadFileToBridgeWhenS3RespondsShouldRetry_409() {
+        tryUploadFileToBridgeWhenS3Responds(status: 409)
+    }
+    
+    func testUploadFileToBridgeWhenS3RespondsShouldRetry_500() {
+        tryUploadFileToBridgeWhenS3Responds(status: 500)
+    }
+    
+    func testUploadFileToBridgeWhenS3RespondsShouldRetry_503() {
+        tryUploadFileToBridgeWhenS3Responds(status: 503)
     }
     
     func testUploadFileToBridgeHappyPath() {
         self.tryUploadFileToBridgeHappyPath()
     }
-    
 }

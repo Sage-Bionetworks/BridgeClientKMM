@@ -109,10 +109,10 @@ fun AssessmentHistoryRecord.clientDataJson() : NSData? {
 }
 
 fun Report.clientDataJson() : NSData? {
-    return this.data?.toString()?.toNSData()
+    return this.data.toString().toNSData()
 }
 
 fun NativeParticipantDataRecord.clientDataJson() : NSData? {
-    return this.data?.toString()?.toNSData()
+    return this.data.toString().toNSData()
 }
 

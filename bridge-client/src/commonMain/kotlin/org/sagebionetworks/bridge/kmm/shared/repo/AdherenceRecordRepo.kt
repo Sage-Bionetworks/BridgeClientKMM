@@ -17,14 +17,19 @@ import kotlinx.datetime.Clock
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.koin.core.component.getScopeName
+import org.sagebionetworks.bridge.kmm.shared.BridgeConfig
 import org.sagebionetworks.bridge.kmm.shared.apis.SchedulesV2Api
+import org.sagebionetworks.bridge.kmm.shared.buildClientData
 import org.sagebionetworks.bridge.kmm.shared.cache.*
+import org.sagebionetworks.bridge.kmm.shared.di.platformModule
 import org.sagebionetworks.bridge.kmm.shared.models.AdherenceRecord
 import org.sagebionetworks.bridge.kmm.shared.models.AdherenceRecordList
 import org.sagebionetworks.bridge.kmm.shared.models.AdherenceRecordsSearch
 import org.sagebionetworks.bridge.kmm.shared.models.SortOrder
 
 class AdherenceRecordRepo(httpClient: HttpClient,
+                          val bridgeConfig: BridgeConfig?,
                           databaseHelper: ResourceDatabaseHelper,
                           backgroundScope: CoroutineScope) :
         AbstractResourceRepo(databaseHelper, backgroundScope) {
@@ -147,12 +152,12 @@ class AdherenceRecordRepo(httpClient: HttpClient,
      * to save to Bridge server.
      */
     fun createUpdateAdherenceRecord(adherenceRecord: AdherenceRecord, studyId: String) {
-        insertUpdate(studyId, adherenceRecord, needSave = true)
+        val record = if (adherenceRecord.clientData == null && bridgeConfig != null) adherenceRecord.copy(clientData = bridgeConfig.buildClientData()) else adherenceRecord
+        insertUpdate(studyId, record, needSave = true)
         backgroundScope.launch {
             processUpdates(studyId)
             processUpdatesV2(studyId)
         }
-
     }
 
     /**

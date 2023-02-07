@@ -78,7 +78,15 @@ class ParticipantReportRepo(httpClient: HttpClient,
         backgroundScope.launch {
             processUpdates(studyId)
         }
+    }
 
+    fun createUpdateReports(reports: List<Report>, studyId: String, identifier: String) {
+        reports.forEach {
+            insertUpdate(studyId, identifier, it.toReportData(), true)
+        }
+        backgroundScope.launch {
+            processUpdates(studyId)
+        }
     }
 
     private fun insertUpdate(studyId: String, identifier: String, reportData: ReportData, needSave: Boolean) {

@@ -62,14 +62,14 @@ open class AbstractSingleStudyAppManager : BridgeClientAppManager {
         }
     }
     
-    open override func signOut() {
+    open override func willSignOut() {
         try? studyManager?.onCleared()
         studyManager = nil
         study = nil
         observedStudyId = nil
         try? notificationManager?.onCleared()
         notificationManager = nil
-        super.signOut()
+        super.willSignOut()
     }
     
     private var observedStudyId: String?

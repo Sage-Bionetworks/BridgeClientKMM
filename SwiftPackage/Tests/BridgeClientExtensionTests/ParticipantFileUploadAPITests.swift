@@ -50,7 +50,7 @@ class ParticipantFileUploadAPITests : XCTestCase, BridgeFileUploadManagerTestCas
         XCTAssertNotNil(participantFile, "SBBParticipantFileUploadRequestFailed notification userInfo has no ParticipantFile object at '\(pfua.participantFileKey)'")
     }
     
-    func uploadSucceeded503RetriedTests(userInfo: [AnyHashable : Any]) {
+    func uploadSucceededRetriedTests(userInfo: [AnyHashable : Any]) {
         let pfua = ParticipantFileUploadAPI.shared
         let fileId = userInfo[pfua.fileIdKey] as? String
         XCTAssertNotNil(fileId, "SBBParticipantFileUploaded notification userInfo has no file id string at '\(pfua.fileIdKey)'")
@@ -60,12 +60,32 @@ class ParticipantFileUploadAPITests : XCTestCase, BridgeFileUploadManagerTestCas
         XCTAssertNotNil(requestUrl, "SBBParticipantFileUploaded notification userInfo has no request URL at '\(pfua.requestUrlKey)")
     }
     
-    func testUploadRequestFails() {
-        self.tryUploadRequestFails()
+    func testUploadRequestFails_412() {
+        tryUploadRequestFails412_Consent()
     }
     
-    func testUploadFileToBridgeWhenS3RespondsWithVariousFailuresThatShouldRetryLater() {
-        self.tryUploadFileToBridgeWhenS3RespondsWithVariousFailuresThatShouldRetryLater()
+    func testUploadRequestFails_503() {
+        tryUploadRequestFailsInitial503_ServerDown()
+    }
+    
+    func testUploadRequestFails_401_ReauthSuccess() {
+        tryUploadRequestFails401_ReauthSucceeded()
+    }
+    
+    func testUploadFileToBridgeWhenS3RespondsShouldRetry_403() {
+        tryUploadFileToBridgeWhenS3Responds(status: 403)
+    }
+    
+    func testUploadFileToBridgeWhenS3RespondsShouldRetry_409() {
+        tryUploadFileToBridgeWhenS3Responds(status: 409)
+    }
+    
+    func testUploadFileToBridgeWhenS3RespondsShouldRetry_500() {
+        tryUploadFileToBridgeWhenS3Responds(status: 500)
+    }
+    
+    func testUploadFileToBridgeWhenS3RespondsShouldRetry_503() {
+        tryUploadFileToBridgeWhenS3Responds(status: 503)
     }
     
     func testUploadFileToBridgeHappyPath() {

@@ -1,5 +1,7 @@
 package org.sagebionetworks.bridge.kmm.shared
 
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
 import org.sagebionetworks.bridge.kmm.shared.models.ClientInfo
 
 interface PlatformConfig {
@@ -39,6 +41,20 @@ interface PlatformConfig {
     val deviceName: String
 
     val osName: String
+}
+
+fun PlatformConfig.buildClientData(input: JsonElement? = null, uploadId: String? = null): JsonElement {
+    var clientData: JsonObject = input?.let {
+        it as? JsonObject ?: JsonObject(mapOf("value" to it))
+    } ?: JsonObject(mapOf())
+    uploadId?.let {
+        clientData.plus("uploadId" to it)
+    }
+    clientData.plus("osName" to osName)
+    clientData.plus("deviceName" to deviceName)
+    clientData.plus("osVersion" to osVersion)
+    clientData.plus("appVersion" to appVersion)
+    return clientData
 }
 
 interface BridgeConfig : PlatformConfig {

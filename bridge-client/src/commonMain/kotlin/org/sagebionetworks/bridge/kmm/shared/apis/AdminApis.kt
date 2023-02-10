@@ -29,6 +29,10 @@ internal class AdminApis(basePath: String = BASE_PATH, httpClient: HttpClient) :
         return getData("v5/studies/$studyId/participants/$userId/requestInfo")
     }
 
+    suspend fun getStudyParticipant(userId: String) : StudyParticipant {
+        return getData("v3/participants/$userId")
+    }
+
 
     /**
      * Search for adherence records.

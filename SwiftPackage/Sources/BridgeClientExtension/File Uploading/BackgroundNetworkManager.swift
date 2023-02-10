@@ -234,7 +234,8 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
     @discardableResult
     func uploadFile(_ fileURL: URL, httpHeaders: [String : String]?, to urlString: String, taskDescription: String) -> URLSessionUploadTask? {
         guard let url = URL(string: urlString) else {
-            Logger.log(tag: .upload, error: ValidationError.unexpectedNull("Error: Could not create URL from string '\(urlString)"))
+            let message = "Error: Could not create URL from string '\(urlString)"
+            Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .invalidURL, message: message))
             return nil
         }
         var request = URLRequest(url: url)
@@ -267,13 +268,17 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
     @discardableResult
     func retry(task: URLSessionDownloadTask) -> Bool {
         guard var request = task.originalRequest else {
-            Logger.log(tag: .upload, error: ValidationError.unexpectedNull("Unable to retry upload task, as originalRequest is nil:\n\(task)"))
+            let message = "Unable to retry upload task, as originalRequest is nil:\n\(task)"
+            Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .corruptData, message: message))
             return false
         }
         
         // Try, try again, until we run out of retries.
         var retry = Int(request.value(forHTTPHeaderField: retryCountHeader) ?? "") ?? 0
-        guard retry < maxRetries else { return false }
+        guard retry < maxRetries else {
+            Logger.log(severity: .info, message: "Retry attempts (\(retry)) exceeds max retry count (\(maxRetries)).")
+            return false
+        }
         
         guard let sessionToken = appManager.sessionToken else {
             Logger.log(severity: .warn, tag: .upload, message: "Unable to retry task--not signed in (auth manager's UserSessionInfo is nil)")

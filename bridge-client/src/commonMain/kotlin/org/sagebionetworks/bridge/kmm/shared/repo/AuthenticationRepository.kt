@@ -255,13 +255,12 @@ class AuthenticationRepository(
                 success = true
             } catch (err: Throwable) {
                 responseError = Error(err.message ?: "Error requesting reAuth: $err")
-                Logger.e("Error requesting reAuth", err)
                 if (err is ResponseException && (err.response.status == HttpStatusCode.Unauthorized ||
                             err.response.status == HttpStatusCode.Forbidden ||
                             err.response.status == HttpStatusCode.NotFound ||
                             err.response.status == HttpStatusCode.Locked)) {
                     // Should clear session for auth related errors: 401, 403, 404, 423
-                    Logger.i("User reauth failed. Removing user session token.")
+                    Logger.e("User reauth failed. Removing user session token.", err)
                     val newSession = sessionInfo.copy(
                         reauthToken = null,
                         authenticated = false,
@@ -270,6 +269,7 @@ class AuthenticationRepository(
                     updateCachedSession(null, newSession)
                 } else {
                     // Some sort of network error leave the session alone so we can try again
+                    Logger.i("User reauth failed. Ignoring. $err")
                 }
             }
             Pair(success, responseError)

@@ -27,7 +27,7 @@ extension AssessmentResult {
             let decoder = BridgeClient.JsonElementDecoder(jsonData: data)
             return try decoder.decodeObject()
         } catch {
-            debugPrint("WARNING! Failed to encode result: \(error)")
+            Logger.log(severity: .warn, message: "WARNING! Failed to encode result: \(error)")
             return nil
         }
     }

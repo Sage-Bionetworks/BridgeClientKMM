@@ -346,7 +346,8 @@ extension BridgeFileUploadAPITyped {
         do {
             retryInfo = try DictionaryDecoder().decode(BridgeFileRetryInfo<TrackingType>.self, from: retryInfoPlist)
         } catch let error {
-            debugPrint("Error attempting to decode plist object to BridgeFileRetryInfo<\(TrackingType.self)>:\n\(retryInfoPlist)\n\(error)")
+            Logger.log(tag: .upload, error: error,
+                       message: "Error attempting to decode plist object to BridgeFileRetryInfo<\(TrackingType.self)>:\n\(retryInfoPlist)")
             // since it's broken, remove it
             mappings.removeValue(forKey: relativePath)
             return true
@@ -392,7 +393,7 @@ extension BridgeFileUploadAPITyped {
     public func sendUploadRequest(for relativePath: String, uploadMetadata: BridgeFileUploadMetadataBlob) {
         // Get the bridge upload object
         guard let bridgeUploadObject = self.uploadRequestObject(for: uploadMetadata) as? UploadRequestType else {
-            debugPrint("Unable to get upload request object (type \(UploadRequestType.self)) from uploadMetadata: \(uploadMetadata)")
+            Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .wrongType, message: "Unable to get upload request object (type \(UploadRequestType.self)) from uploadMetadata: \(uploadMetadata)"))
             return
         }
 
@@ -402,7 +403,7 @@ extension BridgeFileUploadAPITyped {
         // throw this over to the main queue so we can access Kotlin stuff
         OperationQueue.main.addOperation {
             guard let sessionToken = uploadManager.appManager.sessionToken else {
-                debugPrint("Unable to request an upload URL from Bridge--not logged in to an account.")
+                Logger.log(severity: .warn, tag: .upload, message: "Unable to request an upload URL from Bridge--not logged in to an account.")
                 return
             }
             
@@ -419,14 +420,13 @@ extension BridgeFileUploadAPITyped {
     
     public func notifyBridgeUploadSucceeded(relativePath: String, uploadMetadata: BridgeFileUploadMetadataBlob) {
         guard let notifyUrl = self.notifyBridgeUrlString(for: uploadMetadata) else {
-            debugPrint("Unexpected: Could not get URL to notify Bridge of upload success from file upload metadata: \(uploadMetadata)")
             return
         }
         
         // throw this over to the main queue so we can access Kotlin stuff
         OperationQueue.main.addOperation {
             guard let sessionToken = uploadManager.appManager.sessionToken else {
-                debugPrint("Unable to notify Bridge of upload success--not logged in to an account.")
+                Logger.log(severity: .warn, tag: .upload, message: "Unable to notify Bridge of upload success--not logged in to an account.")
                 return
             }
             
@@ -540,7 +540,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
             do {
                 try FileManager.default.setAttributes([.modificationDate : Date()], ofItemAtPath: writeUrl.path)
             } catch let err {
-                debugPrint("FileManager failed to update the modification date of \(fileUrl): \(err)")
+                Logger.log(tag: .upload, error: err, message: "FileManager failed to update the modification date of \(fileUrl)")
             }
         }
     }
@@ -553,7 +553,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
                 let attributes = try FileManager.default.attributesOfItem(atPath: readUrl.path)
                 modDate = attributes[.modificationDate] as? Date
             } catch let err {
-                debugPrint("FileManager failed to read the modification date of \(fileUrl): \(err)")
+                Logger.log(tag: .upload, error: err, message: "FileManager failed to read the modification date of \(fileUrl)")
             }
         }
         return modDate
@@ -584,7 +584,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
             do {
                 try FileManager.default.copyItem(at: readURL, to: writeURL)
             } catch let err {
-                debugPrint("Error copying upload file \(fileURL) to temp file \(String(describing: invariantTempFilePath)) for upload: \(err)")
+                Logger.log(tag: .upload, error: err, message: "Error copying upload file \(fileURL) to temp file \(String(describing: invariantTempFilePath)) for upload.")
                 copyError = err
             }
         }
@@ -592,7 +592,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
             return nil
         }
         if let err = coordError {
-            debugPrint("File coordinator error copying upload file \(fileURL) to temp file \(String(describing: invariantTempFilePath)) for upload: \(err)")
+            Logger.log(tag: .upload, error: err, message: "File coordinator error copying upload file \(fileURL) to temp file \(String(describing: invariantTempFilePath)) for upload.")
             return nil
         }
         
@@ -621,7 +621,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
             do {
                 plistValue = try DictionaryEncoder().encode(value)
             } catch let error {
-                debugPrint("Error attempting to encode \(T.self) to plist object: \(error)")
+                Logger.log(tag: .upload, error: error, message: "Error attempting to encode \(T.self) to plist object.")
                 return
             }
             mappings[key] = plistValue
@@ -638,7 +638,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
                 do {
                     mapping = try DictionaryDecoder().decode(type, from: mappingPlist)
                 } catch let error {
-                    debugPrint("Error attempting to decode plist object to \(T.self):\n\(mappingPlist)\n\(error)")
+                    Logger.log(severity: .error, tag: .upload, message: "Error attempting to decode plist object to \(T.self):\n\(mappingPlist)\n\(error)")
                 }
             }
             if mappings != nil {
@@ -656,7 +656,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
                 do {
                     mapping = try DictionaryDecoder().decode(type, from: mappingPlist)
                 } catch let error {
-                    debugPrint("Error attempting to decode plist object to \(T.self):\n\(mappingPlist)\n\(error)")
+                    Logger.log(severity: .error, tag: .upload, message: "Error attempting to decode plist object to \(T.self):\n\(mappingPlist)\n\(error)")
                 }
             }
         }
@@ -762,7 +762,8 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
     fileprivate func requestUploadURL<T>(uploadApi: BridgeFileUploadAPI, invariantFilePath: String?, fileUrl: URL?, uploadMetadata: BridgeFileUploadMetadata<T>) -> URL? where T: Codable {
         var invariantFilePath = invariantFilePath
         guard let fileUrl = fileUrl else {
-            debugPrint("Error: requestUploadURL called with original fileURL as nil")
+            let message = "Error: requestUploadURL called with original fileURL as nil"
+            Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .invalidURL, message: message))
             return nil
         }
 
@@ -782,7 +783,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
                     try fileCopy?.setExtendedAttribute(data: extrasData, forName: self.uploadExtrasAttributeName)
                 }
             } catch let err {
-                debugPrint("Error trying to set extended attributes for temp file \(fileUrl): \(err)")
+                Logger.log(tag: .upload, error: err, message: "Error trying to set extended attributes for temp file \(fileUrl)")
                 return nil
             }
                 
@@ -792,13 +793,15 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
             // we already have the file copy--create a URL from its path
             let filePath = self.fullyQualifiedPath(of: invariantFilePath!)
             if filePath.isEmpty {
-                debugPrint("Error: unable to get fully qualified path from invariantFilePath '\(invariantFilePath!)'")
+                let message = "Unable to get fully qualified path from invariantFilePath '\(invariantFilePath!)'"
+                Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .empty, message: message))
                 return nil
             }
             
             fileCopy = URL(fileURLWithPath: filePath)
             guard let fileCopy = fileCopy else {
-                debugPrint("Error: unable to create URL from file path '\(filePath)'")
+                let message = "Unable to create URL from file path '\(filePath)'"
+                Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .invalidURL, message: message))
                 return nil
             }
             
@@ -810,7 +813,8 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         }
         
         guard let invariantFilePath = invariantFilePath else {
-            debugPrint("Failed to get sandbox-relative file path from temp file URL")
+            let message = "Failed to get sandbox-relative file path from temp file URL"
+            Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .invalidURL, message: message))
             return nil
         }
         
@@ -824,13 +828,15 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
     public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         // get the sandbox-relative path to the temp copy of the participant file
         guard let invariantFilePath = downloadTask.taskDescription else {
-            debugPrint("Unexpected: Finished a download task with no taskDescription set")
+            let message = "Finished a download task with no taskDescription set"
+            Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .missingFile, message: message))
             return
         }
         
         // get which API this task is using
         guard let uploadApi = self.uploadApi(for: downloadTask.originalRequest?.url) else  {
-            debugPrint("Unexpected: No uploadApi registered for download task \(downloadTask) (url: \(String(describing: downloadTask.originalRequest?.url)))")
+            let message = "Unexpected: No uploadApi registered for download task \(downloadTask) (url: \(String(describing: downloadTask.originalRequest?.url)))"
+            Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .missingFile, message: message))
             return
         }
         
@@ -839,7 +845,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         do {
             urlContents = try String(contentsOf: location)
         } catch let err {
-            debugPrint("Error attempting to read contents from background download task at URL \(location) as String: \(err)")
+            Logger.log(tag: .upload, error: err, message: "Error attempting to read contents from background download task at URL \(location) as String")
             return
         }
         
@@ -847,7 +853,8 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         // in question is just the error response body)
         if let httpResponse = downloadTask.response as? HTTPURLResponse,
            httpResponse.statusCode >= 400 {
-            debugPrint("Request to Bridge endpoint \(String(describing: downloadTask.originalRequest?.url)) for temp file \(invariantFilePath) failed with status \(httpResponse.statusCode) and response body:\n\(urlContents)")
+            let message = "Request to Bridge endpoint \(String(describing: downloadTask.originalRequest?.url)) for temp file \(invariantFilePath) failed with status \(httpResponse.statusCode) and response body:\n\(urlContents)"
+            Logger.log(tag: .upload, error: BridgeHttpError(errorCode: httpResponse.statusCode, message: message))
             
             // 401s on download get retried automatically, so our `urlSession(_:didCompleteWithError:)`
             // delegate method never gets called in that case, so it never would get cleaned up and we
@@ -867,7 +874,8 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
             // We don't actually care what the mapping is to here, just whether or not one exists
             guard let _ = uploadApi.fetchNotifyingBridge(for: invariantFilePath) else {
                 // if it wasn't in either list, log it and bail
-                debugPrint("Unexpected: Unable to retrieve upload metadata for \(invariantFilePath) from either upload request map or notifying Bridge map.")
+                let message = "Unable to retrieve upload metadata for \(invariantFilePath) from either upload request map or notifying Bridge map."
+                Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .missingFile, message: message))
                 return
             }
 
@@ -887,12 +895,14 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         }
 
         guard !urlContents.isEmpty else {
-            debugPrint("Unexpected: Download task finished successfully but string from downloaded file at URL \(location) is empty")
+            let message = "Download task finished successfully but string from downloaded file at URL \(location) is empty"
+            Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .empty, message: message))
             return
         }
         
         guard let jsonData = urlContents.data(using: .utf8) else {
-            debugPrint("Unexpected: Could not convert string contents of downloaded file at URL \(location) to data using .utf8 encoding: \"\(urlContents)\"")
+            let message = "Could not convert string contents of downloaded file at URL \(location) to data using .utf8 encoding: \"\(urlContents)\""
+            Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .corruptData, message: message))
             return
         }
 
@@ -907,14 +917,16 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
     
     func uploadToS3(uploadApi: BridgeFileUploadAPI, bridgeUploadMetadata: BridgeFileUploadMetadataBlob,  invariantFilePath: String) {
         guard let uploadUrl = uploadApi.s3UploadUrlString(for: bridgeUploadMetadata) else {
-            debugPrint("Unexpected: Could not get S3 upload URL from file upload metadata: \(bridgeUploadMetadata)")
+            let message = "Could not get S3 upload URL from file upload metadata: \(bridgeUploadMetadata)"
+            Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .missingMetadata, message: message))
             return
         }
         
         // get the fully-qualified path of the file to be uploaded
         let filePath = self.fullyQualifiedPath(of: invariantFilePath)
         if filePath.isEmpty {
-            debugPrint("Unable to recover fully qualified path from sandbox-relative path \"\(invariantFilePath)\"")
+            let message = "Unable to recover fully qualified path from sandbox-relative path \"\(invariantFilePath)\""
+            Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .empty, message: message))
             return
         }
         
@@ -939,8 +951,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
             guard var retryUploads = self.userDefaults.dictionary(forKey: self.retryUploadsKey) else { return }
             for filePath in retryUploads.keys {
                 autoreleasepool {
-                    guard let uploadApi = self.apiFromXAttrs(for: filePath) else {
-                        debugPrint("Unexpected: couldn't retrieve API from temp file xattrs for \(filePath)")
+                    guard let uploadApi = self.apiFromXAttrs(for: filePath, debugMessage: "Couldn't retrieve API from temp file xattrs for \(filePath)") else {
                         return
                     }
                     
@@ -1177,16 +1188,21 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
             wasNotifyingBridge = true
         }
         else {
-            debugPrint("Unexpected: Unable to retrieve BridgeFileUploadMetadataBlob for \(String(describing: invariantFilePath))")
+            let message = "Unable to retrieve BridgeFileUploadMetadataBlob for \(String(describing: invariantFilePath))"
+            Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .missingMetadata, message: message))
             return
         }
 
         // remove the file from the temp -> orig mappings, and retrieve the original file path
         guard let originalFilePath = removeMapping(String.self, from: invariantFilePath, defaultsKey: self.bridgeFileUploadsKey) else {
-            debugPrint("Unexpected: No original file path found mapped from temp file path \(invariantFilePath)")
-            debugPrint(" Status Code: \(statusCode)")
-            debugPrint(" API: \(uploadApi.apiString)")
-            debugPrint(" Download task: \(downloadTask)")
+            let message =
+            """
+            Unexpected NULL: No original file path found mapped from temp file path \(invariantFilePath)
+                Status Code: \(statusCode)
+                API: \(uploadApi.apiString)
+                Download task: \(downloadTask)
+            """
+            Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .missingFile, message: message))
            return
         }
         
@@ -1234,7 +1250,8 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         default:
             // iOS handles redirects automatically so only e.g. 304 resource not changed etc. from the 300 range should end up here
             // (along with all unhandled 4xx and 5xx of course).
-            debugPrint("Participant file upload to S3 of file \(originalFilePath) failed with HTTP response status code \(statusCode)--unhandled, will not retry")
+            let error = BridgeHttpError(errorCode: statusCode, message: "Participant file upload to S3 of file \(originalFilePath) failed with HTTP response status code \(statusCode)--unhandled, will not retry")
+            Logger.log(tag: .upload, error: error)
             
             // post a notification that the file upload to S3 failed unrecoverably
             let uploadFailedNotification = uploadApi.uploadToS3FailedNotification(for: uploadMetadata)
@@ -1248,7 +1265,8 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         
         // get the sandbox-relative path to the temp copy of the participant file
         guard let invariantFilePath = task.taskDescription else {
-            debugPrint("Unexpected: Finished a background session task with no taskDescription set")
+            let message = "Unexpected: Finished a background session task with no taskDescription set"
+            Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .missingFile, message: message))
             return
         }
         
@@ -1260,8 +1278,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         }
         
         // get which API this task is using from the temp copy's xattrs
-        guard let uploadApi = self.apiFromXAttrs(for: invariantFilePath) else  {
-            debugPrint("Unexpected: No uploadApi marked for temp file \(invariantFilePath)")
+        guard let uploadApi = self.apiFromXAttrs(for: invariantFilePath, debugMessage: "Unexpected: No uploadApi marked for temp file \(invariantFilePath)") else {
             return
         }
 
@@ -1279,16 +1296,21 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         
         // remove the file from the upload requests, and retrieve its BridgeFileUploadMetadata object
         guard let uploadMetadata = uploadApi.fetchUploadingToS3(for: invariantFilePath) else {
-            debugPrint("Unexpected: No BridgeFileUploadMetadataBlob found mapped for temp file \(invariantFilePath)")
+            let message = "No BridgeFileUploadMetadataBlob found mapped for temp file \(invariantFilePath)"
+            Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .missingFile, message: message))
             return
         }
         
         // remove the file from the temp -> orig mappings, and retrieve the original file path
         guard let originalFilePath = removeMapping(String.self, from: invariantFilePath, defaultsKey: self.bridgeFileUploadsKey) else {
-            debugPrint("Unexpected: No original file path found mapped from temp file path \(invariantFilePath)")
-            debugPrint(" Error: \(String(describing: error))")
-            debugPrint(" Task: \(task)")
-            debugPrint(" Session: \(session)")
+            let message =
+            """
+            Unexpected: No original file path found mapped from temp file path \(invariantFilePath)
+              Task: \(task)
+              Session: \(session)
+              Error: \(String(describing: error))
+            """
+            Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .missingFile, message: message))
             return
         }
         
@@ -1301,7 +1323,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         // malformed request, so log it, post a failed upload notification, clean up the temp file,
         // and bail out
         if let error = error {
-            debugPrint("Error uploading file \(originalFilePath) to S3: \(error)")
+            Logger.log(tag: .upload, error: error, message: "Error uploading file \(originalFilePath) to S3")
             let uploadFailedNotification = uploadApi.uploadToS3FailedNotification(for: uploadMetadata)
             cleanUpTempFile(filePath: invariantFilePath)
             self.postAndUpdateUploadingStatus(uploadFailedNotification)
@@ -1310,7 +1332,8 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         
         // check the response for HTTP errors and handle accordingly
         guard let httpResponse = task.response as? HTTPURLResponse else {
-            debugPrint("Unexpected: Upload task response is not an HTTPURLResponse")
+            let message = "Upload task response is not an HTTPURLResponse"
+            Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .wrongType, message: message))
             return
         }
         
@@ -1360,8 +1383,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
             // Get the temp copy and original file path for each file currently in the upload process and
             // copy it to the upload queue with its s3 metadata.
             for invariantFilePath in originalFilePaths.keys {
-                guard let uploadApi = self.apiFromXAttrs(for: invariantFilePath) else {
-                    debugPrint("Unexpected: couldn't retrieve API from temp file xattrs for \(invariantFilePath)")
+                guard let uploadApi = self.apiFromXAttrs(for: invariantFilePath, debugMessage: "Unexpected: couldn't retrieve API from temp file xattrs for \(invariantFilePath)") else {
                     continue
                 }
 
@@ -1375,48 +1397,49 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         }
     }
 
-    func apiFromXAttrs(for filePath: String) -> BridgeFileUploadAPI? {
-        let (uploadApi, _, _, _) = self.apiInfoFromXAttrs(for: filePath) ?? (nil, nil, nil, nil)
-        return uploadApi
+    func apiFromXAttrs(for filePath: String, debugMessage: String? = nil) -> BridgeFileUploadAPI? {
+        self.apiInfoFromXAttrs(for: filePath, debugMessage: debugMessage)?.uploadApi
     }
     
-    func apiInfoFromXAttrs(for filePath: String) -> (uploadApi: BridgeFileUploadAPI, fileId: String, contentType: String, extras: Codable?)? {
+    func apiInfoFromXAttrs(for filePath: String, debugMessage: String? = nil) -> (uploadApi: BridgeFileUploadAPI, fileId: String, contentType: String, extras: Codable?)? {
+        do {
+            return try self._apiInfoFromXAttrs(for: filePath)
+        } catch {
+            Logger.log(tag: .upload, error: error, message: debugMessage)
+            return nil
+        }
+    }
+    
+    func _apiInfoFromXAttrs(for filePath: String) throws -> (uploadApi: BridgeFileUploadAPI, fileId: String, contentType: String, extras: Codable?) {
         let fullPath = self.fullyQualifiedPath(of: filePath)
         guard FileManager.default.fileExists(atPath: fullPath) else {
-            debugPrint("Unexpected: Attempting to retrieve upload API info for temp file with invariant path '\(filePath) but temp file does not exist at '\(fullPath)")
-            return nil
+            let message = "Unexpected: Attempting to retrieve upload API info for temp file with invariant path '\(filePath) but temp file does not exist at '\(fullPath)"
+            throw BridgeUnexpectedNullError(category: .missingFile, message: message)
         }
         let tempFile = URL(fileURLWithPath: fullPath)
-        var apiStringData: Data
-        var fileIdData: Data
-        var contentTypeData: Data
-        var extrasData: Data?
-        do {
-            apiStringData = try tempFile.extendedAttribute(forName: self.uploadApiAttributeName)
-            fileIdData = try tempFile.extendedAttribute(forName: self.fileIdAttributeName)
-            contentTypeData = try tempFile.extendedAttribute(forName: self.contentTypeAttributeName)
-        } catch let err {
-            debugPrint("Error attempting to retrieve xattrs \(self.uploadApiAttributeName), \(self.fileIdAttributeName), and \(self.contentTypeAttributeName) from file at \(fullPath): \(err)")
-            return nil
-        }
+
+        let apiStringData = try tempFile.extendedAttribute(forName: self.uploadApiAttributeName)
+        let fileIdData = try tempFile.extendedAttribute(forName: self.fileIdAttributeName)
+        let contentTypeData = try tempFile.extendedAttribute(forName: self.contentTypeAttributeName)
+
         // extras is an optional attribute so we don't care if it isn't present
-        extrasData = try? tempFile.extendedAttribute(forName: self.uploadExtrasAttributeName)
+        let extrasData = try? tempFile.extendedAttribute(forName: self.uploadExtrasAttributeName)
         
         guard let apiString = String(data: apiStringData, encoding: .utf8) else {
-            debugPrint("Unexpected: Could not convert apiStringData to a utf8 string: \(apiStringData)")
-            return nil
+            let message = "Unexpected: Could not convert apiStringData to a utf8 string: \(apiStringData)"
+            throw BridgeUnexpectedNullError(category: .missingAttributes, message: message)
         }
         guard let api = self.bridgeFileUploadApis[apiString] else {
-            debugPrint("Unexpected: Could not retrieve BridgeFileUploadAPI for \(apiString) from list of registered upload APIs")
-            return nil
+            let message = "Unexpected: Could not retrieve BridgeFileUploadAPI for \(apiString) from list of registered upload APIs"
+            throw BridgeUnexpectedNullError(category: .missingAttributes, message: message)
         }
         guard let fileId = String(data: fileIdData, encoding: .utf8) else {
-            debugPrint("Unexpected: Could not convert fileIdData to a utf8 string: \(fileIdData)")
-            return nil
+            let message = "Unexpected: Could not convert fileIdData to a utf8 string: \(fileIdData)"
+            throw BridgeUnexpectedNullError(category: .missingAttributes, message: message)
         }
         guard let contentType = String(data: contentTypeData, encoding: .utf8) else {
-            debugPrint("Unexpected: Could not convert contentTypeData to a utf8 string: \(contentTypeData)")
-            return nil
+            let message = "Unexpected: Could not convert contentTypeData to a utf8 string: \(contentTypeData)"
+            throw BridgeUnexpectedNullError(category: .missingAttributes, message: message)
         }
         let extras = api.uploadRequestExtras(from: extrasData)
 
@@ -1427,7 +1450,8 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         self.runOnQueue(self.uploadQueue, sync: false) {
             let fullPath = self.fullyQualifiedPath(of: filePath)
             guard FileManager.default.fileExists(atPath: fullPath) else {
-                debugPrint("Unexpected: Attempting to clean up temp file with invariant path '\(filePath) but temp file does not exist at '\(fullPath)")
+                let message = "Unexpected: Attempting to clean up temp file with invariant path '\(filePath) but temp file does not exist at '\(fullPath)"
+                Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .missingFile, message: message))
                 return
             }
             let tempFile = URL(fileURLWithPath: fullPath)
@@ -1437,11 +1461,11 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
                 do {
                     try FileManager.default.removeItem(at: fileUrl)
                 } catch let err {
-                    debugPrint("Error attempting to remove file at \(fileUrl): \(err)")
+                    Logger.log(tag: .upload, error: err, message: "Error attempting to remove file at \(fileUrl)")
                 }
             }
             if let fileCoordinatorError = fileCoordinatorError {
-                debugPrint("Error coordinating deletion of file \(tempFile): \(fileCoordinatorError)")
+                Logger.log(tag: .upload, error: fileCoordinatorError, message: "Error coordinating deletion of file \(tempFile)")
             }
         }
     }
@@ -1520,5 +1544,42 @@ extension URL {
         else {
             return path
         }
+    }
+}
+
+struct BridgeHttpError : Error, CustomNSError {
+    static var errorDomain: String { "BridgeClientUI.HttpError" }
+    
+    let errorCode: Int
+    let message: String
+    
+    var errorUserInfo: [String : Any] {
+        [NSLocalizedFailureReasonErrorKey: message]
+    }
+}
+
+struct BridgeUnexpectedNullError : Error, CustomNSError {
+    static var errorDomain: String { "BridgeClientUI.UnexpectedNullError" }
+    
+    let category: Category
+    let message: String
+    
+    var errorCode: Int {
+        category.rawValue
+    }
+    
+    var errorUserInfo: [String : Any] {
+        [NSLocalizedFailureReasonErrorKey: message]
+    }
+    
+    enum Category : Int {
+        case missingFile = -100
+        case wrongType = -101
+        case missingAttributes = -102
+        case missingIdentifier = -103
+        case empty = -104
+        case invalidURL = -105
+        case corruptData = -106
+        case missingMetadata = -107
     }
 }

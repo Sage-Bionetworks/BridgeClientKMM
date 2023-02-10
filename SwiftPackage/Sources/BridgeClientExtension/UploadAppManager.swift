@@ -34,7 +34,10 @@ open class UploadAppManager : ObservableObject {
     /// Store the last user session id used for login.
     var userSessionId: String? {
         get { sharedUserDefaults.string(forKey: kUserSessionIdKey) }
-        set { sharedUserDefaults.set(newValue, forKey: kUserSessionIdKey) }
+        set {
+            sharedUserDefaults.set(newValue, forKey: kUserSessionIdKey)
+            Logger.logWriter?.setUserId(newValue)
+        }
     }
 
     /// The path to the pem file that is used to encrypt data being uploaded to Bridge.
@@ -177,6 +180,9 @@ open class UploadAppManager : ObservableObject {
     /// **Required:** This method should be called by the app delegate when the app is launching in either `willLaunch` or `didLaunch`.
     @MainActor
     public func setup() {
+        
+        // Before anything else, set the user id so that failures in setup have that information.
+        Logger.logWriter?.setUserId(userSessionId)
 
         // Initialize koin
         #if DEBUG
@@ -305,7 +311,7 @@ open class UploadAppManager : ObservableObject {
     func reauthenticate(_ completion: @escaping (Bool) -> Void) {
         DispatchQueue.main.async {
             guard let authManager = self.authManager else {
-                debugPrint("AuthManager has not been initialized. Cannot reauthenticate.")
+                Logger.log(severity: .warn, message: "AuthManager has not been initialized. Cannot reauthenticate.")
                 completion(false)
                 return
             }
@@ -314,7 +320,7 @@ open class UploadAppManager : ObservableObject {
                 if let error = error {
                     // Assume BridgeClientKMM will have handled any 410 or 412 error appropriately.
                     self.userSessionInfo.loginError = "Reauth Failed: \(error.message ?? "Unknown Error")"
-                    debugPrint("Session token auto-refresh failed: \(String(describing: error))")
+                    Logger.log(severity: .warn, message: "Session token auto-refresh failed: \(error)")
                 }
                 completion(error == nil)
             }
@@ -345,7 +351,7 @@ final class ArchiveUploadProcessor {
             let encrypted = await _encrypt(archive: archive)
             await _upload(archive: archive, encrypted: encrypted)
         } catch {
-            debugPrint("ERROR Failed to archive and upload \(builder.identifier): \(error)")
+            Logger.log(error: error, message: "Failed to archive and upload \(builder.identifier)")
         }
     }
     
@@ -382,16 +388,15 @@ final class ArchiveUploadProcessor {
             try archive.encryptArchive(using: path)
             return true
         } catch {
-            debugPrint("ERROR: Failed to encrypt \(archive.identifier). \(error)")
+            Logger.log(error: error, message: "Failed to encrypt \(archive.identifier)")
             return false
         }
     }
     
     @MainActor
     private func _upload(archive: DataArchive, encrypted: Bool) async {
-        let id = archive.identifier
         guard let url = archive.encryptedURL else {
-            debugPrint("WARNING! Cannot upload \(id)")
+            Logger.log(error: ValidationError.unexpectedNull("Cannot upload archive. Missing encryption."))
             return
         }
         _uploadEncrypted(id: archive.identifier, url: url, schedule: archive.schedule)
@@ -410,7 +415,7 @@ final class ArchiveUploadProcessor {
         do {
             try FileManager.default.removeItem(at: url)
         } catch let err {
-            debugPrint("WARNING! Failed to delete encrypted archive \(id) at \(url). \(err)")
+            Logger.log(error: err, message: "Failed to delete encrypted archive \(id) at \(url)")
         }
     }
 }

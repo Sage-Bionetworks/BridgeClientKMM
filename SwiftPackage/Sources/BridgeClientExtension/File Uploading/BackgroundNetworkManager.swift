@@ -172,7 +172,7 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
         request.httpShouldHandleCookies = false
         request.addHeaders(headers)
         
-        debugPrint("Prepared request--URL:\n\(String(describing: request.url?.absoluteString))\nHeaders:\n\(String(describing: request.allHTTPHeaderFields))")
+        Logger.log(severity: .debug, tag: .upload, message: "Prepared request--URL:\n\(String(describing: request.url?.absoluteString))\nHeaders:\n\(String(describing: request.allHTTPHeaderFields))")
         return request
     }
     
@@ -203,11 +203,11 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
                 let jsonData = try jsonEncoder.encode(parameters)
                 request.httpBody = jsonData
             } catch let error {
-                debugPrint("Error encoding parameters for \(method) request to URL \(URLString):\n\(parameters)\n\(error)")
+                Logger.log(tag: .upload, error: error, message: "Error encoding parameters for \(method) request to URL \(URLString):\n\(parameters)")
             }
         }
         
-        debugPrint("Request body:\n\(String(describing: String(data: request.httpBody ?? Data(), encoding: .utf8)))")
+        Logger.log(severity: .debug, tag: .upload, message: "Request body:\n\(String(describing: String(data: request.httpBody ?? Data(), encoding: .utf8)))")
         
         return request
     }
@@ -234,7 +234,7 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
     @discardableResult
     func uploadFile(_ fileURL: URL, httpHeaders: [String : String]?, to urlString: String, taskDescription: String) -> URLSessionUploadTask? {
         guard let url = URL(string: urlString) else {
-            debugPrint("Could not create URL from string '\(urlString)")
+            Logger.log(tag: .upload, error: ValidationError.unexpectedNull("Error: Could not create URL from string '\(urlString)"))
             return nil
         }
         var request = URLRequest(url: url)
@@ -267,7 +267,7 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
     @discardableResult
     func retry(task: URLSessionDownloadTask) -> Bool {
         guard var request = task.originalRequest else {
-            debugPrint("Unable to retry task, as originalRequest is nil:\n\(task)")
+            Logger.log(tag: .upload, error: ValidationError.unexpectedNull("Unable to retry upload task, as originalRequest is nil:\n\(task)"))
             return false
         }
         
@@ -276,7 +276,7 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
         guard retry < maxRetries else { return false }
         
         guard let sessionToken = appManager.sessionToken else {
-            debugPrint("Unable to retry task--not signed in (auth manager's UserSessionInfo is nil)")
+            Logger.log(severity: .warn, tag: .upload, message: "Unable to retry task--not signed in (auth manager's UserSessionInfo is nil)")
             return false
         }
 
@@ -315,7 +315,7 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
         case 401:
             self.appManager.reauthenticate { success in
                 if success {
-                    debugPrint("Session token auto-refresh succeeded, retrying original request")
+                    Logger.log(severity: .info, tag: .upload, message: "Session token auto-refresh succeeded, retrying original request")
                     self.retry(task: task)
                 }
             }

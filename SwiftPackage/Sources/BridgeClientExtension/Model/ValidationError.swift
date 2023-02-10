@@ -6,7 +6,7 @@
 import Foundation
 
 /// Errors that can be thrown while building documentation.
-public enum ValidationError : Error {
+public enum ValidationError : Error, CustomNSError {
     
     /// A `NULL` value was returned when expectation was that the result will be non-nil.
     case unexpectedNull(String)
@@ -35,6 +35,6 @@ public enum ValidationError : Error {
         case .unexpectedNull(let str): description = str
         case .unknown: description = "Unknown error"
         }
-        return ["NSDebugDescription": description]
+        return [NSLocalizedFailureReasonErrorKey: description]
     }
 }

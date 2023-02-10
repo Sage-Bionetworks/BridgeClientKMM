@@ -196,13 +196,13 @@ public class ParticipantFileUploadAPI: BridgeFileUploadAPITyped {
         // deserialize the bridgeUploadObject from the downloaded JSON data and
         // update the upload metadata with it
         guard var uploadMetadata = metadata as? BridgeFileUploadMetadata<TrackingType> else {
-            debugPrint("Metadata blob was not of the expected type BridgeFileUploadMetadata<\(TrackingType.self)>: \(metadata)")
+            Logger.log(tag: .upload, error: ValidationError.unexpectedNull("Metadata blob was not of the expected type BridgeFileUploadMetadata<\(TrackingType.self)>: \(metadata)"))
             return nil
         }
         do {
             uploadMetadata.bridgeUploadTrackingObject = try self.uploadManager.netManager.jsonDecoder.decode(UploadRequestResponseType.self, from: jsonData)
         } catch let err {
-            debugPrint("Unexpected: Could not parse contents of downloaded file as a \(UploadRequestResponseType.self) object: \"\(String(describing: String(data: jsonData, encoding: .utf8)))\"\n\terror:\(err)")
+            Logger.log(tag: .upload, error: err, message: "Could not parse contents of downloaded file as a \(UploadRequestResponseType.self) object: \"\(String(describing: String(data: jsonData, encoding: .utf8)))\"")
             return nil
         }
         return uploadMetadata

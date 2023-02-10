@@ -48,8 +48,8 @@ open class AbstractSingleStudyAppManager : BridgeClientAppManager {
         }
     }
     
-    open override func appWillFinishLaunching(_ launchOptions: [UIApplication.LaunchOptionsKey : Any]?) {
-        super.appWillFinishLaunching(launchOptions)
+    open override func finishLaunchingApp(_ launchOptions: [UIApplication.LaunchOptionsKey : Any]?) {
+        super.finishLaunchingApp(launchOptions)
         updateStudy()
         // Schedule notifications
         try? notificationManager?.onCleared()

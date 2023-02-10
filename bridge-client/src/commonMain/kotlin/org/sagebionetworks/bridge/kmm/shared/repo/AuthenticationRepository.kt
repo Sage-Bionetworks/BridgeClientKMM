@@ -89,7 +89,7 @@ class AuthenticationRepository(
             try {
                 authenticationApi.signOut(it)
             } catch (error: Throwable) {
-                Logger.e("Error signing out", error)
+                Logger.w("Error signing out: $error")
             }
             database.clearDatabase()
         }
@@ -109,7 +109,7 @@ class AuthenticationRepository(
             authenticationApi.requestPhoneSignIn(phoneSignInRequest)
             return true
         } catch (err: Throwable) {
-            Logger.e("Error requesting phone sign-in", err)
+            Logger.w("Error requesting phone sign-in: $err")
         }
         return false
     }
@@ -129,8 +129,7 @@ class AuthenticationRepository(
             authenticationApi.resendPhoneVerification(identifier)
             return true
         } catch (err: Throwable) {
-            Logger.e("Error calling resendPhoneVerification", err)
-            println(err)
+            Logger.w("Error calling resendPhoneVerification: $err")
         }
         return false
     }
@@ -152,7 +151,7 @@ class AuthenticationRepository(
             return ResourceResult.Success(userSession, ResourceStatus.SUCCESS)
         } catch (err: Throwable) {
             database.removeResource(USER_SESSION_ID, ResourceType.USER_SESSION_INFO, APP_WIDE_STUDY_ID)
-            Logger.e("Error signInPhone", err)
+            Logger.w("Error signInPhone: $err")
         }
         return ResourceResult.Failed(ResourceStatus.FAILED)
     }
@@ -188,7 +187,7 @@ class AuthenticationRepository(
             updateCachedSession(null, userSession)
             ResourceResult.Success(userSession, ResourceStatus.SUCCESS)
         } catch (err: Throwable) {
-            Logger.e("Error requesting reAuth with stored password", err)
+            Logger.w("Error requesting reAuth with stored password: $err")
             if (err is ResponseException && err.response.status == HttpStatusCode.NotFound) {
                 ResourceResult.Failed(ResourceStatus.FAILED)
             } else {
@@ -204,7 +203,7 @@ class AuthenticationRepository(
             return ResourceResult.Success(userSession, ResourceStatus.SUCCESS)
         } catch (err: Throwable) {
             database.removeResource(USER_SESSION_ID, ResourceType.USER_SESSION_INFO, APP_WIDE_STUDY_ID)
-            Logger.e("Error signIn", err)
+            Logger.w("Error signIn: $err")
         }
         return ResourceResult.Failed(ResourceStatus.FAILED)
     }
@@ -231,7 +230,7 @@ class AuthenticationRepository(
             val message = authenticationApi.signUp(signUp)
             return true
         } catch (err: Throwable) {
-            Logger.e("Error signUp", err)
+            Logger.w("Error signUp: $err")
         }
         return false
     }

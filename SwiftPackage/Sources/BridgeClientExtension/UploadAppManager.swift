@@ -396,7 +396,9 @@ final class ArchiveUploadProcessor {
     @MainActor
     private func _upload(archive: DataArchive, encrypted: Bool) async {
         guard let url = archive.encryptedURL else {
-            Logger.log(error: ValidationError.unexpectedNull("Cannot upload archive. Missing encryption."))
+            let message = "Cannot upload archive. Missing encryption."
+            assertionFailure(message)   // Throw an assert to alert the developer that the pem file is missing.
+            Logger.log(error: BridgeUnexpectedNullError(category: .missingFile, message: message))
             return
         }
         _uploadEncrypted(id: archive.identifier, url: url, schedule: archive.schedule)

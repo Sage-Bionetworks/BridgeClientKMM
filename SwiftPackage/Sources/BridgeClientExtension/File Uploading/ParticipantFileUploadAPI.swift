@@ -196,7 +196,8 @@ public class ParticipantFileUploadAPI: BridgeFileUploadAPITyped {
         // deserialize the bridgeUploadObject from the downloaded JSON data and
         // update the upload metadata with it
         guard var uploadMetadata = metadata as? BridgeFileUploadMetadata<TrackingType> else {
-            Logger.log(tag: .upload, error: ValidationError.unexpectedNull("Metadata blob was not of the expected type BridgeFileUploadMetadata<\(TrackingType.self)>: \(metadata)"))
+            let message = "Metadata blob was not of the expected type BridgeFileUploadMetadata<\(TrackingType.self)>: \(metadata)"
+            Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .missingMetadata, message: message))
             return nil
         }
         do {

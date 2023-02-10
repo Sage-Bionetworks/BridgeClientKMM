@@ -52,7 +52,7 @@ internal data class EnrollmentDetail (
     val enrolledOn: kotlin.String,
     
     @SerialName("enrolledBy")
-    val enrolledBy: AccountRef,
+    val enrolledBy: AccountRef? = null,
     
     @SerialName("externalId")
     val externalId: kotlin.String? = null,

@@ -347,6 +347,10 @@ final class ArchiveUploadProcessor {
     private func _encryptAndUpload(using builder: ArchiveBuilder) async {
         do {
             let archive = try await builder.buildArchive()
+            // Copy the startedOn date (if available) from the builder to the archive.
+            if let resultBuilder = builder as? ResultArchiveBuilder, archive.startedOn == nil {
+                archive.startedOn = resultBuilder.startedOn
+            }
             await _copyTest(archive: archive)
             let encrypted = await _encrypt(archive: archive)
             await _upload(archive: archive, encrypted: encrypted)
@@ -401,17 +405,22 @@ final class ArchiveUploadProcessor {
             Logger.log(error: BridgeUnexpectedNullError(category: .missingFile, message: message))
             return
         }
-        _uploadEncrypted(id: archive.identifier, url: url, schedule: archive.schedule)
+        _uploadEncrypted(id: archive.identifier, url: url, schedule: archive.schedule, startedOn: archive.startedOn)
     }
     
     @MainActor
-    private func _uploadEncrypted(id: String, url: URL, schedule: AssessmentScheduleInfo?) {
-        let exporterV3Metadata: JsonElement? = schedule.map { schedule in
-            .object([
-                "instanceGuid": schedule.instanceGuid,
-                "eventTimestamp": schedule.session.eventTimestamp
-            ])
+    private func _uploadEncrypted(id: String, url: URL, schedule: AssessmentScheduleInfo?, startedOn: Date?) {
+        var dictionary: [String : JsonSerializable] = schedule.map { schedule in
+            ["instanceGuid": schedule.instanceGuid,
+             "eventTimestamp": schedule.session.eventTimestamp,
+             "sessionInstanceGuid": schedule.session.instanceGuid,
+             "assessmentIdentifier": schedule.assessmentIdentifier,
+            ]
+        } ?? [:]
+        if let startedOn = startedOn {
+            dictionary["startedOn"] = startedOn.jsonObject()
         }
+        let exporterV3Metadata: JsonElement? = dictionary.count > 0 ? .object(dictionary) : nil
         let extras = StudyDataUploadExtras(encrypted: true, metadata: exporterV3Metadata, zipped: true)
         StudyDataUploadAPI.shared.upload(fileId: id, fileUrl: url, contentType: "application/zip", extras: extras)
         do {

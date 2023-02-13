@@ -98,11 +98,11 @@ class AdherenceRecordRepo(httpClient: HttpClient,
         var adherenceRecordsSearch = AdherenceRecordsSearch(sortOrder = SortOrder.DESC, pageSize = pageSize, includeRepeats = true, currentTimestampsOnly = true)
         try {
             do {
-                val curPageSize = pageSize
+                val curOffset = pageOffset
                 val recordResult = loadAndCacheResults(studyId, adherenceRecordsSearch)
                 pageOffset+= pageSize
                 adherenceRecordsSearch = adherenceRecordsSearch.copy(offsetBy = pageOffset)
-            } while (curPageSize + pageSize < recordResult.total)
+            } while (curOffset + pageSize < recordResult.total)
         } catch (throwable: Throwable) {
             Logger.e("Error loading remote adherence records", throwable)
             return false

@@ -22,7 +22,8 @@ internal class S3UploadApi(private val httpClient: HttpClient) {
                 setBody(fileRequest)
                 method = HttpMethod.Put
                 with(headers) {
-                    append("Content-MD5", uploadFile.md5Hash)
+                    //Old md5 algorithm was sometimes including newline character at end, trim() is to fix old stuck uploads -nbrown 1/20/23
+                    append("Content-MD5", uploadFile.md5Hash.trim())
                 }
             }
         } catch (pipeline: ReceivePipelineException) {

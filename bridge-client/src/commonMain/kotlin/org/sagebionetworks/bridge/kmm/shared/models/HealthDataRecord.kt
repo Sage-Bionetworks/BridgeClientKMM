@@ -45,7 +45,7 @@ import kotlinx.serialization.SerialName
 internal data class HealthDataRecord (
     /* The user's data groups at the time of this upload's submission. */
     @SerialName("userDataGroups")
-    val userDataGroups: List<String>,
+    val userDataGroups: List<String>? = null,
     /* App version, as reported by the app. Generally in the form \"version 1.0.0, build 2\". Must be 48 chars or less.  */
     @SerialName("appVersion")
     val appVersion: String? = null,

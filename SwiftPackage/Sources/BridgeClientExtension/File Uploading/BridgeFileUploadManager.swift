@@ -420,6 +420,7 @@ extension BridgeFileUploadAPITyped {
     
     public func notifyBridgeUploadSucceeded(relativePath: String, uploadMetadata: BridgeFileUploadMetadataBlob) {
         guard let notifyUrl = self.notifyBridgeUrlString(for: uploadMetadata) else {
+            // Do not log any error. Logging is handled by the method called if it is an error. - syoung 02/13/2022
             return
         }
         

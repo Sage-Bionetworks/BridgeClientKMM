@@ -24,6 +24,9 @@ open class DataArchive : NSObject, Identifiable {
     /// The schedule used to start this task (if any).
     public let schedule: AssessmentScheduleInfo?
     
+    /// A timestamp for the data archive that is distinct from when the archive was created.
+    public var startedOn: Date? = nil
+    
     /// Has the archive been zipped?
     public final internal(set) var isCompleted: Bool = false
     

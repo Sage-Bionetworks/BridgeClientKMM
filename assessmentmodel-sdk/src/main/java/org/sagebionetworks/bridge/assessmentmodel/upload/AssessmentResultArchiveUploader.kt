@@ -5,6 +5,7 @@ import android.content.Context.MODE_APPEND
 import android.content.Context.MODE_PRIVATE
 import android.content.res.AssetManager
 import co.touchlab.kermit.Logger
+import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
@@ -44,6 +45,7 @@ class AssessmentResultArchiveUploader(
                                     jsonCoder: Json,
                                     assessmentInstanceId: String,
                                     eventTimestamp: String,
+                                    startedOn: Instant,
                                     assessmentResultFilename: String = "assessmentResult.json",
                                     sessionWindowExpiration: kotlinx.datetime.Instant? = null) {
 
@@ -63,7 +65,8 @@ class AssessmentResultArchiveUploader(
 
         val uploadMetadata: Map<String, JsonElement> = mapOf(
             "instanceGuid" to JsonPrimitive(assessmentInstanceId),
-            "eventTimestamp" to JsonPrimitive(eventTimestamp)
+            "eventTimestamp" to JsonPrimitive(eventTimestamp),
+            "startedOn" to JsonPrimitive(startedOn.toString())
         )
 
 

@@ -242,7 +242,7 @@ open class AbstractTodayTimelineViewModel : NSObject, ObservableObject, Schedule
             dismissAssessment(scheduleInfo)
             
         case .error(let error):
-            debugPrint("Assessment \(scheduleInfo.assessmentInfo.identifier) finished early due to error. \(error)")
+            Logger.log(severity: .warn, message: "Assessment \(scheduleInfo.assessmentInfo.identifier) finished early due to error. \(error)")
             dismissAssessment(scheduleInfo)
             
         case .saveAndFinish(let archiveBuilder):

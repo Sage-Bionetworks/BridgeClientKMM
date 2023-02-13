@@ -88,10 +88,16 @@ open class BridgeClientAppManager : UploadAppManager {
     
     /// **Required:** This method should be called by the app delegate when the app is launching in either `willLaunch` or `didLaunch`.
     @MainActor
-    open func appWillFinishLaunching(_ launchOptions: [UIApplication.LaunchOptionsKey : Any]? ) {
+    open func finishLaunchingApp(_ launchOptions: [UIApplication.LaunchOptionsKey : Any]?) {
         setup()
     }
     
+    @MainActor
+    @available(*, deprecated, message: "Call `finishLaunchingApp(:)` instead.")
+    open func appWillFinishLaunching(_ launchOptions: [UIApplication.LaunchOptionsKey : Any]? ) {
+        finishLaunchingApp(launchOptions)
+    }
+
     /// Login with the given external ID and password.
     ///
     /// - Parameters:

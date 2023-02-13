@@ -128,11 +128,11 @@ public class StudyDataUploadAPI: BridgeFileUploadAPITyped {
         do {
             contentLength = try fileUrl.resourceValues(forKeys: [.fileSizeKey]).fileSize
         } catch let err {
-            debugPrint("Error trying to get content length of study data file at \(fileUrl): \(err)")
+            Logger.log(tag: .upload, error: err, message: "Error trying to get content length of study data file at \(fileUrl)")
             return nil
         }
         guard let contentLength = contentLength else {
-            debugPrint("Error: Study data file content length is nil")
+            Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .empty, message: "Error: Study data file content length is nil"))
             return nil
         }
 
@@ -141,7 +141,7 @@ public class StudyDataUploadAPI: BridgeFileUploadAPITyped {
             let fileData = try Data(contentsOf: fileUrl, options: [.alwaysMapped, .uncached])
             contentMD5String = self.md5base64(data: fileData)
         } catch let err {
-            debugPrint("Error trying to get memory-mapped data of participant file at \(fileUrl) in order to calculate its base64encoded MD5 hash: \(err)")
+            Logger.log(tag: .upload, error: err, message: "Error trying to get memory-mapped data of participant file at \(fileUrl) in order to calculate its base64encoded MD5 hash.")
             return nil
         }
         
@@ -191,6 +191,8 @@ public class StudyDataUploadAPI: BridgeFileUploadAPITyped {
     
     func notifyBridgeUrlString(for uploadMetadata: BridgeFileUploadMetadataBlob) -> String? {
         guard let uploadId = (uploadMetadata as! BridgeFileUploadMetadata<TrackingType>).bridgeUploadTrackingObject.uploadSession?.id else {
+            let message = "Could not get URL to notify Bridge of upload success from file upload metadata: \(uploadMetadata)"
+            Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .missingIdentifier, message: message))
             return nil
         }
         return "\(self.apiString)/\(uploadId)/complete"
@@ -254,14 +256,15 @@ public class StudyDataUploadAPI: BridgeFileUploadAPITyped {
         // deserialize the bridgeUploadObject from the downloaded JSON data and
         // update the upload metadata with it
         guard var uploadMetadata = metadata as? BridgeFileUploadMetadata<TrackingType> else {
-            debugPrint("Metadata blob was not of the expected type BridgeFileUploadMetadata<\(TrackingType.self)>: \(metadata)")
+            let message = "Metadata blob was not of the expected type BridgeFileUploadMetadata<\(TrackingType.self)>: \(metadata)"
+            Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .wrongType, message: message))
             return nil
         }
         do {
             uploadMetadata.bridgeUploadTrackingObject.uploadSession = try self.uploadManager.netManager.jsonDecoder.decode(UploadRequestResponseType.self, from: jsonData)
         } catch let err {
             // it's not an upload request response so log it (just in case it's something unexpected) and return nil
-            debugPrint("Could not parse contents of downloaded file as a \(UploadRequestResponseType.self) object, ignoring: \"\(String(describing: String(data: jsonData, encoding: .utf8)))\"\n\terror:\(err)")
+            Logger.log(severity: .warn, tag: .upload, message: "Could not parse contents of downloaded file as a \(UploadRequestResponseType.self) object, ignoring: \"\(String(describing: String(data: jsonData, encoding: .utf8)))\"\n\terror:\(err)")
             return nil
         }
         return uploadMetadata
@@ -272,7 +275,7 @@ public class StudyDataUploadAPI: BridgeFileUploadAPITyped {
         do {
             return try self.uploadManager.netManager.jsonDecoder.decode(StudyDataUploadExtras.self, from: data)
         } catch let err {
-            debugPrint("Unexpected: Could not parse Xattrs upload extras data as a \(StudyDataUploadExtras.self) object: \"\(String(describing: String(data: data, encoding: .utf8)))\"\n\terror:\(err)")
+            Logger.log(severity: .info, tag: .upload, message: "Unexpected: Could not parse Xattrs upload extras data as a \(StudyDataUploadExtras.self) object: \"\(String(describing: String(data: data, encoding: .utf8)))\"\n\terror:\(err)")
             return nil
         }
     }

@@ -106,7 +106,7 @@ public struct SurveyView<DisplayView : AssessmentDisplayView>: View {
                     restoredResult: config.restoreResult,
                     interruptionHandling: nil)
             } catch {
-                debugPrint("Failed to load assessment \(assessmentInfo.assessmentInfo.identifier): \(error)")
+                Logger.log(severity: .info, message: "Failed to load assessment \(assessmentInfo.assessmentInfo.identifier): \(error)")
                 handler.updateAssessmentStatus(assessmentInfo, status: .error(error))
             }
         }

@@ -45,7 +45,7 @@ extension AppConfigObserver {
             return try decoder.decode(PrivacyNotice.self, from: data)
         }
         catch let err {
-            print("WARNING! Failed to decode config: \(err)")
+            Logger.log(severity: .warn, message: "Failed to decode config: \(err)")
             return nil
         }
     }

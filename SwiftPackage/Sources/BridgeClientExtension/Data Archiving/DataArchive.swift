@@ -63,7 +63,9 @@ open class DataArchive : NSObject, Identifiable {
     public final func addFile(data: Data, filepath: String, createdOn: Date = Date(), contentType: String? = nil) throws {
         guard data.count <= kFileSizeLimit
         else {
-            debugPrint("File size exceeds allowed limit. filepath=\(filepath), filesize=\(data.count)")
+            let error = BridgeArchiveError(category: .exceedsAllowedLimit,
+                                           message: "File size exceeds allowed limit. filepath=\(filepath), filesize=\(data.count)")
+            Logger.log(tag: .upload, error: error)
             return
         }
         try archiver.addFile(data: data, filepath: filepath, createdOn: createdOn, contentType: contentType)
@@ -107,12 +109,30 @@ open class DataArchive : NSObject, Identifiable {
             filename.append(dateString)
             let debugURL = dirURL.appendingPathComponent(filename, isDirectory: false).appendingPathExtension("zip")
             try fileManager.copyItem(at: url, to: debugURL)
-            debugPrint("Copied archive to \(debugURL)")
+            Logger.log(severity: .info, message: "Copied archive to \(debugURL)")
             
         } catch let err {
-            debugPrint("Failed to copy archive: \(err)")
+            Logger.log(severity: .info, message: "Failed to copy archive: \(err)")
         }
     }
     #endif
 }
 
+struct BridgeArchiveError : Error, CustomNSError {
+    static var errorDomain: String { "BridgeClientUI.ArchiveError" }
+    
+    let category: Category
+    let message: String
+    
+    var errorCode: Int {
+        category.rawValue
+    }
+    
+    var errorUserInfo: [String : Any] {
+        [NSLocalizedFailureReasonErrorKey: message]
+    }
+    
+    enum Category : Int {
+        case exceedsAllowedLimit = -200
+    }
+}

@@ -18,6 +18,7 @@ import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper.Compan
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
 import org.sagebionetworks.bridge.kmm.shared.getJsonReponseHandler
+import org.sagebionetworks.bridge.kmm.shared.getMockTestClient
 import org.sagebionetworks.bridge.kmm.shared.getTestClient
 import org.sagebionetworks.bridge.kmm.shared.models.UploadStatus
 import org.sagebionetworks.bridge.kmm.shared.models.UploadValidationStatus
@@ -126,7 +127,8 @@ class UploadManagerTest {
                 )
                 reuseHandlers = false
             }
-            val testClient = getTestClient(mockEngine)
+            // TODO: syoung 02/14/2022 Figure out why this test fails without using original mock.
+            val testClient = getMockTestClient(mockEngine)
             val uploadManager = setupUploadManager(testClient, tempFile)
             val database = uploadManager.database
 

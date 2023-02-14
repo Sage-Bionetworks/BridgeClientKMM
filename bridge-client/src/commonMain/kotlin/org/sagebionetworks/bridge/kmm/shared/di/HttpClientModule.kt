@@ -1,6 +1,7 @@
 package org.sagebionetworks.bridge.kmm.shared.di
 
 import io.ktor.client.*
+import io.ktor.client.engine.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
@@ -16,7 +17,7 @@ import org.sagebionetworks.bridge.kmm.shared.apis.HttpUtil
 import org.sagebionetworks.bridge.kmm.shared.apis.RefreshTokenFeature
 import org.sagebionetworks.bridge.kmm.shared.apis.SessionTokenFeature
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
-import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
+import org.sagebionetworks.bridge.kmm.shared.repo.AuthenticationProvider
 import org.sagebionetworks.bridge.kmm.shared.repo.AuthenticationRepository
 
 fun httpClientModule(enableNetworkLogs: Boolean) = module {
@@ -25,38 +26,30 @@ fun httpClientModule(enableNetworkLogs: Boolean) = module {
 
     //HttpClient configured for use with AuthenticationAPI, it needs its own HttpClient so as not to
     // include the re-authentication feature found in DefaultHttpClient, which would cause a dependency loop
-    single<HttpClient>(named("authHttpClient")) { createHttpClient(enableNetworkLogs, get(), get()) }
+    single<HttpClient>(named("authHttpClient")) { createAuthHttpClient(enableNetworkLogs, get(), get()) }
 
 }
 
 /**
- * Creates an HttpClient configured with session token and refresh token features for authenticated
- * Bridge calls.
+ * Create a base HttpClient with any config that is shared between the authentication services
+ * and the other services (which typically includes a session token).
  */
-private fun createBridgeHttpClient(
-    enableNetworkLogs: Boolean,
-    bridgeConfig: BridgeConfig,
-    authenticationRepository: AuthenticationRepository,
-    etagStorageCache: ResourceDatabaseHelper,
-    httpUtil: HttpUtil
-) = HttpClient {
-    val sessionTokenHeaderKey = "Bridge-Session"
+private fun HttpClient.appendBaseConfig(bridgeConfig: BridgeConfig, httpUtil: HttpUtil, logLevel: LogLevel?) =
+    this.config {
 
     install(UserAgent) {
         agent = bridgeConfig.userAgent
     }
+
     install(ContentNegotiation) {
         json(Json {
             ignoreUnknownKeys = true
         })
     }
-    install(EtagFeature) {
-        storageCache = etagStorageCache
-    }
 
-    if (enableNetworkLogs) {
+    if (logLevel != null) {
         install(Logging) {
-            level = LogLevel.ALL
+            level = logLevel
             logger = object : Logger {
                 override fun log(message: String) {
                     println(message)
@@ -68,6 +61,33 @@ private fun createBridgeHttpClient(
     defaultRequest {
         header("Accept-Language", httpUtil.acceptLanguage())
     }
+}
+
+private fun createBridgeHttpClient(
+    enableNetworkLogs: Boolean,
+    bridgeConfig: BridgeConfig,
+    authenticationRepository: AuthenticationRepository,
+    etagStorageCache: ResourceDatabaseHelper,
+    httpUtil: HttpUtil
+) = HttpClient().appendDefaultConfig(enableNetworkLogs, bridgeConfig, authenticationRepository, etagStorageCache, httpUtil)
+
+/**
+ * Creates an HttpClient configured with session token and refresh token features for authenticated
+ * Bridge calls.
+ */
+internal fun HttpClient.appendDefaultConfig(
+    enableNetworkLogs: Boolean,
+    bridgeConfig: BridgeConfig,
+    authenticationRepository: AuthenticationProvider,
+    etagStorageCache: ResourceDatabaseHelper,
+    httpUtil: HttpUtil
+) = this.appendBaseConfig(bridgeConfig, httpUtil, if (enableNetworkLogs) LogLevel.ALL else null).config {
+
+    val sessionTokenHeaderKey = "Bridge-Session"
+
+    install(EtagFeature) {
+        storageCache = etagStorageCache
+    }
 
     install(SessionTokenFeature) {
         sessionTokenHeaderName = sessionTokenHeaderKey
@@ -78,6 +98,7 @@ private fun createBridgeHttpClient(
             }
         }
     }
+
     install(RefreshTokenFeature) {
         updateTokenHandler = suspend {
             authenticationRepository.reAuth()
@@ -91,31 +112,17 @@ private fun createBridgeHttpClient(
     }
 }
 
-private fun createHttpClient(enableNetworkLogs: Boolean, bridgeConfig: BridgeConfig, httpUtil: HttpUtil) = HttpClient {
+private fun createAuthHttpClient(
+    enableNetworkLogs: Boolean,
+    bridgeConfig: BridgeConfig,
+    httpUtil: HttpUtil
+) = HttpClient().appendAuthConfig(enableNetworkLogs, bridgeConfig, httpUtil)
 
-    install(UserAgent) {
-        agent = bridgeConfig.userAgent
-    }
-
-    install(ContentNegotiation) {
-        json(Json {
-            ignoreUnknownKeys = true
-        })
-    }
-
-    if (enableNetworkLogs) {
-        install(Logging) {
-            level = LogLevel.HEADERS //Don't log body since that could include password
-            logger = object : Logger {
-                override fun log(message: String) {
-                    println(message)
-                }
-            }
-        }
-    }
-    defaultRequest {
-        header("Accept-Language", httpUtil.acceptLanguage())
-    }
+internal fun HttpClient.appendAuthConfig(
+    enableNetworkLogs: Boolean,
+    bridgeConfig: BridgeConfig,
+    httpUtil: HttpUtil
+) = this.appendBaseConfig(bridgeConfig, httpUtil, if (enableNetworkLogs) LogLevel.HEADERS else null).config {
 
     expectSuccess = false //Turns off automatic response code validation
 
@@ -140,7 +147,4 @@ private fun createHttpClient(enableNetworkLogs: Boolean, bridgeConfig: BridgeCon
             }
         }
     }
-
 }
-
-

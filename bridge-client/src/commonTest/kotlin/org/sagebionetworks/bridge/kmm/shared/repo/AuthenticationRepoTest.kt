@@ -6,12 +6,10 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.MainScope
-import org.sagebionetworks.bridge.kmm.shared.BaseTest
+import org.sagebionetworks.bridge.kmm.shared.*
 import org.sagebionetworks.bridge.kmm.shared.apis.AbstractApi
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
-import org.sagebionetworks.bridge.kmm.shared.getJsonReponseHandler
-import org.sagebionetworks.bridge.kmm.shared.getTestClient
 import org.sagebionetworks.bridge.kmm.shared.testDatabaseDriver
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -24,8 +22,13 @@ class AuthenticationRepoTest : BaseTest() {
         runTest {
 
             val json = "{\"statusCode\":404,\"entityClass\":\"Account\",\"message\":\"Study not found.\",\"type\":\"EntityNotFoundException\"}"
-            val db = ResourceDatabaseHelper(testDatabaseDriver())
-            val authRepo = AuthenticationRepository(getTestClient(json, HttpStatusCode.NotFound), TestBridgeConfig(),  db, MainScope())
+            val testConfig = TestHttpClientConfig(authProvider = null)
+
+            val authRepo = AuthenticationRepository(
+                getTestClient(json, HttpStatusCode.NotFound, testConfig),
+                testConfig.bridgeConfig,
+                testConfig.db,
+                MainScope())
 
             val response = authRepo.signInExternalId("typo:test_study", "typo:test_study")
             assertTrue(response is ResourceResult.Failed)

@@ -106,10 +106,9 @@ internal fun HttpClient.appendDefaultConfig(
             authenticationRepository.reAuth()
         }
         isCredentialsActual = fun(request: HttpRequest): Boolean {
-            authenticationRepository.session()?.sessionToken?.let {
+            return authenticationRepository.session()?.sessionToken?.let {
                 return it.isNotEmpty() && it.equals(request.headers.get(sessionTokenHeaderKey))
-            }
-            return true
+            } ?: true
         }
     }
 }

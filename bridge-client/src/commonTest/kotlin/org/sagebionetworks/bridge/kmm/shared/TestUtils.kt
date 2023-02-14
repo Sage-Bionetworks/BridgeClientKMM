@@ -16,10 +16,10 @@ import org.sagebionetworks.bridge.kmm.shared.apis.SessionTokenFeature
 
 internal expect fun testDatabaseDriver() : SqlDriver
 
-fun getTestClient(json: String): HttpClient {
+fun getTestClient(json: String, responseCode: HttpStatusCode = HttpStatusCode.OK): HttpClient {
     val mockEngine = MockEngine.config {
         addHandler (
-            getJsonReponseHandler(json)
+            getJsonReponseHandler(json, responseCode)
         )
     }
     return getTestClient(mockEngine)
@@ -67,8 +67,8 @@ fun getTestClient(mockEngine: HttpClientEngineFactory<MockEngineConfig>) : HttpC
     }
 }
 
-fun getJsonReponseHandler(json: String) : suspend MockRequestHandleScope.(io.ktor.client.request.HttpRequestData) -> io.ktor.client.request.HttpResponseData {
+fun getJsonReponseHandler(json: String, responseCode: HttpStatusCode = HttpStatusCode.OK) : suspend MockRequestHandleScope.(io.ktor.client.request.HttpRequestData) -> io.ktor.client.request.HttpResponseData {
     return {request ->
-        respond(json, headers = headersOf("Content-Type" to listOf(ContentType.Application.Json.toString())))
+        respond(json, responseCode, headersOf("Content-Type" to listOf(ContentType.Application.Json.toString())))
     }
 }

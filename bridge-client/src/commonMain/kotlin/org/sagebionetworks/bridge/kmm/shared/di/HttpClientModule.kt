@@ -83,6 +83,8 @@ internal fun HttpClient.appendDefaultConfig(
     httpUtil: HttpUtil
 ) = this.appendBaseConfig(bridgeConfig, httpUtil, if (enableNetworkLogs) LogLevel.ALL else null).config {
 
+    expectSuccess = true    // Turn on default of throwing exception for status code > 300
+
     val sessionTokenHeaderKey = "Bridge-Session"
 
     install(EtagFeature) {

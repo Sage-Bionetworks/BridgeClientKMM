@@ -8,6 +8,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import org.sagebionetworks.bridge.kmm.shared.BaseTest
 import org.sagebionetworks.bridge.kmm.shared.getJsonReponseHandler
+import org.sagebionetworks.bridge.kmm.shared.getMockTestClient
 import org.sagebionetworks.bridge.kmm.shared.getTestClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -26,7 +27,8 @@ class HttpRequestTests: BaseTest() {
                 )
                 reuseHandlers = false
             }
-            val testClient = getTestClient(mockEngine)
+            // TODO: syoung 02/14/2022 Revisit this and set up to not use the original test client.
+            val testClient = getMockTestClient(mockEngine)
 
             val response: HttpResponse = testClient.get(AbstractApi.BASE_PATH)
             val agentList = response.request.headers.getAll(HttpHeaders.UserAgent)

@@ -19,12 +19,17 @@ import org.sagebionetworks.bridge.kmm.shared.cache.*
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper.Companion.APP_WIDE_STUDY_ID
 import org.sagebionetworks.bridge.kmm.shared.models.*
 
+interface  AuthenticationProvider {
+    fun session() : UserSessionInfo?
+    suspend fun reAuth() : Boolean
+}
+
 class AuthenticationRepository(
     authHttpClient: HttpClient,
     val bridgeConfig: BridgeConfig,
     val database: ResourceDatabaseHelper,
     private val backgroundScope: CoroutineScope
-) : KoinComponent {
+) : KoinComponent, AuthenticationProvider {
 
     internal companion object {
         const val USER_SESSION_ID = "UserSessionId"
@@ -48,7 +53,7 @@ class AuthenticationRepository(
     /**
      * Get the current [UserSessionInfo] object.
      */
-    fun session() : UserSessionInfo? {
+    override fun session() : UserSessionInfo? {
         return sessionResource()?.loadResource()
     }
 
@@ -235,7 +240,7 @@ class AuthenticationRepository(
         return false
     }
 
-    suspend fun reAuth() : Boolean = reAuthWithError().first
+    override suspend fun reAuth() : Boolean = reAuthWithError().first
 
     suspend fun reAuthWithError() : Pair<Boolean, Error?> {
         val sessionInfo = session()

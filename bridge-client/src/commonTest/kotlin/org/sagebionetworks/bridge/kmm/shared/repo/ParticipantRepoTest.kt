@@ -22,7 +22,8 @@ class ParticipantRepoTest : BaseTest() {
         id = "uniqueId",
         authenticated = true,
         studyIds = listOf("testStudyId"),
-        sessionToken = "testSessionToken"
+        sessionToken = "testSessionToken",
+        reauthToken = "testReauthToken"
     )
 
     @Test
@@ -41,8 +42,10 @@ class ParticipantRepoTest : BaseTest() {
                 needSave = false
             )
             db.insertUpdateResource(resource)
-            val authRepo = AuthenticationRepository(getTestClient(""), TestBridgeConfig(),  db, MainScope())
-            val participantRepo = ParticipantRepo(getTestClient(""), db, MainScope(), authRepo)
+            val bridgeConfig = TestBridgeConfig()
+            val testConfig = TestHttpClientConfig(bridgeConfig = bridgeConfig, db = db)
+            val authRepo = AuthenticationRepository(getTestClient("", config = testConfig.copy(authProvider = null)), bridgeConfig,  db, MainScope())
+            val participantRepo = ParticipantRepo(getTestClient("", config = testConfig), db, MainScope(), authRepo)
             val session = authRepo.session()
             assertNotNull(session)
             assertNull(session.clientData)

@@ -19,13 +19,14 @@ import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
 import org.sagebionetworks.bridge.kmm.shared.getJsonReponseHandler
 import org.sagebionetworks.bridge.kmm.shared.getTestClient
+import org.sagebionetworks.bridge.kmm.shared.models.UploadSession
 import org.sagebionetworks.bridge.kmm.shared.models.UploadStatus
 import org.sagebionetworks.bridge.kmm.shared.models.UploadValidationStatus
 import org.sagebionetworks.bridge.kmm.shared.testDatabaseDriver
-import org.sagebionetworks.bridge.kmm.shared.models.UploadSession
 import java.io.File
 import java.io.PrintWriter
-import kotlin.test.*
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 
 class UploadManagerTest {

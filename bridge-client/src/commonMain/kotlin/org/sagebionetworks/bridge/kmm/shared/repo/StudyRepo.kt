@@ -35,13 +35,7 @@ class StudyRepo(internal val bridgeConfig: BridgeConfig, httpClient: HttpClient,
      * @return StudyInfo
      */
     suspend fun getStudyInfo(studyId: String): ResourceResult<StudyInfo> {
-        return try {
-            val studyInfo = studyApi.getStudyInfo(bridgeConfig.appId, studyId)
-            ResourceResult.Success(studyInfo, ResourceStatus.SUCCESS)
-        } catch (err: Throwable) {
-            println(err)
-            ResourceResult.Failed(ResourceStatus.FAILED)
-        }
+        return getResourceById(studyId, studyId = studyId, resourceType = ResourceType.STUDY_INFO, remoteLoad =  { loadRemoteStudyInfo(studyId) })
     }
 
     /**
@@ -50,7 +44,7 @@ class StudyRepo(internal val bridgeConfig: BridgeConfig, httpClient: HttpClient,
      * @return Study
      */
     fun getStudy(studyId: String): Flow<ResourceResult<Study>> {
-        return getResourceById(studyId, resourceType = ResourceType.STUDY, remoteLoad =  { loadRemoteStudy(studyId) },
+        return getResourceByIdAsFlow(studyId, resourceType = ResourceType.STUDY, remoteLoad =  { loadRemoteStudy(studyId) },
             studyId = studyId
         )
     }

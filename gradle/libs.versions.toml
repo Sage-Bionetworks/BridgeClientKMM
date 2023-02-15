@@ -16,7 +16,8 @@ okio = "3.0.0"
 kermit = "1.0.0"
 androidWorkManager = "2.7.1"
 androidxLifecycle = "2.2.0"
-kover = "0.6.1"
+#TODO: syoung 02/15/2022 Figure out why this fails to build on my machine
+#kover = "0.6.1"
 
 [libraries]
 
@@ -38,7 +39,7 @@ gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.r
 gradlePlugin-android = "com.android.tools.build:gradle:7.3.0"
 gradlePlugin-kotlinSerialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 gradlePlugin-sqlDelight = { module = "app.cash.sqldelight:gradle-plugin", version.ref = "sqlDelight" }
-gradlePlugin-kover = { module = "org.jetbrains.kotlinx:kover", version.ref = "kover" }
+#gradlePlugin-kover = { module = "org.jetbrains.kotlinx:kover", version.ref = "kover" }
 
 junit = { module = "junit:junit", version = "4.13.2" }
 
@@ -83,7 +84,7 @@ gradlePlugins = [
     "gradlePlugin-android",
     "gradlePlugin-kotlinSerialization",
     "gradlePlugin-sqlDelight",
-    "gradlePlugin-kover",
+#    "gradlePlugin-kover",
 ]
 ktor-common = ["ktor-client-core", "ktor-client-logging", "ktor-client-serialization"]
 

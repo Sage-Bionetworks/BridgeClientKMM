@@ -13,62 +13,71 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 import org.sagebionetworks.bridge.kmm.shared.apis.RefreshTokenFeature
 import org.sagebionetworks.bridge.kmm.shared.apis.SessionTokenFeature
+import org.sagebionetworks.bridge.kmm.shared.apis.HttpUtil
+import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
+import org.sagebionetworks.bridge.kmm.shared.di.appendAuthConfig
+import org.sagebionetworks.bridge.kmm.shared.di.appendDefaultConfig
+import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
+import org.sagebionetworks.bridge.kmm.shared.repo.AuthenticationProvider
+import org.sagebionetworks.bridge.kmm.shared.repo.TestBridgeConfig
 
 internal expect fun testDatabaseDriver() : SqlDriver
 
-fun getTestClient(json: String): HttpClient {
+data class MockAuthenticationProvider(
+    var userSessionInfo: UserSessionInfo? = createUserSessionInfo(),
+    val reauthSessionToken: String = "newTestSessionToken",
+    val reauthToken: String = "newReauthToken"
+) : AuthenticationProvider {
+    override fun session(): UserSessionInfo? {
+        return userSessionInfo
+    }
+
+    override suspend fun reAuth(): Boolean {
+        userSessionInfo = userSessionInfo?.copy(sessionToken = reauthSessionToken, reauthToken = reauthToken)
+        return userSessionInfo != null
+    }
+}
+
+fun createUserSessionInfo(sessionToken: String = "testSessionToken", reauthToken: String? = "reauthToken") : UserSessionInfo = UserSessionInfo(
+    id = "uniqueId",
+    authenticated = true,
+    studyIds = listOf("testStudyId"),
+    sessionToken = sessionToken,
+    reauthToken = reauthToken
+)
+
+data class TestHttpClientConfig(
+    val bridgeConfig: BridgeConfig = TestBridgeConfig(),
+    val authProvider: AuthenticationProvider? = MockAuthenticationProvider(),
+    val db: ResourceDatabaseHelper = ResourceDatabaseHelper(testDatabaseDriver()),
+    val langCode: String = "en-US,en"
+) : HttpUtil {
+    override fun acceptLanguage(): String {
+        return langCode
+    }
+}
+
+fun getTestClient(json: String,
+                  responseCode: HttpStatusCode = HttpStatusCode.OK,
+                  config: TestHttpClientConfig = TestHttpClientConfig()): HttpClient {
     val mockEngine = MockEngine.config {
         addHandler (
-            getJsonReponseHandler(json)
+            getJsonReponseHandler(json, responseCode)
         )
     }
-    return getTestClient(mockEngine)
+    return getTestClient(mockEngine, config)
 }
 
-fun getTestClient(mockEngine: HttpClientEngineFactory<MockEngineConfig>) : HttpClient {
-    return HttpClient(mockEngine) {
-        install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-            })
-        }
-        install(Logging) {
-            level = LogLevel.ALL
-            logger = object : Logger {
-                override fun log(message: String) {
-                    println(message)
-                }
-            }
-        }
-        install(UserAgent) {
-            agent = "Unit Test agent"
-        }
-        install(SessionTokenFeature) {
-            sessionTokenHeaderName = "Bridge-Session"
-            sessionTokenProvider = object : SessionTokenFeature.SessionTokenProvider {
-
-                override fun getSessionToken(): String? {
-                    return "TestToken"
-                }
-            }
-        }
-        install(RefreshTokenFeature) {
-            updateTokenHandler = suspend {
-                true
-            }
-            isCredentialsActual = fun(request: HttpRequest): Boolean {
-                // By always returning false, test can simulate an expired token by mocking a 401 response.
-                // Other tests will not call this code.
-                return false
-            }
-
-        }
-        expectSuccess = true
+fun getTestClient(mockEngine: HttpClientEngineFactory<MockEngineConfig>,
+                  config: TestHttpClientConfig = TestHttpClientConfig()) =
+    if (config.authProvider != null) {
+        HttpClient(mockEngine).appendDefaultConfig(true, config.bridgeConfig, config.authProvider, config.db, config)
+    } else {
+        HttpClient(mockEngine).appendAuthConfig(true, config.bridgeConfig, config)
     }
-}
 
-fun getJsonReponseHandler(json: String) : suspend MockRequestHandleScope.(io.ktor.client.request.HttpRequestData) -> io.ktor.client.request.HttpResponseData {
+fun getJsonReponseHandler(json: String, responseCode: HttpStatusCode = HttpStatusCode.OK) : suspend MockRequestHandleScope.(io.ktor.client.request.HttpRequestData) -> io.ktor.client.request.HttpResponseData {
     return {request ->
-        respond(json, headers = headersOf("Content-Type" to listOf(ContentType.Application.Json.toString())))
+        respond(json, responseCode, headersOf("Content-Type" to listOf(ContentType.Application.Json.toString())))
     }
 }

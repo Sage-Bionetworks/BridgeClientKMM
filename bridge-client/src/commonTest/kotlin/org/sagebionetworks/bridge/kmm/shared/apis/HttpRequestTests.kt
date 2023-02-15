@@ -8,7 +8,6 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import org.sagebionetworks.bridge.kmm.shared.BaseTest
 import org.sagebionetworks.bridge.kmm.shared.getJsonReponseHandler
-import org.sagebionetworks.bridge.kmm.shared.getMockTestClient
 import org.sagebionetworks.bridge.kmm.shared.getTestClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -16,7 +15,7 @@ import kotlin.test.assertEquals
 class HttpRequestTests: BaseTest() {
 
     @Test
-    fun testRefreshToken() {
+    fun testRefreshToken_UserAgent() {
         runTest {
             val mockEngine = MockEngine.config {
                 // 1 - Fail first call to simulate expired token
@@ -27,14 +26,14 @@ class HttpRequestTests: BaseTest() {
                 )
                 reuseHandlers = false
             }
-            // TODO: syoung 02/14/2022 Revisit this and set up to not use the original test client.
-            val testClient = getMockTestClient(mockEngine)
+            val testClient = getTestClient(mockEngine)
 
             val response: HttpResponse = testClient.get(AbstractApi.BASE_PATH)
             val agentList = response.request.headers.getAll(HttpHeaders.UserAgent)
+            assertEquals(HttpStatusCode.OK, response.status)
             // Verify that we only had one User-Agent added
             assertEquals(1, agentList?.size)
-            assertEquals("Unit Test agent", agentList?.get(0))
+            assertEquals("bridge-client-kmm-test/1 (Test; Test/Test)", agentList?.get(0))
         }
     }
 

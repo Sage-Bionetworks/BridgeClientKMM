@@ -47,7 +47,7 @@ class AssessmentConfigRepo(httpClient: HttpClient, databaseHelper: ResourceDatab
      * Bridge server when necessary.
      */
     fun getAssessmentConfig(assessmentInfo: AssessmentInfo): Flow<ResourceResult<AssessmentConfig>> {
-        return getResourceById(
+        return getResourceByIdAsFlow(
             identifier = assessmentInfo.guid,
             secondaryId = assessmentInfo.identifier,
             resourceType = ResourceType.ASSESSMENT_CONFIG,

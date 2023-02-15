@@ -29,7 +29,7 @@ class AppConfigRepo(httpClient: HttpClient,
     )
 
     fun getAppConfig(): Flow<ResourceResult<AppConfig>> {
-        return getResourceById(
+        return getResourceByIdAsFlow(
             identifier = bridgeConfig.appId,
             resourceType = ResourceType.APP_CONFIG,
             remoteLoad = { loadRemoteAppConfig() },

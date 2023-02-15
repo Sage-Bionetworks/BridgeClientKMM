@@ -70,7 +70,7 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
     }
 
     private fun getTimeline(studyId: String): Flow<ResourceResult<ParticipantSchedule>> {
-        return getResourceById(
+        return getResourceByIdAsFlow(
             SCHEDULE_TIMELINE_ID + studyId,
             resourceType = ResourceType.PARTICIPANT_SCHEDULE,
             remoteLoad = { loadRemoteTimeline(studyId) },

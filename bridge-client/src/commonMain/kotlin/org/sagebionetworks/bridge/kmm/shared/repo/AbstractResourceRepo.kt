@@ -14,12 +14,12 @@ import org.sagebionetworks.bridge.kmm.shared.cache.*
 
 abstract class AbstractResourceRepo(val database: ResourceDatabaseHelper, protected val backgroundScope: CoroutineScope) {
 
-    internal inline fun <reified T: Any> getResourceById(identifier: String,
-                                                         studyId: String,
-                                                         resourceType: ResourceType,
-                                                         secondaryId: String? = null,
-                                                         noinline remoteLoad: suspend () -> String,
-                                                         noinline shouldUpdate: (Resource) -> Boolean = {false}): Flow<ResourceResult<T>> {
+    internal inline fun <reified T: Any> getResourceByIdAsFlow(identifier: String,
+                                                               studyId: String,
+                                                               resourceType: ResourceType,
+                                                               secondaryId: String? = null,
+                                                               noinline remoteLoad: suspend () -> String,
+                                                               noinline shouldUpdate: (Resource) -> Boolean = {false}): Flow<ResourceResult<T>> {
         return database.getResourceAsFlow(identifier, resourceType, studyId).filter { curResource ->
             var filterResource = true //Return current item in the flow
             if (curResource == null ||
@@ -39,6 +39,21 @@ abstract class AbstractResourceRepo(val database: ResourceDatabaseHelper, protec
         }
 
     }
+
+    internal suspend inline fun <reified T: Any> getResourceById(identifier: String,
+                                                         studyId: String,
+                                                         resourceType: ResourceType,
+                                                         secondaryId: String? = null,
+                                                         noinline remoteLoad: suspend () -> String) : ResourceResult<T> {
+        var curResource = database.getResource(identifier, resourceType, studyId)
+        if (curResource == null ||
+                    (curResource.lastUpdate + defaultUpdateFrequency < Clock.System.now().toEpochMilliseconds())
+        ) {
+            curResource = remoteLoadResource(database, identifier, secondaryId, resourceType, studyId, curResource, remoteLoad)
+        }
+        return processResult(curResource)
+    }
+
 
     internal companion object {
 

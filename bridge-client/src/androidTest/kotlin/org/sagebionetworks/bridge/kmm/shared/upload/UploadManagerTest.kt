@@ -18,15 +18,15 @@ import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper.Compan
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
 import org.sagebionetworks.bridge.kmm.shared.getJsonReponseHandler
-import org.sagebionetworks.bridge.kmm.shared.getMockTestClient
 import org.sagebionetworks.bridge.kmm.shared.getTestClient
+import org.sagebionetworks.bridge.kmm.shared.models.UploadSession
 import org.sagebionetworks.bridge.kmm.shared.models.UploadStatus
 import org.sagebionetworks.bridge.kmm.shared.models.UploadValidationStatus
 import org.sagebionetworks.bridge.kmm.shared.testDatabaseDriver
-import org.sagebionetworks.bridge.kmm.shared.models.UploadSession
 import java.io.File
 import java.io.PrintWriter
-import kotlin.test.*
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 
 class UploadManagerTest {
@@ -127,8 +127,7 @@ class UploadManagerTest {
                 )
                 reuseHandlers = false
             }
-            // TODO: syoung 02/14/2022 Figure out why this test fails without using original mock.
-            val testClient = getMockTestClient(mockEngine)
+            val testClient = getTestClient(mockEngine)
             val uploadManager = setupUploadManager(testClient, tempFile)
             val database = uploadManager.database
 

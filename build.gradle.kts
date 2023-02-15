@@ -16,24 +16,25 @@ buildscript {
 plugins {
     id("org.jetbrains.dokka") version "1.6.0"
     id("maven-publish")
-    id("org.jetbrains.kotlinx.kover") version "0.6.1"
+//    id("org.jetbrains.kotlinx.kover") version "0.6.1"
 }
 
-koverMerged {
-    enable()
-
-    htmlReport {
-        // set to true to run koverHtmlReport task during the execution of the check task (if it exists) of the current project
-        onCheck.set(true)
-    }
-
-    filters {
-
-        projects {
-            excludes += listOf("androidApp", "bridge-client-presentation")
-        }
-    }
-}
+// TODO: syoung 02/15/2022 Figure out why this plugin doesn't work on my machine.
+//koverMerged {
+//    enable()
+//
+//    htmlReport {
+//        // set to true to run koverHtmlReport task during the execution of the check task (if it exists) of the current project
+//        onCheck.set(true)
+//    }
+//
+//    filters {
+//
+//        projects {
+//            excludes += listOf("androidApp", "bridge-client-presentation")
+//        }
+//    }
+//}
 
 tasks.dokkaHtmlMultiModule {
     outputDirectory.set(rootDir.resolve("build/dokka"))
@@ -63,5 +64,6 @@ allprojects {
             }
         }
     }
-    apply(plugin = "kover")
+// TODO: syoung 02/15/2022 Figure out why this plugin doesn't work on my machine.
+//    apply(plugin = "kover")
 }

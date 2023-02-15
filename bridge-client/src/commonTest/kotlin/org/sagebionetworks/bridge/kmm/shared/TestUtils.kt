@@ -76,48 +76,6 @@ fun getTestClient(mockEngine: HttpClientEngineFactory<MockEngineConfig>,
         HttpClient(mockEngine).appendAuthConfig(true, config.bridgeConfig, config)
     }
 
-//fun getMockTestClient(mockEngine: HttpClientEngineFactory<MockEngineConfig>) : HttpClient {
-//    return HttpClient(mockEngine) {
-//        install(ContentNegotiation) {
-//            json(Json {
-//                ignoreUnknownKeys = true
-//            })
-//        }
-//        install(Logging) {
-//            level = LogLevel.ALL
-//            logger = object : Logger {
-//                override fun log(message: String) {
-//                    println(message)
-//                }
-//            }
-//        }
-//        install(UserAgent) {
-//            agent = "Unit Test agent"
-//        }
-//        install(SessionTokenFeature) {
-//            sessionTokenHeaderName = "Bridge-Session"
-//            sessionTokenProvider = object : SessionTokenFeature.SessionTokenProvider {
-//
-//                override fun getSessionToken(): String? {
-//                    return "TestToken"
-//                }
-//            }
-//        }
-//        install(RefreshTokenFeature) {
-//            updateTokenHandler = suspend {
-//                true
-//            }
-//            isTokenSameOrNull = fun(request: HttpRequest): Boolean {
-//                // By always returning false, test can simulate an expired token by mocking a 401 response.
-//                // Other tests will not call this code.
-//                return false
-//            }
-//
-//        }
-//        expectSuccess = true
-//    }
-//}
-
 fun getJsonReponseHandler(json: String, responseCode: HttpStatusCode = HttpStatusCode.OK) : suspend MockRequestHandleScope.(io.ktor.client.request.HttpRequestData) -> io.ktor.client.request.HttpResponseData {
     return {request ->
         respond(json, responseCode, headersOf("Content-Type" to listOf(ContentType.Application.Json.toString())))

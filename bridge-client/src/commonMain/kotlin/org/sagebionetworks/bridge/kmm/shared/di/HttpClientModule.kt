@@ -1,7 +1,6 @@
 package org.sagebionetworks.bridge.kmm.shared.di
 
 import io.ktor.client.*
-import io.ktor.client.engine.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
@@ -105,7 +104,8 @@ internal fun HttpClient.appendDefaultConfig(
         updateTokenHandler = suspend {
             authenticationRepository.reAuth()
         }
-        isCredentialsActual = fun(request: HttpRequest): Boolean {
+        // Check if the cached session token matches the one used in the request, or is null.
+        isTokenSameOrNull = fun(request: HttpRequest): Boolean {
             return authenticationRepository.session()?.sessionToken?.let {
                 return it.isNotEmpty() && it.equals(request.headers.get(sessionTokenHeaderKey))
             } ?: true

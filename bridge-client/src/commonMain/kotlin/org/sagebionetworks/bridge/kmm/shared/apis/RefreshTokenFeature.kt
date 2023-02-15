@@ -17,17 +17,17 @@ import kotlinx.coroutines.sync.Mutex
 
 internal class RefreshTokenFeature(
     private val updateTokenHandler: suspend () -> Boolean,
-    private val isCredentialsActual: (HttpRequest) -> Boolean
+    private val isTokenSameOrNull: (HttpRequest) -> Boolean
 ) {
 
     class Config {
         var updateTokenHandler: (suspend () -> Boolean)? = null
-        var isCredentialsActual: ((HttpRequest) -> Boolean)? = null
+        var isTokenSameOrNull: ((HttpRequest) -> Boolean)? = null
 
         // TODO: syoung 11/25/2020 Shouldn't these be `NullPointerException`?
         fun build() = RefreshTokenFeature(
             updateTokenHandler ?: throw IllegalArgumentException("updateTokenHandler should be passed"),
-            isCredentialsActual ?: throw IllegalArgumentException("isCredentialsActual should be passed")
+            isTokenSameOrNull ?: throw IllegalArgumentException("isTokenSameOrNull should be passed")
         )
     }
 
@@ -52,7 +52,7 @@ internal class RefreshTokenFeature(
 
                     // If token of the request isn't actual, then token has already been updated and
                     // let's just to try repeat request.
-                    if (!feature.isCredentialsActual(subject.request)) {
+                    if (!feature.isTokenSameOrNull(subject.request)) {
                         refreshTokenHttpFeatureMutex.unlock()
                         val requestBuilder = HttpRequestBuilder().takeFrom(subject.request)
                         // Remove the User-Agent header so that UserAgent plugin doesn't add a second one

@@ -58,6 +58,13 @@ kotlin {
             xcframework.add(this)
         }
     }
+    // macosX64() adds support for running in a macOS app or commandline tool
+    macosX64("macos") {
+        binaries.framework {
+            baseName = iosFrameworkName
+            xcframework.add(this)
+        }
+    }
 
     targets.withType<KotlinNativeTarget> {
         compilations.all {
@@ -116,7 +123,12 @@ kotlin {
                 implementation(libs.coroutines.test)
             }
         }
-        val iosMain by getting {
+        val iosMain by getting
+        val macosMain by getting
+        val xcodeMain by creating {
+            dependsOn(commonMain)
+            iosMain.dependsOn(this)
+            macosMain.dependsOn(this)
             dependencies {
                 implementation(libs.sqlDelight.native)
                 implementation(libs.ktor.client.ios)

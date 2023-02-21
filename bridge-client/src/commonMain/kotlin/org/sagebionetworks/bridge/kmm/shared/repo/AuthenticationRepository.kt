@@ -96,8 +96,9 @@ class AuthenticationRepository(
             } catch (error: Throwable) {
                 Logger.w("Error signing out: $error")
             }
-            database.clearDatabase()
         }
+        // Always clear database when signOut is called
+        database.clearDatabase()
     }
 
     /**

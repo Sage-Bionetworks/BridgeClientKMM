@@ -147,7 +147,8 @@ class AssessmentArchiver(
             return false
         }
         if (file.length() > 100000000) {
-            Logger.w("File larger than 100mb, skipping file result: $resultData")
+            //Log as an exception so it gets reported to Crashlytics for apps that us it  -nbrown 2/10/23
+            Logger.e("File larger than 100mb, skipping file result: $resultData", IllegalArgumentException("File larger than 100mb"))
             return false
         }
 

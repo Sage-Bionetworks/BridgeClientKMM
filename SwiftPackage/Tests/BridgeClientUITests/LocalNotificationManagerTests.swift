@@ -3,6 +3,7 @@
 //
 
 import XCTest
+import UserNotifications
 import BridgeClient
 @testable import BridgeClientUI
 

@@ -29,7 +29,9 @@ open class LocalNotificationManager : NSObject, UNUserNotificationCenterDelegate
     
     func setupNotifications(_ notifications: [NativeScheduledNotification]) {
         // Reset the icon badge.
+        #if os(iOS)
         UIApplication.shared.applicationIconBadgeNumber = 0
+        #endif
         
         // Exit early if nothing has changed.
         guard self.notifications != notifications else { return }
@@ -87,17 +89,19 @@ open class LocalNotificationManager : NSObject, UNUserNotificationCenterDelegate
         // Set up the notification
         let content = UNMutableNotificationContent()
         content.sound = UNNotificationSound.default
-        content.badge = UIApplication.shared.applicationIconBadgeNumber + 1 as NSNumber;
         content.categoryIdentifier = scheduledNotificationCategory
         content.threadIdentifier = notification.instanceGuid
         if let message = notification.message {
             content.title = message.subject
             content.body = message.message
         }
+        content.userInfo = [kAllowSnoozeKey : notification.allowSnooze]
+#if os(iOS)
+        content.badge = UIApplication.shared.applicationIconBadgeNumber + 1 as NSNumber;
         if #available(iOS 15.0, *) {
             content.interruptionLevel = notification.isTimeSensitive ? .timeSensitive : .active
         }
-        content.userInfo = [kAllowSnoozeKey : notification.allowSnooze]
+#endif
         return content
     }
     

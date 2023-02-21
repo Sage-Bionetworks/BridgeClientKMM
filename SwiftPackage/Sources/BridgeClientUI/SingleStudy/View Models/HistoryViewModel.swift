@@ -51,7 +51,7 @@ open class HistoryViewModel : NSObject, ObservableObject {
         else {
             self.historyManager = NativeHistoryManager(studyId: studyId) { historyList in
                 self.records = historyList
-                    .flatMap { $0.history() }
+                    .map { $0.history() }
                     .sorted(by: { $0.finishedOn > $1.finishedOn })
             }
             self.historyManager.observeHistory()

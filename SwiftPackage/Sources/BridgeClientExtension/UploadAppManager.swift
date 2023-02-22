@@ -6,10 +6,22 @@
 import Foundation
 import BridgeClient
 import JsonModel
+import Network
 
 public let kPreviewStudyId = "xcode_preview"
 public let kStudyIdKey = "studyId"
 fileprivate let kUserSessionIdKey = "userSessionId"
+
+public enum NetworkStatus : String, CaseIterable {
+    /// Network connectivity is unknown
+    case unknown
+    /// The network is connected
+    case connected
+    /// The network is not connected
+    case notConnected
+    /// The user has disabled cellular
+    case cellularDenied
+}
 
 open class UploadAppManager : ObservableObject {
     
@@ -52,7 +64,19 @@ open class UploadAppManager : ObservableObject {
     @Published public var title: String
     
     /// Is the app currently uploading results or user files? This status is maintained and updated by BridgeFileUploadManager.
-    @Published public var isUploading: Bool = false
+    @Published public var isUploading: Bool = false {
+        didSet {
+            if isUploading {
+                startMonitoringNetwork()
+            }
+            else {
+                stopMonitoringNetwork()
+            }
+        }
+    }
+    
+    /// Is the app currently connected to the internet? This status is only monitored if the app is uploading data.
+    @Published public var networkStatus: NetworkStatus = .unknown
     
     /// A threadsafe observer for the `BridgeClient.UserSessionInfo` for the current user.
     public let appConfig: AppConfigObserver = .init()
@@ -280,6 +304,34 @@ open class UploadAppManager : ObservableObject {
     /// @Protected - Only this class should call this method and only subclasses should implement.
     open func updateAppState() {
         // Do nothing. Allows subclass override setup and app state changes.
+    }
+    
+    private let networkMonitoringQueue = DispatchQueue(label: "org.sagebase.NetworkConnectivityMonitor.\(UUID())")
+    private let networkMonitor: NWPathMonitor = .init()
+    
+    func stopMonitoringNetwork() {
+        networkMonitor.cancel()
+    }
+
+    func startMonitoringNetwork() {
+        networkMonitor.pathUpdateHandler = { [weak self] path in
+            guard let strongSelf = self else { return }
+            DispatchQueue.main.async {
+                switch path.status {
+                case .unsatisfied:
+                    if #available(iOS 14.2, *), path.unsatisfiedReason == .cellularDenied {
+                        strongSelf.networkStatus = .cellularDenied
+                    } else {
+                        strongSelf.networkStatus = .notConnected
+                    }
+                case .satisfied:
+                    strongSelf.networkStatus = .connected
+                default:
+                    strongSelf.networkStatus = .unknown
+                }
+            }
+         }
+        networkMonitor.start(queue: networkMonitoringQueue)
     }
     
     /// Encrypt and upload an archive created with the given builder.

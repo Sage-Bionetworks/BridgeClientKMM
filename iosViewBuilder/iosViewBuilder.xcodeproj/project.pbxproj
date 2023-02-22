@@ -43,6 +43,7 @@
 		FF8FBD7229A55E4F008872E0 /* AssessmentModel in Frameworks */ = {isa = PBXBuildFile; productRef = FF8FBD7129A55E4F008872E0 /* AssessmentModel */; };
 		FF8FBD7429A55E4F008872E0 /* AssessmentModelUI in Frameworks */ = {isa = PBXBuildFile; productRef = FF8FBD7329A55E4F008872E0 /* AssessmentModelUI */; };
 		FF8FBD7729A55E66008872E0 /* SharedMobileUI in Frameworks */ = {isa = PBXBuildFile; productRef = FF8FBD7629A55E66008872E0 /* SharedMobileUI */; };
+		FF8FBD7929A5B7A4008872E0 /* TodayFinishedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF8FBD7829A5B7A4008872E0 /* TodayFinishedView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -80,6 +81,7 @@
 		FF8FBD5129A55D8F008872E0 /* CompletedDotView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CompletedDotView.swift; sourceTree = "<group>"; };
 		FF8FBD5229A55D8F008872E0 /* CustomScrollView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomScrollView.swift; sourceTree = "<group>"; };
 		FF8FBD5329A55D8F008872E0 /* HistoryCardView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistoryCardView.swift; sourceTree = "<group>"; };
+		FF8FBD7829A5B7A4008872E0 /* TodayFinishedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayFinishedView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -185,6 +187,7 @@
 				FF8FBD3529A55D8F008872E0 /* HistoryView.swift */,
 				FF8FBD3629A55D8F008872E0 /* PrivacyNoticeView.swift */,
 				FF8FBD3729A55D8F008872E0 /* StudyInfoView.swift */,
+				FF8FBD7829A5B7A4008872E0 /* TodayFinishedView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -345,6 +348,7 @@
 				FF8FBD5B29A55D8F008872E0 /* StudyInfoView.swift in Sources */,
 				FF8FBD6B29A55D8F008872E0 /* CompositeTintedImage.swift in Sources */,
 				FF8FBD6429A55D8F008872E0 /* StudyObserver.swift in Sources */,
+				FF8FBD7929A5B7A4008872E0 /* TodayFinishedView.swift in Sources */,
 				FF8FBD6E29A55D8F008872E0 /* CustomScrollView.swift in Sources */,
 				FF8FBD1D29A55D4D008872E0 /* ContentView.swift in Sources */,
 				FF8FBD5929A55D8F008872E0 /* HistoryView.swift in Sources */,

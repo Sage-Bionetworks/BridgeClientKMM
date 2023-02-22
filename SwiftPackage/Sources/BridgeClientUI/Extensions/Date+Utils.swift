@@ -25,8 +25,8 @@ extension Date {
         Calendar.current.isDateInTomorrow(self)
     }
     
-    public var isThisWeek: Bool {
-        Calendar.current.dateComponents([.day], from: self, to: Date()).day.map { abs($0) <= 7 } ?? false
+    public func isWithinDays(_ numDays: Int) -> Bool {
+        Calendar.current.dateComponents([.day], from: self, to: Date()).day.map { abs($0) <= numDays } ?? false
     }
     
     /// This date localized using the participant's preferred locale.

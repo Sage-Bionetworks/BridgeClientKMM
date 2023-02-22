@@ -57,7 +57,7 @@ open class AbstractTodayTimelineViewModel : NSObject, ObservableObject, Schedule
             }
             let sessions = filterSessions(newSessions)
             let upNext = sessions.first(where: { $0.state == .upNext })
-            self.isNextSessionSoon = upNext?.window.startDateTime.isThisWeek ?? false
+            self.isNextSessionSoon = upNext?.window.startDateTime.isWithinDays(7) ?? false
             self.sessions = sessions
         }
     }

@@ -7,6 +7,8 @@ import BridgeClientExtension
 import BridgeClient
 import SharedMobileUI
 
+/// The "Today" view used by Mobile Toolbox app and any other app with the same open-ended design of multiple studies with wildly
+/// varying timing for sessions where messaging the participant about whether or not they have completed uploading their data is important.
 public struct TodayView: View {
     @EnvironmentObject private var bridgeManager: SingleStudyAppManager
     @EnvironmentObject private var viewModel: TodayTimelineViewModel
@@ -24,6 +26,8 @@ public struct TodayView: View {
     }
 }
 
+/// A simplified "today" view.
+/// - Note: This is currently only used by the BiAffect app.
 public struct TodayWrapperView: View {
     @ObservedObject private var viewModel: TodayTimelineViewModel
     
@@ -36,7 +40,8 @@ public struct TodayWrapperView: View {
     }
 }
 
-struct GenericTodayWrapperView<TodayFinishedContent : TodayFinishedViewProtocol>: View {
+/// A version of the Today view that can handle a generic view for the header when there are no assessments *currently* available.
+public struct GenericTodayWrapperView<TodayFinishedContent : TodayFinishedViewProtocol>: View {
     @ObservedObject private var viewModel: AbstractTodayTimelineViewModel
     
     public init(viewModel: AbstractTodayTimelineViewModel) {
@@ -156,7 +161,8 @@ extension AnyTransition {
     }
 }
 
-struct PreviewTodayView : View {
+// Used to allow previewing the `TodayView`
+fileprivate struct PreviewTodayView : View {
     @StateObject var bridgeManager = SingleStudyAppManager(appId: kPreviewStudyId)
     @StateObject var viewModel = TodayTimelineViewModel()
     
@@ -164,14 +170,9 @@ struct PreviewTodayView : View {
         TodayView(previewSchedulesB)
             .environmentObject(bridgeManager)
             .environmentObject(viewModel)
-            .onAppear {
-                bridgeManager.isUploading = true
-            }
     }
 }
 
-// syoung 08/16/2021 SwiftUI fails to build complex UI in a shared framework. Therefore, the preview
-// for this element is in iosApp.
 struct TodayScheduleView_Previews: PreviewProvider {
     static var previews: some View {
         PreviewTodayView()

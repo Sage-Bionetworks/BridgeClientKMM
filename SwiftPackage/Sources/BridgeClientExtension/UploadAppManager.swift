@@ -12,17 +12,6 @@ public let kPreviewStudyId = "xcode_preview"
 public let kStudyIdKey = "studyId"
 fileprivate let kUserSessionIdKey = "userSessionId"
 
-public enum NetworkStatus : String, CaseIterable {
-    /// Network connectivity is unknown
-    case unknown
-    /// The network is connected
-    case connected
-    /// The network is not connected
-    case notConnected
-    /// The user has disabled cellular
-    case cellularDenied
-}
-
 open class UploadAppManager : ObservableObject {
     
     /// The configuration bits that need to be set on the 'BridgeClient.xcframework' in order to connect to

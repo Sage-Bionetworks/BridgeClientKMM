@@ -5,10 +5,15 @@ import SwiftUI
 import BridgeClientExtension
 import SharedMobileUI
 
-protocol TodayFinishedViewProtocol : View {
+/// A protocol that allows for using a different backing view model (or subclass) to show a view when there
+/// are no more assessments *currently* available to the participant.
+/// - See Also: ``GenericTodayWrapperView``
+public protocol TodayFinishedViewProtocol : View {
     init()
 }
 
+/// Wrapped `UploadingMessageView` for use with MobileToolboxApp or other apps that do not require
+/// subclassing the app manager or today timeline view model because EnvironmentObjects must be final.
 struct TodayFinishedView : View, TodayFinishedViewProtocol {
     @EnvironmentObject private var bridgeManager: SingleStudyAppManager
     @EnvironmentObject private var viewModel: TodayTimelineViewModel
@@ -20,6 +25,8 @@ struct TodayFinishedView : View, TodayFinishedViewProtocol {
     }
 }
 
+/// A general purpose implementation of the header view when there are no assessments currently available
+/// that does not directly tie to the backing view models.
 struct UploadingMessageView : View {
     @Binding var isUploading: Bool
     @Binding var networkStatus: NetworkStatus
@@ -37,7 +44,7 @@ struct UploadingMessageView : View {
     @ViewBuilder
     func uploadingView() -> some View {
         VStack(spacing: 24) {
-            if networkStatus == .notConnected || networkStatus == .cellularDenied {
+            if networkStatus.contains(.notConnected) {
                 Image(systemName: "wifi.exclamationmark")
                     .scaleEffect(x: 1.5, y: 1.5, anchor: .center)
                     .foregroundColor(.red)
@@ -90,7 +97,8 @@ struct TodayUpToDateView : View, TodayFinishedViewProtocol {
     }
 }
 
-struct PreviewAllTodayFinished : View {
+// Used to allow previewing the UploadingMessageView.
+fileprivate struct PreviewAllTodayFinished : View {
     @State var isUploading: Bool = true
     @State var networkStatus: NetworkStatus = .connected
     @State var isNextSessionSoon: Bool = true

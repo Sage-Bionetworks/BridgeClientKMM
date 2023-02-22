@@ -4,6 +4,12 @@
 
 import SwiftUI
 
+#if os(iOS)
+typealias BCUImage = UIImage
+#else
+typealias BCUImage = NSImage
+#endif
+
 public struct LogoImage: View {
     @StateObject var imageLoader: ImageLoader = .init()
     
@@ -14,7 +20,7 @@ public struct LogoImage: View {
     }
 
     public var body: some View {
-        Image(uiImage: imageLoader.image)
+        logoImage()
             .resizable()
             .aspectRatio(contentMode: .fit)
             .frame(height:80)
@@ -24,8 +30,16 @@ public struct LogoImage: View {
             }
     }
     
+    func logoImage() -> Image {
+#if os(iOS)
+        Image(uiImage: imageLoader.image)
+#else
+        Image(nsImage: imageLoader.image)
+#endif
+    }
+    
     class ImageLoader: ObservableObject {
-        @Published var image: UIImage = .init()
+        @Published var image: BCUImage = .init()
 
         func onAppear(urlString: String?) {
             guard let urlString = urlString,
@@ -34,7 +48,7 @@ public struct LogoImage: View {
                 return
             }
             let task = URLSession.shared.dataTask(with: url) { data, response, error in
-                guard let data = data, let downloadedImage = UIImage(data: data)
+                guard let data = data, let downloadedImage = BCUImage(data: data)
                 else {
                     return
                 }

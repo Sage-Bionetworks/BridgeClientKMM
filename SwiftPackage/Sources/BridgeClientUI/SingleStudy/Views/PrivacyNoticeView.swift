@@ -63,10 +63,12 @@ public struct PrivacyNoticeView: View {
             }
             .disabled(self.showFullNotice)
             .buttonStyle(RoundedButtonStyle())
+#if os(iOS)
             .fullScreenCover(isPresented: $showFullNotice) {
                 PDFShareView(url: url, done: { self.showFullNotice = false })
                     .accentColor(.init("LinkColor"))
             }
+#endif
         }
         else {
             EmptyView()
@@ -123,6 +125,8 @@ public struct PrivacyNoticeView: View {
         }
     }
 }
+
+#if os(iOS)
 
 struct PDFShareView: View {
     let url: URL
@@ -209,6 +213,8 @@ struct PDFShareView: View {
         }
     }
 }
+
+#endif
 
 // syoung 08/16/2021 SwiftUI fails to build complex UI in a shared framework. Therefore, the preview
 // for this element is in iosApp.

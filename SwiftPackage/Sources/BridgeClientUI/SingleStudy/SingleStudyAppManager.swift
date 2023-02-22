@@ -48,6 +48,7 @@ open class AbstractSingleStudyAppManager : BridgeClientAppManager {
         }
     }
     
+#if os(iOS)
     open override func finishLaunchingApp(_ launchOptions: [UIApplication.LaunchOptionsKey : Any]?) {
         super.finishLaunchingApp(launchOptions)
         updateStudy()
@@ -61,6 +62,7 @@ open class AbstractSingleStudyAppManager : BridgeClientAppManager {
             }
         }
     }
+#endif
     
     open override func willSignOut() {
         try? studyManager?.onCleared()

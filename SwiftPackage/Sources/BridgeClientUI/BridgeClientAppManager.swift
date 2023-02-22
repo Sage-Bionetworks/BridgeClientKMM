@@ -3,6 +3,7 @@
 //
 
 import SwiftUI
+import Combine
 import BridgeClient
 import BridgeClientExtension
 import JsonModel
@@ -86,6 +87,7 @@ open class BridgeClientAppManager : UploadAppManager {
     /// The local notification manager is a singleton that can be set up as the notification delegate (to handle snoozing).
     lazy public var localNotificationManager : LocalNotificationManager = LocalNotificationManager()
     
+#if os(iOS)
     /// **Required:** This method should be called by the app delegate when the app is launching in either `willLaunch` or `didLaunch`.
     @MainActor
     open func finishLaunchingApp(_ launchOptions: [UIApplication.LaunchOptionsKey : Any]?) {
@@ -97,6 +99,7 @@ open class BridgeClientAppManager : UploadAppManager {
     open func appWillFinishLaunching(_ launchOptions: [UIApplication.LaunchOptionsKey : Any]? ) {
         finishLaunchingApp(launchOptions)
     }
+#endif
 
     /// Login with the given external ID and password.
     ///

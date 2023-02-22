@@ -1,0 +1,70 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "AssessmentModel",
+        "repositoryURL": "https://github.com/Sage-Bionetworks/AssessmentModelKMM.git",
+        "state": {
+          "branch": null,
+          "revision": "0efc7de4679b61c0c27c4117558de87318fd77dc",
+          "version": "0.11.1"
+        }
+      },
+      {
+        "package": "BridgeArchiver",
+        "repositoryURL": "https://github.com/Sage-Bionetworks/BridgeArchiver-Swift.git",
+        "state": {
+          "branch": null,
+          "revision": "d5a7645789e62adc790c3d6b34d6f1637a46ba73",
+          "version": "0.3.1"
+        }
+      },
+      {
+        "package": "CMSSupport",
+        "repositoryURL": "https://github.com/Sage-Bionetworks/CMSSupport.git",
+        "state": {
+          "branch": null,
+          "revision": "99ef4bcead679b83ee6b5414fd79992478f6c311",
+          "version": "1.2.3"
+        }
+      },
+      {
+        "package": "JsonModel",
+        "repositoryURL": "https://github.com/Sage-Bionetworks/JsonModel-Swift.git",
+        "state": {
+          "branch": null,
+          "revision": "cf13a8af6b09c25605f340150bb6392ea9d3c0f8",
+          "version": "2.0.0"
+        }
+      },
+      {
+        "package": "MobilePassiveData",
+        "repositoryURL": "https://github.com/Sage-Bionetworks/MobilePassiveData-SDK.git",
+        "state": {
+          "branch": null,
+          "revision": "33a124d928a8499c88ac36543f414d7604f26573",
+          "version": "1.5.1"
+        }
+      },
+      {
+        "package": "SharedMobileUI",
+        "repositoryURL": "https://github.com/Sage-Bionetworks/SharedMobileUI-AppleOS.git",
+        "state": {
+          "branch": null,
+          "revision": "02192711c7f739df823bf187bd1b4cad9fe921c1",
+          "version": "0.19.0"
+        }
+      },
+      {
+        "package": "ZIPFoundation",
+        "repositoryURL": "https://github.com/weichsel/ZIPFoundation.git",
+        "state": {
+          "branch": null,
+          "revision": "43ec568034b3731101dbf7670765d671c30f54f3",
+          "version": "0.9.16"
+        }
+      }
+    ]
+  },
+  "version": 1
+}

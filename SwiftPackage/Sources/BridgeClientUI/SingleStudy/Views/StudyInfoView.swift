@@ -142,6 +142,7 @@ public struct AboutStudyView: View {
         .padding(.top, 4)
         .padding(.horizontal, horizontalPadding)
         .padding(.bottom, 32)
+#if os(iOS)
         .fullScreenCover(isPresented: $isPresentingPrivacyNotice) {
             ScreenBackground {
                 VStack(alignment: .leading, spacing: 0) {
@@ -155,6 +156,7 @@ public struct AboutStudyView: View {
                 }
             }
         }
+#endif
     }
     
     private func showPrivacyNotice() {

@@ -73,9 +73,11 @@ open class AbstractTodayTimelineViewModel : NSObject, ObservableObject, Schedule
     public init(filterSessions: (([TodayTimelineSession]) -> [TodayTimelineSession])? = nil) {
         self.filterSessions = filterSessions ?? { $0 }
         super.init()
+        #if os(iOS)
         NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: .main) { _ in
             self.updateSessionState()
         }
+        #endif
     }
     
     deinit {

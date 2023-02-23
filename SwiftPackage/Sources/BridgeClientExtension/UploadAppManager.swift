@@ -55,12 +55,7 @@ open class UploadAppManager : ObservableObject {
     /// Is the app currently uploading results or user files? This status is maintained and updated by BridgeFileUploadManager.
     @Published public var isUploading: Bool = false {
         didSet {
-            if isUploading {
-                startMonitoringNetwork()
-            }
-            else {
-                stopMonitoringNetwork()
-            }
+            updateNetworkMonitoring()
         }
     }
     
@@ -118,6 +113,7 @@ open class UploadAppManager : ObservableObject {
         }
         
         self.session = session
+        updateNetworkMonitoring()
         self.isNewLogin = (updateType == .login || updateType == .signout)
         self.uploadProcessor.isTestUser = session?.dataGroups?.contains("test_user") ?? false
         if updateType == .login {
@@ -296,13 +292,27 @@ open class UploadAppManager : ObservableObject {
     }
     
     private let networkMonitoringQueue = DispatchQueue(label: "org.sagebase.NetworkConnectivityMonitor.\(UUID())")
-    private let networkMonitor: NWPathMonitor = .init()
+    private var networkMonitor: NWPathMonitor?
     
-    func stopMonitoringNetwork() {
-        networkMonitor.cancel()
+    private func updateNetworkMonitoring() {
+        // This is not thread protected so it should always be called from the main thread
+        if isUploading || !userSessionInfo.isAuthenticated {
+            startMonitoringNetwork()
+        }
+        else {
+            stopMonitoringNetwork()
+        }
+    }
+    
+    private func stopMonitoringNetwork() {
+        networkMonitor?.cancel()
+        networkMonitor = nil
     }
 
-    func startMonitoringNetwork() {
+    private func startMonitoringNetwork() {
+        guard networkMonitor == nil else { return }
+        let networkMonitor = NWPathMonitor()
+        self.networkMonitor = networkMonitor
         networkMonitor.pathUpdateHandler = { [weak self] path in
             guard let strongSelf = self else { return }
             DispatchQueue.main.async {
@@ -319,7 +329,7 @@ open class UploadAppManager : ObservableObject {
                     strongSelf.networkStatus = .unknown
                 }
             }
-         }
+        }
         networkMonitor.start(queue: networkMonitoringQueue)
     }
     

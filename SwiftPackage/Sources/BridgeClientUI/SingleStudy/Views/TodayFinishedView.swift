@@ -39,11 +39,12 @@ struct UploadingMessageView : View {
             TodayUpToDateView()
                 .opacity(isUploading ? 0 : 1)
         }
+        .frame(maxWidth: .infinity, alignment: .center)
     }
     
     @ViewBuilder
     func uploadingView() -> some View {
-        VStack(spacing: 24) {
+        VStack(alignment: .center, spacing: 24) {
             if networkStatus.contains(.notConnected) {
                 Image(systemName: "wifi.exclamationmark")
                     .scaleEffect(x: 1.5, y: 1.5, anchor: .center)
@@ -100,7 +101,7 @@ struct TodayUpToDateView : View, TodayFinishedViewProtocol {
 // Used to allow previewing the UploadingMessageView.
 fileprivate struct PreviewAllTodayFinished : View {
     @State var isUploading: Bool = true
-    @State var networkStatus: NetworkStatus = .connected
+    @State var networkStatus: NetworkStatus = .notConnected
     @State var isNextSessionSoon: Bool = true
     
     var body: some View {

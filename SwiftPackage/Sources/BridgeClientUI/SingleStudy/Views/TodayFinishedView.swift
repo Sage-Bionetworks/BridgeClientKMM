@@ -48,7 +48,7 @@ struct UploadingMessageView : View {
             if networkStatus.contains(.notConnected) {
                 Image(systemName: "wifi.exclamationmark")
                     .scaleEffect(x: 1.5, y: 1.5, anchor: .center)
-                    .foregroundColor(.red)
+                    .foregroundColor(.errorRed)
             } else {
                 progressSpinner()
             }

@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FF4B9E8229A7F33F002A5668 /* ExternalIdLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF4B9E7E29A7F33F002A5668 /* ExternalIdLoginView.swift */; };
+		FF4B9E8329A7F33F002A5668 /* SingleStudyLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF4B9E7F29A7F33F002A5668 /* SingleStudyLoginView.swift */; };
+		FF4B9E8429A7F33F002A5668 /* TextEntryLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF4B9E8029A7F33F002A5668 /* TextEntryLoginView.swift */; };
+		FF4B9E8529A7F33F002A5668 /* StudyIdLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF4B9E8129A7F33F002A5668 /* StudyIdLoginView.swift */; };
+		FF4B9E8729A7F38A002A5668 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FF4B9E8629A7F38A002A5668 /* Colors.xcassets */; };
 		FF8FBD1B29A55D4D008872E0 /* iosViewBuilderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF8FBD1A29A55D4D008872E0 /* iosViewBuilderApp.swift */; };
 		FF8FBD1D29A55D4D008872E0 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF8FBD1C29A55D4D008872E0 /* ContentView.swift */; };
 		FF8FBD1F29A55D4E008872E0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FF8FBD1E29A55D4E008872E0 /* Assets.xcassets */; };
@@ -47,6 +52,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		FF4B9E7E29A7F33F002A5668 /* ExternalIdLoginView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExternalIdLoginView.swift; sourceTree = "<group>"; };
+		FF4B9E7F29A7F33F002A5668 /* SingleStudyLoginView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SingleStudyLoginView.swift; sourceTree = "<group>"; };
+		FF4B9E8029A7F33F002A5668 /* TextEntryLoginView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextEntryLoginView.swift; sourceTree = "<group>"; };
+		FF4B9E8129A7F33F002A5668 /* StudyIdLoginView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StudyIdLoginView.swift; sourceTree = "<group>"; };
+		FF4B9E8629A7F38A002A5668 /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
 		FF8FBD1729A55D4D008872E0 /* iosViewBuilder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iosViewBuilder.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF8FBD1A29A55D4D008872E0 /* iosViewBuilderApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iosViewBuilderApp.swift; sourceTree = "<group>"; };
 		FF8FBD1C29A55D4D008872E0 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -99,6 +109,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		FF4B9E7D29A7F33F002A5668 /* Login */ = {
+			isa = PBXGroup;
+			children = (
+				FF4B9E7E29A7F33F002A5668 /* ExternalIdLoginView.swift */,
+				FF4B9E7F29A7F33F002A5668 /* SingleStudyLoginView.swift */,
+				FF4B9E8029A7F33F002A5668 /* TextEntryLoginView.swift */,
+				FF4B9E8129A7F33F002A5668 /* StudyIdLoginView.swift */,
+			);
+			path = Login;
+			sourceTree = "<group>";
+		};
 		FF8FBD0E29A55D4D008872E0 = {
 			isa = PBXGroup;
 			children = (
@@ -163,6 +184,7 @@
 		FF8FBD2D29A55D8F008872E0 /* SingleStudy */ = {
 			isa = PBXGroup;
 			children = (
+				FF4B9E7D29A7F33F002A5668 /* Login */,
 				FF8FBD2E29A55D8F008872E0 /* View Models */,
 				FF8FBD3229A55D8F008872E0 /* Views */,
 				FF8FBD3129A55D8F008872E0 /* SingleStudyAppManager.swift */,
@@ -197,6 +219,7 @@
 			children = (
 				FF8FBD3B29A55D8F008872E0 /* Localizable.strings */,
 				FF8FBD3D29A55D8F008872E0 /* Images.xcassets */,
+				FF4B9E8629A7F38A002A5668 /* Colors.xcassets */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -329,6 +352,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FF4B9E8729A7F38A002A5668 /* Colors.xcassets in Resources */,
 				FF8FBD2229A55D4E008872E0 /* Preview Assets.xcassets in Resources */,
 				FF8FBD5F29A55D8F008872E0 /* Images.xcassets in Resources */,
 				FF8FBD5E29A55D8F008872E0 /* Localizable.strings in Resources */,
@@ -365,12 +389,16 @@
 				FF8FBD5529A55D8F008872E0 /* TodayTimelineViewModel.swift in Sources */,
 				FF8FBD6529A55D8F008872E0 /* NativeScheduledSessionWindow+View.swift in Sources */,
 				FF8FBD5629A55D8F008872E0 /* SingleStudyAppManager.swift in Sources */,
+				FF4B9E8329A7F33F002A5668 /* SingleStudyLoginView.swift in Sources */,
 				FF8FBD6729A55D8F008872E0 /* AssessmentTimelineCardView.swift in Sources */,
 				FF8FBD6929A55D8F008872E0 /* LineView.swift in Sources */,
 				FF8FBD5C29A55D8F008872E0 /* BridgeClientAppManager.swift in Sources */,
+				FF4B9E8529A7F33F002A5668 /* StudyIdLoginView.swift in Sources */,
 				FF8FBD6229A55D8F008872E0 /* JsonAssessmentViewRepresentable.swift in Sources */,
+				FF4B9E8229A7F33F002A5668 /* ExternalIdLoginView.swift in Sources */,
 				FF8FBD6329A55D8F008872E0 /* PrivacyNotice.swift in Sources */,
 				FF8FBD5729A55D8F008872E0 /* EndOfStudyView.swift in Sources */,
+				FF4B9E8429A7F33F002A5668 /* TextEntryLoginView.swift in Sources */,
 				FF8FBD6629A55D8F008872E0 /* Date+Utils.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

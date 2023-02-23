@@ -25,6 +25,10 @@ extension Date {
         Calendar.current.isDateInTomorrow(self)
     }
     
+    public func isWithinDays(_ numDays: Int) -> Bool {
+        Calendar.current.dateComponents([.day], from: self, to: Date()).day.map { abs($0) <= numDays } ?? false
+    }
+    
     /// This date localized using the participant's preferred locale.
     ///
     /// - Parameter hasTimeOfDay: Whether or not the time of day should be included.

@@ -6,6 +6,8 @@ import io.ktor.client.plugins.*
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
@@ -15,11 +17,12 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.sagebionetworks.bridge.kmm.shared.BridgeConfig
 import org.sagebionetworks.bridge.kmm.shared.apis.AuthenticationApi
+import org.sagebionetworks.bridge.kmm.shared.apis.BridgeErrorStatusNotifier
 import org.sagebionetworks.bridge.kmm.shared.cache.*
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper.Companion.APP_WIDE_STUDY_ID
 import org.sagebionetworks.bridge.kmm.shared.models.*
 
-interface  AuthenticationProvider {
+interface  AuthenticationProvider : BridgeErrorStatusNotifier {
     fun session() : UserSessionInfo?
     suspend fun reAuth() : Boolean
 }
@@ -40,6 +43,14 @@ class AuthenticationRepository(
     // Lazy inject the ParticipantRepo so we don't have a dependency loop.
     // This is here so we can check for offline updates that need to be saved to bridge.
     private val participantRepo: ParticipantRepo by inject()
+
+    private val _appStatusMutable = MutableStateFlow(AppStatus.SUPPORTED)
+
+    /**
+     * A [StateFlow] with the status of whether or not this version of the app is supported by Bridge.
+     * When Bridge services return a http status code of 410, this will emit an [AppStatus.UNSUPPORTED].
+     */
+    val appStatus: StateFlow<AppStatus> = _appStatusMutable
 
     /**
      * Get the current [UserSessionInfo] object as a Flow. The flow will emit a new value whenever
@@ -281,10 +292,12 @@ class AuthenticationRepository(
         } ?: Pair(false, Error("reAuth token is null"))
     }
 
-    fun notifyUIOfBridgeError(statusCode: HttpStatusCode) {
-        // TODO: emm 2021-08-17 pass 410 (app version not supported) and 412 (not consented) Bridge errors along to the UI to deal with.
+    override fun notifyUIOfBridgeError(statusCode: HttpStatusCode) {
+        if (statusCode == HttpStatusCode.Gone) {
+            _appStatusMutable.value = AppStatus.UNSUPPORTED
+        }
+        // TODO: emm 2021-08-17 pass 412 (not consented) Bridge errors along to the UI to deal with.
     }
-
 
     internal fun updateCachedSession(oldUserSessionInfo: UserSessionInfo?, newUserSession: UserSessionInfo) {
         val oldSessionResource = sessionResource()
@@ -328,6 +341,11 @@ class AuthenticationRepository(
         }
     }
 
+}
+
+enum class AppStatus {
+    SUPPORTED,
+    UNSUPPORTED,
 }
 
 

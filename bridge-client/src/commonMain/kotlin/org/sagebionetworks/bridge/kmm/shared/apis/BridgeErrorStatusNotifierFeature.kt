@@ -25,7 +25,7 @@ internal class BridgeErrorStatusNotifierFeature constructor(
     }
 
     companion object Feature : HttpClientPlugin<Config, BridgeErrorStatusNotifierFeature> {
-        override val key = AttributeKey<BridgeErrorStatusNotifierFeature>("SessionTokenFeature")
+        override val key = AttributeKey<BridgeErrorStatusNotifierFeature>("BridgeErrorStatusNotifierFeature")
 
         override fun prepare(block: Config.() -> Unit) = Config().apply(block).build()
 

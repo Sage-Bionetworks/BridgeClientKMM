@@ -28,11 +28,17 @@ data class MockAuthenticationProvider(
     val reauthSessionToken: String = "newTestSessionToken",
     val reauthToken: String = "newReauthToken"
 ) : AuthenticationProvider {
+
+    var reauthCalled: Boolean = false
+    var sessionCallCount: Int = 0
+
     override fun session(): UserSessionInfo? {
+        sessionCallCount++
         return userSessionInfo
     }
 
     override suspend fun reAuth(): Boolean {
+        reauthCalled = true
         userSessionInfo = userSessionInfo?.copy(sessionToken = reauthSessionToken, reauthToken = reauthToken)
         return userSessionInfo != null
     }

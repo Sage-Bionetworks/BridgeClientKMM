@@ -55,7 +55,7 @@ class AdherenceUploadReportScript {
         val file = File("/adherence_vs_uploads_$studyId.csv")
         file.createNewFile()
         val printWriter = file.printWriter()
-        printWriter.println("ExternalID, UserID, Missing Assessment Upload, Have upload, Filesize (bytes), Finished On, declined, User Agent")
+        printWriter.println("ExternalID, UserID, Session Guid, Missing Assessment Upload, Have upload, Filesize (bytes), Finished On, declined, User Agent")
 
         val enrollmentList = mutableListOf<EnrollmentDetail>()
         val pageSize = 100
@@ -83,9 +83,11 @@ class AdherenceUploadReportScript {
             val timeline = adminApis.getStudyParticipantTimeline(studyId, participantId)
             val assessmentMap = timeline.assessments!!.associateBy { it.key }
             val scheduledAssessmentMap = mutableMapOf<String, AssessmentInfo>()
+            val scheduledSessionMap = mutableMapOf<String, ScheduledSession>()
             for (scheduledSession in timeline.schedule!!) {
                 for (assessmentInstance in scheduledSession.assessments) {
                     scheduledAssessmentMap.put(assessmentInstance.instanceGuid, assessmentMap.get(assessmentInstance.refKey)!!)
+                    scheduledSessionMap.put(assessmentInstance.instanceGuid, scheduledSession)
                 }
             }
 
@@ -102,12 +104,13 @@ class AdherenceUploadReportScript {
             for (adherenceRecord in adherenceList.items) {
                 val upload = uploadMap.get(adherenceRecord.instanceGuid)
                 val assessmentInfo = scheduledAssessmentMap.get(adherenceRecord.instanceGuid)
+                val scheduledSession = scheduledSessionMap.get(adherenceRecord.instanceGuid)
                 if (assessmentInfo != null) {
                     if (upload == null) {
                         //We have an assessment adherence record without an upload
-                        printWriter.println("$externalId, $participantId, ${assessmentInfo.label}, , ,${adherenceRecord.finishedOn?.toString()}, ${adherenceRecord.declined.toString()}, $userAgent")
+                        printWriter.println("$externalId, $participantId, ${scheduledSession?.refGuid}, ${assessmentInfo.label}, , ,${adherenceRecord.finishedOn?.toString()}, ${adherenceRecord.declined.toString()}, $userAgent")
                     } else {
-                        printWriter.println("$externalId, $participantId, ${assessmentInfo.label}, true, ${upload.contentLength}, ${adherenceRecord.finishedOn?.toString()}, ${adherenceRecord.declined.toString()}, $userAgent")
+                        printWriter.println("$externalId, $participantId, ${scheduledSession?.refGuid}, ${assessmentInfo.label}, true, ${upload.contentLength}, ${adherenceRecord.finishedOn?.toString()}, ${adherenceRecord.declined.toString()}, $userAgent")
                     }
                 }
             }

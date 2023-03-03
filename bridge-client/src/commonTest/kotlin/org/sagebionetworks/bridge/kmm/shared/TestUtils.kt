@@ -36,6 +36,10 @@ data class MockAuthenticationProvider(
         userSessionInfo = userSessionInfo?.copy(sessionToken = reauthSessionToken, reauthToken = reauthToken)
         return userSessionInfo != null
     }
+
+    override fun notifyUIOfBridgeError(statusCode: HttpStatusCode) {
+
+    }
 }
 
 fun createUserSessionInfo(sessionToken: String = "testSessionToken", reauthToken: String? = "reauthToken") : UserSessionInfo = UserSessionInfo(

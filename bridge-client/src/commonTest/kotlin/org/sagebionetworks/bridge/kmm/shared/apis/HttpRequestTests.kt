@@ -44,7 +44,7 @@ class HttpRequestTests: BaseTest() {
             var request2Headers: Headers? = null
 
             val mockEngine = MockEngine.config {
-                // 1 - Fail first call to simulate expired token
+                // 1 - Fail first call due to missing session token
                 addHandler {
                     request1Headers = it.headers
                     respondError(HttpStatusCode.Unauthorized)

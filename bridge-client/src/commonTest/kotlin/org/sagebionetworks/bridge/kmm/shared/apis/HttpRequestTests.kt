@@ -56,18 +56,32 @@ class HttpRequestTests: BaseTest() {
                 }
                 reuseHandlers = false
             }
-            val authProvider = MockBrokenAuthenticationProvider(minCount = 1)
-            val testClient = getTestClient(mockEngine, TestHttpClientConfig(authProvider = authProvider))
 
+            // This mock sets up the initial call with a null session - we don't know why this is happening
+            // but have reason to suspect that it can happen so we are checking for recovery with this test.
+            val authProvider = MockBrokenAuthenticationProvider(minCount = 1)
+
+            // Set up the test client and call the fake request.
+            val testClient = getTestClient(mockEngine, TestHttpClientConfig(authProvider = authProvider))
             val response: HttpResponse = testClient.get(AbstractApi.BASE_PATH)
 
+            // Check assumption that the broken auth provider returns null for the first request
+            // (which throws a 401 b/c the session token is null)
             assertNotNull(request1Headers)
             assertNull(request1Headers!!.get("Bridge-Session"))
 
+            // Check the assumption that the broken auth provider returns non-null for the second request
+            // (which then passes b/c the session token is still valid and not expired)
             assertNotNull(request2Headers)
-            assertNotNull(request2Headers!!.get("Bridge-Session"))
+            assertEquals("testSessionToken", request1Headers!!.get("Bridge-Session"))
 
+            // Check that reauth was *not* called because the first session token != the second session token
             assertFalse(authProvider.reauthCalled)
+
+            // Check that three calls were made to the session
+            // 1 - initial request
+            // 2 - refresh token handler
+            // 3 - retry request
             assertEquals(3, authProvider.sessionCallCount)
         }
     }
@@ -92,18 +106,29 @@ class HttpRequestTests: BaseTest() {
                 }
                 reuseHandlers = false
             }
+
+            // Set up the test client and call the fake request.
             val authProvider = MockAuthenticationProvider()
             val testClient = getTestClient(mockEngine, TestHttpClientConfig(authProvider = authProvider))
-
             val response: HttpResponse = testClient.get(AbstractApi.BASE_PATH)
 
+            // Check assumption that the first request (Handler 1) returns the "expired" token
             assertNotNull(request1Headers)
             assertEquals("testSessionToken", request1Headers!!.get("Bridge-Session"))
 
+            // Check assumption that the the second request (Handler 2) returns the new session token
             assertNotNull(request2Headers)
             assertEquals("newTestSessionToken", request2Headers!!.get("Bridge-Session"))
 
+            // Check that the reauth is called because the initial request session token and the
+            // refresh session token values are the same. That is, that the session is expired and
+            // needs a new session token.
             assertTrue(authProvider.reauthCalled)
+
+            // Check that three calls were made to the session
+            // 1 - initial request
+            // 2 - refresh token handler
+            // 3 - retry request
             assertEquals(3, authProvider.sessionCallCount)
         }
     }

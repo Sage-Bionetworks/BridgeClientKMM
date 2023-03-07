@@ -75,7 +75,7 @@ class HttpRequestTests: BaseTest() {
             // Check the assumption that the broken auth provider returns non-null for the second request
             // (which then passes b/c the session token is still valid and not expired)
             assertNotNull(request2Headers)
-            assertEquals("testSessionToken", request1Headers!!.get("Bridge-Session"))
+            assertEquals("testSessionToken", request2Headers!!.get("Bridge-Session"))
 
             // Check that reauth was *not* called because the first session token != the second session token
             assertFalse(authProvider.reauthCalled)

@@ -32,6 +32,27 @@ class AuthenticationRepoTest : BaseTest() {
 
             val response = authRepo.signInExternalId("typo:test_study", "typo:test_study")
             assertTrue(response is ResourceResult.Failed)
+            assertEquals(HttpStatusCode.NotFound, response.httpStatusCode)
+        }
+    }
+
+    @Test
+    fun testSignIn_410() {
+        runTest {
+
+            val json = "{\"statusCode\":410}"
+            val testConfig = TestHttpClientConfig(authProvider = null)
+
+            val authRepo = AuthenticationRepository(
+                getTestClient(json, HttpStatusCode.Gone, testConfig),
+                testConfig.bridgeConfig,
+                testConfig.db,
+                MainScope())
+
+            val response = authRepo.signInExternalId("typo:test_study", "typo:test_study")
+            assertTrue(response is ResourceResult.Failed)
+            assertEquals(HttpStatusCode.Gone, response.httpStatusCode)
+            assertEquals(AppStatus.UNSUPPORTED, authRepo.appStatus.value)
         }
     }
 }

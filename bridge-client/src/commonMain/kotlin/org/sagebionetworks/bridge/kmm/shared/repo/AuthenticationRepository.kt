@@ -119,16 +119,16 @@ class AuthenticationRepository(
      * @param regionCode CLDR two-letter region code describing the region in which the phone number was issued.
      * @return Boolean
      */
-    suspend fun requestPhoneSignIn(number: String, regionCode: String) : Boolean {
+    suspend fun requestPhoneSignIn(number: String, regionCode: String) : ResourceResult<Boolean> {
         try {
             val phone = Phone(number, regionCode)
             val phoneSignInRequest = PhoneSignInRequest(bridgeConfig.appId, phone)
             authenticationApi.requestPhoneSignIn(phoneSignInRequest)
-            return true
+            return ResourceResult.Success(true, ResourceStatus.SUCCESS)
         } catch (err: Throwable) {
             Logger.w("Error requesting phone sign-in: $err")
+            return ResourceResult.Failed(ResourceStatus.FAILED, getHttpStatusCode(err))
         }
-        return false
     }
 
     /**
@@ -139,16 +139,16 @@ class AuthenticationRepository(
      * @param regionCode CLDR two-letter region code describing the region in which the phone number was issued.
      * @return Message
      */
-    suspend fun resendPhoneVerification(number: String, regionCode: String) : Boolean {
+    suspend fun resendPhoneVerification(number: String, regionCode: String) : ResourceResult<Boolean> {
         try {
             val phone = Phone(number, regionCode)
             val identifier = Identifier(bridgeConfig.appId, phone=phone)
             authenticationApi.resendPhoneVerification(identifier)
-            return true
+            return ResourceResult.Success(true, ResourceStatus.SUCCESS)
         } catch (err: Throwable) {
             Logger.w("Error calling resendPhoneVerification: $err")
+            return ResourceResult.Failed(ResourceStatus.FAILED, getHttpStatusCode(err))
         }
-        return false
     }
 
     /**
@@ -169,8 +169,8 @@ class AuthenticationRepository(
         } catch (err: Throwable) {
             database.removeResource(USER_SESSION_ID, ResourceType.USER_SESSION_INFO, APP_WIDE_STUDY_ID)
             Logger.w("Error signInPhone: $err")
+            return ResourceResult.Failed(ResourceStatus.FAILED, getHttpStatusCode(err))
         }
-        return ResourceResult.Failed(ResourceStatus.FAILED)
     }
 
     suspend fun signInExternalId(externalId: String, password: String) : ResourceResult<UserSessionInfo> {
@@ -221,8 +221,17 @@ class AuthenticationRepository(
         } catch (err: Throwable) {
             database.removeResource(USER_SESSION_ID, ResourceType.USER_SESSION_INFO, APP_WIDE_STUDY_ID)
             Logger.w("Error signIn: $err")
+            return ResourceResult.Failed(ResourceStatus.FAILED, getHttpStatusCode(err))
         }
-        return ResourceResult.Failed(ResourceStatus.FAILED)
+    }
+
+    private fun getHttpStatusCode(error: Throwable) : HttpStatusCode? {
+        var httpStatusCode: HttpStatusCode? = null
+        (error as? ResponseException)?.let {
+            httpStatusCode = it.response.status
+            notifyUIOfBridgeError(it.response.status)
+        }
+        return httpStatusCode
     }
 
     suspend fun signUpEmail(email: String,

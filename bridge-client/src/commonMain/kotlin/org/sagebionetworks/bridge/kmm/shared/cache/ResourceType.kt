@@ -1,5 +1,6 @@
 package org.sagebionetworks.bridge.kmm.shared.cache
 
+import io.ktor.http.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
@@ -28,7 +29,7 @@ enum class ResourceStatus {
 sealed class ResourceResult<out T : Any> {
     data class Success<out T : Any>(val data: T, val status: ResourceStatus) : ResourceResult<T>()
     //TODO: Failed reason -nbrown 12/4/20
-    data class Failed(val status: ResourceStatus) : ResourceResult<Nothing>()
+    data class Failed(val status: ResourceStatus, val httpStatusCode: HttpStatusCode? = null) : ResourceResult<Nothing>()
     object InProgress : ResourceResult<Nothing>()
 }
 

@@ -10,6 +10,7 @@ import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.serialization.json.Json
 import org.sagebionetworks.bridge.kmm.shared.apis.RefreshTokenFeature
 import org.sagebionetworks.bridge.kmm.shared.apis.SessionTokenFeature
@@ -18,6 +19,7 @@ import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
 import org.sagebionetworks.bridge.kmm.shared.di.appendAuthConfig
 import org.sagebionetworks.bridge.kmm.shared.di.appendDefaultConfig
 import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
+import org.sagebionetworks.bridge.kmm.shared.repo.AppStatus
 import org.sagebionetworks.bridge.kmm.shared.repo.AuthenticationProvider
 import org.sagebionetworks.bridge.kmm.shared.repo.TestBridgeConfig
 
@@ -43,8 +45,11 @@ data class MockAuthenticationProvider(
         return userSessionInfo != null
     }
 
+    val appStatusMutable = MutableStateFlow(AppStatus.SUPPORTED)
     override fun notifyUIOfBridgeError(statusCode: HttpStatusCode) {
-
+        if (statusCode == HttpStatusCode.Gone) {
+            appStatusMutable.value = AppStatus.UNSUPPORTED
+        }
     }
 }
 

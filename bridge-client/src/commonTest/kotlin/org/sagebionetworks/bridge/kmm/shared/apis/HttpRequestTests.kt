@@ -3,11 +3,13 @@ package org.sagebionetworks.bridge.kmm.shared.apis
 import io.ktor.client.*
 import io.ktor.client.engine.*
 import io.ktor.client.engine.mock.*
+import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import org.sagebionetworks.bridge.kmm.shared.*
 import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
+import org.sagebionetworks.bridge.kmm.shared.repo.AppStatus
 import org.sagebionetworks.bridge.kmm.shared.repo.AuthenticationProvider
 import kotlin.test.*
 
@@ -146,6 +148,74 @@ class HttpRequestTests: BaseTest() {
         }
     }
 
+    @Test
+    fun test410_unAuthenticatedCall() {
+        runTest {
+
+            var request1Headers: Headers? = null
+
+            val mockEngine = MockEngine.config {
+                // 1 - Fail first call due to 410 app unsupported
+                addHandler {
+                    request1Headers = it.headers
+                    respondError(HttpStatusCode.Gone)
+                }
+                reuseHandlers = false
+            }
+
+            val authProvider = MockAuthenticationProvider(userSessionInfo = null)
+
+            // Set up the test client and call the fake request.
+            val testClient = getTestClient(
+                mockEngine,
+                TestHttpClientConfig(authProvider = authProvider)
+            )
+            try {
+                val response: HttpResponse = testClient.get(AbstractApi.BASE_PATH)
+                assertTrue(false, "Request should have thrown an exception")
+            } catch (exception: ClientRequestException) {
+
+            }
+            assertEquals(AppStatus.UNSUPPORTED, authProvider.appStatusMutable.value)
+            assertNotNull(request1Headers)
+            assertNull(request1Headers!!.get("Bridge-Session"))
+        }
+    }
+
+    @Test
+    fun test410_authenticatedCall() {
+        runTest {
+
+            var request1Headers: Headers? = null
+
+            val mockEngine = MockEngine.config {
+                // 1 - Fail first call due to 410 app unsupported
+                addHandler {
+                    request1Headers = it.headers
+                    respondError(HttpStatusCode.Gone)
+                }
+                reuseHandlers = false
+            }
+
+            val authProvider = MockAuthenticationProvider()
+
+            // Set up the test client and call the fake request.
+            val testClient = getTestClient(
+                mockEngine,
+                TestHttpClientConfig(authProvider = authProvider)
+            )
+            try {
+                val response: HttpResponse = testClient.get(AbstractApi.BASE_PATH)
+                assertTrue(false, "Request should have thrown an exception")
+            } catch (exception: ClientRequestException) {
+
+            }
+            assertEquals(AppStatus.UNSUPPORTED, authProvider.appStatusMutable.value)
+            assertNotNull(request1Headers)
+            assertNotNull(request1Headers!!.get("Bridge-Session"))
+        }
+    }
+
 
     internal class TestApi(basePath: String, httpClient: HttpClient): AbstractApi(basePath, httpClient) {
 
@@ -167,6 +237,10 @@ class HttpRequestTests: BaseTest() {
         override suspend fun reAuth(): Boolean {
             reauthCalled = true
             return true
+        }
+
+        override fun notifyUIOfBridgeError(statusCode: HttpStatusCode) {
+
         }
     }
 }

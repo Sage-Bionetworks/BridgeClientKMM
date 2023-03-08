@@ -29,7 +29,9 @@ import org.sagebionetworks.bridge.kmm.shared.BridgeConfig as KmmBridgeConfig
 class AssessmentResultArchiveUploader(
     val context: Context,
     val bridgeConfig: KmmBridgeConfig,
-    val uploadRequester: UploadRequester) {
+    val uploadRequester: UploadRequester,
+    val uploadEncryptor: AndroidUploadEncryptor = AndroidStudyUploadEncryptorWrapper(context)
+    ) {
 
     val CONTENT_TYPE_DATA_ARCHIVE = "application/zip"
 
@@ -81,8 +83,6 @@ class AssessmentResultArchiveUploader(
         NoSuchAlgorithmException::class
     )
     fun persist(filename: String, archive: Archive, uploadMetadata: Map<String, JsonElement>, sessionWindowExpiration: kotlinx.datetime.Instant?): UploadFile {
-        val encryptor = AndroidStudyUploadEncryptor(getPublicKey())
-
         val md5: MessageDigest = try {
             MessageDigest.getInstance("MD5")
         } catch (e: NoSuchAlgorithmException) {
@@ -93,7 +93,7 @@ class AssessmentResultArchiveUploader(
         try {
             context.openFileOutput(filename, MODE_PRIVATE).use { os ->
                 DigestOutputStream(os, md5).use { md5OutStream ->
-                    encryptor.encrypt(md5OutStream).use { encryptedOutputStream ->
+                    uploadEncryptor.encrypt(md5OutStream).use { encryptedOutputStream ->
                         archive.writeTo(encryptedOutputStream)
                     }
                 }
@@ -123,7 +123,7 @@ class AssessmentResultArchiveUploader(
     }
 
     @Throws(IOException::class, CertificateException::class)
-    open fun getPublicKey(): X509Certificate? {
+    fun getPublicKey(): X509Certificate? {
         try {
             context.assets.open(
                 STUDY_PUBLIC_KEY,

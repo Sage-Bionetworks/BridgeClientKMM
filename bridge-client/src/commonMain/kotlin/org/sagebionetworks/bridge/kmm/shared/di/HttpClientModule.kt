@@ -11,10 +11,7 @@ import kotlinx.serialization.json.Json
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import org.sagebionetworks.bridge.kmm.shared.BridgeConfig
-import org.sagebionetworks.bridge.kmm.shared.apis.EtagFeature
-import org.sagebionetworks.bridge.kmm.shared.apis.HttpUtil
-import org.sagebionetworks.bridge.kmm.shared.apis.RefreshTokenFeature
-import org.sagebionetworks.bridge.kmm.shared.apis.SessionTokenFeature
+import org.sagebionetworks.bridge.kmm.shared.apis.*
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
 import org.sagebionetworks.bridge.kmm.shared.repo.AuthenticationProvider
 import org.sagebionetworks.bridge.kmm.shared.repo.AuthenticationRepository
@@ -88,6 +85,10 @@ internal fun HttpClient.appendDefaultConfig(
 
     install(EtagFeature) {
         storageCache = etagStorageCache
+    }
+
+    install(BridgeErrorStatusNotifierFeature) {
+        statusNotifier = authenticationRepository
     }
 
     install(SessionTokenFeature) {

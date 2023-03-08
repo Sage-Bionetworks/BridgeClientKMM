@@ -82,6 +82,10 @@ class UploadRequester(
     val pendingUploads get() = database.getResources(ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID).isNotEmpty()
             || database.getResources(ResourceType.UPLOAD_SESSION, APP_WIDE_STUDY_ID).isNotEmpty()
 
+    fun getPendingFileUploads() : List<Resource> {
+        return database.getResources(ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID)
+    }
+
 
 
     private fun getFile(filename: String): Path {

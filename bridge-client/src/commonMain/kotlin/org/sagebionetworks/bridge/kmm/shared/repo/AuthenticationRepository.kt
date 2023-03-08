@@ -6,6 +6,8 @@ import io.ktor.client.plugins.*
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
@@ -15,11 +17,12 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.sagebionetworks.bridge.kmm.shared.BridgeConfig
 import org.sagebionetworks.bridge.kmm.shared.apis.AuthenticationApi
+import org.sagebionetworks.bridge.kmm.shared.apis.BridgeErrorStatusNotifier
 import org.sagebionetworks.bridge.kmm.shared.cache.*
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper.Companion.APP_WIDE_STUDY_ID
 import org.sagebionetworks.bridge.kmm.shared.models.*
 
-interface  AuthenticationProvider {
+interface  AuthenticationProvider : BridgeErrorStatusNotifier {
     fun session() : UserSessionInfo?
     suspend fun reAuth() : Boolean
 }
@@ -40,6 +43,14 @@ class AuthenticationRepository(
     // Lazy inject the ParticipantRepo so we don't have a dependency loop.
     // This is here so we can check for offline updates that need to be saved to bridge.
     private val participantRepo: ParticipantRepo by inject()
+
+    private val _appStatusMutable = MutableStateFlow(AppStatus.SUPPORTED)
+
+    /**
+     * A [StateFlow] with the status of whether or not this version of the app is supported by Bridge.
+     * When Bridge services return a http status code of 410, this will emit an [AppStatus.UNSUPPORTED].
+     */
+    val appStatus: StateFlow<AppStatus> = _appStatusMutable
 
     /**
      * Get the current [UserSessionInfo] object as a Flow. The flow will emit a new value whenever
@@ -108,16 +119,16 @@ class AuthenticationRepository(
      * @param regionCode CLDR two-letter region code describing the region in which the phone number was issued.
      * @return Boolean
      */
-    suspend fun requestPhoneSignIn(number: String, regionCode: String) : Boolean {
+    suspend fun requestPhoneSignIn(number: String, regionCode: String) : ResourceResult<Boolean> {
         try {
             val phone = Phone(number, regionCode)
             val phoneSignInRequest = PhoneSignInRequest(bridgeConfig.appId, phone)
             authenticationApi.requestPhoneSignIn(phoneSignInRequest)
-            return true
+            return ResourceResult.Success(true, ResourceStatus.SUCCESS)
         } catch (err: Throwable) {
             Logger.w("Error requesting phone sign-in: $err")
+            return ResourceResult.Failed(ResourceStatus.FAILED, getHttpStatusCode(err))
         }
-        return false
     }
 
     /**
@@ -128,16 +139,16 @@ class AuthenticationRepository(
      * @param regionCode CLDR two-letter region code describing the region in which the phone number was issued.
      * @return Message
      */
-    suspend fun resendPhoneVerification(number: String, regionCode: String) : Boolean {
+    suspend fun resendPhoneVerification(number: String, regionCode: String) : ResourceResult<Boolean> {
         try {
             val phone = Phone(number, regionCode)
             val identifier = Identifier(bridgeConfig.appId, phone=phone)
             authenticationApi.resendPhoneVerification(identifier)
-            return true
+            return ResourceResult.Success(true, ResourceStatus.SUCCESS)
         } catch (err: Throwable) {
             Logger.w("Error calling resendPhoneVerification: $err")
+            return ResourceResult.Failed(ResourceStatus.FAILED, getHttpStatusCode(err))
         }
-        return false
     }
 
     /**
@@ -158,8 +169,8 @@ class AuthenticationRepository(
         } catch (err: Throwable) {
             database.removeResource(USER_SESSION_ID, ResourceType.USER_SESSION_INFO, APP_WIDE_STUDY_ID)
             Logger.w("Error signInPhone: $err")
+            return ResourceResult.Failed(ResourceStatus.FAILED, getHttpStatusCode(err))
         }
-        return ResourceResult.Failed(ResourceStatus.FAILED)
     }
 
     suspend fun signInExternalId(externalId: String, password: String) : ResourceResult<UserSessionInfo> {
@@ -210,8 +221,17 @@ class AuthenticationRepository(
         } catch (err: Throwable) {
             database.removeResource(USER_SESSION_ID, ResourceType.USER_SESSION_INFO, APP_WIDE_STUDY_ID)
             Logger.w("Error signIn: $err")
+            return ResourceResult.Failed(ResourceStatus.FAILED, getHttpStatusCode(err))
         }
-        return ResourceResult.Failed(ResourceStatus.FAILED)
+    }
+
+    private fun getHttpStatusCode(error: Throwable) : HttpStatusCode? {
+        var httpStatusCode: HttpStatusCode? = null
+        (error as? ResponseException)?.let {
+            httpStatusCode = it.response.status
+            notifyUIOfBridgeError(it.response.status)
+        }
+        return httpStatusCode
     }
 
     suspend fun signUpEmail(email: String,
@@ -281,10 +301,12 @@ class AuthenticationRepository(
         } ?: Pair(false, Error("reAuth token is null"))
     }
 
-    fun notifyUIOfBridgeError(statusCode: HttpStatusCode) {
-        // TODO: emm 2021-08-17 pass 410 (app version not supported) and 412 (not consented) Bridge errors along to the UI to deal with.
+    override fun notifyUIOfBridgeError(statusCode: HttpStatusCode) {
+        if (statusCode == HttpStatusCode.Gone) {
+            _appStatusMutable.value = AppStatus.UNSUPPORTED
+        }
+        // TODO: emm 2021-08-17 pass 412 (not consented) Bridge errors along to the UI to deal with.
     }
-
 
     internal fun updateCachedSession(oldUserSessionInfo: UserSessionInfo?, newUserSession: UserSessionInfo) {
         val oldSessionResource = sessionResource()
@@ -328,6 +350,11 @@ class AuthenticationRepository(
         }
     }
 
+}
+
+enum class AppStatus {
+    SUPPORTED,
+    UNSUPPORTED,
 }
 
 

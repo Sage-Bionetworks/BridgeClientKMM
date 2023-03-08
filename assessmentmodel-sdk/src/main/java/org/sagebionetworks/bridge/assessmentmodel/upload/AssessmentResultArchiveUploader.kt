@@ -104,7 +104,7 @@ class AssessmentResultArchiveUploader(
             val filePath = context.getFileStreamPath(filename).absolutePath
 
             val digest = md5.digest()
-            val md5Hash = digest.toByteString().base64() + '\n'
+            val md5Hash = digest.toByteString().base64()
 
             return UploadFile(
                 filePath = filePath,

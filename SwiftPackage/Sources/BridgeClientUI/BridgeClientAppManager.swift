@@ -70,7 +70,7 @@ open class BridgeClientAppManager : UploadAppManager {
     ///    }
     /// ```
     public enum AppState : String, StringEnumSet, Comparable {
-        case launching, login, onboarding, main
+        case launching, login, onboarding, main, error
     }
     
     /// The "state" of the app.
@@ -143,7 +143,10 @@ open class BridgeClientAppManager : UploadAppManager {
     }
     
     public final func fetchAppState() -> AppState {
-        if appConfig.isLaunching || userSessionInfo.loginState == .launching {
+        if bridgeAppStatus != .supported {
+            return .error
+        }
+        else if appConfig.isLaunching || userSessionInfo.loginState == .launching {
             return .launching
         }
         else if !userSessionInfo.isAuthenticated {

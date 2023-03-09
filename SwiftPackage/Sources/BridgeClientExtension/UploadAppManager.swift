@@ -62,6 +62,13 @@ open class UploadAppManager : ObservableObject {
     /// Is the app currently connected to the internet? This status is only monitored if the app is uploading data.
     @Published public var networkStatus: NetworkStatus = .unknown
     
+    /// The status of the app as reported by bridge services.
+    @Published public var bridgeAppStatus: BridgeClient.AppStatus = .supported {
+        didSet {
+            updateAppState()
+        }
+    }
+    
     /// A threadsafe observer for the `BridgeClient.UserSessionInfo` for the current user.
     public let appConfig: AppConfigObserver = .init()
     
@@ -207,9 +214,15 @@ open class UploadAppManager : ObservableObject {
         }
         self.appConfigManager.observeAppConfig()
         
-        // Hook up user session info
+        // Hook up user session info and bridge app status
         self.authManager = NativeAuthenticationManager() { userSessionInfo in
             self.updateUserSessionStatus(userSessionInfo, updateType: .observed)
+        }
+        self.bridgeAppStatus = self.authManager.currentAppStatus()
+        self.authManager.observeAppStatus { status in
+            DispatchQueue.main.async {
+                self.bridgeAppStatus = status
+            }
         }
         let userState = self.authManager.sessionState()
         self.userSessionInfo.loginError = userState.error

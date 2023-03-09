@@ -103,6 +103,7 @@ class AuthenticationRepository(
     suspend fun signOut() {
         session()?.let {
             try {
+                Logger.i("Signing out participant.")
                 authenticationApi.signOut(it)
             } catch (error: Throwable) {
                 Logger.w("Error signing out: $error")
@@ -277,6 +278,7 @@ class AuthenticationRepository(
             try {
                 val userSession = authenticationApi.reauthenticate(signIn)
                 updateCachedSession(sessionInfo, userSession)
+                Logger.i("Session token updated.")
                 success = true
             } catch (err: Throwable) {
                 responseError = Error(err.message ?: "Error requesting reAuth: $err")
@@ -327,11 +329,12 @@ class AuthenticationRepository(
             //New session doesn't have re-auth token, so keep old one
             toCacheSession = newUserSession.copy(reauthToken = oldUserSessionInfo.reauthToken)
         }
-        // TODO: syoung 02/01/2022 Test this before uncommenting.
-//        val previousSession = oldSessionResource?.loadResource<UserSessionInfo>()
-//        if (previousSession != null && previousSession.id != newUserSession.id) {
-//            database.clearDatabase()
-//        }
+        val previousSession = oldSessionResource?.loadResource<UserSessionInfo>()
+        if (previousSession != null && previousSession.id != newUserSession.id) {
+            Logger.e("Previous session ID does not match new session ID")
+            // TODO: syoung 02/01/2022 Test this before uncommenting.
+            // database.clearDatabase()
+        }
         val resource = Resource(
             identifier = USER_SESSION_ID,
             secondaryId = ResourceDatabaseHelper.DEFAULT_SECONDARY_ID,

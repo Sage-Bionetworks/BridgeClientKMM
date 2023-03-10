@@ -3,10 +3,12 @@
 
 import Foundation
 import BridgeClient
+import JsonModel
 
 public protocol IOSLogWriter : NativeLogWriter {
     var identifier: String { get }
     func setUserId(_ userId: String?)
+    func addKeys(from dictionary: [String : Any])
 }
 
 public struct LoggingTag : RawRepresentable, Hashable, ExpressibleByStringLiteral {
@@ -55,7 +57,8 @@ public final class Logger {
     ///   - severity: The logging level of the message.
     ///   - tag: A tag that can be used to parse where the message is coming from.
     ///   - message: The message to send.
-    public static func log(severity: LogSeverity, tag: LoggingTag = .bridgeClientUI, message: String) {
+    public static func log(severity: LogSeverity, tag: LoggingTag = .bridgeClientUI, message: String, metadata: [String : Any]? = nil) {
+        updateMetadata(metadata)
         logToConsole(severity: severity, tag: tag, message: message, error: nil)
         guard severity >= logLevel else { return }
         logWriter?.log(severity: severity, message: message, tag: tag.rawValue, error: nil)
@@ -68,7 +71,8 @@ public final class Logger {
     ///   - tag: A tag that can be used to parse where the error is coming from.
     ///   - error: The error to send to logging services.
     ///   - message: An optional message to send with the error.
-    public static func log(tag: LoggingTag = .bridgeClientUI, error: Error, message: String? = nil) {
+    public static func log(tag: LoggingTag = .bridgeClientUI, error: Error, message: String? = nil, metadata: [String : Any]? = nil) {
+        updateMetadata(metadata)
         logToConsole(severity: .error, tag: tag, message: message, error: error)
         logWriter?.log(severity: .error, message: message, tag: tag.rawValue, error: error)
     }
@@ -86,6 +90,11 @@ public final class Logger {
         if let error = error {
             debugPrint(error)
         }
+    }
+    
+    private static func updateMetadata(_ metadata: [String : Any]?) {
+        guard let metadata = metadata, metadata.count > 0 else { return }
+        logWriter?.addKeys(from: metadata)
     }
 }
 

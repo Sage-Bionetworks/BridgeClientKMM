@@ -153,6 +153,7 @@ class AdherenceRecordRepo(httpClient: HttpClient,
      */
     fun createUpdateAdherenceRecord(adherenceRecord: AdherenceRecord, studyId: String) {
         val record = if (adherenceRecord.clientData == null && bridgeConfig != null) adherenceRecord.copy(clientData = bridgeConfig.buildClientData()) else adherenceRecord
+        Logger.i("Updating adherence record:${adherenceRecord.instanceGuid}, finished:${adherenceRecord.finishedOn}")
         insertUpdate(studyId, record, needSave = true)
         backgroundScope.launch {
             processUpdates(studyId)

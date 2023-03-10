@@ -40,9 +40,19 @@ struct UploadSession : Codable, Equatable, Hashable {
     var type: String = "UploadSession"
 }
 
-struct StudyDataUploadObject: Codable {
+struct StudyDataUploadObject: Codable, BridgeUploadTrackingData {
     var uploadRequest: UploadRequest
     var uploadSession: UploadSession?
+    
+    var userInfo: [String : Any]? {
+        uploadRequest.metadata.flatMap {
+            if case .object(let ret) = $0 {
+                return ret
+            } else {
+                return nil
+            }
+        }
+    }
 }
 
 public struct StudyDataUploadExtras: Codable {

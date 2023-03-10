@@ -14,13 +14,19 @@ import UIKit
 #endif
 
 protocol BridgeFileUploadMetadataBlob {}
-struct BridgeFileUploadMetadata<T>: Codable, BridgeFileUploadMetadataBlob where T: Codable {
+protocol BridgeUploadTrackingData : Codable {
+    var userInfo: [String : Any]? { get }
+}
+struct BridgeFileUploadMetadata<T>: Codable, BridgeFileUploadMetadataBlob where T: BridgeUploadTrackingData {
     var bridgeUploadTrackingObject: T
     var s3Headers: [String : String]
+    var userInfo: [String : Any]? {
+        bridgeUploadTrackingObject.userInfo
+    }
 }
 
 protocol BridgeFileRetryInfoBlob {}
-struct BridgeFileRetryInfo<T>: Codable, BridgeFileRetryInfoBlob where T: Codable {
+struct BridgeFileRetryInfo<T>: Codable, BridgeFileRetryInfoBlob where T: BridgeUploadTrackingData {
     var apiString: String
     var originalFilePath: String
     var uploadMetadata: BridgeFileUploadMetadata<T>
@@ -275,7 +281,7 @@ protocol BridgeFileUploadAPI {
 /// To support a new Bridge file upload API, create a class that implements this protocol to handle the peculiarities
 /// of that particular API, and register an instance of it with the singleton BridgeFileUploadManager for that API.
 protocol BridgeFileUploadAPITyped : BridgeFileUploadAPI {
-    associatedtype TrackingType where TrackingType: Codable
+    associatedtype TrackingType where TrackingType: BridgeUploadTrackingData
     associatedtype UploadRequestType where UploadRequestType: Codable
     associatedtype UploadRequestResponseType where UploadRequestResponseType: Codable
 
@@ -359,6 +365,7 @@ extension BridgeFileUploadAPITyped {
             
             let uploadMetadata = retryInfo.uploadMetadata
             if !self.isUploadSessionExpired(for: uploadMetadata) {
+                Logger.log(severity: .info, message: "Retrying file upload - not expired", metadata: uploadMetadata.userInfo)
                 // if we have an upload URL and it's not expired, just retry upload to S3
                 // -- restore tracking of what file it's a copy of
                 self.uploadManager.persistMapping(from: relativePath, to: fileUrl.path, defaultsKey: self.uploadManager.bridgeFileUploadsKey)
@@ -366,6 +373,7 @@ extension BridgeFileUploadAPITyped {
                 self.uploadManager.uploadToS3(uploadApi: self, bridgeUploadMetadata: uploadMetadata, invariantFilePath: relativePath)
             }
             else {
+                Logger.log(severity: .info, message: "Retrying file upload - session expired - requesting upload URL", metadata: uploadMetadata.userInfo)
                 // request a fresh upload URL from Bridge
                 self.uploadManager.requestUploadURL(uploadApi: self, invariantFilePath: relativePath, fileUrl: fileUrl, uploadMetadata: uploadMetadata)
             }
@@ -735,7 +743,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         
     /// Upload a  file to Bridge via the specified upload API.
     /// Generally intended to only be called by BridgeFileUploadAPI implementations.
-    func upload<T>(_ trackingType: T.Type, uploadApi: BridgeFileUploadAPI, fileId: String, fileUrl: URL, contentType: String? = nil, extras: Codable? = nil) where T: Codable {
+    func upload<T>(_ trackingType: T.Type, uploadApi: BridgeFileUploadAPI, fileId: String, fileUrl: URL, contentType: String? = nil, extras: Codable? = nil) where T: BridgeUploadTrackingData {
         uploadInternal(trackingType, uploadApi: uploadApi, fileId: fileId, fileUrl: fileUrl, contentType: contentType, extras: extras)
         return
     }
@@ -743,7 +751,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
     // Internal function returns temp file URL for tests, or nil on pre-flight check failures.
     // Should not be called directly except from unit/integration test cases.
     @discardableResult
-    func uploadInternal<T>(_ trackingType: T.Type, uploadApi: BridgeFileUploadAPI, fileId: String, fileUrl: URL, contentType: String? = nil, extras: Codable? = nil) -> URL? where T: Codable {
+    func uploadInternal<T>(_ trackingType: T.Type, uploadApi: BridgeFileUploadAPI, fileId: String, fileUrl: URL, contentType: String? = nil, extras: Codable? = nil) -> URL? where T: BridgeUploadTrackingData {
         // Check if this uploadApi is already registered, and if not, do so
         if !self.bridgeFileUploadApis.keys.contains(uploadApi.apiString) {
             self.bridgeFileUploadApis[uploadApi.apiString] = uploadApi

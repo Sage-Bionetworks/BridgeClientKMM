@@ -11,6 +11,7 @@ import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus
 import org.sagebionetworks.bridge.kmm.shared.models.SharingScope
 import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
+import org.sagebionetworks.bridge.kmm.shared.repo.AppStatus
 import org.sagebionetworks.bridge.kmm.shared.repo.AuthenticationRepository
 import org.sagebionetworks.bridge.kmm.shared.repo.ParticipantRepo
 
@@ -22,6 +23,23 @@ open class NativeAuthenticationManager(
     private val participantManager : ParticipantRepo by inject(mode = LazyThreadSafetyMode.NONE)
 
     private val scope = MainScope()
+
+    fun currentAppStatus() : AppStatus {
+        return try {
+            authManager.appStatus.value
+        } catch (err: Exception) {
+            Logger.e("Failed to get current app status", err)
+            AppStatus.SUPPORTED
+        }
+    }
+
+    fun observeAppStatus(handler: (AppStatus) -> Unit) {
+        scope.launch {
+            authManager.appStatus.collect { status ->
+                handler(status)
+            }
+        }
+    }
 
     fun observeUserSessionInfo() {
         scope.launch {

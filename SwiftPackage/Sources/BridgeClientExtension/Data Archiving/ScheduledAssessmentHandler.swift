@@ -62,11 +62,21 @@ public struct AssessmentScheduleInfo : Identifiable, Hashable, Codable {
         assessmentInfo.identifier
     }
     
+    public var isFirstAssessment: Bool {
+        session.assessments.firstIndex(of: assessmentIdentifier) == 0
+    }
+    
+    public var isLastAssessment: Bool {
+        session.assessments.firstIndex(of: assessmentIdentifier) == (session.assessments.count - 1)
+    }
+    
     public init(session: NativeScheduledSessionWindow, assessment: NativeScheduledAssessment) {
         self.instanceGuid = assessment.instanceGuid
         self.session = Session(instanceGuid: session.instanceGuid,
                                eventTimestamp: session.eventTimestamp,
-                               scheduledOn: session.startDateTime)
+                               scheduledOn: session.startDateTime,
+                               assessments: session.assessments.map { $0.assessmentInfo.identifier }
+        )
         self.assessmentInfo = Info(identifier: assessment.assessmentInfo.identifier,
                                    key: assessment.assessmentInfo.key,
                                    guid: assessment.assessmentInfo.guid,
@@ -96,6 +106,8 @@ public struct AssessmentScheduleInfo : Identifiable, Hashable, Codable {
         public let eventTimestamp: String
         /// The calculated start time for when this session opens.
         public let scheduledOn: Date
+        /// A list of the assessment guids
+        public let assessments: [String]
     }
 }
 

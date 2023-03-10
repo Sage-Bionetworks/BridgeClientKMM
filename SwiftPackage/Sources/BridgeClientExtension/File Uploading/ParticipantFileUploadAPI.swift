@@ -8,7 +8,7 @@ import UniformTypeIdentifiers
 import CoreServices
 import BridgeClient
 
-struct ParticipantFile: Codable {
+struct ParticipantFile: Codable, BridgeUploadTrackingData {
     let fileId : String
     let mimeType: String
     let createdOn: Date?
@@ -16,6 +16,10 @@ struct ParticipantFile: Codable {
     var uploadUrl: String?
     var expiresOn: Date?
     var type: String = "ParticipantFile"
+    
+    var userInfo: [String : Any]? {
+        nil
+    }
 }
 
 extension Notification.Name {

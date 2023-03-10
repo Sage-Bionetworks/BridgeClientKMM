@@ -474,24 +474,57 @@ final class ArchiveUploadProcessor {
     
     @MainActor
     private func _uploadEncrypted(id: String, url: URL, schedule: AssessmentScheduleInfo?, startedOn: Date?) {
-        var dictionary: [String : JsonSerializable] = schedule.map { schedule in
-            ["instanceGuid": schedule.instanceGuid,
-             "eventTimestamp": schedule.session.eventTimestamp,
-             "sessionInstanceGuid": schedule.session.instanceGuid,
-             "assessmentIdentifier": schedule.assessmentIdentifier,
-            ]
-        } ?? [:]
-        if let startedOn = startedOn {
-            dictionary["startedOn"] = startedOn.jsonObject()
-        }
+        let uploadMetadata = UploadMetadata(schedule: schedule, startedOn: startedOn)
+        let dictionary: [String : JsonSerializable] = {
+            do {
+                return try uploadMetadata.jsonEncodedDictionary()
+            } catch {
+                Logger.log(tag: .upload, error: error)
+                return [:]
+            }
+        }()
         let exporterV3Metadata: JsonElement? = dictionary.count > 0 ? .object(dictionary) : nil
         let extras = StudyDataUploadExtras(encrypted: true, metadata: exporterV3Metadata, zipped: true)
+        Logger.log(severity: .info, message: "Uploading file: \(id)", metadata: dictionary)
         StudyDataUploadAPI.shared.upload(fileId: id, fileUrl: url, contentType: "application/zip", extras: extras)
         do {
             try FileManager.default.removeItem(at: url)
         } catch let err {
             Logger.log(error: err, message: "Failed to delete encrypted archive \(id) at \(url)")
         }
+    }
+}
+
+public struct UploadMetadata : Codable {
+    public let instanceGuid: String?
+    public let eventTimestamp: String?
+    public let startedOn: String?
+    public let assessmentIdentifier: String?
+    public let sessionInstanceGuid: String?
+    public let isFirstAssessment: Bool?
+    public let isLastAssessment: Bool?
+    public let appInfo: AppInfo
+    
+    init(schedule: AssessmentScheduleInfo?, startedOn: Date?) {
+        let platform = PlatformConfigImpl()
+        self.appInfo = .init(osVersion: platform.osVersion,
+                             deviceName: platform.deviceName,
+                             appName: platform.appName,
+                             appVersionName: platform.appVersionName)
+        self.instanceGuid = schedule?.instanceGuid
+        self.assessmentIdentifier = schedule?.assessmentIdentifier
+        self.eventTimestamp = schedule?.session.eventTimestamp
+        self.startedOn = startedOn?.jsonObject() as? String
+        self.sessionInstanceGuid = schedule?.session.instanceGuid
+        self.isFirstAssessment = schedule?.isFirstAssessment
+        self.isLastAssessment = schedule?.isLastAssessment
+    }
+    
+    public struct AppInfo : Codable {
+        public let osVersion: String
+        public let deviceName: String
+        public let appName: String
+        public let appVersionName: String
     }
 }
 

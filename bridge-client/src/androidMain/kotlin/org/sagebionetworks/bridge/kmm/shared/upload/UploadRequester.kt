@@ -7,6 +7,7 @@ import co.touchlab.kermit.Logger
 import app.cash.sqldelight.db.SqlDriver
 import io.ktor.client.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import kotlinx.serialization.encodeToString
@@ -84,6 +85,10 @@ class UploadRequester(
 
     fun getPendingFileUploads() : List<Resource> {
         return database.getResources(ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID)
+    }
+
+    fun getPendingFileUploadsFlow() : Flow<List<Resource>> {
+        return database.getResourcesAsFlow(ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID)
     }
 
 

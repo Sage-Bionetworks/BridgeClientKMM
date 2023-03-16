@@ -10,6 +10,11 @@ import JsonModel
 
 fileprivate let kOnboardingStateKey = "isOnboardingFinished"
 
+public protocol ReauthPasswordHandler {
+    func storedPassword(for session: UserSessionInfoObserver) -> String?
+    func clearStoredPassword()
+}
+
 /// This class is intended to be used as the `BridgeClient` app singleton. It manages login, app state,
 /// app configuration, user configuration, notifications, and uploading files to Bridge services. It is intended
 /// to be used in conjunction with a `UIApplicationDelegate` to handle start up and background
@@ -146,7 +151,7 @@ open class BridgeClientAppManager : UploadAppManager {
         if bridgeAppStatus != .supported {
             return .error
         }
-        else if appConfig.isLaunching || userSessionInfo.loginState == .launching {
+        else if appConfig.isLaunching || userSessionInfo.loginState == .launching || reauthStatus == .pending {
             return .launching
         }
         else if !userSessionInfo.isAuthenticated {
@@ -157,6 +162,35 @@ open class BridgeClientAppManager : UploadAppManager {
         }
         else {
             return .main
+        }
+    }
+    
+    // MARK: Reauth handling
+    
+    public var reauthPasswordHandler: ReauthPasswordHandler? = nil
+    var reauthStatus: ResourceStatus?
+    
+    /// Override the default (which is to do nothing) and check to see if there is a
+    /// ``ReauthPasswordHandler`` set to get the password for this app.
+    open override func handleReauthFailed() -> Bool {
+        if let password = reauthPasswordHandler?.storedPassword(for: userSessionInfo) {
+            reauthStatus = .pending
+            reauthWithCredentials(password: password) { [weak self] status in
+                self?.reauthStatus = status
+                if status == .failed {
+                    self?.reauthPasswordHandler?.clearStoredPassword()
+                    self?.userSessionInfo.loginError = "Failed to reauth using stored credentials."
+                }
+                else if status == .retry {
+                    // If the reauth failed, then we need to show the participant the login and have them
+                    // attempt reauth or sign out.
+                    self?.updateAppState()
+                }
+            }
+            return true
+        }
+        else {
+            return false
         }
     }
 }

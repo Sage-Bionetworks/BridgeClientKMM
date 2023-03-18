@@ -33,6 +33,7 @@ CREATE TABLE ScheduledSessions (
 
 CREATE TABLE ScheduledAssessments (
     studyId TEXT NOT NULL,
+    assessmentOrder INTEGER NOT NULL,
     sessionInstanceGuid TEXT NOT NULL,
     assessmentInstanceGuid TEXT NOT NULL,
     guid TEXT NOT NULL,
@@ -76,8 +77,8 @@ INSERT OR REPLACE INTO ScheduledSessions(studyId, instanceGuid, startDate, endDa
 VALUES(?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 insertUpdateScheduledAssessments:
-INSERT OR REPLACE INTO ScheduledAssessments(studyId, sessionInstanceGuid, assessmentInstanceGuid, guid, identifier, assessmentInfoJson)
-VALUES(?,?,?,?,?,?);
+INSERT OR REPLACE INTO ScheduledAssessments(studyId, assessmentOrder, sessionInstanceGuid, assessmentInstanceGuid, guid, identifier, assessmentInfoJson)
+VALUES(?,?,?,?,?,?,?);
 
 insertUpdateAdherenceRecord:
 INSERT OR REPLACE INTO AdherenceRecords(studyId, instanceGuid, startedOn, finishedOn, declined, adherenceEventTimestamp, adherenceJson, status, needSave)
@@ -95,12 +96,13 @@ SELECT
     AdherenceRecords.adherenceJson
 FROM
     ScheduledAssessments
-LEFT JOIN AdherenceRecords ON ScheduledAssessments.assessmentInstanceGuid = AdherenceRecords.instanceGuid;
+LEFT JOIN AdherenceRecords ON ScheduledAssessments.assessmentInstanceGuid = AdherenceRecords.instanceGuid ORDER BY ScheduledAssessments.assessmentOrder;
 
 
 CREATE VIEW fullScheduledSessions AS
 SELECT
     ScheduledSessions.*,
+    scheduledAssessmentAdherence.assessmentOrder,
     scheduledAssessmentAdherence.sessionInstanceGuid,
     scheduledAssessmentAdherence.assessmentInstanceGuid,
     scheduledAssessmentAdherence.assessmentInfoJson,
@@ -110,7 +112,7 @@ SELECT
     scheduledAssessmentAdherence.adherenceJson
 FROM
     ScheduledSessions
-JOIN scheduledAssessmentAdherence ON ScheduledSessions.instanceGuid = scheduledAssessmentAdherence.sessionInstanceGuid;
+JOIN scheduledAssessmentAdherence ON ScheduledSessions.instanceGuid = scheduledAssessmentAdherence.sessionInstanceGuid ORDER BY scheduledAssessmentAdherence.assessmentOrder;
 
 fullSessionsCount:
 SELECT COUNT()

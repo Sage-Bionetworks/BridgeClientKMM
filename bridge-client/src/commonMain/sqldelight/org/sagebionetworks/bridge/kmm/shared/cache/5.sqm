@@ -1,0 +1,18 @@
+DELETE FROM ScheduledSessions;
+DELETE FROM ScheduledAssessments;
+DELETE FROM AdherenceRecords;
+DELETE FROM ScheduledNotifications;
+DELETE FROM ScheduleMetadata;
+
+DROP TABLE ScheduledAssessments;
+
+CREATE TABLE ScheduledAssessments (
+    studyId TEXT NOT NULL,
+    assessmentOrder INTEGER NOT NULL,
+    sessionInstanceGuid TEXT NOT NULL,
+    assessmentInstanceGuid TEXT NOT NULL,
+    guid TEXT NOT NULL,
+    identifier TEXT NOT NULL,
+    assessmentInfoJson TEXT NOT NULL,
+    PRIMARY KEY (studyId, assessmentInstanceGuid)
+);

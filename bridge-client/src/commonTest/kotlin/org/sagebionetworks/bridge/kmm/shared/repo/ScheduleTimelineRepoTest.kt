@@ -2951,6 +2951,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
                 "memory-for-sequences",
                 "number-match",
                 "fnameb",
+                "spelling",
+                "vocabulary"
             )
             assertEquals(expectedOrder, assessments)
         }

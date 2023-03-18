@@ -212,6 +212,7 @@ class ParticipantScheduleDatabase(val databaseHelper: ResourceDatabaseHelper) {
         public val persistent: Boolean,
         public val scheduledSessionJson: String,
         public val sessionInfoJson: String,
+        public val assessmentOrder: Long,
         public val sessionInstanceGuid: String,
         public val assessmentInstanceGuid: String,
         public val assessmentInfoJson: String,
@@ -234,6 +235,7 @@ class ParticipantScheduleDatabase(val databaseHelper: ResourceDatabaseHelper) {
         persistent: Boolean,
         scheduledSessionJson: String,
         sessionInfoJson: String,
+        assessmentOrder: Long,
         sessionInstanceGuid: String,
         assessmentInstanceGuid: String,
         assessmentInfoJson: String,
@@ -253,6 +255,7 @@ class ParticipantScheduleDatabase(val databaseHelper: ResourceDatabaseHelper) {
                                        persistent,
                                        scheduledSessionJson,
                                        sessionInfoJson,
+                                       assessmentOrder,
                                        sessionInstanceGuid,
                                        assessmentInstanceGuid,
                                        assessmentInfoJson,
@@ -273,6 +276,7 @@ class ParticipantScheduleDatabase(val databaseHelper: ResourceDatabaseHelper) {
             persistent,
             scheduledSessionJson,
             sessionInfoJson,
+            assessmentOrder,
             sessionInstanceGuid,
             assessmentInstanceGuid,
             assessmentInfoJson,
@@ -335,15 +339,18 @@ class ParticipantScheduleDatabase(val databaseHelper: ResourceDatabaseHelper) {
                     scheduledSessionJson = Json.encodeToString(it.scheduledSession),
                     sessionInfoJson = Json.encodeToString(it.sessionInfo),
                 )
+                var order : Long = 0
                 it.assessments.forEach { assessment ->
                     dbQuery.insertUpdateScheduledAssessments(
                         studyId = studyId,
+                        assessmentOrder = order,
                         sessionInstanceGuid = it.scheduledSession.instanceGuid,
                         assessmentInstanceGuid = assessment.instanceGuid,
                         guid = assessment.assessmentInfo.guid,
                         identifier = assessment.assessmentInfo.identifier,
                         assessmentInfoJson = Json.encodeToString(assessment.assessmentInfo),
                     )
+                    order++
                 }
                 // Store all potential notifications for a session
                 it.sessionInfo.notifications?.forEach { notificationInfo ->

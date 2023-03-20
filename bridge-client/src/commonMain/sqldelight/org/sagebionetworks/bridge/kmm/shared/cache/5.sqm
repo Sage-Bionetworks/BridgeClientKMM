@@ -3,6 +3,7 @@ DELETE FROM ScheduledAssessments;
 DELETE FROM AdherenceRecords;
 DELETE FROM ScheduledNotifications;
 DELETE FROM ScheduleMetadata;
+DELETE FROM EtagCache;
 
 DROP TABLE ScheduledAssessments;
 
@@ -16,3 +17,36 @@ CREATE TABLE ScheduledAssessments (
     assessmentInfoJson TEXT NOT NULL,
     PRIMARY KEY (studyId, assessmentInstanceGuid)
 );
+
+DROP VIEW scheduledAssessmentAdherence;
+
+-- Combine assessments and adherence into a single view
+CREATE VIEW scheduledAssessmentAdherence AS
+SELECT
+    ScheduledAssessments.*,
+    AdherenceRecords.instanceGuid,
+    AdherenceRecords.startedOn,
+    AdherenceRecords.finishedOn,
+    AdherenceRecords.declined,
+    AdherenceRecords.adherenceEventTimestamp,
+    AdherenceRecords.adherenceJson
+FROM
+    ScheduledAssessments
+LEFT JOIN AdherenceRecords ON ScheduledAssessments.assessmentInstanceGuid = AdherenceRecords.instanceGuid ORDER BY ScheduledAssessments.assessmentOrder;
+
+DROP VIEW fullScheduledSessions;
+
+CREATE VIEW fullScheduledSessions AS
+SELECT
+    ScheduledSessions.*,
+    scheduledAssessmentAdherence.assessmentOrder,
+    scheduledAssessmentAdherence.sessionInstanceGuid,
+    scheduledAssessmentAdherence.assessmentInstanceGuid,
+    scheduledAssessmentAdherence.assessmentInfoJson,
+    scheduledAssessmentAdherence.startedOn,
+    scheduledAssessmentAdherence.finishedOn,
+    scheduledAssessmentAdherence.declined,
+    scheduledAssessmentAdherence.adherenceJson
+FROM
+    ScheduledSessions
+JOIN scheduledAssessmentAdherence ON ScheduledSessions.instanceGuid = scheduledAssessmentAdherence.sessionInstanceGuid ORDER BY scheduledAssessmentAdherence.assessmentOrder;

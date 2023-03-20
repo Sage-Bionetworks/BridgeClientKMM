@@ -317,7 +317,6 @@ class ParticipantScheduleDatabase(val databaseHelper: ResourceDatabaseHelper) {
 
         databaseHelper.database.transaction {
             dbQuery.clearSchedule(studyId)
-            dbQuery.insertUpdateScheduleMetadata(studyId, createdOn)
             sessionWindowsList.forEach {
                 val timezone = TimeZone.currentSystemDefault()
                 val startInstant = it.scheduledSession.startDateTime.toInstant(timezone)
@@ -386,6 +385,7 @@ class ParticipantScheduleDatabase(val databaseHelper: ResourceDatabaseHelper) {
                     }
                 }
             }
+            dbQuery.insertUpdateScheduleMetadata(studyId, createdOn)
         }
 
     }

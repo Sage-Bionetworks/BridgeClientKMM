@@ -262,9 +262,7 @@ class AuthenticationRepository(
         return false
     }
 
-    override suspend fun reAuth() : Boolean = reAuthWithError().first
-
-    suspend fun reAuthWithError() : Pair<Boolean, Error?> {
+    override suspend fun reAuth() : Boolean {
         val sessionInfo = session()
         return sessionInfo?.reauthToken?.let { reauthToken ->
             val signIn = SignIn(
@@ -274,14 +272,12 @@ class AuthenticationRepository(
                 reauthToken = reauthToken
             )
             var success = false
-            var responseError: Error? = null
             try {
                 val userSession = authenticationApi.reauthenticate(signIn)
                 updateCachedSession(sessionInfo, userSession)
                 Logger.i("Session token updated.")
                 success = true
             } catch (err: Throwable) {
-                responseError = Error(err.message ?: "Error requesting reAuth: $err")
                 if (err is ResponseException && (err.response.status == HttpStatusCode.Unauthorized ||
                             err.response.status == HttpStatusCode.Forbidden ||
                             err.response.status == HttpStatusCode.NotFound ||
@@ -299,8 +295,8 @@ class AuthenticationRepository(
                     Logger.i("User reauth failed. Ignoring. $err")
                 }
             }
-            Pair(success, responseError)
-        } ?: Pair(false, Error("reAuth token is null"))
+            success
+        } ?: false
     }
 
     override fun notifyUIOfBridgeError(statusCode: HttpStatusCode) {

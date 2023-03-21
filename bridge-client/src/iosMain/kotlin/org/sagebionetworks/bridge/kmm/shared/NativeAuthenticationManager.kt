@@ -5,6 +5,10 @@ import io.ktor.http.*
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.Instant
+import kotlinx.datetime.minus
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
@@ -14,6 +18,8 @@ import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
 import org.sagebionetworks.bridge.kmm.shared.repo.AppStatus
 import org.sagebionetworks.bridge.kmm.shared.repo.AuthenticationRepository
 import org.sagebionetworks.bridge.kmm.shared.repo.ParticipantRepo
+import org.sagebionetworks.bridge.kmm.shared.repo.ParticipantReportRepo
+import platform.Foundation.NSUUID
 
 open class NativeAuthenticationManager(
     private val viewUpdate: (UserSessionInfo?) -> Unit
@@ -21,6 +27,7 @@ open class NativeAuthenticationManager(
 
     private val authManager : AuthenticationRepository by inject(mode = LazyThreadSafetyMode.NONE)
     private val participantManager : ParticipantRepo by inject(mode = LazyThreadSafetyMode.NONE)
+    private val reportRepo : ParticipantReportRepo by inject(mode = LazyThreadSafetyMode.NONE)
 
     private val scope = MainScope()
 
@@ -55,11 +62,20 @@ open class NativeAuthenticationManager(
 
     open fun reauth(completion: (Error?) -> Unit) {
         scope.launch {
-            val response = authManager.reAuthWithError()
-            if (response.first) {
-                completion(null)
+            val studyId = authManager.session()?.studyIds?.firstOrNull()
+            if (studyId == null) {
+                completion(Error("reAuth failed. Null session."))
             } else {
-                completion(response.second ?: Error("reAuth failed. Unknown cause."))
+                // Ping the server to reauthenticate using a participant report
+                val end = Clock.System.now()
+                val start = end.minus(1, DateTimeUnit.MINUTE)
+                val uuid = NSUUID().UUIDString
+                val ping = reportRepo.loadRemoteReports(studyId, "Ping$uuid", start, end)
+                if (ping) {
+                    completion(null)
+                } else {
+                    completion(Error("reAuth failed. Unknown cause."))
+                }
             }
         }
     }

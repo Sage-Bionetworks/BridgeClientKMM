@@ -201,6 +201,7 @@ open class UploadAppManager : ObservableObject {
         Logger.logWriter?.setUserId(userSessionId)
 
         // Initialize koin
+        Logger.log(severity: .info, message: "Initializing Koin")
         #if DEBUG
             let enableNetworkLogs = true
         #else
@@ -209,12 +210,14 @@ open class UploadAppManager : ObservableObject {
         KoinKt.doInitKoin(enableNetworkLogs: enableNetworkLogs)
         
         // Hook up app config
+        Logger.log(severity: .info, message: "Hook up app config")
         self.appConfigManager = NativeAppConfigManager() { appConfig, _ in
             self.config = appConfig ?? self.config
         }
         self.appConfigManager.observeAppConfig()
         
         // Hook up user session info and bridge app status
+        Logger.log(severity: .info, message: "Hook up user session info and bridge app status")
         self.authManager = NativeAuthenticationManager() { userSessionInfo in
             self.updateUserSessionStatus(userSessionInfo, updateType: .observed)
         }
@@ -226,7 +229,11 @@ open class UploadAppManager : ObservableObject {
         }
         let userState = self.authManager.sessionState()
         self.userSessionInfo.loginError = userState.error
-        self.updateUserSessionStatus(userState.sessionInfo, updateType: .launch)
+        if userState.error == nil {
+            // Only update during launch if the call did not throw an exception.
+            // Otherwise, we have to wait until the observer comes back.
+            self.updateUserSessionStatus(session, updateType: .launch)
+        }
         self.authManager.observeUserSessionInfo()
     }
     

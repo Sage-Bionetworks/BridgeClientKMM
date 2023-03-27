@@ -1,8 +1,8 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import com.android.zipflinger.Sources.dir
-import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
+import org.jetbrains.kotlin.gradle.plugin.mpp.BitcodeEmbeddingMode
 import org.gradle.internal.classpath.Instrumented.systemProperty
 
 plugins {
@@ -48,6 +48,7 @@ kotlin {
     ios {
         binaries.framework {
             baseName = iosFrameworkName
+            embedBitcode(BitcodeEmbeddingMode.DISABLE)
             xcframework.add(this)
         }
     }
@@ -55,6 +56,7 @@ kotlin {
     iosSimulatorArm64 {
         binaries.framework {
             baseName = iosFrameworkName
+            embedBitcode(BitcodeEmbeddingMode.DISABLE)
             xcframework.add(this)
         }
     }

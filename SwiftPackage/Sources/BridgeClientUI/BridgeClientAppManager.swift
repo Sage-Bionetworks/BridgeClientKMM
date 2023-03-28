@@ -149,18 +149,23 @@ open class BridgeClientAppManager : UploadAppManager {
     
     public final func fetchAppState() -> AppState {
         if bridgeAppStatus != .supported {
+            Logger.log(severity: .info, message: "Updating app state to `error`. bridgeAppStatus != .supported")
             return .error
         }
         else if appConfig.isLaunching || userSessionInfo.loginState == .launching || reauthStatus == .pending {
+            Logger.log(severity: .info, message: "Updating app state to `launching`.\nappConfig.isLaunching=\(appConfig.isLaunching)\nuserSessionInfo.loginState=\(userSessionInfo.loginState)\nreauthStatus=\(reauthStatus == .pending)")
             return .launching
         }
         else if !userSessionInfo.isAuthenticated {
+            Logger.log(severity: .info, message: "Updating app state to `login`. User not authenticated. loginState=\(userSessionInfo.loginState)")
             return .login
         }
         else if !isOnboardingFinished {
+            Logger.log(severity: .info, message: "Updating app state to `onboarding`.")
             return .onboarding
         }
         else {
+            Logger.log(severity: .info, message: "Updating app state to `main`.")
             return .main
         }
     }
@@ -175,15 +180,16 @@ open class BridgeClientAppManager : UploadAppManager {
     open override func handleReauthFailed() -> Bool {
         if let password = reauthPasswordHandler?.storedPassword(for: userSessionInfo) {
             reauthStatus = .pending
+            #if DEBUG
+            print("Attempting reauth recovery\nemail: '\(userSessionInfo.email ?? "NULL")'\nexternalId: '\(userSessionInfo.externalId ?? "NULL")'\npassword: '\(password)'")
+            #endif
             reauthWithCredentials(password: password) { [weak self] status in
-                self?.reauthStatus = status
-                if status == .failed {
-                    self?.reauthPasswordHandler?.clearStoredPassword()
-                    self?.userSessionInfo.loginError = "Failed to reauth using stored credentials."
-                }
-                else if status == .retry {
-                    // If the reauth failed, then we need to show the participant the login and have them
-                    // attempt reauth or sign out.
+                DispatchQueue.main.async {
+                    self?.reauthStatus = status
+                    if status == .failed {
+                        self?.reauthPasswordHandler?.clearStoredPassword()
+                        self?.userSessionInfo.loginError = "Failed to reauth using stored credentials."
+                    }
                     self?.updateAppState()
                 }
             }

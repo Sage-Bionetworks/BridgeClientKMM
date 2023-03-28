@@ -634,6 +634,11 @@ __attribute__((swift_name("UserSessionState")))
 @property (readonly) BridgeClientUserSessionInfo * _Nullable sessionInfo __attribute__((swift_name("sessionInfo")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("AccountStatus")))
 @interface BridgeClientAccountStatus : BridgeClientKotlinEnum<BridgeClientAccountStatus *>
@@ -659,6 +664,11 @@ __attribute__((swift_name("AccountStatus.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializerTypeParamsSerializers:(BridgeClientKotlinArray<id<BridgeClientKotlinx_serialization_coreKSerializer>> *)typeParamsSerializers __attribute__((swift_name("serializer(typeParamsSerializers:)")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("Address")))
 @interface BridgeClientAddress : BridgeClientBase
@@ -696,6 +706,11 @@ __attribute__((swift_name("Address.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("AdherenceRecord")))
 @interface BridgeClientAdherenceRecord : BridgeClientBase
@@ -735,6 +750,11 @@ __attribute__((swift_name("AdherenceRecord.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("AdherenceRecordType")))
 @interface BridgeClientAdherenceRecordType : BridgeClientKotlinEnum<BridgeClientAdherenceRecordType *>
@@ -759,6 +779,11 @@ __attribute__((swift_name("AdherenceRecordType.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializerTypeParamsSerializers:(BridgeClientKotlinArray<id<BridgeClientKotlinx_serialization_coreKSerializer>> *)typeParamsSerializers __attribute__((swift_name("serializer(typeParamsSerializers:)")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("AdherenceRecordUpdates")))
 @interface BridgeClientAdherenceRecordUpdates : BridgeClientBase
@@ -784,6 +809,11 @@ __attribute__((swift_name("AdherenceRecordUpdates.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("AdherenceRecordsSearch")))
 @interface BridgeClientAdherenceRecordsSearch : BridgeClientBase
@@ -833,6 +863,11 @@ __attribute__((swift_name("AdherenceRecordsSearch.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("AppConfig")))
 @interface BridgeClientAppConfig : BridgeClientBase
@@ -882,6 +917,11 @@ __attribute__((swift_name("AppConfig.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("AssessmentConfig")))
 @interface BridgeClientAssessmentConfig : BridgeClientBase
@@ -913,6 +953,11 @@ __attribute__((swift_name("AssessmentConfig.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("AssessmentInfo")))
 @interface BridgeClientAssessmentInfo : BridgeClientBase
@@ -957,6 +1002,11 @@ __attribute__((swift_name("AssessmentInfo.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("ClientInfo")))
 @interface BridgeClientClientInfo : BridgeClientBase
@@ -994,6 +1044,11 @@ __attribute__((swift_name("ClientInfo.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("ColorScheme")))
 @interface BridgeClientColorScheme : BridgeClientBase
@@ -1025,6 +1080,11 @@ __attribute__((swift_name("ColorScheme.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("ConfigReference")))
 @interface BridgeClientConfigReference : BridgeClientBase
@@ -1052,6 +1112,11 @@ __attribute__((swift_name("ConfigReference.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("ConsentStatus")))
 @interface BridgeClientConsentStatus : BridgeClientBase
@@ -1087,6 +1152,11 @@ __attribute__((swift_name("ConsentStatus.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("Contact")))
 @interface BridgeClientContact : BridgeClientBase
@@ -1126,6 +1196,11 @@ __attribute__((swift_name("Contact.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("ContactRole")))
 @interface BridgeClientContactRole : BridgeClientKotlinEnum<BridgeClientContactRole *>
@@ -1154,6 +1229,11 @@ __attribute__((swift_name("ContactRole.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializerTypeParamsSerializers:(BridgeClientKotlinArray<id<BridgeClientKotlinx_serialization_coreKSerializer>> *)typeParamsSerializers __attribute__((swift_name("serializer(typeParamsSerializers:)")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("Criteria")))
 @interface BridgeClientCriteria : BridgeClientBase
@@ -1191,6 +1271,11 @@ __attribute__((swift_name("Criteria.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("DateRange")))
 @interface BridgeClientDateRange : BridgeClientBase
@@ -1216,6 +1301,11 @@ __attribute__((swift_name("DateRange.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("EnrollmentInfo")))
 @interface BridgeClientEnrollmentInfo : BridgeClientBase
@@ -1251,6 +1341,11 @@ __attribute__((swift_name("EnrollmentInfo.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("Environment")))
 @interface BridgeClientEnvironment : BridgeClientKotlinEnum<BridgeClientEnvironment *>
@@ -1277,6 +1372,11 @@ __attribute__((swift_name("Environment.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializerTypeParamsSerializers:(BridgeClientKotlinArray<id<BridgeClientKotlinx_serialization_coreKSerializer>> *)typeParamsSerializers __attribute__((swift_name("serializer(typeParamsSerializers:)")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("FileReference")))
 @interface BridgeClientFileReference : BridgeClientBase
@@ -1306,6 +1406,11 @@ __attribute__((swift_name("FileReference.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("Identifier")))
 @interface BridgeClientIdentifier : BridgeClientBase
@@ -1335,6 +1440,11 @@ __attribute__((swift_name("Identifier.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("ImageResource")))
 @interface BridgeClientImageResource : BridgeClientBase
@@ -1364,6 +1474,11 @@ __attribute__((swift_name("ImageResource.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("IrbDecisionType")))
 @interface BridgeClientIrbDecisionType : BridgeClientKotlinEnum<BridgeClientIrbDecisionType *>
@@ -1388,6 +1503,11 @@ __attribute__((swift_name("IrbDecisionType.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializerTypeParamsSerializers:(BridgeClientKotlinArray<id<BridgeClientKotlinx_serialization_coreKSerializer>> *)typeParamsSerializers __attribute__((swift_name("serializer(typeParamsSerializers:)")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("Label")))
 @interface BridgeClientLabel : BridgeClientBase
@@ -1421,6 +1541,11 @@ __attribute__((swift_name("Model")))
 - (NSString *)getIdentifier __attribute__((swift_name("getIdentifier()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("NotificationInfo")))
 @interface BridgeClientNotificationInfo : BridgeClientBase
@@ -1454,6 +1579,11 @@ __attribute__((swift_name("NotificationInfo.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("NotificationMessage")))
 @interface BridgeClientNotificationMessage : BridgeClientBase
@@ -1483,6 +1613,11 @@ __attribute__((swift_name("NotificationMessage.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("NotificationType")))
 @interface BridgeClientNotificationType : BridgeClientKotlinEnum<BridgeClientNotificationType *>
@@ -1507,6 +1642,11 @@ __attribute__((swift_name("NotificationType.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializerTypeParamsSerializers:(BridgeClientKotlinArray<id<BridgeClientKotlinx_serialization_coreKSerializer>> *)typeParamsSerializers __attribute__((swift_name("serializer(typeParamsSerializers:)")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("ParticipantData")))
 @interface BridgeClientParticipantData : BridgeClientBase
@@ -1534,6 +1674,11 @@ __attribute__((swift_name("ParticipantData.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("ParticipantSchedule")))
 @interface BridgeClientParticipantSchedule : BridgeClientBase
@@ -1571,6 +1716,11 @@ __attribute__((swift_name("ParticipantSchedule.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("PerformanceOrder")))
 @interface BridgeClientPerformanceOrder : BridgeClientKotlinEnum<BridgeClientPerformanceOrder *>
@@ -1596,6 +1746,11 @@ __attribute__((swift_name("PerformanceOrder.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializerTypeParamsSerializers:(BridgeClientKotlinArray<id<BridgeClientKotlinx_serialization_coreKSerializer>> *)typeParamsSerializers __attribute__((swift_name("serializer(typeParamsSerializers:)")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("Phone")))
 @interface BridgeClientPhone : BridgeClientBase
@@ -1625,6 +1780,11 @@ __attribute__((swift_name("Phone.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("PhoneSignInRequest")))
 @interface BridgeClientPhoneSignInRequest : BridgeClientBase
@@ -1652,6 +1812,11 @@ __attribute__((swift_name("PhoneSignInRequest.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("PhoneSignin")))
 @interface BridgeClientPhoneSignin : BridgeClientBase
@@ -1681,6 +1846,11 @@ __attribute__((swift_name("PhoneSignin.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("ReminderType")))
 @interface BridgeClientReminderType : BridgeClientKotlinEnum<BridgeClientReminderType *>
@@ -1705,6 +1875,11 @@ __attribute__((swift_name("ReminderType.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializerTypeParamsSerializers:(BridgeClientKotlinArray<id<BridgeClientKotlinx_serialization_coreKSerializer>> *)typeParamsSerializers __attribute__((swift_name("serializer(typeParamsSerializers:)")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("Role")))
 @interface BridgeClientRole : BridgeClientKotlinEnum<BridgeClientRole *>
@@ -1731,6 +1906,11 @@ __attribute__((swift_name("Role.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializerTypeParamsSerializers:(BridgeClientKotlinArray<id<BridgeClientKotlinx_serialization_coreKSerializer>> *)typeParamsSerializers __attribute__((swift_name("serializer(typeParamsSerializers:)")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("ScheduledAssessment")))
 @interface BridgeClientScheduledAssessment : BridgeClientBase
@@ -1758,6 +1938,11 @@ __attribute__((swift_name("ScheduledAssessment.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("ScheduledSession")))
 @interface BridgeClientScheduledSession : BridgeClientBase
@@ -1808,6 +1993,11 @@ __attribute__((swift_name("ScheduledSession.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("SchemaReference")))
 @interface BridgeClientSchemaReference : BridgeClientBase
@@ -1835,6 +2025,11 @@ __attribute__((swift_name("SchemaReference.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("SessionInfo")))
 @interface BridgeClientSessionInfo : BridgeClientBase
@@ -1872,6 +2067,11 @@ __attribute__((swift_name("SessionInfo.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("SharingScope")))
 @interface BridgeClientSharingScope : BridgeClientKotlinEnum<BridgeClientSharingScope *>
@@ -1897,6 +2097,11 @@ __attribute__((swift_name("SharingScope.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializerTypeParamsSerializers:(BridgeClientKotlinArray<id<BridgeClientKotlinx_serialization_coreKSerializer>> *)typeParamsSerializers __attribute__((swift_name("serializer(typeParamsSerializers:)")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("SignInType")))
 @interface BridgeClientSignInType : BridgeClientKotlinEnum<BridgeClientSignInType *>
@@ -1924,6 +2129,11 @@ __attribute__((swift_name("SignInType.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializerTypeParamsSerializers:(BridgeClientKotlinArray<id<BridgeClientKotlinx_serialization_coreKSerializer>> *)typeParamsSerializers __attribute__((swift_name("serializer(typeParamsSerializers:)")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("SortOrder")))
 @interface BridgeClientSortOrder : BridgeClientKotlinEnum<BridgeClientSortOrder *>
@@ -1948,6 +2158,11 @@ __attribute__((swift_name("SortOrder.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializerTypeParamsSerializers:(BridgeClientKotlinArray<id<BridgeClientKotlinx_serialization_coreKSerializer>> *)typeParamsSerializers __attribute__((swift_name("serializer(typeParamsSerializers:)")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("Study")))
 @interface BridgeClientStudy : BridgeClientBase
@@ -2019,6 +2234,11 @@ __attribute__((swift_name("Study.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("StudyActivityEvent")))
 @interface BridgeClientStudyActivityEvent : BridgeClientBase
@@ -2054,6 +2274,11 @@ __attribute__((swift_name("StudyActivityEvent.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("StudyActivityEventList")))
 @interface BridgeClientStudyActivityEventList : BridgeClientBase
@@ -2079,6 +2304,11 @@ __attribute__((swift_name("StudyActivityEventList.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("StudyActivityEventRequest")))
 @interface BridgeClientStudyActivityEventRequest : BridgeClientBase
@@ -2101,6 +2331,11 @@ __attribute__((swift_name("StudyActivityEventRequest.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("StudyBurstInfo")))
 @interface BridgeClientStudyBurstInfo : BridgeClientBase
@@ -2134,6 +2369,11 @@ __attribute__((swift_name("StudyBurstInfo.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("StudyInfo")))
 @interface BridgeClientStudyInfo : BridgeClientBase
@@ -2171,6 +2411,11 @@ __attribute__((swift_name("StudyInfo.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("StudyParticipant")))
 @interface BridgeClientStudyParticipant : BridgeClientBase
@@ -2246,6 +2491,11 @@ __attribute__((swift_name("StudyParticipant.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("StudyPhase")))
 @interface BridgeClientStudyPhase : BridgeClientKotlinEnum<BridgeClientStudyPhase *>
@@ -2275,6 +2525,11 @@ __attribute__((swift_name("StudyPhase.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializerTypeParamsSerializers:(BridgeClientKotlinArray<id<BridgeClientKotlinx_serialization_coreKSerializer>> *)typeParamsSerializers __attribute__((swift_name("serializer(typeParamsSerializers:)")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("SurveyReference")))
 @interface BridgeClientSurveyReference : BridgeClientBase
@@ -2306,6 +2561,11 @@ __attribute__((swift_name("SurveyReference.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("Timeline")))
 @interface BridgeClientTimeline : BridgeClientBase
@@ -2343,6 +2603,11 @@ __attribute__((swift_name("Timeline.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("UserConsentHistory")))
 @interface BridgeClientUserConsentHistory : BridgeClientBase
@@ -2384,6 +2649,11 @@ __attribute__((swift_name("UserConsentHistory.Companion")))
 - (id<BridgeClientKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("UserSessionInfo")))
 @interface BridgeClientUserSessionInfo : BridgeClientBase
@@ -3644,6 +3914,11 @@ __attribute__((swift_name("ScheduledAssessmentReference")))
 @property (readonly) NSString *studyId __attribute__((swift_name("studyId")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("ScheduledNotification")))
 @interface BridgeClientScheduledNotification : BridgeClientBase
@@ -3889,6 +4164,11 @@ __attribute__((swift_name("KotlinThrowable")))
 - (NSError *)asError __attribute__((swift_name("asError()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable(with=NormalClass(value=kotlinx/datetime/serializers/InstantIso8601Serializer))
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("Kotlinx_datetimeInstant")))
 @interface BridgeClientKotlinx_datetimeInstant : BridgeClientBase <BridgeClientKotlinComparable>
@@ -3905,6 +4185,11 @@ __attribute__((swift_name("Kotlinx_datetimeInstant")))
 @property (readonly) int32_t nanosecondsOfSecond __attribute__((swift_name("nanosecondsOfSecond")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable(with=NormalClass(value=kotlinx/serialization/json/JsonElementSerializer))
+*/
 __attribute__((swift_name("Kotlinx_serialization_jsonJsonElement")))
 @interface BridgeClientKotlinx_serialization_jsonJsonElement : BridgeClientBase
 @property (class, readonly, getter=companion) BridgeClientKotlinx_serialization_jsonJsonElementCompanion *companion __attribute__((swift_name("companion")));
@@ -4018,6 +4303,11 @@ __attribute__((swift_name("Kotlinx_serialization_coreKSerializer")))
 @required
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable(with=NormalClass(value=kotlinx/datetime/serializers/LocalTimeIso8601Serializer))
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("Kotlinx_datetimeLocalTime")))
 @interface BridgeClientKotlinx_datetimeLocalTime : BridgeClientBase <BridgeClientKotlinComparable>
@@ -4036,6 +4326,11 @@ __attribute__((swift_name("Kotlinx_datetimeLocalTime")))
 @property (readonly) int32_t second __attribute__((swift_name("second")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable(with=NormalClass(value=kotlinx/datetime/serializers/DateTimePeriodIso8601Serializer))
+*/
 __attribute__((swift_name("Kotlinx_datetimeDateTimePeriod")))
 @interface BridgeClientKotlinx_datetimeDateTimePeriod : BridgeClientBase
 @property (class, readonly, getter=companion) BridgeClientKotlinx_datetimeDateTimePeriodCompanion *companion __attribute__((swift_name("companion")));
@@ -4051,6 +4346,11 @@ __attribute__((swift_name("Kotlinx_datetimeDateTimePeriod")))
 @property (readonly) int32_t years __attribute__((swift_name("years")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable(with=NormalClass(value=kotlinx/datetime/serializers/LocalDateIso8601Serializer))
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("Kotlinx_datetimeLocalDate")))
 @interface BridgeClientKotlinx_datetimeLocalDate : BridgeClientBase <BridgeClientKotlinComparable>
@@ -4070,6 +4370,11 @@ __attribute__((swift_name("Kotlinx_datetimeLocalDate")))
 @property (readonly) int32_t year __attribute__((swift_name("year")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable(with=NormalClass(value=kotlinx/datetime/serializers/LocalDateTimeIso8601Serializer))
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("Kotlinx_datetimeLocalDateTime")))
 @interface BridgeClientKotlinx_datetimeLocalDateTime : BridgeClientBase <BridgeClientKotlinComparable>
@@ -4231,6 +4536,11 @@ __attribute__((swift_name("RuntimeQuery")))
 - (void)removeListenerListener:(id<BridgeClientRuntimeQueryListener>)listener __attribute__((swift_name("removeListener(listener:)")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable(with=NormalClass(value=kotlinx/datetime/serializers/TimeZoneSerializer))
+*/
 __attribute__((swift_name("Kotlinx_datetimeTimeZone")))
 @interface BridgeClientKotlinx_datetimeTimeZone : BridgeClientBase
 @property (class, readonly, getter=companion) BridgeClientKotlinx_datetimeTimeZoneCompanion *companion __attribute__((swift_name("companion")));
@@ -4680,12 +4990,7 @@ __attribute__((swift_name("Kotlinx_serialization_coreEncoder")))
 - (void)encodeDoubleValue:(double)value __attribute__((swift_name("encodeDouble(value:)")));
 - (void)encodeEnumEnumDescriptor:(id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)enumDescriptor index:(int32_t)index __attribute__((swift_name("encodeEnum(enumDescriptor:index:)")));
 - (void)encodeFloatValue:(float)value __attribute__((swift_name("encodeFloat(value:)")));
-
-/**
- * @note annotations
- *   kotlinx.serialization.ExperimentalSerializationApi
-*/
-- (id<BridgeClientKotlinx_serialization_coreEncoder>)encodeInlineInlineDescriptor:(id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)inlineDescriptor __attribute__((swift_name("encodeInline(inlineDescriptor:)")));
+- (id<BridgeClientKotlinx_serialization_coreEncoder>)encodeInlineDescriptor:(id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)descriptor __attribute__((swift_name("encodeInline(descriptor:)")));
 - (void)encodeIntValue:(int32_t)value __attribute__((swift_name("encodeInt(value:)")));
 - (void)encodeLongValue:(int64_t)value __attribute__((swift_name("encodeLong(value:)")));
 
@@ -4757,11 +5062,6 @@ __attribute__((swift_name("Kotlinx_serialization_coreSerialDescriptor")))
  *   kotlinx.serialization.ExperimentalSerializationApi
 */
 @property (readonly) int32_t elementsCount __attribute__((swift_name("elementsCount")));
-
-/**
- * @note annotations
- *   kotlinx.serialization.ExperimentalSerializationApi
-*/
 @property (readonly) BOOL isInline __attribute__((swift_name("isInline")));
 
 /**
@@ -4793,12 +5093,7 @@ __attribute__((swift_name("Kotlinx_serialization_coreDecoder")))
 - (double)decodeDouble __attribute__((swift_name("decodeDouble()")));
 - (int32_t)decodeEnumEnumDescriptor:(id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)enumDescriptor __attribute__((swift_name("decodeEnum(enumDescriptor:)")));
 - (float)decodeFloat __attribute__((swift_name("decodeFloat()")));
-
-/**
- * @note annotations
- *   kotlinx.serialization.ExperimentalSerializationApi
-*/
-- (id<BridgeClientKotlinx_serialization_coreDecoder>)decodeInlineInlineDescriptor:(id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)inlineDescriptor __attribute__((swift_name("decodeInline(inlineDescriptor:)")));
+- (id<BridgeClientKotlinx_serialization_coreDecoder>)decodeInlineDescriptor:(id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)descriptor __attribute__((swift_name("decodeInline(descriptor:)")));
 - (int32_t)decodeInt __attribute__((swift_name("decodeInt()")));
 - (int64_t)decodeLong __attribute__((swift_name("decodeLong()")));
 
@@ -5285,11 +5580,6 @@ __attribute__((swift_name("Kotlinx_serialization_coreCompositeEncoder")))
 - (void)encodeCharElementDescriptor:(id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index value:(unichar)value __attribute__((swift_name("encodeCharElement(descriptor:index:value:)")));
 - (void)encodeDoubleElementDescriptor:(id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index value:(double)value __attribute__((swift_name("encodeDoubleElement(descriptor:index:value:)")));
 - (void)encodeFloatElementDescriptor:(id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index value:(float)value __attribute__((swift_name("encodeFloatElement(descriptor:index:value:)")));
-
-/**
- * @note annotations
- *   kotlinx.serialization.ExperimentalSerializationApi
-*/
 - (id<BridgeClientKotlinx_serialization_coreEncoder>)encodeInlineElementDescriptor:(id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index __attribute__((swift_name("encodeInlineElement(descriptor:index:)")));
 - (void)encodeIntElementDescriptor:(id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index value:(int32_t)value __attribute__((swift_name("encodeIntElement(descriptor:index:value:)")));
 - (void)encodeLongElementDescriptor:(id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index value:(int64_t)value __attribute__((swift_name("encodeLongElement(descriptor:index:value:)")));
@@ -5366,11 +5656,6 @@ __attribute__((swift_name("Kotlinx_serialization_coreCompositeDecoder")))
 - (double)decodeDoubleElementDescriptor:(id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index __attribute__((swift_name("decodeDoubleElement(descriptor:index:)")));
 - (int32_t)decodeElementIndexDescriptor:(id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)descriptor __attribute__((swift_name("decodeElementIndex(descriptor:)")));
 - (float)decodeFloatElementDescriptor:(id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index __attribute__((swift_name("decodeFloatElement(descriptor:index:)")));
-
-/**
- * @note annotations
- *   kotlinx.serialization.ExperimentalSerializationApi
-*/
 - (id<BridgeClientKotlinx_serialization_coreDecoder>)decodeInlineElementDescriptor:(id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index __attribute__((swift_name("decodeInlineElement(descriptor:index:)")));
 - (int32_t)decodeIntElementDescriptor:(id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index __attribute__((swift_name("decodeIntElement(descriptor:index:)")));
 - (int64_t)decodeLongElementDescriptor:(id<BridgeClientKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index __attribute__((swift_name("decodeLongElement(descriptor:index:)")));
@@ -5659,6 +5944,11 @@ __attribute__((swift_name("KotlinByteArray")))
 @property (readonly) int32_t size __attribute__((swift_name("size")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable(with=NormalClass(value=kotlinx/datetime/serializers/FixedOffsetTimeZoneSerializer))
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("Kotlinx_datetimeFixedOffsetTimeZone")))
 @interface BridgeClientKotlinx_datetimeFixedOffsetTimeZone : BridgeClientKotlinx_datetimeTimeZone
@@ -6268,6 +6558,7 @@ __attribute__((swift_name("Ktor_httpURLBuilder")))
 @property (class, readonly, getter=companion) BridgeClientKtor_httpURLBuilderCompanion *companion __attribute__((swift_name("companion")));
 - (BridgeClientKtor_httpUrl *)build __attribute__((swift_name("build()")));
 - (NSString *)buildString __attribute__((swift_name("buildString()")));
+- (NSString *)description __attribute__((swift_name("description()")));
 @property NSString *encodedFragment __attribute__((swift_name("encodedFragment")));
 @property id<BridgeClientKtor_httpParametersBuilder> encodedParameters __attribute__((swift_name("encodedParameters")));
 @property NSString * _Nullable encodedPassword __attribute__((swift_name("encodedPassword")));
@@ -6328,6 +6619,11 @@ __attribute__((swift_name("KotlinByteIterator")))
 - (int8_t)nextByte __attribute__((swift_name("nextByte()")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable(with=NormalClass(value=kotlinx/datetime/serializers/UtcOffsetSerializer))
+*/
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("Kotlinx_datetimeUtcOffset")))
 @interface BridgeClientKotlinx_datetimeUtcOffset : BridgeClientBase

@@ -106,7 +106,7 @@ class AuthenticationRepository(
                 Logger.i("Signing out participant.")
                 authenticationApi.signOut(it)
             } catch (error: Throwable) {
-                Logger.w("Error signing out: $error")
+                Logger.e("Error signing out: $error")
             }
         }
         // Always clear database when signOut is called
@@ -205,7 +205,7 @@ class AuthenticationRepository(
             updateCachedSession(null, userSession)
             ResourceResult.Success(userSession, ResourceStatus.SUCCESS)
         } catch (err: Throwable) {
-            Logger.w("Error requesting reAuth with stored password: $err")
+            Logger.e("Error requesting reAuth with stored password: $err")
             if (err is ResponseException && err.response.status == HttpStatusCode.NotFound) {
                 ResourceResult.Failed(ResourceStatus.FAILED)
             } else {

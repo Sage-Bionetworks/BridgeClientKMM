@@ -7,7 +7,7 @@ compileSdk = "33"
 # Dependencies
 coroutines = "1.6.4"
 kotlin = "1.7.20"
-ktor = "2.1.1"
+ktor = "2.2.4"
 kotlinxSerialization = "1.3.0"
 kotlinxDateTime = "0.4.0"
 sqlDelight = "2.0.0-alpha04"

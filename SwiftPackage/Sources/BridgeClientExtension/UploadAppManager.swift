@@ -119,6 +119,8 @@ open class UploadAppManager : ObservableObject {
             return
         }
         
+        Logger.log(severity: .info, message: "Updating UserSessionInfo. updateType='\(updateType)', sessionToken='\(session?.sessionToken ?? "NULL")'")
+        
         self.session = session
         updateNetworkMonitoring()
         self.isNewLogin = (updateType == .login || updateType == .signout)
@@ -221,12 +223,14 @@ open class UploadAppManager : ObservableObject {
         self.authManager = NativeAuthenticationManager() { userSessionInfo in
             self.updateUserSessionStatus(userSessionInfo, updateType: .observed)
         }
+        Logger.log(severity: .info, message: "Getting current app status")
         self.bridgeAppStatus = self.authManager.currentAppStatus()
         self.authManager.observeAppStatus { status in
             DispatchQueue.main.async {
                 self.bridgeAppStatus = status
             }
         }
+        Logger.log(severity: .info, message: "Getting current session state")
         let userState = self.authManager.sessionState()
         self.userSessionInfo.loginError = userState.error
         if userState.error == nil {

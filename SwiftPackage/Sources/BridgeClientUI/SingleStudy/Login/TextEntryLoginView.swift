@@ -28,6 +28,7 @@ struct TextEntryLoginView: View {
             }, onCommit: {
                 self.navigator.goForward()
             })
+            .accessibilityIdentifier("login")
             .keyboardType(.asciiCapable)
             .autocapitalization(.none)
             .disableAutocorrection(true)

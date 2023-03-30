@@ -2,6 +2,7 @@ package org.sagebionetworks.bridge.kmm.shared
 
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import org.sagebionetworks.bridge.kmm.shared.models.ClientInfo
 
 interface PlatformConfig {
@@ -47,13 +48,15 @@ fun PlatformConfig.buildClientData(input: JsonElement? = null, uploadId: String?
     var clientData: JsonObject = input?.let {
         it as? JsonObject ?: JsonObject(mapOf("value" to it))
     } ?: JsonObject(mapOf())
-    uploadId?.let {
-        clientData.plus("uploadId" to it)
-    }
-    clientData.plus("osName" to osName)
-    clientData.plus("deviceName" to deviceName)
-    clientData.plus("osVersion" to osVersion)
-    clientData.plus("appVersion" to appVersion)
+    clientData = JsonObject(clientData.toMutableMap().apply {
+        uploadId?.let {
+            this["uploadId"] = JsonPrimitive(it)
+        }
+        this["osName"] = JsonPrimitive(osName)
+        this["deviceName"] = JsonPrimitive(deviceName)
+        this["osVersion"] = JsonPrimitive(osVersion)
+        this["appVersion"] = JsonPrimitive(appVersion)
+    })
     return clientData
 }
 

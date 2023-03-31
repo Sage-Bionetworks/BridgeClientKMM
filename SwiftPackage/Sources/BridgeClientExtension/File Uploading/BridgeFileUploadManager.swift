@@ -1014,6 +1014,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
             // are orphaned. Note that under some unusual circumstances this may lead to
             // duplication of uploads.
             let uploadURLsRequested = defaults.dictionary(forKey: self.uploadURLsRequestedKey) ?? [String : Any]()
+            Logger.log(severity: .info, message: "checkForOrphanedUploads: Processing \(uploadURLsRequested.count) uploadURL requests.")
             for invariantFilePath in uploadURLsRequested.keys {
                 guard let api = self.apiFromXAttrs(for: invariantFilePath) else { continue }
                 guard let metadataBlob = api.retrieveMetadata(from: invariantFilePath, mappings: uploadURLsRequested) else { continue }
@@ -1024,6 +1025,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
                 
                 // If we get all the way here, touch the file to reset the orphanage clock
                 // and then send the upload request again.
+                Logger.log(severity: .info, message: "checkForOrphanedUploads: Resending upload request.")
                 self.touch(fileUrl: fileUrl)
                 api.sendUploadRequest(for: invariantFilePath, uploadMetadata: metadataBlob)
             }
@@ -1031,6 +1033,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
             // Assume any uploads in the uploadingToS3 map whose sessions are at or past their
             // expiration datetime are orphaned.
             let uploadingToS3 = defaults.dictionary(forKey: self.uploadingToS3Key) ?? [String : Any]()
+            Logger.log(severity: .info, message: "checkForOrphanedUploads: Processing \(uploadingToS3.count) uploads to S3.")
             for invariantFilePath in uploadingToS3.keys {
                 guard let api = self.apiFromXAttrs(for: invariantFilePath) else { continue }
                 guard let metadataBlob = api.retrieveMetadata(from: invariantFilePath, mappings: uploadingToS3) else { continue }
@@ -1052,6 +1055,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
             // 24 hours old are orphaned. Note that under some unusual circumstances this may
             // lead to duplicate notifications to Bridge.
             let notifyingBridge = defaults.dictionary(forKey: self.notifyingBridgeUploadSucceededKey) ?? [String : Any]()
+            Logger.log(severity: .info, message: "checkForOrphanedUploads: Processing \(notifyingBridge.count) upload success Bridge notifications.")
             for invariantFilePath in notifyingBridge.keys {
                 guard let api = self.apiFromXAttrs(for: invariantFilePath) else { continue }
                 guard let metadataBlob = api.retrieveMetadata(from: invariantFilePath, mappings: notifyingBridge) else { continue }
@@ -1068,6 +1072,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
             
             // Assume any uploads in the bridgeFileUploads map which are not in any other map
             // and have no in-flight tasks and are at least 24 hours old are orphaned.
+            Logger.log(severity: .info, message: "checkForOrphanedUploads: Processing \(fileUploads.count) orphaned file uploads.")
             for invariantFilePath in fileUploads.keys {
                 guard !filesInFlight.contains(invariantFilePath) else { continue }
                 guard !uploadURLsRequested.keys.contains(invariantFilePath) else { continue }
@@ -1109,6 +1114,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
                 }
             }
             let retryQueue = defaults.dictionary(forKey: self.retryUploadsKey) ?? [String : Any]()
+            Logger.log(severity: .info, message: "checkForOrphanedUploads: Processing \(allFiles.count) files found in the upload directory.")
             for fileUrl in allFiles {
                 let invariantFilePath = self.sandboxRelativePath(of: fileUrl)
                 guard !filesInFlight.contains(invariantFilePath) else { continue }
@@ -1129,6 +1135,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
     
     /// Call this function to check for and retry any orphaned uploads, and update the app's isUploading state  accordingly.
     public func checkAndRetryOrphanedUploads() {
+        Logger.log(severity: .info, message: "Checking for orphaned uploads")
         // This needs to start out from the main queue to avoid an EXC_BAD_ACCESS crash in
         // checkForOrphanedUploads(), but we also need that function to do its thing before
         // continuing on here and we don't want to potentially deadlock by popping out
@@ -1167,7 +1174,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         if let retries = self.userDefaults.dictionary(forKey: self.retryUploadsKey) {
             uploadsCount = uploadsCount + retries.count
         }
-        
+        Logger.log(severity: .info, message: "Number of uploads in progress = \(uploadsCount)")
         return uploadsCount != 0
     }
     

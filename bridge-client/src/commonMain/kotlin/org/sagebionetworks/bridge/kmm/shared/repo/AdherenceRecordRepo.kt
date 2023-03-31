@@ -230,8 +230,7 @@ class AdherenceRecordRepo(httpClient: HttpClient,
         }
     }
 
-    private suspend fun processUpdatesV2(studyId: String, adherenceToUpload: List<AdherenceRecords>) {
-        val recordsToUpload = dbQuery.selectAdherenceNeedSave(studyId).executeAsList()
+    private suspend fun processUpdatesV2(studyId: String, recordsToUpload: List<AdherenceRecords>) {
         val adherenceToUpload: List<AdherenceRecord> = recordsToUpload.mapNotNull { Json.decodeFromString(it.adherenceJson) }
 
         if (adherenceToUpload.isEmpty()) return

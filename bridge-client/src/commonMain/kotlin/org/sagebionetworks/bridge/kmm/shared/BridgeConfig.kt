@@ -45,10 +45,10 @@ interface PlatformConfig {
 }
 
 fun PlatformConfig.buildClientData(input: JsonElement? = null, uploadId: String? = null): JsonElement {
-    var clientData: JsonObject = input?.let {
-        it as? JsonObject ?: JsonObject(mapOf("value" to it))
-    } ?: JsonObject(mapOf())
-    clientData = JsonObject(clientData.toMutableMap().apply {
+    val clientData = input?.let {
+        (it as? JsonObject)?.toMutableMap() ?: mutableMapOf("value" to it)
+    } ?: mutableMapOf()
+    return  JsonObject(clientData.apply {
         uploadId?.let {
             this["uploadId"] = JsonPrimitive(it)
         }
@@ -57,7 +57,6 @@ fun PlatformConfig.buildClientData(input: JsonElement? = null, uploadId: String?
         this["osVersion"] = JsonPrimitive(osVersion)
         this["appVersion"] = JsonPrimitive(appVersion)
     })
-    return clientData
 }
 
 interface BridgeConfig : PlatformConfig {

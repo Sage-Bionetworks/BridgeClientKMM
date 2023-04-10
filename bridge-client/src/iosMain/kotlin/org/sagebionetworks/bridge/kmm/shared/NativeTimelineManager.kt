@@ -80,9 +80,9 @@ class NativeTimelineManager(
 
     fun observeTodaySchedule(isNewLogin: Boolean) {
         todayJob = scope.launch {
-            if (isNewLogin) {
-                adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)
-            }
+            // Always load remote adherence records
+            adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)
+            // Start the observer
             repo.getSessionsForToday(studyId, alwaysIncludeNextDay).collect { timelineResource ->
                 (timelineResource as? ResourceResult.Success)?.data?.let { timelineSlice ->
                     viewUpdate(timelineSlice.toNaive())

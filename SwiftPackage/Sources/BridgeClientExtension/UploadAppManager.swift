@@ -292,11 +292,19 @@ open class UploadAppManager : ObservableObject {
     /// Sign out the current user.
     @MainActor
     public final func signOut() {
+        NotificationCenter.default.post(name: Self.BridgeClientWillSignOut, object: self)
         willSignOut()
         updateUserSessionStatus(nil, updateType: .signout)
         authManager.signOut()
         didSignOut()
+        NotificationCenter.default.post(name: Self.BridgeClientDidSignOut, object: self)
     }
+    
+    /// A notification that the participant has been signed out.
+    public static let BridgeClientWillSignOut: Notification.Name = .init("BridgeClientWillSignOut")
+    
+    /// A notification that the participant has been signed out.
+    public static let BridgeClientDidSignOut: Notification.Name = .init("BridgeClientDidSignOut")
     
     /// The current user will sign out.
     /// @Protected - Only this class should call this method and only subclasses should implement.

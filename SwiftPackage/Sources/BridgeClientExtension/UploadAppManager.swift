@@ -300,7 +300,7 @@ open class UploadAppManager : ObservableObject {
         NotificationCenter.default.post(name: Self.BridgeClientDidSignOut, object: self)
     }
     
-    /// A notification that the participant has been signed out.
+    /// A notification that the participant is about to be signed out.
     public static let BridgeClientWillSignOut: Notification.Name = .init("BridgeClientWillSignOut")
     
     /// A notification that the participant has been signed out.

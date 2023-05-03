@@ -15,7 +15,8 @@ public protocol ResultCollectionArchivable : FileArchivable {
     func buildAdherenceData() throws -> JsonSerializable?
 }
 
-public class ResultCollectionArchiveBuilder : ResultArchiveBuilder {
+/// A simple achive builder to use when you have a collection of file archivables.
+public final class ResultCollectionArchiveBuilder : ResultArchiveBuilder {
     
     public let uuid: UUID
     public let adherenceData: JsonSerializable?
@@ -24,7 +25,6 @@ public class ResultCollectionArchiveBuilder : ResultArchiveBuilder {
     
     private let collection: ResultCollectionArchivable
     private let outputDirectory: URL?
-    private var manifest = Set<FileInfo>()
     
     /// The archive that backs this builder.
     let archive: StudyDataUploadArchive
@@ -32,15 +32,18 @@ public class ResultCollectionArchiveBuilder : ResultArchiveBuilder {
     public var identifier: String {
         archive.identifier
     }
-
-    public init?(_ collection: ResultCollectionArchivable, outputDirectory: URL?, schedule: AssessmentScheduleInfo? = nil, schemaIdentifier: String? = nil, schemaRevision: Int? = nil) throws {
+    
+    @available(*, deprecated, message: "Bridge Exporter V1 no longer supported - schema identifier and revision are ignored.")
+    public convenience init?(_ collection: ResultCollectionArchivable, outputDirectory: URL?, schedule: AssessmentScheduleInfo? = nil, schemaIdentifier: String?, schemaRevision: Int?) throws {
+        try self.init(collection, outputDirectory: outputDirectory)
+    }
+    
+    public init?(_ collection: ResultCollectionArchivable, outputDirectory: URL?, schedule: AssessmentScheduleInfo? = nil) throws {
         self.collection = collection
         self.uuid = .init()
         self.adherenceData = try collection.buildAdherenceData()
         self.outputDirectory = outputDirectory
         guard let archive = StudyDataUploadArchive(identifier: collection.identifier,
-                                                   schemaIdentifier: schemaIdentifier ?? collection.identifier,
-                                                   schemaRevision: schemaRevision,
                                                    schedule: schedule)
         else {
             return nil
@@ -62,10 +65,8 @@ public class ResultCollectionArchiveBuilder : ResultArchiveBuilder {
             try addFile($0)
         }
 
-        // Close the archive.
-        let metadata = ArchiveMetadata(files: Array(manifest))
-        let metadataDictionary = try metadata.jsonEncodedDictionary()
-        try archive.completeArchive(createdOn: Date(), with: metadataDictionary)
+        // Close the archive
+        try archive.completeArchive()
         
         return archive
     }
@@ -75,7 +76,6 @@ public class ResultCollectionArchiveBuilder : ResultArchiveBuilder {
         else {
             return
         }
-        try archive.addFile(data: data, filepath: manifestInfo.filename, createdOn: manifestInfo.timestamp, contentType: manifestInfo.contentType)
-        manifest.insert(manifestInfo)
+        try archive.addFile(data: data, fileInfo: manifestInfo)
     }
 }

@@ -5,27 +5,54 @@
 import Foundation
 import BridgeArchiver
 import JsonModel
+import ResultModel
 import BridgeClient
 
 // Errors are thrown by server if the size is more that 100,000,000 bytes.
 // Note: I am not sure why its not 100 mb = 104857600 bytes, but messaging
 // suggests that this is the actual limit. syoung 06/13/2022
-let kFileSizeLimit = 100000000
+let kFileSizeLimit = 100_000_000
 
-/// Wrapper for tying a ``BridgeArchiver`` to an uploaded archive.
+fileprivate let kMetadataFilename                 = "metadata.json"
+fileprivate let kScheduledActivityGuidKey         = "scheduledActivityGuid"
+fileprivate let kScheduleIdentifierKey            = "scheduleIdentifier"
+fileprivate let kScheduledOnKey                   = "scheduledOn"
+fileprivate let kScheduledActivityLabelKey        = "activityLabel"
+fileprivate let kDataGroups                       = "dataGroups"
+
+/// The public final class to use for uploading using Exporter v3.
+public final class StudyDataUploadArchive : DataArchive {
+}
+
+/// Wrapper for tying a ``BridgeArchiver`` to an uploaded assessment archive.
 open class DataArchive : NSObject, Identifiable {
     public let id: UUID = .init()
     
     /// The identifier for this archive.
     public let identifier: String
     
-    private let archiver: BridgeArchiver
-    
-    /// The schedule used to start this task (if any).
+    /// The schedule associated with this archive (if any).
     public let schedule: AssessmentScheduleInfo?
     
-    /// A timestamp for the data archive that is distinct from when the archive was created.
-    public var startedOn: Date? = nil
+    /// A timestamp for the data archive that can be mapped to an adherence record so
+    /// that the record created by this library can be marked as "uploaded" in the
+    /// asynchronous upload request.
+    ///
+    /// - Note: This is different from a `createdOn` date would timestamp when the
+    /// **archive** was created rather than when the **assessment** was started.
+    /// If this archive is not associated with an assessment then this should be
+    /// left as nil.
+    public final internal(set) var adherenceStartedOn: Date?
+    
+    /// This name conflicts with the `ResultArchiveBuilder` protocol.
+    @available(*, deprecated, message: "Use `adherenceStartedOn` instead. This will be deleted in future builds.")
+    public final var startedDate: Date? {
+        get { adherenceStartedOn }
+        set { adherenceStartedOn = newValue }
+    }
+    
+    /// The data groups that are set as metadata on this archive.
+    public let dataGroups: [String]?
     
     /// Has the archive been zipped?
     public final internal(set) var isCompleted: Bool = false
@@ -34,15 +61,25 @@ open class DataArchive : NSObject, Identifiable {
     public final private(set) var encryptedURL: URL?
     
     /// A list of all the files included in the archive.
-    public var files: [FileEntry] {
+    public final var files: [FileEntry] {
         archiver.files
     }
     
-    public init?(identifier: String, schedule: AssessmentScheduleInfo? = nil) {
+    /// The manifest that gets added to the archive as part of the metadata.
+    public final private(set) var manifest: [FileInfo] = []
+    
+    private let archiver: BridgeArchiver
+    
+    public init?(identifier: String,
+                 schedule: AssessmentScheduleInfo? = nil,
+                 startedOn: Date? = nil,
+                 dataGroups: [String]? = nil) {
         guard let archiver = BridgeArchiver() else { return nil }
         self.archiver = archiver
         self.identifier = identifier
         self.schedule = schedule
+        self.dataGroups = dataGroups
+        self.adherenceStartedOn = startedOn
         super.init()
     }
     
@@ -56,14 +93,22 @@ open class DataArchive : NSObject, Identifiable {
         try? archiver.remove()
     }
     
-    /// Add a file to the archive.
+    /// Add a file to this archive.
     ///
     /// - Parameters:
-    ///   - data: The data to be added.
-    ///   - filepath: The file path for the added data.
-    ///   - createdOn: The timestamp for when the data was created.
-    ///   - contentType: The content type of the data.
+    ///   - data: The data to encode to add as a file.
+    ///   - fileInfo: The file info to include in the manifest.
+    public final func addFile(data: Data, fileInfo: FileInfo) throws {
+        try _addFile(data: data, filepath: fileInfo.filename, createdOn: fileInfo.timestamp, contentType: fileInfo.contentType)
+        self.manifest.append(fileInfo)
+    }
+
+    @available(*, deprecated, message: "Use `addFile(data:fileInfo:)` instead.")
     public final func addFile(data: Data, filepath: String, createdOn: Date = Date(), contentType: String? = nil) throws {
+        try _addFile(data: data, filepath: filepath, createdOn: createdOn, contentType: contentType)
+    }
+    
+    private func _addFile(data: Data, filepath: String, createdOn: Date, contentType: String?) throws {
         guard data.count <= kFileSizeLimit
         else {
             let error = BridgeArchiveError(category: .exceedsAllowedLimit,
@@ -74,6 +119,34 @@ open class DataArchive : NSObject, Identifiable {
         try archiver.addFile(data: data, filepath: filepath, createdOn: createdOn, contentType: contentType)
     }
     
+    /// Close the archive (but do not encrypt or delete).
+    public final func completeArchive() throws {
+        let metadata = ArchiveMetadata(files: manifest)
+        let metadataDictionary = try metadata.jsonEncodedDictionary()
+        try addMetadata(metadataDictionary)
+        isCompleted = true
+    }
+    
+    func addMetadata(_ metadata: [String : Any]) throws {
+        // Set up the activity metadata.
+        var metadataDictionary: [String : Any] = metadata
+        
+        // Add metadata values from the schedule.
+        if let schedule = self.schedule {
+            metadataDictionary[kScheduledActivityGuidKey] = schedule.instanceGuid
+            metadataDictionary[kScheduleIdentifierKey] = schedule.session.instanceGuid
+            metadataDictionary[kScheduledOnKey] = ISO8601TimestampFormatter.string(from: schedule.session.scheduledOn)
+            metadataDictionary[kScheduledActivityLabelKey] = schedule.assessmentInfo.label
+        }
+        
+        // Add the current data groups.
+        if let dataGroups = dataGroups {
+            metadataDictionary[kDataGroups] = dataGroups.joined(separator: ",")
+        }
+        
+        let data = try JSONSerialization.data(withJSONObject: metadataDictionary, options: [.prettyPrinted, .withoutEscapingSlashes])
+        try _addFile(data: data, filepath: kMetadataFilename, createdOn: Date(), contentType: "json")
+    }
     
     /// Encrypt the upload using the pem file at the given path.
     ///

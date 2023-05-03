@@ -375,9 +375,7 @@ open class UploadAppManager : ObservableObject {
         uploadProcessor.encryptAndUpload(using: builder)
     }
     
-    /// Encrypt and upload the given data archives.
-    ///
-    /// - Parameter archives: The archives to encrypt and upload.
+    @available(*, deprecated, message: "Encrypt and upload with an `ArchiveBuilder` instead. Batch upload of multiple archives is no longer supported and will be deleted in a future version.")
     public final func encryptAndUpload(_ archives: [DataArchive]) {
         OperationQueue.main.addOperation {
             self.isUploading = true
@@ -431,8 +429,8 @@ final class ArchiveUploadProcessor {
         do {
             let archive = try await builder.buildArchive()
             // Copy the startedOn date (if available) from the builder to the archive.
-            if let resultBuilder = builder as? ResultArchiveBuilder, archive.startedOn == nil {
-                archive.startedOn = resultBuilder.startedOn
+            if let resultBuilder = builder as? ResultArchiveBuilder, archive.adherenceStartedOn == nil {
+                archive.adherenceStartedOn = resultBuilder.startedOn
             }
             await _copyTest(archive: archive)
             let encrypted = await _encrypt(archive: archive)
@@ -442,6 +440,7 @@ final class ArchiveUploadProcessor {
         }
     }
     
+    @available(*, deprecated)
     func encryptAndUpload(_ archives: [DataArchive]) {
         Task.detached(priority: .medium) {
             await self._encryptAndUpload(archives)
@@ -449,6 +448,7 @@ final class ArchiveUploadProcessor {
     }
 
     @MainActor
+    @available(*, deprecated)
     private func _encryptAndUpload(_ archives: [DataArchive]) async {
         await withTaskGroup(of: Void.self) { group in
             archives.forEach { archive in
@@ -488,7 +488,7 @@ final class ArchiveUploadProcessor {
             Logger.log(error: BridgeUnexpectedNullError(category: .missingFile, message: message))
             return
         }
-        _uploadEncrypted(id: archive.identifier, url: url, schedule: archive.schedule, startedOn: archive.startedOn)
+        _uploadEncrypted(id: archive.identifier, url: url, schedule: archive.schedule, startedOn: archive.adherenceStartedOn)
     }
     
     @MainActor

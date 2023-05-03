@@ -8,6 +8,40 @@ import JsonModel
 import ResultModel
 import BridgeClient
 
+/// The archive builder is used to allow for inheritance patterns where the builder
+/// needs to inherit from something other than the archive itself. This is used to
+/// support older code that uses a UIViewController or `RSDTaskViewModel`.
+public protocol ArchiveBuilder : AnyObject {
+    
+    /// A unique identifier that can be used to retain this task until it is complete.
+    var uuid: UUID { get }
+
+    /// An identifier that can be logging reports.
+    var identifier: String { get }
+
+    /// Build an archive asyncronously and return the result.
+    func buildArchive() async throws -> DataArchive
+    
+    /// Cleanup after.
+    func cleanup() async throws
+}
+
+/// Extends the archive builder to support saving adherence scoring to the `clientData`
+/// property on an `AdherenceRecord` and to allow matching an adherence record to an
+/// associated upload request.
+public protocol ResultArchiveBuilder : ArchiveBuilder {
+    
+    /// A timestamp for tracking the archive.
+    var startedOn: Date { get }
+    
+    /// A timestamp for tracking the archive.
+    var endedOn: Date { get }
+    
+    /// Any adherence data that should be added to the adherence record. Limit 64kb.
+    var adherenceData: JsonSerializable? { get }
+}
+
+/// The archive builder to use with an assessment result.
 open class AssessmentArchiveBuilder : ResultArchiveBuilder {
 
     /// The result to be processed for archive and upload.
@@ -27,23 +61,29 @@ open class AssessmentArchiveBuilder : ResultArchiveBuilder {
         archive.identifier
     }
     
+    @available(*, deprecated, message: "Bridge Exporter V1 no longer supported - schema identifier and revision are ignored.")
+    public convenience init?(_ assessmentResult: AssessmentResult,
+                 schedule: AssessmentScheduleInfo? = nil,
+                 adherenceData: JsonSerializable? = nil,
+                 outputDirectory: URL? = nil,
+                 schemaIdentifier: String?,
+                 schemaRevision: Int?,
+                 dataGroups: [String]? = nil,
+                 v2Format: BridgeUploaderInfoV2.FormatVersion = .v2_generic) {
+        self.init(assessmentResult, schedule: schedule, adherenceData: adherenceData, outputDirectory: outputDirectory, dataGroups: dataGroups)
+    }
+    
     public init?(_ assessmentResult: AssessmentResult,
                  schedule: AssessmentScheduleInfo? = nil,
                  adherenceData: JsonSerializable? = nil,
                  outputDirectory: URL? = nil,
-                 schemaIdentifier: String? = nil,
-                 schemaRevision: Int? = nil,
-                 dataGroups: [String]? = nil,
-                 v2Format: BridgeUploaderInfoV2.FormatVersion = .v2_generic) {
+                 dataGroups: [String]? = nil) {
         self.assessmentResult = assessmentResult
         self.adherenceData = adherenceData?.appendingClientInfo()
         self.outputDirectory = outputDirectory
         guard let archive = StudyDataUploadArchive(identifier: assessmentResult.identifier,
-                                                   schemaIdentifier: schemaIdentifier ?? assessmentResult.schemaIdentifier,
-                                                   schemaRevision: schemaRevision,
-                                                   dataGroups: dataGroups,
                                                    schedule: schedule,
-                                                   v2Format: v2Format)
+                                                   dataGroups: dataGroups)
         else {
             return nil
         }
@@ -70,25 +110,20 @@ open class AssessmentArchiveBuilder : ResultArchiveBuilder {
         if !answers.isEmpty {
             let data = try JSONSerialization.data(withJSONObject: answers, options: [.prettyPrinted, .withoutEscapingSlashes, .sortedKeys])
             let manifestInfo = FileInfo(filename: "answers.json", timestamp: assessmentResult.endDate, contentType: "application/json")
-            try archive.addFile(data: data, filepath: manifestInfo.filename, createdOn: manifestInfo.timestamp, contentType: manifestInfo.contentType)
-            manifest.insert(manifestInfo)
+            try archive.addFile(data: data, fileInfo: manifestInfo)
         }
         
         // Add the top-level assessment if desired.
         if let (data, manifestInfo) = try assessmentResultFile() {
-            try archive.addFile(data: data, filepath: manifestInfo.filename, createdOn: manifestInfo.timestamp, contentType: manifestInfo.contentType)
-            manifest.insert(manifestInfo)
+            try archive.addFile(data: data, fileInfo: manifestInfo)
         }
         
         // Close the archive.
-        let metadata = ArchiveMetadata(files: Array(manifest))
-        let metadataDictionary = try metadata.jsonEncodedDictionary()
-        try archive.completeArchive(createdOn: Date(), with: metadataDictionary)
+        try archive.completeArchive()
         
         return archive
     }
     
-    private var manifest = Set<FileInfo>()
     private var answers: [String : JsonSerializable] = [:]
     
     private func addBranchResults(_ branchResult: BranchNodeResult, _ stepPath: String? = nil) throws {
@@ -117,8 +152,7 @@ open class AssessmentArchiveBuilder : ResultArchiveBuilder {
         else if let fileArchivable = result as? FileArchivable,
                 let (fileInfo, data) = try fileArchivable.buildArchivableFileData(at: stepPath),
                 let manifestInfo = manifestFileInfo(for: fileArchivable, fileInfo: fileInfo) {
-            try archive.addFile(data: data, filepath: manifestInfo.filename, createdOn: manifestInfo.timestamp, contentType: manifestInfo.contentType)
-            manifest.insert(manifestInfo)
+            try archive.addFile(data: data, fileInfo: manifestInfo)
         }
         else if let answer = result as? AnswerResult,
                 let value = answer.jsonValue {

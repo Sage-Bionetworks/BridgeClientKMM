@@ -7,33 +7,8 @@ import Foundation
 import JsonModel
 import ResultModel
 
-public protocol ArchiveBuilder : AnyObject {
-    
-    /// A unique identifier that can be used to retain this task until it is complete.
-    var uuid: UUID { get }
-
-    /// An identifier that can be logging reports.
-    var identifier: String { get }
-
-    /// Build an archive asyncronously and return the result.
-    func buildArchive() async throws -> DataArchive
-    
-    /// Cleanup after.
-    func cleanup() async throws
-}
-
-public protocol ResultArchiveBuilder : ArchiveBuilder {
-    
-    /// A timestamp for tracking the archive.
-    var startedOn: Date { get }
-    
-    /// A timestamp for tracking the archive.
-    var endedOn: Date { get }
-    
-    /// Any adherence data that should be added to the adherence record. Limit 64kb.
-    var adherenceData: JsonSerializable? { get }
-}
-
+/// A simple archive builder to use when uploading a single json file that may not
+/// implement the `AssessmentResult` protocol.
 open class JsonResultArchiveBuilder : ResultArchiveBuilder {
     
     public let uuid: UUID = .init()
@@ -51,28 +26,40 @@ open class JsonResultArchiveBuilder : ResultArchiveBuilder {
         archive.identifier
     }
     
-    public init?(json: Data, filename: String, schema: URL, timestamp: Date = Date(), startedOn: Date? = nil, schedule: AssessmentScheduleInfo? = nil, schemaIdentifier: String? = nil) {
-        self.json = json
-        self.startedOn = startedOn ?? timestamp
-        self.fileInfo = .init(filename: filename, timestamp: timestamp, contentType: "application/json", identifier: schedule?.assessmentInfo.identifier, jsonSchema: schema)
-        guard let archive = StudyDataUploadArchive(identifier: schedule?.assessmentInfo.identifier ?? schemaIdentifier ?? filename,
-                   schemaIdentifier: schemaIdentifier,
-                   schedule: schedule)
+    @available(*, deprecated, message: "Bridge Exporter V1 no longer supported - schema identifier and revision are ignored.")
+    public convenience init?(json: Data, filename: String, schema: URL, timestamp: Date = Date(), startedOn: Date? = nil, schedule: AssessmentScheduleInfo? = nil, schemaIdentifier: String?) {
+        self.init(json: json, filename: filename, schema: schema, timestamp: timestamp, startedOn: startedOn)
+    }
+    
+    public init?(json: Data, filename: String, schema: URL, timestamp: Date = Date(), startedOn: Date? = nil, schedule: AssessmentScheduleInfo? = nil) {
+        guard let archive = StudyDataUploadArchive(identifier: schedule?.assessmentInfo.identifier ?? filename, schedule: schedule)
         else {
             return nil
         }
+        self.json = json
+        self.startedOn = startedOn ?? timestamp
+        self.fileInfo = .init(filename: filename, timestamp: timestamp, contentType: "application/json", identifier: schedule?.assessmentInfo.identifier, jsonSchema: schema)
         self.archive = archive
     }
+    
+    /// Override to add additional files to the archive.
+    open func additionalFiles() throws -> [(data: Data, fileInfo: FileInfo)] {
+        []
+    }
         
-    public func buildArchive() async throws -> DataArchive {
+    public final func buildArchive() async throws -> DataArchive {
 
-        // Add the JSON file
-        try archive.addFile(data: json, filepath: fileInfo.filename, createdOn: fileInfo.timestamp, contentType: fileInfo.contentType)
+        // Add the JSON file.
+        try archive.addFile(data: json, fileInfo: fileInfo)
+        
+        /// Any additional files to add to the archive.
+        let files = try additionalFiles()
+        try files.forEach {
+            try archive.addFile(data: $0.data, fileInfo: $0.fileInfo)
+        }
         
         // Close the archive.
-        let metadata = ArchiveMetadata(files: [fileInfo])
-        let metadataDictionary = try metadata.jsonEncodedDictionary()
-        try archive.completeArchive(createdOn: Date(), with: metadataDictionary)
+        try archive.completeArchive()
         
         return archive
     }

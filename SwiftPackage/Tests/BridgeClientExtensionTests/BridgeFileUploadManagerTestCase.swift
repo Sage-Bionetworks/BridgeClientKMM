@@ -4,7 +4,7 @@
 //
 
 import XCTest
-@testable import BridgeClient
+import BridgeClient
 @testable import BridgeClientExtension
 
 extension NSNotification.Name {

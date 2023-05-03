@@ -7,17 +7,8 @@ import BridgeArchiver
 import JsonModel
 
 fileprivate let kBridgeV2InfoFilename             = "info.json"
-fileprivate let kMetadataFilename                 = "metadata.json"
-fileprivate let kScheduledActivityGuidKey         = "scheduledActivityGuid"
-fileprivate let kScheduleIdentifierKey            = "scheduleIdentifier"
-fileprivate let kScheduledOnKey                   = "scheduledOn"
-fileprivate let kScheduledActivityLabelKey        = "activityLabel"
-fileprivate let kDataGroups                       = "dataGroups"
 
-public final class StudyDataUploadArchive : AbstractResultArchive {
-}
-
-/// An abstract class for archiving result data.
+@available(*, deprecated, message: "Use `AbstractDataArchive` or `StudyDataUploadArchive` instead.")
 open class AbstractResultArchive : DataArchive {
 
     /// The schema info for this archive.
@@ -29,9 +20,6 @@ open class AbstractResultArchive : DataArchive {
     
     /// A special-cased file where the values are pulling into the Synapse table without requiring the filename as part of the column name.
     public var dataFilename: String = "answers.json"
-    
-    /// The data groups that are set as metadata on this archive.
-    public let dataGroups: [String]?
     
     let v2Format: BridgeUploaderInfoV2.FormatVersion
     
@@ -49,10 +37,9 @@ open class AbstractResultArchive : DataArchive {
                  v2Format: BridgeUploaderInfoV2.FormatVersion = .v2_generic) {
         self.schemaIdentifier = schemaIdentifier
         self.schemaRevision = schemaRevision
-        self.dataGroups = dataGroups
         self.isPlaceholder = isPlaceholder
         self.v2Format = v2Format
-        super.init(identifier: identifier, schedule: schedule)
+        super.init(identifier: identifier, schedule: schedule, dataGroups: dataGroups)
     }
     
     /// Close the archive with optional metadata from a task result.
@@ -66,27 +53,6 @@ open class AbstractResultArchive : DataArchive {
         try addBridgeV2Info()
         
         isCompleted = true
-    }
-    
-    private func addMetadata(_ metadata: [String : Any]) throws {
-        // Set up the activity metadata.
-        var metadataDictionary: [String : Any] = metadata
-        
-        // Add metadata values from the schedule.
-        if let schedule = self.schedule {
-            metadataDictionary[kScheduledActivityGuidKey] = schedule.instanceGuid
-            metadataDictionary[kScheduleIdentifierKey] = schedule.session.instanceGuid
-            metadataDictionary[kScheduledOnKey] = ISO8601TimestampFormatter.string(from: schedule.session.scheduledOn)
-            metadataDictionary[kScheduledActivityLabelKey] = schedule.assessmentInfo.label
-        }
-        
-        // Add the current data groups.
-        if let dataGroups = dataGroups {
-            metadataDictionary[kDataGroups] = dataGroups.joined(separator: ",")
-        }
-        
-        let data = try JSONSerialization.data(withJSONObject: metadataDictionary, options: [.prettyPrinted, .withoutEscapingSlashes])
-        try addFile(data: data, filepath: kMetadataFilename, createdOn: Date(), contentType: "json")
     }
     
     private func addBridgeV2Info() throws {

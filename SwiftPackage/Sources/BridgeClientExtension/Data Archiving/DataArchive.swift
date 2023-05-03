@@ -38,10 +38,9 @@ open class DataArchive : NSObject, Identifiable {
     /// that the record created by this library can be marked as "uploaded" in the
     /// asynchronous upload request.
     ///
-    /// - Note: This is different from a `createdOn` date would timestamp when the
-    /// **archive** was created rather than when the **assessment** was started.
-    /// If this archive is not associated with an assessment then this should be
-    /// left as nil.
+    /// - Note: This is different from a `createdOn` date used to mark when the
+    /// **archive** was created. If this archive is not tied to a scheduled assessment
+    /// then this property should be null.
     public final internal(set) var adherenceStartedOn: Date?
     
     /// This name conflicts with the `ResultArchiveBuilder` protocol.

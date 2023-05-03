@@ -26,7 +26,7 @@ open class JsonResultArchiveBuilder : ResultArchiveBuilder {
         archive.identifier
     }
     
-    @available(*, deprecated, message: "Bridge Exporter V1 no longer supported - schema identifier and revision are ignored.")
+    @available(*, deprecated, message: "Bridge Exporter V1 and V2 are no longer supported - schema identifier and revision are ignored.")
     public convenience init?(json: Data, filename: String, schema: URL, timestamp: Date = Date(), startedOn: Date? = nil, schedule: AssessmentScheduleInfo? = nil, schemaIdentifier: String?) {
         self.init(json: json, filename: filename, schema: schema, timestamp: timestamp, startedOn: startedOn)
     }

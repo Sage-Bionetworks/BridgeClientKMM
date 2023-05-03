@@ -33,7 +33,7 @@ public final class ResultCollectionArchiveBuilder : ResultArchiveBuilder {
         archive.identifier
     }
     
-    @available(*, deprecated, message: "Bridge Exporter V1 no longer supported - schema identifier and revision are ignored.")
+    @available(*, deprecated, message: "Bridge Exporter V1 and V2 are no longer supported - schema identifier and revision are ignored.")
     public convenience init?(_ collection: ResultCollectionArchivable, outputDirectory: URL?, schedule: AssessmentScheduleInfo? = nil, schemaIdentifier: String?, schemaRevision: Int?) throws {
         try self.init(collection, outputDirectory: outputDirectory)
     }

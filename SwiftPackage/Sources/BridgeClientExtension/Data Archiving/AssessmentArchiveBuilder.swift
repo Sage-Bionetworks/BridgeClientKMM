@@ -61,7 +61,7 @@ open class AssessmentArchiveBuilder : ResultArchiveBuilder {
         archive.identifier
     }
     
-    @available(*, deprecated, message: "Bridge Exporter V1 no longer supported - schema identifier and revision are ignored.")
+    @available(*, deprecated, message: "Bridge Exporter V1 and V2 are no longer supported - schema identifier and revision are ignored.")
     public convenience init?(_ assessmentResult: AssessmentResult,
                  schedule: AssessmentScheduleInfo? = nil,
                  adherenceData: JsonSerializable? = nil,

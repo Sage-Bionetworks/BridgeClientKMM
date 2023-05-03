@@ -6,7 +6,7 @@ compileSdk = "33"
 
 # Dependencies
 coroutines = "1.6.4"
-kotlin = "1.7.20"
+kotlin = "1.8.20"
 ktor = "2.2.4"
 kotlinxSerialization = "1.3.0"
 kotlinxDateTime = "0.4.0"
@@ -36,7 +36,7 @@ coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", ve
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 
 gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-gradlePlugin-android = "com.android.tools.build:gradle:7.3.0"
+gradlePlugin-android = "com.android.tools.build:gradle:7.4.0"
 gradlePlugin-kotlinSerialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 gradlePlugin-sqlDelight = { module = "app.cash.sqldelight:gradle-plugin", version.ref = "sqlDelight" }
 #gradlePlugin-kover = { module = "org.jetbrains.kotlinx:kover", version.ref = "kover" }

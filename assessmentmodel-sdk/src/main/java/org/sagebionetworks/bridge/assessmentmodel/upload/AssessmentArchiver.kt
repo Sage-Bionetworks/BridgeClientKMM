@@ -54,7 +54,7 @@ class AssessmentArchiver(
                 timestamp = assessmentResult.endDateTime?.toString() ?: Clock.System.now().toString(),
                 contentType = "application/json",
                 identifier = assessmentResult.identifier,
-                //jsonSchema = assessmentResult.jsonSchema TODO: Update AssessmentModelResult to have jsonSchema field -nbrown 12/5/2022
+                jsonSchema = assessmentResult.jsonSchema
             )
         )
 

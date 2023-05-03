@@ -174,7 +174,11 @@ publishing {
     }
 }
 
-
+// Explicitly set the device. Note: this is a work-around for running tests on Mac silicon and
+// will need to be updated when the iPhone 14 is not available as a test device.
+tasks.getByName<org.jetbrains.kotlin.gradle.targets.native.tasks.KotlinNativeSimulatorTest>("iosSimulatorArm64Test") {
+    deviceId = "iPhone 14"
+}
 
 tasks.register("createSwiftPackage") {
     description = "Creates a Swift package to distribute an XCFramework"

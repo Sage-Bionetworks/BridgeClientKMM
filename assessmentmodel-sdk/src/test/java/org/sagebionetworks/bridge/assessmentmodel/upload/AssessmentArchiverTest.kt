@@ -6,12 +6,15 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.plus
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -103,14 +106,24 @@ class AssessmentArchiverTest {
         val byteArrayOutputStream = ByteArrayOutputStream()
         archive.writeTo(byteArrayOutputStream)
         val zipInputStream = ZipInputStream(ByteArrayInputStream(byteArrayOutputStream.toByteArray()))
-
+        var foundMetadataFile = false
         do {
             val entry = zipInputStream.nextEntry
             if (entry != null) {
                 assertTrue(mutableExpectedFiles.remove(entry.name))
+                if (entry.name == "metadata.json") {
+                    val data = zipInputStream.readBytes()
+                    val metadataJsonString = data.toString(Charsets.UTF_8)
+                    val metadata: ArchiveMetadata = Json.decodeFromString(metadataJsonString)
+                    val archiveFileInfo = metadata.files.find { it.filename == resultFileName }
+                    assertNotNull(archiveFileInfo)
+                    assertNotNull(assessmentResult.jsonSchema)
+                    assertEquals(assessmentResult.jsonSchema, archiveFileInfo?.jsonSchema)
+                    foundMetadataFile = true
+                }
             }
         } while (entry != null)
-
+        assertTrue(foundMetadataFile)
         assertTrue(mutableExpectedFiles.isEmpty())
     }
 

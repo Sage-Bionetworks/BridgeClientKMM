@@ -41,7 +41,7 @@ open class DataArchive : NSObject, Identifiable {
     /// - Note: This is different from a `createdOn` date used to mark when the
     /// **archive** was created. If this archive is not tied to a scheduled assessment
     /// then this property should be null.
-    public final internal(set) var adherenceStartedOn: Date?
+    public final var adherenceStartedOn: Date?
     
     /// This name conflicts with the `ResultArchiveBuilder` protocol.
     @available(*, deprecated, message: "Use `adherenceStartedOn` instead. This will be deleted in future builds.")

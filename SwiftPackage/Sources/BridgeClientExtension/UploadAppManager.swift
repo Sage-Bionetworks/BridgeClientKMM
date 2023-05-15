@@ -518,32 +518,11 @@ public struct UploadMetadata : Codable {
     public let instanceGuid: String?
     public let eventTimestamp: String?
     public let startedOn: String?
-    public let assessmentIdentifier: String?
-    public let sessionInstanceGuid: String?
-    public let isFirstAssessment: Bool?
-    public let isLastAssessment: Bool?
-    public let appInfo: AppInfo
     
     init(schedule: AssessmentScheduleInfo?, startedOn: Date?) {
-        let platform = PlatformConfigImpl()
-        self.appInfo = .init(osVersion: platform.osVersion,
-                             deviceName: platform.deviceName,
-                             appName: platform.appName,
-                             appVersionName: platform.appVersionName)
         self.instanceGuid = schedule?.instanceGuid
-        self.assessmentIdentifier = schedule?.assessmentIdentifier
         self.eventTimestamp = schedule?.session.eventTimestamp
         self.startedOn = startedOn?.jsonObject() as? String
-        self.sessionInstanceGuid = schedule?.session.instanceGuid
-        self.isFirstAssessment = schedule?.isFirstAssessment
-        self.isLastAssessment = schedule?.isLastAssessment
-    }
-    
-    public struct AppInfo : Codable {
-        public let osVersion: String
-        public let deviceName: String
-        public let appName: String
-        public let appVersionName: String
     }
 }
 

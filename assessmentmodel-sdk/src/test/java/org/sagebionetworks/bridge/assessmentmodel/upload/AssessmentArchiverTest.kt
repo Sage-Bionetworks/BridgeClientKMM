@@ -2,6 +2,8 @@ package org.sagebionetworks.bridge.assessmentmodel.upload
 
 import co.touchlab.kermit.CommonWriter
 import co.touchlab.kermit.Logger
+import jep.Interpreter
+import jep.SharedInterpreter
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
@@ -39,6 +41,7 @@ class AssessmentArchiverTest {
     val jsonCoder = Json{
         serializersModule = Serialization.SerializersModule.default + testResultSerializersModule
         encodeDefaults = true
+        explicitNulls = false
     }
 
     @Rule @JvmField
@@ -120,11 +123,31 @@ class AssessmentArchiverTest {
                     assertNotNull(assessmentResult.jsonSchema)
                     assertEquals(assessmentResult.jsonSchema, archiveFileInfo?.jsonSchema)
                     foundMetadataFile = true
+                    val schemaErrors = validateSchema(metadataJsonString, "https://sage-bionetworks.github.io/mobile-client-json/schemas/v1/TaskMetadata.json")
+                    assertTrue(schemaErrors.isEmpty())
                 }
             }
         } while (entry != null)
         assertTrue(foundMetadataFile)
         assertTrue(mutableExpectedFiles.isEmpty())
+    }
+
+    private fun validateSchema(jsonString: String, schemaUrl: String) : List<String> {
+        val interp = SharedInterpreter()
+        interp.exec("import jsonschema")
+        interp.exec("import requests")
+        interp.exec("import json")
+        interp.set("urlString", schemaUrl)
+        interp.exec("schema = requests.get(urlString).json()")
+        interp.set("arg", jsonString)
+        interp.exec("data = json.loads(arg)")
+        interp.exec("validator_cls = jsonschema.validators.validator_for(schema)")
+        interp.exec("validator = validator_cls(schema=schema)")
+        interp.exec("all_errors = [e.message for e in validator.iter_errors(data)]")
+        val errors = interp.getValue("all_errors") as List<String>
+        println(errors.toString())
+        interp.close()
+        return errors
     }
 
 }

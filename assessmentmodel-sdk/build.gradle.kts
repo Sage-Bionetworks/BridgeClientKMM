@@ -59,9 +59,14 @@ dependencies {
         implementation("com.madgag.spongycastle:prov:$spongycastle")
         // marked api due to propagation of CMSException
         api("com.madgag.spongycastle:bcpkix-jdk15on:$spongycastle")
+
+        testImplementation("black.ninia:jep:4.1.1")
     }
 
-
+tasks.withType(Test::class) {
+    val path = System.getProperty("user.dir") + "/python-packages/jep"
+    systemProperty("java.library.path", path)
+}
 
 afterEvaluate {
     publishing {

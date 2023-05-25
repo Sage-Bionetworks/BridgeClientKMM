@@ -21,6 +21,7 @@ jobs:
       id: cp311
       with:
         python-version: "3.11"
+    - name: Set python path
       run: |
         echo "PYTHONPATH=${{ steps.cp310.outputs.python-path }}" >> "$GITHUB_ENV"
     - name: Install dependencies

@@ -132,6 +132,18 @@ class AssessmentArchiverTest {
         assertTrue(mutableExpectedFiles.isEmpty())
     }
 
+    /**
+     * Validate [jsonString] against the schema defined at [schemaUrl]
+     * This use python jsonschema, which is what BridgeDownstream uses for validation
+     * To call python from kotlin code we use jep https://github.com/ninia/jep
+     * So to run locally:
+     * verify you have python installed then:
+     *      python -m pip install --upgrade pip
+     *      pip install jsonschema requests jep
+     * Add something like jep_path=/usr/local/lib/python3.11/site-packages/jep to local.properties file
+     * You can find site-packages directories with this command:
+     *      python -m site
+     */
     private fun validateSchema(jsonString: String, schemaUrl: String) : List<String> {
         val interp = SharedInterpreter()
         interp.exec("import jsonschema")

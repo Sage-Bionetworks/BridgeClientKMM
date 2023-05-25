@@ -64,8 +64,11 @@ dependencies {
     }
 
 tasks.withType(Test::class) {
-    //val path = System.getProperty("user.dir") + "/python-packages/jep"
-    val path = "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/jep"
+    // Set the path to jep, which we use to run python in unit tests
+    // https://github.com/ninia/jep
+    // By using python jsonschema for validation, we use the same validator as BridgeDownstream
+    val path = com.android.build.gradle.internal.cxx.configure.gradleLocalProperties(rootProject.rootDir)
+        .getProperty("jep_path") ?: System.getenv("JEP_PATH")
     systemProperty("java.library.path", path)
 }
 

@@ -64,7 +64,8 @@ dependencies {
     }
 
 tasks.withType(Test::class) {
-    val path = System.getProperty("user.dir") + "/python-packages/jep"
+    //val path = System.getProperty("user.dir") + "/python-packages/jep"
+    val path = "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/jep"
     systemProperty("java.library.path", path)
 }
 

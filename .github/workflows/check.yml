@@ -23,7 +23,7 @@ jobs:
         python-version: "3.11"
     - name: Set python path
       run: |
-        echo "PYTHONPATH=${{ steps.cp310.outputs.python-path }}" >> "$GITHUB_ENV"
+        echo "PYTHONPATH=${{ steps.cp311.outputs.python-path }}" >> "$GITHUB_ENV"
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip

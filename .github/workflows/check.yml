@@ -15,6 +15,16 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
+    #Install python for schema validation in unittests
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install jsonschema requests json
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Check BridgeClient
       env:
         testExternalId01: ${{ secrets.TEST_EXTERNAL_ID_01 }}

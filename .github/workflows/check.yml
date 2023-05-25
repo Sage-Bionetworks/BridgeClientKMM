@@ -18,8 +18,11 @@ jobs:
     #Install python for schema validation in unittests
     - name: Set up Python 3.11
       uses: actions/setup-python@v4
+      id: cp311
       with:
         python-version: "3.11"
+      run: |
+        echo "PYTHONPATH=${{ steps.cp310.outputs.python-path }}" >> "$GITHUB_ENV"
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip

@@ -66,7 +66,6 @@ class AssessmentArchiver(
             appVersion = appVersion,
             deviceInfo = "${Build.PRODUCT} ${Build.MODEL}; $os",
             deviceTypeIdentifier = bridgeConfig.deviceName,
-            taskIdentifier = assessmentResult.identifier,
             files = manifest.toList()
         )
         archiveBuilder.addDataFile(
@@ -180,7 +179,6 @@ data class ArchiveMetadata(
     val appVersion: String,
     val deviceInfo: String,
     val deviceTypeIdentifier: String,
-    val taskIdentifier: String,
     val files: List<ArchiveFileInfo>
 )
 

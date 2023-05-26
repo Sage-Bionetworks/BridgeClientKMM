@@ -2,8 +2,9 @@ package org.sagebionetworks.bridge.assessmentmodel.upload
 
 import co.touchlab.kermit.CommonWriter
 import co.touchlab.kermit.Logger
-import jep.Interpreter
-import jep.SharedInterpreter
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.networknt.schema.JsonSchemaFactory
+import com.networknt.schema.SpecVersion
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
@@ -30,6 +31,7 @@ import org.sagebionetworks.bridge.kmm.shared.BridgeConfig
 import org.sagebionetworks.bridge.kmm.shared.PlatformConfig
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.net.URI
 import java.util.zip.ZipInputStream
 
 class AssessmentArchiverTest {
@@ -123,8 +125,7 @@ class AssessmentArchiverTest {
                     assertNotNull(assessmentResult.jsonSchema)
                     assertEquals(assessmentResult.jsonSchema, archiveFileInfo?.jsonSchema)
                     foundMetadataFile = true
-                    val schemaErrors = validateSchema(metadataJsonString, "https://sage-bionetworks.github.io/mobile-client-json/schemas/v1/TaskMetadata.json")
-                    assertTrue(schemaErrors.isEmpty())
+                    validateJson(metadataJsonString, "https://sage-bionetworks.github.io/mobile-client-json/schemas/v2/ArchiveMetadata.json")
                 }
             }
         } while (entry != null)
@@ -132,36 +133,16 @@ class AssessmentArchiverTest {
         assertTrue(mutableExpectedFiles.isEmpty())
     }
 
-    /**
-     * Validate [jsonString] against the schema defined at [schemaUrl]
-     * This use python jsonschema, which is what BridgeDownstream uses for validation
-     * To call python from kotlin code we use jep https://github.com/ninia/jep
-     * So to run locally:
-     * verify you have python installed then:
-     *      python -m pip install --upgrade pip
-     *      pip install jsonschema requests jep
-     * Add something like jep_path=/usr/local/lib/python3.11/site-packages/jep to local.properties file
-     * You can find site-packages directories with this command:
-     *      python -m site
-     */
-    private fun validateSchema(jsonString: String, schemaUrl: String) : List<String> {
-        val interp = SharedInterpreter()
-        interp.exec("import jsonschema")
-        interp.exec("import requests")
-        interp.exec("import json")
-        interp.set("urlString", schemaUrl)
-        interp.exec("schema = requests.get(urlString).json()")
-        interp.set("arg", jsonString)
-        interp.exec("data = json.loads(arg)")
-        interp.exec("validator_cls = jsonschema.validators.validator_for(schema)")
-        interp.exec("validator = validator_cls(schema=schema)")
-        interp.exec("all_errors = [e.message for e in validator.iter_errors(data)]")
-        val errors = interp.getValue("all_errors") as List<String>
-        println(errors.toString())
-        interp.close()
-        return errors
-    }
+}
 
+fun validateJson(jsonString: String, schemaUrl: String) {
+    val jsonSchema = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V7).getSchema(
+        URI(schemaUrl)
+    )
+    jsonSchema.initializeValidators()
+    val jsonNode = ObjectMapper().readTree(jsonString)
+    val errors = jsonSchema.validate(jsonNode)
+    assertTrue(errors.toString(), errors.isEmpty())
 }
 
 val testResultSerializersModule = SerializersModule {

@@ -8,29 +8,12 @@ jobs:
   build:
 
     runs-on: macos-latest
-    env:
-      # TODO: Figure out less fragile way of getting and setting path to jep -nbrown 5/25/13
-      JEP_PATH: "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/jep"
     steps:
     - uses: actions/checkout@v2
     - name: set up JDK 11
       uses: actions/setup-java@v1
       with:
         java-version: 11
-    #Install python for schema validation in unittests
-    - name: Set up Python 3.11
-      uses: actions/setup-python@v4
-      id: cp311
-      with:
-        python-version: "3.11"
-    - name: Set python path
-      run: |
-        echo "PYTHONPATH=${{ steps.cp311.outputs.python-path }}" >> "$GITHUB_ENV"
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install jsonschema requests jep
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Check BridgeClient
       env:
         testExternalId01: ${{ secrets.TEST_EXTERNAL_ID_01 }}

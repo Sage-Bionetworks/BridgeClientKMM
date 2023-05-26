@@ -59,18 +59,9 @@ dependencies {
         implementation("com.madgag.spongycastle:prov:$spongycastle")
         // marked api due to propagation of CMSException
         api("com.madgag.spongycastle:bcpkix-jdk15on:$spongycastle")
-    
+
         testImplementation("com.networknt:json-schema-validator:1.0.82")
     }
-
-tasks.withType(Test::class) {
-    // Set the path to jep, which we use to run python in unit tests
-    // https://github.com/ninia/jep
-    // By using python jsonschema for validation, we use the same validator as BridgeDownstream
-    val path = com.android.build.gradle.internal.cxx.configure.gradleLocalProperties(rootProject.rootDir)
-        .getProperty("jep_path") ?: System.getenv("JEP_PATH")
-    systemProperty("java.library.path", path)
-}
 
 afterEvaluate {
     publishing {

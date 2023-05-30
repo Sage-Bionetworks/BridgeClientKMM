@@ -2,6 +2,9 @@ package org.sagebionetworks.bridge.assessmentmodel.upload
 
 import co.touchlab.kermit.CommonWriter
 import co.touchlab.kermit.Logger
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.networknt.schema.JsonSchemaFactory
+import com.networknt.schema.SpecVersion
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
@@ -28,6 +31,7 @@ import org.sagebionetworks.bridge.kmm.shared.BridgeConfig
 import org.sagebionetworks.bridge.kmm.shared.PlatformConfig
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.net.URI
 import java.util.zip.ZipInputStream
 
 class AssessmentArchiverTest {
@@ -39,6 +43,7 @@ class AssessmentArchiverTest {
     val jsonCoder = Json{
         serializersModule = Serialization.SerializersModule.default + testResultSerializersModule
         encodeDefaults = true
+        explicitNulls = false
     }
 
     @Rule @JvmField
@@ -120,6 +125,7 @@ class AssessmentArchiverTest {
                     assertNotNull(assessmentResult.jsonSchema)
                     assertEquals(assessmentResult.jsonSchema, archiveFileInfo?.jsonSchema)
                     foundMetadataFile = true
+                    validateJson(metadataJsonString, "https://sage-bionetworks.github.io/mobile-client-json/schemas/v2/ArchiveMetadata.json")
                 }
             }
         } while (entry != null)
@@ -127,6 +133,16 @@ class AssessmentArchiverTest {
         assertTrue(mutableExpectedFiles.isEmpty())
     }
 
+}
+
+fun validateJson(jsonString: String, schemaUrl: String) {
+    val jsonSchema = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V7).getSchema(
+        URI(schemaUrl)
+    )
+    jsonSchema.initializeValidators()
+    val jsonNode = ObjectMapper().readTree(jsonString)
+    val errors = jsonSchema.validate(jsonNode)
+    assertTrue(errors.toString(), errors.isEmpty())
 }
 
 val testResultSerializersModule = SerializersModule {

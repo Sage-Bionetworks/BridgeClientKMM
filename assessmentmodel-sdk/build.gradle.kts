@@ -59,9 +59,9 @@ dependencies {
         implementation("com.madgag.spongycastle:prov:$spongycastle")
         // marked api due to propagation of CMSException
         api("com.madgag.spongycastle:bcpkix-jdk15on:$spongycastle")
+
+        testImplementation("com.networknt:json-schema-validator:1.0.82")
     }
-
-
 
 afterEvaluate {
     publishing {

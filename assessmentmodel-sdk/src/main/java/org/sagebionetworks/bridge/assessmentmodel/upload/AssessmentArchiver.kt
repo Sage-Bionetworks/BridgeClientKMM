@@ -167,7 +167,7 @@ class AssessmentArchiver(
             ArchiveFileInfo(
                 filename = resultData.filename,
                 timestamp = resultData.endDateTime?.toString() ?: Clock.System.now().toString(),
-                contentType = "application/json",
+                contentType = resultData.contentType,
                 identifier = resultData.identifier, // Mapped to Result.identifier
                 stepPath = stepPath,
                 jsonSchema = resultData.jsonSchema

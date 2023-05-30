@@ -11,6 +11,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import okio.ByteString.Companion.toByteString
 import org.sagebionetworks.assessmentmodel.AssessmentResult
+import org.sagebionetworks.assessmentmodel.Result
 import org.sagebionetworks.bridge.data.AndroidStudyUploadEncryptor
 import org.sagebionetworks.bridge.data.Archive
 import org.sagebionetworks.bridge.kmm.shared.upload.UploadFile
@@ -43,7 +44,7 @@ class AssessmentResultArchiveUploader(
      * Specifying a [sessionWindowExpiration] will delay the upload until after that point in time.
      * Subsequent calls to this method with the same [assessmentInstanceId] will replace any delayed uploads.
      */
-    fun archiveResultAndQueueUpload(assessmentResult: AssessmentResult,
+    fun archiveResultAndQueueUpload(assessmentResult: Result,
                                     jsonCoder: Json,
                                     assessmentInstanceId: String,
                                     eventTimestamp: String,
@@ -58,11 +59,11 @@ class AssessmentResultArchiveUploader(
             assessmentResultFilename = assessmentResultFilename
         )
 
-        val assessmentRunUUID =  if (assessmentResult.runUUIDString.isEmpty()) {
+        val assessmentRunUUID =  if (assessmentResult is AssessmentResult && assessmentResult.runUUIDString.isNotEmpty()) {
+            assessmentResult.runUUIDString
+        } else {
             Logger.e("No runUUIDString in assessmentResult, created")
             UUID.randomUUID().toString()
-        } else {
-            assessmentResult.runUUIDString
         }
 
         val uploadMetadata: Map<String, JsonElement> = mapOf(

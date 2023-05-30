@@ -18,10 +18,10 @@ import org.sagebionetworks.bridge.kmm.shared.BridgeConfig
 import java.io.File
 
 class AssessmentArchiver(
-    private val assessmentResult: AssessmentResult,
+    private val assessmentResult: Result,
     private val jsonCoder: Json,
     private val bridgeConfig: BridgeConfig,
-    private val assessmentResultFilename: String
+    private val assessmentResultFilename: String // Used when result is of type AssessmentResult
 ) {
 
     private val manifest: MutableSet<ArchiveFileInfo> = mutableSetOf()
@@ -29,7 +29,7 @@ class AssessmentArchiver(
 
     init {
         val appVersion = "version ${bridgeConfig.appVersionName}, build ${bridgeConfig.appVersion}"
-        val item = assessmentResult.schemaIdentifier ?: assessmentResult.identifier
+        val item = assessmentResult.identifier
         archiveBuilder = Archive.Builder.forActivity(item)
             .withAppVersionName(appVersion)
             .withPhoneInfo(bridgeConfig.deviceName)
@@ -37,26 +37,31 @@ class AssessmentArchiver(
 
     fun buildArchive() : Archive {
         // Iterate through all the results within this collection and add if they are `JsonFileArchivableResult`.
-        addBranchResults(assessmentResult)
+        recursiveAdd(assessmentResult)
 
         //Add assessment result file to archive
-        Logger.d("Writing result for assessment ${assessmentResult.identifier}")
-        archiveBuilder.addDataFile(JsonArchiveFile(
-            assessmentResultFilename,
-            assessmentResult.endDateTime?.toJodaDateTime(),
-            jsonCoder.encodeToString(assessmentResult)
-        ))
-
-        //Add add assessment result file info to manifest
-        manifest.add(
-            ArchiveFileInfo(
-                filename = assessmentResultFilename,
-                timestamp = assessmentResult.endDateTime?.toString() ?: Clock.System.now().toString(),
-                contentType = "application/json",
-                identifier = assessmentResult.identifier,
-                jsonSchema = assessmentResult.jsonSchema
+        if (assessmentResult is AssessmentResult) {
+            Logger.d("Writing result for assessment ${assessmentResult.identifier}")
+            archiveBuilder.addDataFile(
+                JsonArchiveFile(
+                    assessmentResultFilename,
+                    assessmentResult.endDateTime?.toJodaDateTime(),
+                    jsonCoder.encodeToString(assessmentResult)
+                )
             )
-        )
+
+            //Add assessment result file info to manifest
+            manifest.add(
+                ArchiveFileInfo(
+                    filename = assessmentResultFilename,
+                    timestamp = assessmentResult.endDateTime?.toString() ?: Clock.System.now()
+                        .toString(),
+                    contentType = "application/json",
+                    identifier = assessmentResult.identifier,
+                    jsonSchema = assessmentResult.jsonSchema
+                )
+            )
+        }
 
         //Add metadata file
         val appVersion = "version ${bridgeConfig.appVersionName}, build ${bridgeConfig.appVersion}"
@@ -162,7 +167,7 @@ class AssessmentArchiver(
             ArchiveFileInfo(
                 filename = resultData.filename,
                 timestamp = resultData.endDateTime?.toString() ?: Clock.System.now().toString(),
-                contentType = "application/json",
+                contentType = resultData.contentType,
                 identifier = resultData.identifier, // Mapped to Result.identifier
                 stepPath = stepPath,
                 jsonSchema = resultData.jsonSchema

@@ -154,6 +154,13 @@ SELECT *
 FROM scheduledAssessmentAdherence
 WHERE studyId = ? AND finishedOn IS NOT NULL AND declined = 0;
 
+latestScheduledAssessmentAdherenceById:
+SELECT *
+FROM scheduledAssessmentAdherence
+WHERE studyId = ? AND identifier = ?
+ORDER BY finishedOn DESC
+LIMIT 1;
+
 selectAdherenceNeedSave:
 SELECT *
 FROM AdherenceRecords

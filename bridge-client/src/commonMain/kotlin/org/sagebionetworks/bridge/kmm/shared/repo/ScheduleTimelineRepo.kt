@@ -146,6 +146,20 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
         return participantScheduleDatabase.getStudyBurstSchedule(studyId, timezone)
     }
 
+    /**
+     * Get the date of the most recently finished ScheduledAssessmentAdherence
+     * @param studyId Study identifier
+     * @param assessmentIdentifier identifier for the assessment
+     * @return the most recent completion date of this assessment, null if never completed
+     */
+    fun getLatestScheduledAssessmentAdherence(
+        studyId: String,
+        assessmentIdentifier: String
+    ): Instant? {
+        val latestScheduledAssessmentAdherence = participantScheduleDatabase.getLatestScheduledAssessmentAdherence(studyId, assessmentIdentifier)
+        return latestScheduledAssessmentAdherence?.finishedOn?.let { Instant.parse(it) }
+    }
+
     internal fun getSessionsForDay(
         studyId: String,
         instantInDay: Instant,

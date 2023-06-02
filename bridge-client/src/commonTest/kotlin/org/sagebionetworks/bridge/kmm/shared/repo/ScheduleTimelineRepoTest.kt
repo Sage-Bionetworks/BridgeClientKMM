@@ -3,6 +3,7 @@ package org.sagebionetworks.bridge.kmm.shared.repo
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.toList
 import kotlinx.datetime.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -2796,6 +2797,38 @@ class ScheduleTimelineRepoTest: BaseTest() {
     }
 
     @Test
+    fun testBMC337ScheduledAssessmentAdherence() {
+        runTest {
+
+            val studyId = "cxhnxd"
+            val eventTimeStamp = Instant.parse("2022-04-08T19:54:36.184Z")
+            val repo = getTestScheduleTimelineRepo(
+                adherenceRecordJson = bmc337AdherenceRecordJson,
+                timeStamp = eventTimeStamp,
+                timelineJson = getbmc337TimelineJson(eventTimeStamp))
+            repo.adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)
+            repo.updateScheduleIfNeeded(studyId)
+
+            val scheduledAssessmentAdherenceExpected = mapOf(
+                "fnameb" to "2022-04-08T20:30:03.790Z",
+                "number-match" to "2022-04-08T20:24:49.492Z",
+                "dccs" to "2022-04-08T20:22:54.061Z",
+                "fnamea" to "2022-04-08T20:20:43.716Z",
+                "flanker" to "2022-04-08T20:18:03.588Z",
+                "psm" to "2022-04-08T20:14:35.868Z",
+                "spelling" to "2022-04-08T20:06:05.677Z",
+                "memory-for-sequences" to "2022-04-08T20:02:36.506Z",
+                "vocabulary" to "2022-04-08T19:58:49.566Z"
+                )
+            scheduledAssessmentAdherenceExpected.forEach {
+                val scheduledAssessmentAdherence = repo.getLatestScheduledAssessmentAdherence(studyId, it.key)
+                assertNotNull(scheduledAssessmentAdherence)
+                assertEquals(it.value, scheduledAssessmentAdherence.toString())
+            }
+        }
+    }
+
+    @Test
     fun test_createStudyBurst() {
         runTest {
             val tz = TimeZone.currentSystemDefault()
@@ -3352,6 +3385,15 @@ class ScheduleTimelineRepoTest: BaseTest() {
        "type":"ParticipantSchedule"
     }
     """.trimIndent()
+
+    @Test
+    fun testGetLatestScheduledAssessmentAdherence() {
+        runTest {
+            val eventTimeStamp = Clock.System.now()
+            val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
+
+        }
+    }
 
     @Test
     fun testBMC446AssessmentOrder() {

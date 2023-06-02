@@ -3386,15 +3386,6 @@ class ScheduleTimelineRepoTest: BaseTest() {
     """.trimIndent()
 
     @Test
-    fun testGetLatestScheduledAssessmentAdherence() {
-        runTest {
-            val eventTimeStamp = Clock.System.now()
-            val repo = getTestScheduleTimelineRepo(timeStamp = eventTimeStamp)
-
-        }
-    }
-
-    @Test
     fun testBMC446AssessmentOrder() {
         // BMC-446 Assessments are not shown to participant in the expected fixed order
         // Via manual testing, I can confirm that the order of the assessments in the today

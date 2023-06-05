@@ -2796,7 +2796,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
     }
 
     @Test
-    fun testBMC337ScheduledAssessmentAdherence() {
+    fun testBMC337LatestScheduledAssessmentAdherence() {
         runTest {
 
             val studyId = "cxhnxd"
@@ -2822,7 +2822,7 @@ class ScheduleTimelineRepoTest: BaseTest() {
             scheduledAssessmentAdherenceExpected.forEach {
                 val scheduledAssessmentAdherence = repo.getLatestScheduledAssessmentAdherence(studyId, it.key)
                 assertNotNull(scheduledAssessmentAdherence)
-                assertEquals(it.value, scheduledAssessmentAdherence.toString())
+                assertEquals(it.value, scheduledAssessmentAdherence.finishedOn)
             }
         }
     }

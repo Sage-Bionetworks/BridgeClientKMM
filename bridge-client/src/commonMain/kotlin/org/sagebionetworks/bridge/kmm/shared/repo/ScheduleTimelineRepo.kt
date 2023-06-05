@@ -155,9 +155,8 @@ class ScheduleTimelineRepo(internal val adherenceRecordRepo: AdherenceRecordRepo
     fun getLatestScheduledAssessmentAdherence(
         studyId: String,
         assessmentIdentifier: String
-    ): Instant? {
-        val latestScheduledAssessmentAdherence = participantScheduleDatabase.getLatestScheduledAssessmentAdherence(studyId, assessmentIdentifier)
-        return latestScheduledAssessmentAdherence?.finishedOn?.let { Instant.parse(it) }
+    ): ScheduledAssessmentAdherence? {
+        return participantScheduleDatabase.getLatestScheduledAssessmentAdherence(studyId, assessmentIdentifier)
     }
 
     internal fun getSessionsForDay(

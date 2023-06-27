@@ -28,19 +28,31 @@ class NativeTimelineStudyBurstManager(
 
     var scheduleJob: Job? = null
 
+    @Deprecated("`userJoinedDate` is ignored",
+        ReplaceWith("refreshStudyBurstSchedule()")
+    )
     fun refreshStudyBurstSchedule(userJoinedDate: Instant) {
-        runCatching { scheduleJob?.cancel() }
-        scheduleJob = null
-        observeStudyBurstSchedule(false, userJoinedDate)
+        refreshStudyBurstSchedule()
     }
 
+    fun refreshStudyBurstSchedule() {
+        runCatching { scheduleJob?.cancel() }
+        scheduleJob = null
+        observeStudyBurstSchedule()
+    }
+
+    @Deprecated("`isNewLogin` and `userJoinedDate` are ignored",
+        ReplaceWith("observeStudyBurstSchedule()")
+    )
     fun observeStudyBurstSchedule(isNewLogin: Boolean,
                                   userJoinedDate: Instant) {
+        observeStudyBurstSchedule()
+    }
+
+    fun observeStudyBurstSchedule() {
         scheduleJob = scope.launch {
-            if (isNewLogin) {
-                if (!adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)) {
-                    updateFailed?.invoke()
-                }
+            if (!adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)) {
+                updateFailed?.invoke()
             }
             repo.getStudyBurstSchedule(studyId).collect { timelineResource ->
                 (timelineResource as? ResourceResult.Success)?.data?.let { schedule ->
@@ -78,7 +90,14 @@ class NativeTimelineManager(
 
     var todayJob: Job? = null
 
+    @Deprecated("`isNewLogin` is ignored",
+        ReplaceWith("observeTodaySchedule()")
+    )
     fun observeTodaySchedule(isNewLogin: Boolean) {
+        observeTodaySchedule()
+    }
+
+    fun observeTodaySchedule() {
         todayJob = scope.launch {
             // Always load remote adherence records
             adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)
@@ -94,7 +113,7 @@ class NativeTimelineManager(
     fun refreshTodaySchedule() {
         runCatching { todayJob?.cancel() }
         todayJob = null
-        observeTodaySchedule(false)
+        observeTodaySchedule()
     }
 }
 

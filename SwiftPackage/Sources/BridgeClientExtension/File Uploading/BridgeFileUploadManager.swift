@@ -13,7 +13,9 @@ import JsonModel
 import UIKit
 #endif
 
-protocol BridgeFileUploadMetadataBlob {}
+protocol BridgeFileUploadMetadataBlob {
+    var userInfo: [String : Any]? { get }
+}
 protocol BridgeUploadTrackingData : Codable {
     var userInfo: [String : Any]? { get }
 }
@@ -411,7 +413,7 @@ extension BridgeFileUploadAPITyped {
         // throw this over to the main queue so we can access Kotlin stuff
         OperationQueue.main.addOperation {
             guard let sessionToken = uploadManager.appManager.sessionToken else {
-                Logger.log(severity: .warn, tag: .upload, message: "Unable to request an upload URL from Bridge--not logged in to an account.")
+                Logger.log(tag: .upload, error: BridgeAuthError(), metadata: uploadMetadata.userInfo)
                 return
             }
             
@@ -665,11 +667,13 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
                 do {
                     mapping = try DictionaryDecoder().decode(type, from: mappingPlist)
                 } catch let error {
-                    Logger.log(severity: .error, tag: .upload, message: "Error attempting to decode plist object to \(T.self):\n\(mappingPlist)\n\(error)")
+                    Logger.log(tag: .upload, error: error, message: "Error attempting to decode plist object to \(T.self):\n\(mappingPlist)")
                 }
             }
+            else {
+                Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .missingMapping, message: "in retrieveMapping: Missing mapping for \(key)"))
+            }
         }
-
         return mapping
     }
 
@@ -1018,10 +1022,18 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
             for invariantFilePath in uploadURLsRequested.keys {
                 guard let api = self.apiFromXAttrs(for: invariantFilePath) else { continue }
                 guard let metadataBlob = api.retrieveMetadata(from: invariantFilePath, mappings: uploadURLsRequested) else { continue }
-                // Assume files with an active urlsession task are not (yet) orphaned, no matter how old.
-                guard !filesInFlight.contains(invariantFilePath) else { continue }
+
                 var fileUrl: URL!
-                guard self.fileIsADayOld(invariantFilePath: invariantFilePath, fileUrl: &fileUrl) else { continue }
+                guard self.fileIsADayOld(invariantFilePath: invariantFilePath, fileUrl: &fileUrl)
+                else {
+                    Logger.log(severity: .info, message: "checkForOrphanedUploads: Exiting upload request resend - file is less than a day old.")
+                    continue
+                }
+                
+                // If there is a file in-flight then something went wrong. Cancel before resending
+                if let inflight = tasks.first(where: { $0.description == invariantFilePath }) {
+                    inflight.cancel()
+                }
                 
                 // If we get all the way here, touch the file to reset the orphanage clock
                 // and then send the upload request again.
@@ -1563,6 +1575,22 @@ extension URL {
     }
 }
 
+struct BridgeAuthError : Error, CustomNSError {
+    static var errorDomain: String { "BridgeClientUI.AuthError" }
+    
+    let errorCode: Int
+    let message: String
+    
+    init(errorCode: Int = -1, message: String = "Not logged in to an account.") {
+        self.errorCode = errorCode
+        self.message = message
+    }
+    
+    var errorUserInfo: [String : Any] {
+        [NSLocalizedFailureReasonErrorKey: message]
+    }
+}
+
 struct BridgeHttpError : Error, CustomNSError {
     static var errorDomain: String { "BridgeClientUI.HttpError" }
     
@@ -1597,5 +1625,6 @@ struct BridgeUnexpectedNullError : Error, CustomNSError {
         case invalidURL = -105
         case corruptData = -106
         case missingMetadata = -107
+        case missingMapping = -108
     }
 }

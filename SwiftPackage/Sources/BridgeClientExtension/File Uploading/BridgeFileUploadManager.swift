@@ -537,13 +537,13 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
     
     internal var appDidBecomeActiveObserver: Any?
     
-    internal func onLaunchFinished() {
+    internal func onSessionTokenChanged() {
         
         #if canImport(UIKit)
         if appDidBecomeActiveObserver == nil {
             // Set up a listener to retry temporarily-failed uploads whenever the app becomes active
             self.appDidBecomeActiveObserver = NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: nil) { notification in
-                
+                Logger.log(severity: .info, message: "App became active. Calling checkAndRetryOrphanedUploads()")
                 self.checkAndRetryOrphanedUploads()
             }
         }
@@ -1159,7 +1159,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
     
     /// Call this function to check for and retry any orphaned uploads, and update the app's isUploading state  accordingly.
     public func checkAndRetryOrphanedUploads() {
-        Logger.log(severity: .info, message: "Checking for orphaned uploads")
+        Logger.log(severity: .info, message: "in checkAndRetryOrphanedUploads()")
         // This needs to start out from the main queue to avoid an EXC_BAD_ACCESS crash in
         // checkForOrphanedUploads(), but we also need that function to do its thing before
         // continuing on here and we don't want to potentially deadlock by popping out

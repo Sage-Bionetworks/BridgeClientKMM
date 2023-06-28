@@ -142,13 +142,7 @@ open class UploadAppManager : ObservableObject {
     }
     
     /// The "state" of the app.
-    @Published public var appState: AppState = .launching {
-        didSet {
-            if oldValue != .main, appState == .main {
-                BridgeFileUploadManager.shared.onLaunchFinished()
-            }
-        }
-    }
+    @Published public var appState: AppState = .launching
     
     /// Call to set up the user session before callback from the observer fires.
     @MainActor
@@ -163,7 +157,9 @@ open class UploadAppManager : ObservableObject {
             // then just return without updating state.
             return
         }
-
+        
+        let oldToken = self.session?.sessionToken
+        
         Logger.log(severity: .info, message: "Updating UserSessionInfo. updateType='\(updateType)', sessionToken='\(session?.sessionToken ?? "NULL")'")
         
         self.session = session
@@ -189,6 +185,12 @@ open class UploadAppManager : ObservableObject {
 
         didUpdateUserSessionInfo()
         updateAppState()
+        
+        // If we have a session token and it is different from the old one then check orphaned files.
+        if let newToken = session?.sessionToken, !newToken.isEmpty, newToken != oldToken {
+            Logger.log(severity: .info, message: "Session token updated: newToken='\(newToken)', oldToken='\(oldToken ?? "")'")
+            BridgeFileUploadManager.shared.onSessionTokenChanged()
+        }
     }
     
     private var appConfigManager: NativeAppConfigManager!

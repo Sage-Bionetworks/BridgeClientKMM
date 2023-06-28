@@ -533,11 +533,19 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         super.init()
         
         self.netManager.backgroundTransferDelegate = self
+    }
+    
+    internal var appDidBecomeActiveObserver: Any?
+    
+    internal func onLaunchFinished() {
         
         #if canImport(UIKit)
-        // Set up a listener to retry temporarily-failed uploads whenever the app becomes active
-        NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: nil) { notification in
-            self.checkAndRetryOrphanedUploads()
+        if appDidBecomeActiveObserver == nil {
+            // Set up a listener to retry temporarily-failed uploads whenever the app becomes active
+            self.appDidBecomeActiveObserver = NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: nil) { notification in
+                
+                self.checkAndRetryOrphanedUploads()
+            }
         }
         #endif
         
@@ -1003,13 +1011,16 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         // App extensions are severely memory constrained, so don't even try this if we're in one.
         guard !self.netManager.isRunningInAppExtension() else { return }
         
+        // Do not attempt to check and retry orphaned uploads if the session token isn't set up.
+        guard self.appManager?.sessionToken != nil else { return }
+        
         self.netManager.backgroundSession().getAllTasks { tasks in
             var tasks = tasks
             let defaults = self.userDefaults
             
             // Get the set of all temp files for which there is a currently-active background
             // URLSession task.
-            let filesInFlight = Set(tasks.map { $0.description })
+            var filesInFlight = Set(tasks.map { $0.description })
             
             // Get the mappings from temp file to original file for all in-progress uploads.
             let fileUploads = defaults.dictionary(forKey: self.bridgeFileUploadsKey) ?? [String : Any]()
@@ -1033,6 +1044,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
                 // If there is a file in-flight then something went wrong. Cancel before resending
                 if let inflight = tasks.first(where: { $0.description == invariantFilePath }) {
                     inflight.cancel()
+                    filesInFlight.remove(invariantFilePath)
                 }
                 
                 // If we get all the way here, touch the file to reset the orphanage clock

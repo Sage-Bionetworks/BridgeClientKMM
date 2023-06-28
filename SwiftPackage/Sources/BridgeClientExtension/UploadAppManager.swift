@@ -105,6 +105,51 @@ open class UploadAppManager : ObservableObject {
         case launch, login, signout, observed
     }
     
+    /// The  "state" of the app. SwiftUI relies upon observance patterns that do not work with Kotlin classes
+    /// because those classes are not threadsafe. The state handling of SwiftUI relies upon being able to
+    /// process observed changes on a background thread so the Kotlin classes must be wrapped. This
+    /// state enum is used to allow the app content view to change the UI to match the login state.
+    ///
+    /// - Example:
+    /// ```
+    ///    struct ContentView: View {
+    ///        @EnvironmentObject var bridgeManager: SingleStudyAppManager
+    ///        @StateObject var todayViewModel: TodayTimelineViewModel = .init()
+    ///
+    ///        var body: some View {
+    ///            switch bridgeManager.appState {
+    ///            case .launching:
+    ///                LaunchView()
+    ///            case .login:
+    ///                LoginView()
+    ///            case .onboarding:
+    ///                OnboardingView()
+    ///            case .main:
+    ///                MainView()
+    ///                    .environmentObject(todayViewModel)
+    ///                    .assessmentInfoMap(.init(extensions: MTBIdentifier.allCases))
+    ///                    .fullScreenCover(isPresented: $todayViewModel.isPresentingAssessment) {
+    ///                        MTBAssessmentView(todayViewModel)
+    ///                            .edgesIgnoringSafeArea(.all)
+    ///                    }
+    ///                    .statusBar(hidden: todayViewModel.isPresentingAssessment)
+    ///            }
+    ///        }
+    ///    }
+    /// ```
+    public enum AppState : String, StringEnumSet, Comparable {
+        case launching, login, onboarding, main, error
+    }
+    
+    /// The "state" of the app.
+    @Published public var appState: AppState = .launching {
+        didSet {
+            if oldValue != .main, appState == .main {
+                BridgeFileUploadManager.shared.onLaunchFinished()
+            }
+        }
+    }
+    
     /// Call to set up the user session before callback from the observer fires.
     @MainActor
     public final func handleUserLogin(_ session: UserSessionInfo?) {
@@ -118,7 +163,7 @@ open class UploadAppManager : ObservableObject {
             // then just return without updating state.
             return
         }
-        
+
         Logger.log(severity: .info, message: "Updating UserSessionInfo. updateType='\(updateType)', sessionToken='\(session?.sessionToken ?? "NULL")'")
         
         self.session = session
@@ -182,11 +227,17 @@ open class UploadAppManager : ObservableObject {
         else {
             self.sharedUserDefaults = UserDefaults.standard
         }
-
+        
         // Is this a new login (in which case we need to get the adherence records)
         self.isNewLogin = (self.userSessionId == nil)
+        
+        // Set up the background manager
+        setupBackgroundManager()
+    }
+    
+    private func setupBackgroundManager() {
 
-        // Set up the background network manager singleton and make us its app manager
+        // Hookup the background network manager singleton and make us its app manager
         let bnm = BackgroundNetworkManager.shared
         bnm.appManager = self
         

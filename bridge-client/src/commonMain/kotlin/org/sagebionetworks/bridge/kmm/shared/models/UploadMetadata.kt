@@ -11,6 +11,11 @@ data class UploadMetadata(
     val eventTimestamp: String? = null,
     val startedOn: String? = null,
 ) {
+
+    fun getId(): String? {
+        return if (instanceGuid == null) null else "$instanceGuid|$eventTimestamp|$startedOn"
+    }
+
     internal fun toJsonMap(): Map<String, JsonElement> {
         val jsonCoder = Json {
             ignoreUnknownKeys = true

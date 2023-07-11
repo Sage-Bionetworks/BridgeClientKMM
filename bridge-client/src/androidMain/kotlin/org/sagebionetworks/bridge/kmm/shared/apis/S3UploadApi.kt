@@ -6,7 +6,7 @@ import io.ktor.client.content.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import org.sagebionetworks.bridge.kmm.shared.upload.UploadFile
+import org.sagebionetworks.bridge.kmm.shared.models.UploadFile
 import java.io.File
 
 internal class S3UploadApi(private val httpClient: HttpClient) {

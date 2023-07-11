@@ -1,6 +1,5 @@
 package org.sagebionetworks.bridge.kmm.shared.upload
 
-import android.util.Log
 import co.touchlab.kermit.Logger
 import app.cash.sqldelight.db.SqlDriver
 import io.ktor.client.*
@@ -9,13 +8,13 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okio.FileSystem
 import okio.Path.Companion.toPath
-import org.koin.core.component.getScopeName
 import org.sagebionetworks.bridge.kmm.shared.apis.S3UploadApi
 import org.sagebionetworks.bridge.kmm.shared.apis.UploadsApi
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper.Companion.APP_WIDE_STUDY_ID
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
 import org.sagebionetworks.bridge.kmm.shared.cache.loadResource
+import org.sagebionetworks.bridge.kmm.shared.models.UploadFile
 import org.sagebionetworks.bridge.kmm.shared.repo.AbstractResourceRepo
 import org.sagebionetworks.bridge.kmm.shared.models.UploadRequest
 import org.sagebionetworks.bridge.kmm.shared.models.UploadSession

@@ -19,6 +19,7 @@ import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
 import org.sagebionetworks.bridge.kmm.shared.getJsonReponseHandler
 import org.sagebionetworks.bridge.kmm.shared.getTestClient
+import org.sagebionetworks.bridge.kmm.shared.models.UploadFile
 import org.sagebionetworks.bridge.kmm.shared.models.UploadSession
 import org.sagebionetworks.bridge.kmm.shared.models.UploadStatus
 import org.sagebionetworks.bridge.kmm.shared.models.UploadValidationStatus

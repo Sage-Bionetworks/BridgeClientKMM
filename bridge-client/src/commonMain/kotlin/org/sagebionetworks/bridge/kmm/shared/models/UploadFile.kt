@@ -1,8 +1,7 @@
-package org.sagebionetworks.bridge.kmm.shared.upload
+package org.sagebionetworks.bridge.kmm.shared.models
 
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
-import org.sagebionetworks.bridge.kmm.shared.models.UploadRequest
 
 @Serializable
 data class UploadFile (
@@ -11,7 +10,9 @@ data class UploadFile (
     val fileLength: Long,
     val md5Hash: String,
     val encrypted: Boolean = true,
-    val metadata: Map<String, kotlinx.serialization.json.JsonElement>? = null,
+    val metadata: UploadMetadata? = null,
+
+    // TODO: Deprecate on Android. This is not supported on iOS. - syoung 07/10/2023
     val sessionExpires: Instant? = null // Delay doing upload until after session expires
 ) {
 
@@ -30,7 +31,7 @@ data class UploadFile (
             contentMd5 = md5Hash.trim(), //Old md5 algorithm was sometimes including newline character at end, trim() is to fix old stuck uploads -nbrown 1/20/23
             contentType = contentType,
             encrypted = encrypted,
-            metadata = metadata,
+            metadata = metadata?.toJsonMap(),
             type = "UploadRequest"
         )
     }

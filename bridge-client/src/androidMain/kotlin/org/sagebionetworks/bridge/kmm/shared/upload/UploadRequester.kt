@@ -1,7 +1,6 @@
 package org.sagebionetworks.bridge.kmm.shared.upload
 
 import android.content.Context
-import android.util.Log
 import androidx.work.*
 import co.touchlab.kermit.Logger
 import app.cash.sqldelight.db.SqlDriver
@@ -16,6 +15,7 @@ import okio.*
 import okio.Path.Companion.toPath
 import org.sagebionetworks.bridge.kmm.shared.cache.*
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper.Companion.APP_WIDE_STUDY_ID
+import org.sagebionetworks.bridge.kmm.shared.models.UploadFile
 
 class UploadRequester(
     val database: ResourceDatabaseHelper,

@@ -7,14 +7,12 @@ import android.content.res.AssetManager
 import co.touchlab.kermit.Logger
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonPrimitive
 import okio.ByteString.Companion.toByteString
 import org.sagebionetworks.assessmentmodel.AssessmentResult
 import org.sagebionetworks.assessmentmodel.Result
-import org.sagebionetworks.bridge.data.AndroidStudyUploadEncryptor
 import org.sagebionetworks.bridge.data.Archive
-import org.sagebionetworks.bridge.kmm.shared.upload.UploadFile
+import org.sagebionetworks.bridge.kmm.shared.models.UploadMetadata
+import org.sagebionetworks.bridge.kmm.shared.models.UploadFile
 import org.sagebionetworks.bridge.kmm.shared.upload.UploadRequester
 import org.spongycastle.cms.CMSException
 import org.spongycastle.jcajce.provider.asymmetric.x509.CertificateFactory
@@ -66,13 +64,7 @@ class AssessmentResultArchiveUploader(
             UUID.randomUUID().toString()
         }
 
-        val uploadMetadata: Map<String, JsonElement> = mapOf(
-            "instanceGuid" to JsonPrimitive(assessmentInstanceId),
-            "eventTimestamp" to JsonPrimitive(eventTimestamp),
-            "startedOn" to JsonPrimitive(startedOn.toString())
-        )
-
-
+        val uploadMetadata = UploadMetadata(assessmentInstanceId, eventTimestamp, startedOn.toString())
         val uploadFile = persist(assessmentRunUUID, archiver.buildArchive(), uploadMetadata, sessionWindowExpiration)
         Logger.i("UploadFile $uploadFile")
         uploadRequester.queueAndRequestUpload(context, uploadFile, assessmentInstanceId)
@@ -83,7 +75,7 @@ class AssessmentResultArchiveUploader(
         CMSException::class,
         NoSuchAlgorithmException::class
     )
-    fun persist(filename: String, archive: Archive, uploadMetadata: Map<String, JsonElement>, sessionWindowExpiration: kotlinx.datetime.Instant?): UploadFile {
+    fun persist(filename: String, archive: Archive, uploadMetadata: UploadMetadata, sessionWindowExpiration: kotlinx.datetime.Instant?): UploadFile {
         val md5: MessageDigest = try {
             MessageDigest.getInstance("MD5")
         } catch (e: NoSuchAlgorithmException) {

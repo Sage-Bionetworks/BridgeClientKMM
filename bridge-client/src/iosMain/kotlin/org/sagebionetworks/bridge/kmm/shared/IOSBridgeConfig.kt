@@ -12,6 +12,7 @@ object IOSBridgeConfig  : BridgeConfig {
 
     private val atomicRef: AtomicReference<IOSPlatformConfig?> = AtomicReference(null)
 
+    @OptIn(FreezingIsDeprecated::class)
     fun initialize(platformConfig : IOSPlatformConfig) {
         atomicRef.compareAndSet(null, platformConfig.freeze())
     }

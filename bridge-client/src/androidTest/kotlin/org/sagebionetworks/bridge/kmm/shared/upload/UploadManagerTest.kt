@@ -4,7 +4,9 @@ import io.ktor.client.*
 import io.ktor.client.engine.*
 import io.ktor.client.engine.mock.*
 import io.ktor.http.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestScope
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.encodeToString
@@ -13,12 +15,14 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import org.sagebionetworks.bridge.kmm.shared.cache.Resource
+import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper.Companion.APP_WIDE_STUDY_ID
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper.Companion.DEFAULT_SECONDARY_ID
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
 import org.sagebionetworks.bridge.kmm.shared.getJsonReponseHandler
 import org.sagebionetworks.bridge.kmm.shared.getTestClient
+import org.sagebionetworks.bridge.kmm.shared.models.UploadFile
 import org.sagebionetworks.bridge.kmm.shared.models.UploadSession
 import org.sagebionetworks.bridge.kmm.shared.models.UploadStatus
 import org.sagebionetworks.bridge.kmm.shared.models.UploadValidationStatus
@@ -34,6 +38,7 @@ class UploadManagerTest {
     @get:Rule
     var tempFolder = TemporaryFolder()
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun setupUploadManager(testHttpClient: HttpClient,
                                    tempFile: File,
                                    assessmentInstanceId: String = DEFAULT_SECONDARY_ID,
@@ -51,11 +56,12 @@ class UploadManagerTest {
             sessionExpires = sessionExpiration
         )
 
-        val uploadManager = UploadManager(testHttpClient, testDatabaseDriver())
+        val testDatabaseHelper = ResourceDatabaseHelper(testDatabaseDriver())
+        val uploadManager = UploadManager(testHttpClient, testDatabaseHelper, TestScope())
         val database = uploadManager.database
         val resource = Resource(
             identifier = uploadFile.getUploadFileResourceId(),
-            secondaryId = DEFAULT_SECONDARY_ID,
+            secondaryId = assessmentInstanceId,
             type = ResourceType.FILE_UPLOAD,
             studyId = APP_WIDE_STUDY_ID,
             json = Json.encodeToString(uploadFile),
@@ -135,7 +141,7 @@ class UploadManagerTest {
             try {
                 //First try will throw an error with the s3 call
                 uploadManager.processUploads()
-            } catch (throwable: Throwable) {
+            } catch (_: Throwable) {
 
             }
             assertFalse(database.getResources(ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID).isEmpty())
@@ -182,7 +188,7 @@ class UploadManagerTest {
             try {
                 //First try will throw an error with the completeUploadSession call
                 uploadManager.processUploads()
-            } catch (throwable: Throwable) {
+            } catch (_: Throwable) {
 
             }
             //File upload and temp file should be gone

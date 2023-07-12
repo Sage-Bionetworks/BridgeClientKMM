@@ -137,7 +137,7 @@ open class AbstractTodayTimelineViewModel : NSObject, ObservableObject, Schedule
                     self.schedules = timelineSlice.scheduledSessionWindows
                 }
             }
-            self.timelineManager.observeTodaySchedule(isNewLogin: bridgeManager.isNewLogin)
+            self.timelineManager.observeTodaySchedule()
         }
         else {
             self.schedules = previewSchedules

@@ -1,11 +1,11 @@
 package org.sagebionetworks.bridge.kmm.shared.upload
 
 import android.content.Context
-import android.util.Log
 import androidx.work.*
 import co.touchlab.kermit.Logger
 import app.cash.sqldelight.db.SqlDriver
 import io.ktor.client.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
@@ -16,6 +16,7 @@ import okio.*
 import okio.Path.Companion.toPath
 import org.sagebionetworks.bridge.kmm.shared.cache.*
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper.Companion.APP_WIDE_STUDY_ID
+import org.sagebionetworks.bridge.kmm.shared.models.UploadFile
 
 class UploadRequester(
     val database: ResourceDatabaseHelper,
@@ -104,7 +105,8 @@ internal class CoroutineUploadWorker(
     context: Context,
     params: WorkerParameters,
     private val httpClient: HttpClient,
-    private val sqlDriver: SqlDriver
+    private val databaseHelper: ResourceDatabaseHelper,
+    private val backgroundScope: CoroutineScope,
 ) : CoroutineWorker(context, params) {
     private val TAG = "CoroutineUploadWorker"
     
@@ -112,7 +114,7 @@ internal class CoroutineUploadWorker(
         return withContext(Dispatchers.IO) {
             Logger.d { "Upload worker started" }
             val uploadManager = UploadManager(
-                httpClient, sqlDriver
+                httpClient, databaseHelper, backgroundScope
             )
             return@withContext try {
                 if (uploadManager.processUploads()) {

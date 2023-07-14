@@ -23,7 +23,7 @@ import kotlinx.serialization.SerialName
  * @param type UploadSession
  */
 @Serializable
-internal data class UploadSession (
+data class UploadSession (
     /* The upload ID. The client needs to use this ID to call Bridge when the upload is complete.  */
     @SerialName("id")
     val id: String? = null,

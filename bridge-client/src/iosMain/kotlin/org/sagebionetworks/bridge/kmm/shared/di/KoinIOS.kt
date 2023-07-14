@@ -21,7 +21,5 @@ actual val platformModule = module {
     single<BridgeConfig> { IOSBridgeConfig }
 
     single<HttpUtil> {HttpIosUtil()}
-
-    single<UploadRepo> { UploadRepo(get(), get(), get(named("background"))) }
 }
 

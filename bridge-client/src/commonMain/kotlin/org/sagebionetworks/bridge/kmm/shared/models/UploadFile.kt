@@ -17,6 +17,7 @@ data class UploadFile (
 ) : UploadFileIdentifiable {
 
     internal fun getSecondaryId(): String {
+        // TODO: syoung 07/14/2023 Refactor use of secondaryId on Android to use adherence record unique id (instanceGuid|eventTimestamp|startedOn)
         return metadata?.instanceGuid ?: filename()
     }
 

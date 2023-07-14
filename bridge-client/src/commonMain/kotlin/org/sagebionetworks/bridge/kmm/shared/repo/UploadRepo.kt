@@ -18,8 +18,11 @@ import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
 import org.sagebionetworks.bridge.kmm.shared.cache.loadResource
 import org.sagebionetworks.bridge.kmm.shared.models.UploadFile
+import org.sagebionetworks.bridge.kmm.shared.models.UploadFileIdentifiable
 import org.sagebionetworks.bridge.kmm.shared.models.UploadRequest
 import org.sagebionetworks.bridge.kmm.shared.models.UploadSession
+import org.sagebionetworks.bridge.kmm.shared.models.getUploadFileResourceId
+import org.sagebionetworks.bridge.kmm.shared.models.getUploadSessionResourceId
 
 internal open class UploadRepo(
     httpClient: HttpClient,
@@ -85,14 +88,20 @@ internal open class UploadRepo(
     }
 
     /**
-     * Remove the [UploadFile] from the local cache. This is called after successfully uploading to S3.
+     * Remove the [UploadFile] from the local cache and send "upload complete" message to Bridge.
+     * This is called after successfully uploading to S3.
+     *
+     * Note: Deleting the file must be handled natively as a part of S3 upload rather than using
+     * expect/actually. This is done b/c on iOS, the file path can change with OS version changes
+     * and the [UploadFile] only keeps a pointer to the invariant file path. syoung 07/14/2023
      */
-    fun removeUploadFile(uploadFile: UploadFile) {
+    suspend fun didFinishUploadFile(uploadFile: UploadFileIdentifiable, uploadSessionId: String?) {
         database.removeResource(
             uploadFile.getUploadFileResourceId(),
             ResourceType.FILE_UPLOAD,
             ResourceDatabaseHelper.APP_WIDE_STUDY_ID
         )
+        completeUploadSession(uploadSessionId, uploadFile.getUploadSessionResourceId())
     }
 
     /**
@@ -140,11 +149,11 @@ internal open class UploadRepo(
         }
     }
 
-    suspend fun completeUploadSession(uploadSession: UploadSession, resourceid: String) {
-        uploadSession.id?.let {
-            uploadsApi.completeUploadSession(uploadSession.id)
+    suspend fun completeUploadSession(uploadSessionId: String?, resourceId: String) {
+        uploadSessionId?.let {
+            uploadsApi.completeUploadSession(it)
             database.removeResource(
-                resourceid,
+                resourceId,
                 ResourceType.UPLOAD_SESSION,
                 ResourceDatabaseHelper.APP_WIDE_STUDY_ID
             )
@@ -162,7 +171,7 @@ internal open class UploadRepo(
                 ResourceDatabaseHelper.APP_WIDE_STUDY_ID
             )) {
                 resource.loadResource<UploadSession>()?.let {
-                    completeUploadSession(it, resource.identifier)
+                    completeUploadSession(it.id, resource.identifier)
                 }
             }
         }

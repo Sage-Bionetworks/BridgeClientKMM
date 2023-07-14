@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UploadFile (
-    val filePath: String,
+    override val filePath: String,
     val contentType: String,
     val fileLength: Long,
     val md5Hash: String,
@@ -14,15 +14,7 @@ data class UploadFile (
 
     // TODO: Deprecate on Android. This is not supported on iOS. - syoung 07/10/2023
     val sessionExpires: Instant? = null // Delay doing upload until after session expires
-) {
-
-    internal fun getUploadFileResourceId(): String {
-        return "uploadFile-$filePath"
-    }
-
-    internal fun getUploadSessionResourceId(): String {
-        return "uploadSession--$filePath"
-    }
+) : UploadFileIdentifiable {
 
     internal fun getSecondaryId(): String {
         return metadata?.instanceGuid ?: filename()
@@ -44,4 +36,16 @@ data class UploadFile (
         )
     }
 
+}
+
+interface UploadFileIdentifiable {
+    val filePath: String
+}
+
+internal fun UploadFileIdentifiable.getUploadFileResourceId(): String {
+    return "uploadFile-$filePath"
+}
+
+internal fun UploadFileIdentifiable.getUploadSessionResourceId(): String {
+    return "uploadSession--$filePath"
 }

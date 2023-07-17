@@ -4,6 +4,7 @@ import co.touchlab.kermit.Logger
 import co.touchlab.stately.ensureNeverFrozen
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.Instant
@@ -58,8 +59,8 @@ internal open class UploadRepo(
     }
 
     /**
-     * Get all the [UploadFile]s from the local cache. This will include files with an outstanding
-     * S3 upload in progress.
+     * Get all the [UploadFile] records from the local cache. This will include files with an
+     * outstanding S3 upload in progress.
      */
     fun getUploadFiles(): List<UploadFile> {
         val resources = database.getResources(
@@ -67,24 +68,6 @@ internal open class UploadRepo(
             ResourceDatabaseHelper.APP_WIDE_STUDY_ID
         )
         return resources.mapNotNull { it.loadResource() }
-    }
-
-    /**
-     * Store the [UploadFile] to the local cache. This is called before requesting an S3 upload session.
-     */
-    fun storeUploadFile(uploadFile: UploadFile) {
-        //Store uploadFile in local cache
-        val resource = Resource(
-            identifier = uploadFile.getUploadFileResourceId(),
-            type = ResourceType.FILE_UPLOAD,
-            secondaryId = uploadFile.getSecondaryId(),
-            studyId = ResourceDatabaseHelper.APP_WIDE_STUDY_ID,
-            json = Json.encodeToString(uploadFile),
-            lastUpdate = Clock.System.now().toEpochMilliseconds(),
-            status = ResourceStatus.SUCCESS,
-            needSave = false
-        )
-        database.insertUpdateResource(resource)
     }
 
     /**
@@ -96,12 +79,21 @@ internal open class UploadRepo(
      * and the [UploadFile] only keeps a pointer to the invariant file path. syoung 07/14/2023
      */
     suspend fun didFinishUploadFile(uploadFile: UploadFileIdentifiable, uploadSessionId: String?) {
-        database.removeResource(
-            uploadFile.getUploadFileResourceId(),
-            ResourceType.FILE_UPLOAD,
+        val resourceId = uploadFile.getUploadSessionResourceId()
+        val resource = database.getResource(resourceId, ResourceType.UPLOAD_SESSION,
             ResourceDatabaseHelper.APP_WIDE_STUDY_ID
-        )
-        completeUploadSession(uploadSessionId, uploadFile.getUploadSessionResourceId())
+        )?.copy(needSave = true)
+        database.database.transaction {
+            resource?.let {
+                database.insertUpdateResource(it)
+            }
+            database.removeResource(
+                uploadFile.getUploadFileResourceId(),
+                ResourceType.FILE_UPLOAD,
+                ResourceDatabaseHelper.APP_WIDE_STUDY_ID
+            )
+        }
+        completeUploadSession(uploadSessionId, resourceId)
     }
 
     /**
@@ -160,22 +152,20 @@ internal open class UploadRepo(
         }
     }
 
-    suspend fun processFinishedUploads() : Boolean {
-        //Check that all uploads succeeded and have been removed
-        val success = database.getResources(ResourceType.FILE_UPLOAD,
+    /**
+     * Process any [UploadSession] records where the upload to S3 has been completed, but Bridge
+     * has not been notified.
+     */
+    suspend fun processFinishedUploads() {
+        // Check if we have any sessions that have been uploaded and still need completing
+        for (resource in database.getResourcesNeedSave(
+            ResourceType.UPLOAD_SESSION,
             ResourceDatabaseHelper.APP_WIDE_STUDY_ID
-        ).isEmpty()
-        if (success) {
-            //Check if we have any sessions that have been uploaded and still need completing
-            for (resource in database.getResources(ResourceType.UPLOAD_SESSION,
-                ResourceDatabaseHelper.APP_WIDE_STUDY_ID
-            )) {
-                resource.loadResource<UploadSession>()?.let {
-                    completeUploadSession(it.id, resource.identifier)
-                }
+        )) {
+            resource.loadResource<UploadSession>()?.let {
+                completeUploadSession(it.id, resource.identifier)
             }
         }
-        return success
     }
 
 }

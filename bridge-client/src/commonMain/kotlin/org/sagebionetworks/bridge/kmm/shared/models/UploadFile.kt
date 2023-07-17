@@ -11,9 +11,6 @@ data class UploadFile (
     val md5Hash: String,
     val encrypted: Boolean = true,
     val metadata: UploadMetadata? = null,
-
-    // TODO: Deprecate on Android. This is not supported on iOS. - syoung 07/10/2023
-    val sessionExpires: Instant? = null // Delay doing upload until after session expires
 ) : UploadFileIdentifiable {
 
     internal fun getSecondaryId(): String {

@@ -13,7 +13,9 @@ import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
 import org.sagebionetworks.bridge.kmm.shared.cache.loadResource
+import org.sagebionetworks.bridge.kmm.shared.models.S3UploadSession
 import org.sagebionetworks.bridge.kmm.shared.models.UploadFile
+import org.sagebionetworks.bridge.kmm.shared.models.UploadFileId
 import org.sagebionetworks.bridge.kmm.shared.models.UploadFileIdentifiable
 import org.sagebionetworks.bridge.kmm.shared.models.UploadSession
 import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
@@ -26,6 +28,7 @@ open class NativeUploadManager(
 ) : KoinComponent {
 
     private val repo : UploadRepo by inject(mode = LazyThreadSafetyMode.NONE)
+    private val adherenceRecordRepo : AdherenceRecordRepo by inject(mode = LazyThreadSafetyMode.NONE)
 
     private val scope = MainScope()
 
@@ -40,33 +43,49 @@ open class NativeUploadManager(
         }
     }
 
-    fun storeUploadFile(uploadFile: UploadFile) {
-        repo.database.storeUploadFile(uploadFile)
-    }
-
-    fun getUploadFiles(): List<UploadFile> {
-        return repo.getUploadFiles()
-    }
-
-    fun requestUploadSession(uploadFile: UploadFile, callBack: (UploadFile, UploadSession?) -> Unit) {
+    fun queueAndRequestUploadSession(uploadFile: UploadFile, callBack: (S3UploadSession?) -> Unit) {
         scope.launch {
+            repo.database.storeUploadFile(uploadFile)
             try {
-                val uploadSession = repo.getUploadSession(uploadFile)
-                callBack(uploadFile, uploadSession)
+                val uploadSession = repo.getS3UploadSession(uploadFile)
+                callBack(uploadSession)
             } catch (_: Throwable) {
-                callBack(uploadFile, null)
+                callBack(null)
             }
         }
     }
 
-    fun markUploadFileFinished(filePath: String) {
-        repo.markUploadFileFinished(UploadFileId(filePath))
+    fun getUploadFiles(): List<String> {
+        return repo.getUploadFiles().map { it.filePath }
+    }
+
+    fun requestUploadSession(filePath: String, callBack: (S3UploadSession?) -> Unit) {
+        scope.launch {
+            try {
+                val uploadSession = repo.getS3UploadSessionForFile(filePath)
+                callBack(uploadSession)
+            } catch (_: Throwable) {
+                callBack(null)
+            }
+        }
+    }
+
+    fun markUploadFileFinished(filePath: String, callBack: (Boolean) -> Unit) {
+        markAndProcessFinishedUploads(filePath, callBack)
     }
 
     fun processFinishedUploads(callBack: (Boolean) -> Unit) {
+        markAndProcessFinishedUploads(null, callBack)
+    }
+
+    private fun markAndProcessFinishedUploads(filePath: String? = null, callBack: (Boolean) -> Unit) {
         scope.launch {
+            if (filePath != null) {
+                repo.markUploadFileFinished(UploadFileId(filePath))
+            }
             try {
                 repo.processFinishedUploads()
+                adherenceRecordRepo.processAdherenceRecordUpdates(studyId)
                 callBack(true)
             } catch (_: Throwable) {
                 callBack(false)
@@ -74,6 +93,5 @@ open class NativeUploadManager(
         }
     }
 
-    internal class UploadFileId(override val filePath: String) : UploadFileIdentifiable
 }
 

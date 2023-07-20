@@ -91,8 +91,7 @@ class AdherenceRecordRepo(httpClient: HttpClient,
      */
     suspend fun loadRemoteAdherenceRecords(studyId: String) : Boolean {
         // First check to see if we have any records that need to be saved
-        processUpdates(studyId)
-        processUpdatesV2(studyId)
+        processAdherenceRecordUpdates(studyId)
         val pageSize = 500
         var pageOffset = 0
         var adherenceRecordsSearch = AdherenceRecordsSearch(sortOrder = SortOrder.DESC, pageSize = pageSize, includeRepeats = true, currentTimestampsOnly = true)
@@ -108,6 +107,11 @@ class AdherenceRecordRepo(httpClient: HttpClient,
             return false
         }
         return true
+    }
+
+    suspend fun processAdherenceRecordUpdates(studyId: String) {
+        processUpdates(studyId)
+        processUpdatesV2(studyId)
     }
 
     private suspend fun loadAndCacheResults(studyId: String, adherenceRecordsSearch: AdherenceRecordsSearch) : AdherenceRecordList {

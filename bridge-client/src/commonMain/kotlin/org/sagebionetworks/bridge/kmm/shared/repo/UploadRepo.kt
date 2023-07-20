@@ -3,6 +3,7 @@ package org.sagebionetworks.bridge.kmm.shared.repo
 import co.touchlab.kermit.Logger
 import co.touchlab.stately.ensureNeverFrozen
 import io.ktor.client.HttpClient
+import io.ktor.http.headers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
@@ -15,7 +16,9 @@ import org.sagebionetworks.bridge.kmm.shared.apis.UploadsApi
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
 import org.sagebionetworks.bridge.kmm.shared.cache.loadResource
+import org.sagebionetworks.bridge.kmm.shared.models.S3UploadSession
 import org.sagebionetworks.bridge.kmm.shared.models.UploadFile
+import org.sagebionetworks.bridge.kmm.shared.models.UploadFileId
 import org.sagebionetworks.bridge.kmm.shared.models.UploadFileIdentifiable
 import org.sagebionetworks.bridge.kmm.shared.models.UploadRequest
 import org.sagebionetworks.bridge.kmm.shared.models.UploadSession
@@ -94,6 +97,39 @@ internal open class UploadRepo(
     }
 
     /**
+     * Get the cached [UploadFile] for a given `filePath`.
+     */
+    fun getUploadFile(filePath: String): UploadFile? {
+        val fileId = UploadFileId(filePath)
+        return database.getResourcesById(
+            fileId.getUploadFileResourceId(),
+            ResourceType.FILE_UPLOAD,
+            ResourceDatabaseHelper.APP_WIDE_STUDY_ID
+        ).firstOrNull()?.loadResource()
+    }
+
+    /**
+     * Get the S3 Upload Session for the given file path.
+     *
+     * Note: Currently, only uploading study data (archives) is supported. syoung 07/20/2023
+     */
+    suspend fun getS3UploadSessionForFile(filePath: String): S3UploadSession? {
+        return getUploadFile(filePath)?.let { getS3UploadSession(it) }
+    }
+
+    internal suspend fun getS3UploadSession(uploadFile: UploadFile): S3UploadSession? {
+        val uploadSession = getUploadSession(uploadFile)
+        return if (uploadSession?.id == null) null
+        else S3UploadSession(
+            filePath = uploadFile.filePath,
+            contentType = uploadFile.contentType,
+            uploadSessionId = uploadSession.id,
+            url = uploadSession.url,
+            requestHeaders = uploadFile.getS3RequestHeaders(),
+        )
+    }
+
+    /**
      * Retrieves cached UploadSession (if one exists), else requests one from Bridge and caches session
      * before returning it. This method is responsible for ensuring that upload session has not expired and is valid.
      */
@@ -164,5 +200,4 @@ internal open class UploadRepo(
             }
         }
     }
-
 }

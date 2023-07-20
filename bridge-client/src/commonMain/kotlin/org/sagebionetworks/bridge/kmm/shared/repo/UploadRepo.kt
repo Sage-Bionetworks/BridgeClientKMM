@@ -4,7 +4,6 @@ import co.touchlab.kermit.Logger
 import co.touchlab.stately.ensureNeverFrozen
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.Instant
@@ -13,9 +12,7 @@ import kotlinx.datetime.plus
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.sagebionetworks.bridge.kmm.shared.apis.UploadsApi
-import org.sagebionetworks.bridge.kmm.shared.cache.Resource
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
-import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
 import org.sagebionetworks.bridge.kmm.shared.cache.loadResource
 import org.sagebionetworks.bridge.kmm.shared.models.UploadFile
@@ -71,14 +68,15 @@ internal open class UploadRepo(
     }
 
     /**
-     * Remove the [UploadFile] from the local cache and send "upload complete" message to Bridge.
-     * This is called after successfully uploading to S3.
+     * Remove the [UploadFile] from the local cache and mark the upload session as "completed"
+     * by setting `needSave = true`. This is called after successfully uploading to S3.
      *
      * Note: Deleting the file must be handled natively as a part of S3 upload rather than using
-     * expect/actually. This is done b/c on iOS, the file path can change with OS version changes
-     * and the [UploadFile] only keeps a pointer to the invariant file path. syoung 07/14/2023
+     * expect/actually. This is done b/c on iOS coordinating file read/write is much more
+     * complicated - the file location can change with app or OS updates and synchronization is
+     * a bit brittle. It's less confusing to handle this in Swift. syoung 07/14/2023
      */
-    suspend fun didFinishUploadFile(uploadFile: UploadFileIdentifiable, uploadSessionId: String?) {
+    fun markUploadFileFinished(uploadFile: UploadFileIdentifiable) {
         val resourceId = uploadFile.getUploadSessionResourceId()
         val resource = database.getResource(resourceId, ResourceType.UPLOAD_SESSION,
             ResourceDatabaseHelper.APP_WIDE_STUDY_ID
@@ -93,7 +91,6 @@ internal open class UploadRepo(
                 ResourceDatabaseHelper.APP_WIDE_STUDY_ID
             )
         }
-        completeUploadSession(uploadSessionId, resourceId)
     }
 
     /**

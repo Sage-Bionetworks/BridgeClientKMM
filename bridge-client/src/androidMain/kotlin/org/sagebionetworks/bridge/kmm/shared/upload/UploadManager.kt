@@ -3,7 +3,6 @@ package org.sagebionetworks.bridge.kmm.shared.upload
 import co.touchlab.kermit.Logger
 import io.ktor.client.*
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.datetime.*
 import okio.FileSystem
 import okio.Path.Companion.toPath
 import org.sagebionetworks.bridge.kmm.shared.apis.S3UploadApi
@@ -12,6 +11,7 @@ import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
 import org.sagebionetworks.bridge.kmm.shared.cache.loadResource
 import org.sagebionetworks.bridge.kmm.shared.models.UploadFile
 import org.sagebionetworks.bridge.kmm.shared.models.UploadSession
+import org.sagebionetworks.bridge.kmm.shared.models.getUploadSessionResourceId
 import org.sagebionetworks.bridge.kmm.shared.repo.UploadRepo
 
 internal class UploadManager(
@@ -59,6 +59,7 @@ internal class UploadManager(
         val uploadSession = getUploadSession(uploadFile)
         uploadSession?.let {
             uploadToS3(uploadFile, uploadSession)
+            completeUploadSession(uploadSession.id, uploadFile.getUploadSessionResourceId())
         }
     }
 
@@ -68,7 +69,7 @@ internal class UploadManager(
             Logger.d("uploadingToS3 $uploadFile")
             s3UploadApi.uploadFile(uploadSession.url, uploadFile) //TODO: Handle network exceptions -nbrown 4/26/21
             FileSystem.SYSTEM.delete(uploadFile.filePath.toPath()) //TODO: Handle delete failure -nbrown 12/16/20
-            didFinishUploadFile(uploadFile, uploadSession.id)
+            markUploadFileFinished(uploadFile)
         } catch (error: Throwable) {
             Logger.e("Error uploadingToS3 $uploadFile", error)
 

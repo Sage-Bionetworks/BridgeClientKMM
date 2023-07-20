@@ -21,7 +21,8 @@ class AssessmentArchiver(
     private val assessmentResult: Result,
     private val jsonCoder: Json,
     private val bridgeConfig: BridgeConfig,
-    private val assessmentResultFilename: String // Used when result is of type AssessmentResult
+    // To serialize assessmentResult as part of archive, include a filename for the result.
+    private val assessmentResultFilename: String? = null // Used when result is of type AssessmentResult
 ) {
 
     private val manifest: MutableSet<ArchiveFileInfo> = mutableSetOf()
@@ -40,7 +41,7 @@ class AssessmentArchiver(
         recursiveAdd(assessmentResult)
 
         //Add assessment result file to archive
-        if (assessmentResult is AssessmentResult) {
+        if (assessmentResult is AssessmentResult && assessmentResultFilename != null) {
             Logger.d("Writing result for assessment ${assessmentResult.identifier}")
             archiveBuilder.addDataFile(
                 JsonArchiveFile(
@@ -103,19 +104,16 @@ class AssessmentArchiver(
         val identifier = result.identifier
         val path = "$pathSuffix$identifier"
 
-        when (result) {
-            is BranchNodeResult -> {
-                addBranchResults(result, path)
-            }
-            is CollectionResult -> {
-                recursiveAddFiles(result.inputResults, path)
-            }
-            is JsonFileArchivableResult -> {
-                addJsonFileArchivableResult(result, path)
-            }
-            is FileResult -> {
-                addFileResult(result, path)
-            }
+        if (result is BranchNodeResult) {
+            addBranchResults(result, path)
+        } else if (result is CollectionResult) {
+            recursiveAddFiles(result.inputResults, path)
+        }
+        if (result is JsonFileArchivableResult) {
+            addJsonFileArchivableResult(result, path)
+        }
+        if (result is FileResult) {
+            addFileResult(result, path)
         }
     }
 

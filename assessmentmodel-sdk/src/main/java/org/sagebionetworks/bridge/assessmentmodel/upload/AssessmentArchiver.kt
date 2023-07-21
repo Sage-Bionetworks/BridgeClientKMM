@@ -17,6 +17,11 @@ import org.sagebionetworks.bridge.data.JsonArchiveFile
 import org.sagebionetworks.bridge.kmm.shared.BridgeConfig
 import java.io.File
 
+/**
+ * To serialize results of type [AssessmentResult] using the specified [jsonCoder], include a non-null [assessmentResultFilename].
+ * For Results that have their own serialization format and implement [JsonFileArchivableResult] or
+ * [FileResult], specify a null [assessmentResultFilename].
+ */
 class AssessmentArchiver(
     private val assessmentResult: Result,
     private val jsonCoder: Json,

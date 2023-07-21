@@ -2796,6 +2796,38 @@ class ScheduleTimelineRepoTest: BaseTest() {
     }
 
     @Test
+    fun testBMC337LatestScheduledAssessmentAdherence() {
+        runTest {
+
+            val studyId = "cxhnxd"
+            val eventTimeStamp = Instant.parse("2022-04-08T19:54:36.184Z")
+            val repo = getTestScheduleTimelineRepo(
+                adherenceRecordJson = bmc337AdherenceRecordJson,
+                timeStamp = eventTimeStamp,
+                timelineJson = getbmc337TimelineJson(eventTimeStamp))
+            repo.adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)
+            repo.updateScheduleIfNeeded(studyId)
+
+            val scheduledAssessmentAdherenceExpected = mapOf(
+                "fnameb" to "2022-04-08T20:30:03.790Z",
+                "number-match" to "2022-04-08T20:24:49.492Z",
+                "dccs" to "2022-04-08T20:22:54.061Z",
+                "fnamea" to "2022-04-08T20:20:43.716Z",
+                "flanker" to "2022-04-08T20:18:03.588Z",
+                "psm" to "2022-04-08T20:14:35.868Z",
+                "spelling" to "2022-04-08T20:06:05.677Z",
+                "memory-for-sequences" to "2022-04-08T20:02:36.506Z",
+                "vocabulary" to "2022-04-08T19:58:49.566Z"
+                )
+            scheduledAssessmentAdherenceExpected.forEach {
+                val scheduledAssessmentAdherence = repo.getLatestScheduledAssessmentAdherence(studyId, it.key)
+                assertNotNull(scheduledAssessmentAdherence)
+                assertEquals(it.value, scheduledAssessmentAdherence.finishedOn)
+            }
+        }
+    }
+
+    @Test
     fun test_createStudyBurst() {
         runTest {
             val tz = TimeZone.currentSystemDefault()

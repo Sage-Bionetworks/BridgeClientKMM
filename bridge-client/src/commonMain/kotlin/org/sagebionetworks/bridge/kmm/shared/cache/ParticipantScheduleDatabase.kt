@@ -54,6 +54,13 @@ class ParticipantScheduleDatabase(val databaseHelper: ResourceDatabaseHelper) {
         }
     }
 
+    internal fun getLatestScheduledAssessmentAdherence(
+        studyId: String,
+        assessmentIdentifier: String
+    ): ScheduledAssessmentAdherence? {
+        return dbQuery.latestScheduledAssessmentAdherenceById(studyId, assessmentIdentifier).executeAsOneOrNull()
+    }
+
     fun getCachedPendingNotifications(studyId: String, nowInstant: Instant) : List<ScheduledNotification> {
         val nowString = nowInstant.toLocalDateTime(TimeZone.currentSystemDefault()).toString()
         val notificationList = dbQuery.futurePendingNotifications(studyId, nowString).executeAsList().toSet().toList()

@@ -110,14 +110,17 @@ public struct GenericTodayWrapperView<TodayFinishedContent : TodayFinishedViewPr
     @ViewBuilder
     private func singleCardView(_ session: TodayTimelineSession, _ assessment: TodayTimelineAssessment) -> some View {
         if (session.persistent || !(assessment.isDeclined || assessment.isCompleted)) {
-            AssessmentTimelineCardView(assessment)
-                .onTapGesture {
-                    guard assessment.isEnabled else { return }
-                    self.viewModel.selectedAssessment = assessment.assessmentScheduleInfo
-                    self.viewModel.isPresentingAssessment = true
-                }
-                .transition(.exitStageLeft)
-                .animation(.easeOut(duration: 1))
+            Button(action: {
+                guard assessment.isEnabled else { return }
+                self.viewModel.selectedAssessment = assessment.assessmentScheduleInfo
+                self.viewModel.isPresentingAssessment = true
+            }) {
+                AssessmentTimelineCardView(assessment)
+            }
+            .transition(.exitStageLeft)
+            .animation(.easeOut(duration: 1))
+            .accessibilityLabel(assessment.assessmentInfo.label)
+            .accessibilityIdentifier(assessment.assessmentInfo.identifier)
         }
     }
 

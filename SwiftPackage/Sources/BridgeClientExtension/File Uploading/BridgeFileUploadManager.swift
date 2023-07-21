@@ -13,7 +13,9 @@ import JsonModel
 import UIKit
 #endif
 
-protocol BridgeFileUploadMetadataBlob {}
+protocol BridgeFileUploadMetadataBlob {
+    var userInfo: [String : Any]? { get }
+}
 protocol BridgeUploadTrackingData : Codable {
     var userInfo: [String : Any]? { get }
 }
@@ -411,7 +413,7 @@ extension BridgeFileUploadAPITyped {
         // throw this over to the main queue so we can access Kotlin stuff
         OperationQueue.main.addOperation {
             guard let sessionToken = uploadManager.appManager.sessionToken else {
-                Logger.log(severity: .warn, tag: .upload, message: "Unable to request an upload URL from Bridge--not logged in to an account.")
+                Logger.log(tag: .upload, error: BridgeAuthError(), metadata: uploadMetadata.userInfo)
                 return
             }
             
@@ -531,11 +533,19 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         super.init()
         
         self.netManager.backgroundTransferDelegate = self
+    }
+    
+    internal var appDidBecomeActiveObserver: Any?
+    
+    internal func onSessionTokenChanged() {
         
         #if canImport(UIKit)
-        // Set up a listener to retry temporarily-failed uploads whenever the app becomes active
-        NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: nil) { notification in
-            self.checkAndRetryOrphanedUploads()
+        if appDidBecomeActiveObserver == nil {
+            // Set up a listener to retry temporarily-failed uploads whenever the app becomes active
+            self.appDidBecomeActiveObserver = NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: nil) { notification in
+                Logger.log(severity: .info, message: "App became active. Calling checkAndRetryOrphanedUploads()")
+                self.checkAndRetryOrphanedUploads()
+            }
         }
         #endif
         
@@ -665,11 +675,13 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
                 do {
                     mapping = try DictionaryDecoder().decode(type, from: mappingPlist)
                 } catch let error {
-                    Logger.log(severity: .error, tag: .upload, message: "Error attempting to decode plist object to \(T.self):\n\(mappingPlist)\n\(error)")
+                    Logger.log(tag: .upload, error: error, message: "Error attempting to decode plist object to \(T.self):\n\(mappingPlist)")
                 }
             }
+            else {
+                Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .missingMapping, message: "in retrieveMapping: Missing mapping for \(key)"))
+            }
         }
-
         return mapping
     }
 
@@ -999,13 +1011,16 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         // App extensions are severely memory constrained, so don't even try this if we're in one.
         guard !self.netManager.isRunningInAppExtension() else { return }
         
+        // Do not attempt to check and retry orphaned uploads if the session token isn't set up.
+        guard self.appManager?.sessionToken != nil else { return }
+        
         self.netManager.backgroundSession().getAllTasks { tasks in
             var tasks = tasks
             let defaults = self.userDefaults
             
             // Get the set of all temp files for which there is a currently-active background
             // URLSession task.
-            let filesInFlight = Set(tasks.map { $0.description })
+            var filesInFlight = Set(tasks.map { $0.description })
             
             // Get the mappings from temp file to original file for all in-progress uploads.
             let fileUploads = defaults.dictionary(forKey: self.bridgeFileUploadsKey) ?? [String : Any]()
@@ -1018,10 +1033,19 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
             for invariantFilePath in uploadURLsRequested.keys {
                 guard let api = self.apiFromXAttrs(for: invariantFilePath) else { continue }
                 guard let metadataBlob = api.retrieveMetadata(from: invariantFilePath, mappings: uploadURLsRequested) else { continue }
-                // Assume files with an active urlsession task are not (yet) orphaned, no matter how old.
-                guard !filesInFlight.contains(invariantFilePath) else { continue }
+
                 var fileUrl: URL!
-                guard self.fileIsADayOld(invariantFilePath: invariantFilePath, fileUrl: &fileUrl) else { continue }
+                guard self.fileIsADayOld(invariantFilePath: invariantFilePath, fileUrl: &fileUrl)
+                else {
+                    Logger.log(severity: .info, message: "checkForOrphanedUploads: Exiting upload request resend - file is less than a day old.")
+                    continue
+                }
+                
+                // If there is a file in-flight then something went wrong. Cancel before resending
+                if let inflight = tasks.first(where: { $0.description == invariantFilePath }) {
+                    inflight.cancel()
+                    filesInFlight.remove(invariantFilePath)
+                }
                 
                 // If we get all the way here, touch the file to reset the orphanage clock
                 // and then send the upload request again.
@@ -1135,7 +1159,7 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
     
     /// Call this function to check for and retry any orphaned uploads, and update the app's isUploading state  accordingly.
     public func checkAndRetryOrphanedUploads() {
-        Logger.log(severity: .info, message: "Checking for orphaned uploads")
+        Logger.log(severity: .info, message: "in checkAndRetryOrphanedUploads()")
         // This needs to start out from the main queue to avoid an EXC_BAD_ACCESS crash in
         // checkForOrphanedUploads(), but we also need that function to do its thing before
         // continuing on here and we don't want to potentially deadlock by popping out
@@ -1563,6 +1587,22 @@ extension URL {
     }
 }
 
+struct BridgeAuthError : Error, CustomNSError {
+    static var errorDomain: String { "BridgeClientUI.AuthError" }
+    
+    let errorCode: Int
+    let message: String
+    
+    init(errorCode: Int = -1, message: String = "Not logged in to an account.") {
+        self.errorCode = errorCode
+        self.message = message
+    }
+    
+    var errorUserInfo: [String : Any] {
+        [NSLocalizedFailureReasonErrorKey: message]
+    }
+}
+
 struct BridgeHttpError : Error, CustomNSError {
     static var errorDomain: String { "BridgeClientUI.HttpError" }
     
@@ -1597,5 +1637,6 @@ struct BridgeUnexpectedNullError : Error, CustomNSError {
         case invalidURL = -105
         case corruptData = -106
         case missingMetadata = -107
+        case missingMapping = -108
     }
 }

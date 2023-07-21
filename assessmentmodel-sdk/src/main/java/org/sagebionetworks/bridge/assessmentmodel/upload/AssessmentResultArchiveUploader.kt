@@ -49,7 +49,7 @@ class AssessmentResultArchiveUploader(
                                     assessmentInstanceId: String,
                                     eventTimestamp: String,
                                     startedOn: Instant,
-                                    assessmentResultFilename: String = "assessmentResult.json",
+                                    assessmentResultFilename: String? = "assessmentResult.json",
                                     sessionWindowExpiration: kotlinx.datetime.Instant? = null) {
 
         val archiver = AssessmentArchiver(

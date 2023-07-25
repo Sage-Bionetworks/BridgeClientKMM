@@ -1,13 +1,9 @@
-package org.sagebionetworks.bridge.kmm.shared
+package org.sagebionetworks.bridge.kmm.shared.managers
 
-import co.touchlab.sqliter.DatabaseConfiguration
-import co.touchlab.sqliter.createDatabaseManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.datetime.*
 import kotlinx.serialization.json.JsonElement
@@ -17,6 +13,7 @@ import org.koin.core.component.inject
 import org.sagebionetworks.bridge.kmm.shared.cache.*
 import org.sagebionetworks.bridge.kmm.shared.models.*
 import org.sagebionetworks.bridge.kmm.shared.repo.*
+import org.sagebionetworks.bridge.kmm.shared.toNSData
 import platform.Foundation.*
 
 class NativeTimelineStudyBurstManager(

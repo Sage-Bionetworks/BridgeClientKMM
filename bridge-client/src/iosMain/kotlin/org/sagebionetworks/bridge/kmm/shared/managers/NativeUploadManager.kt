@@ -1,26 +1,14 @@
-package org.sagebionetworks.bridge.kmm.shared.upload
+package org.sagebionetworks.bridge.kmm.shared.managers
 
-import co.touchlab.kermit.Logger
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
-import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus
-import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
-import org.sagebionetworks.bridge.kmm.shared.cache.loadResource
 import org.sagebionetworks.bridge.kmm.shared.models.S3UploadSession
 import org.sagebionetworks.bridge.kmm.shared.models.UploadFile
 import org.sagebionetworks.bridge.kmm.shared.models.UploadFileId
-import org.sagebionetworks.bridge.kmm.shared.models.UploadFileIdentifiable
-import org.sagebionetworks.bridge.kmm.shared.models.UploadSession
-import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
 import org.sagebionetworks.bridge.kmm.shared.repo.*
-import platform.Foundation.NSError
 
 open class NativeUploadManager(
     private val studyId: String,
@@ -45,9 +33,8 @@ open class NativeUploadManager(
 
     fun queueAndRequestUploadSession(uploadFile: UploadFile, callBack: (S3UploadSession?) -> Unit) {
         scope.launch {
-            repo.database.storeUploadFile(uploadFile)
             try {
-                val uploadSession = repo.getS3UploadSession(uploadFile)
+                val uploadSession = repo.queueAndRequestUploadSession(uploadFile)
                 callBack(uploadSession)
             } catch (_: Throwable) {
                 callBack(null)

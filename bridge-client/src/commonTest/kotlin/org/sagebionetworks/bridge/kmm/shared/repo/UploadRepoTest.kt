@@ -28,6 +28,7 @@ import org.sagebionetworks.bridge.kmm.shared.models.UploadFileIdentifiable
 import org.sagebionetworks.bridge.kmm.shared.models.UploadSession
 import org.sagebionetworks.bridge.kmm.shared.models.UploadStatus
 import org.sagebionetworks.bridge.kmm.shared.models.UploadValidationStatus
+import org.sagebionetworks.bridge.kmm.shared.models.getUploadFileResourceId
 import org.sagebionetworks.bridge.kmm.shared.models.getUploadSessionResourceId
 import org.sagebionetworks.bridge.kmm.shared.randomUUID
 import org.sagebionetworks.bridge.kmm.shared.testDatabaseDriver
@@ -40,8 +41,6 @@ import kotlin.test.assertTrue
 
 class UploadRepoTest : BaseTest() {
 
-    // List of methods that still need tests
-//    fun getUploadFiles(): List<UploadFile>
 
     fun mockUploadSession(expires: Instant): UploadSession {
         return UploadSession(
@@ -52,13 +51,46 @@ class UploadRepoTest : BaseTest() {
         )
     }
 
+    fun mockUploadFile(): UploadFile {
+        return UploadFile(
+            randomUUID(),
+            "application/zip",
+            1024,
+            randomUUID(),
+        )
+    }
+
+    @Test
+    fun testGetUploadFiles() {
+        runBlocking {
+            val mockEngine = MockEngine.config {
+                // Should never be called
+                addHandler { respondError(HttpStatusCode.ExpectationFailed) }
+                
+                reuseHandlers = false
+            }
+            val testClient = getTestClient(mockEngine)
+            val testDatabaseHelper = ResourceDatabaseHelper(testDatabaseDriver())
+            val repo = UploadRepo(testClient, testDatabaseHelper, MainScope())
+            val database = repo.database
+
+            val uploadFile1 = mockUploadFile()
+            val uploadFile2 = mockUploadFile()
+            database.storeUploadFile(uploadFile1)
+            database.storeUploadFile(uploadFile2)
+
+            val expected: Set<UploadFile> = setOf(uploadFile1, uploadFile2)
+            val uploadFiles: Set<UploadFile> = repo.getUploadFiles().toSet()
+            assertEquals(expected, uploadFiles)
+
+        }
+    }
+
     @Test
     fun testS3UploadSession_HappyPath() {
         runBlocking {
 
             // Run through a "happy path" where everything is online.
-
-            val tempFile = "tempFile.txt"
 
             val expires = Clock.System.now().plus(
                 24,
@@ -85,24 +117,19 @@ class UploadRepoTest : BaseTest() {
             val repo = UploadRepo(testClient, testDatabaseHelper, MainScope())
             val database = repo.database
 
-            val uploadFile = UploadFile(tempFile,
-                "application/zip",
-                1024,
-                "md5Hash",
-            )
-
+            val uploadFile = mockUploadFile()
             val response = repo.queueAndRequestUploadSession(uploadFile)
             assertNotNull(response)
 
             val expectedS3UploadSession = S3UploadSession(
-                filePath = tempFile,
+                filePath = uploadFile.filePath,
                 contentType = "application/zip",
                 uploadSessionId = sessionId,
                 url = uploadSession.url,
                 requestHeaders = mapOf(
                     "Content-Length" to "1024",
                     "Content-Type" to "application/zip",
-                    "Content-MD5" to "md5Hash"
+                    "Content-MD5" to uploadFile.md5Hash!!
                 )
             )
 
@@ -112,7 +139,7 @@ class UploadRepoTest : BaseTest() {
             assertEquals(1L, initialCount)
 
             // Pretend to upload the S3 file by marking it as finished
-            repo.markUploadFileFinished(UploadFileId(tempFile))
+            repo.markUploadFileFinished(UploadFileId(uploadFile.filePath))
 
             val afterUploadCount = database.getPendingUploadCount()
             assertEquals(1L, afterUploadCount)
@@ -135,8 +162,6 @@ class UploadRepoTest : BaseTest() {
             // Run through the first part of a case where the upload is offline when the file
             // is queued.
 
-            val tempFile = "tempFile.txt"
-
             val mockEngine = MockEngine.config {
                 // 1 - getUploadSession call timeout
                 addHandler { respondError(HttpStatusCode.GatewayTimeout) }
@@ -147,12 +172,7 @@ class UploadRepoTest : BaseTest() {
             val testDatabaseHelper = ResourceDatabaseHelper(testDatabaseDriver())
             val repo = UploadRepo(testClient, testDatabaseHelper, MainScope())
 
-            val uploadFile = UploadFile(tempFile,
-                "application/zip",
-                1024,
-                "md5Hash",
-            )
-
+            val uploadFile = mockUploadFile()
             val response = repo.queueAndRequestUploadSession(uploadFile)
             assertNull(response)
         }
@@ -165,12 +185,8 @@ class UploadRepoTest : BaseTest() {
             // Run through a case where an upload to S3 fails because the initial upload fails and
             // a retry is attempted after the session expires.
 
-            val tempFile = "tempFile.txt"
-            val uploadFile = UploadFile(tempFile,
-                "application/zip",
-                1024,
-                "md5Hash",
-            )
+            val uploadFile = mockUploadFile()
+            val tempFile = uploadFile.filePath
             val now = Clock.System.now()
             val expires = now.plus(
                 20,
@@ -218,7 +234,7 @@ class UploadRepoTest : BaseTest() {
                 requestHeaders = mapOf(
                     "Content-Length" to "1024",
                     "Content-Type" to "application/zip",
-                    "Content-MD5" to "md5Hash"
+                    "Content-MD5" to uploadFile.md5Hash!!
                 )
             )
 
@@ -236,12 +252,8 @@ class UploadRepoTest : BaseTest() {
             // Run through a case where an upload to S3 fails because the initial upload fails and
             // a retry is attempted after the session expires.
 
-            val tempFile = "tempFile.txt"
-            val uploadFile = UploadFile(tempFile,
-                "application/zip",
-                1024,
-                "md5Hash",
-            )
+            val uploadFile = mockUploadFile()
+            val tempFile = uploadFile.filePath
             val past = Clock.System.now().minus(
                 2,
                 DateTimeUnit.DAY,
@@ -298,7 +310,7 @@ class UploadRepoTest : BaseTest() {
                 requestHeaders = mapOf(
                     "Content-Length" to "1024",
                     "Content-Type" to "application/zip",
-                    "Content-MD5" to "md5Hash"
+                    "Content-MD5" to uploadFile.md5Hash!!
                 )
             )
 

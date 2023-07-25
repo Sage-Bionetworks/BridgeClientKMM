@@ -272,7 +272,7 @@ extension BridgeFileUploadManagerTestCaseTyped {
         self.mockURLSession.set(downloadFileUrl: successResponseUrl, error: nil, for: endpoint, httpMethod: "POST")
         
         // -- set up the S3 upload success response
-        self.mockURLSession.set(json: [:], responseCode: 200, for: s3url, httpMethod: "PUT")
+        self.mockURLSession.set(json: Dictionary<String, Any>(), responseCode: 200, for: s3url, httpMethod: "PUT")
         
         // -- set up the "upload completed" api call response
         if self.uploadApi.notifiesBridgeWhenUploaded {
@@ -300,7 +300,7 @@ extension BridgeFileUploadManagerTestCaseTyped {
                 return
             }
             let notifyBridgeEndpoint = "/\(notifyBridgeUrlString)"
-            self.mockURLSession.set(json: [:], responseCode: 200, for: notifyBridgeEndpoint, httpMethod: "POST")
+            self.mockURLSession.set(json: Dictionary<String, Any>(), responseCode: 200, for: notifyBridgeEndpoint, httpMethod: "POST")
             self.mockURLSession.set(downloadFileUrl: uploadCompleteResponseUrl, error: nil, for: notifyBridgeEndpoint, httpMethod: "POST")
         }
         
@@ -437,7 +437,7 @@ extension BridgeFileUploadManagerTestCaseTyped {
         self.mockURLSession.set(downloadFileUrl: successResponseUrl, error: nil, for: endpoint, httpMethod: "POST")
         
         // -- set up the S3 upload success response
-        self.mockURLSession.set(json: [:], responseCode: 200, for: s3url, httpMethod: "PUT")
+        self.mockURLSession.set(json: Dictionary<String, Any>(), responseCode: 200, for: s3url, httpMethod: "PUT")
         
         // -- set up the "upload completed" api call response
         if self.uploadApi.notifiesBridgeWhenUploaded {
@@ -465,7 +465,7 @@ extension BridgeFileUploadManagerTestCaseTyped {
                 return
             }
             let notifyBridgeEndpoint = "/\(notifyBridgeUrlString)"
-            self.mockURLSession.set(json: [:], responseCode: 200, for: notifyBridgeEndpoint, httpMethod: "POST")
+            self.mockURLSession.set(json: Dictionary<String, Any>(), responseCode: 200, for: notifyBridgeEndpoint, httpMethod: "POST")
             self.mockURLSession.set(downloadFileUrl: uploadCompleteResponseUrl, error: nil, for: notifyBridgeEndpoint, httpMethod: "POST")
         }
         
@@ -603,7 +603,7 @@ extension BridgeFileUploadManagerTestCaseTyped {
                 return
             }
             let notifyBridgeEndpoint = "/\(notifyBridgeUrlString)"
-            self.mockURLSession.set(json: [:], responseCode: 200, for: notifyBridgeEndpoint, httpMethod: "POST")
+            self.mockURLSession.set(json: Dictionary<String, Any>(), responseCode: 200, for: notifyBridgeEndpoint, httpMethod: "POST")
             self.mockURLSession.set(downloadFileUrl: uploadCompleteResponseUrl, error: nil, for: notifyBridgeEndpoint, httpMethod: "POST")
         }
 

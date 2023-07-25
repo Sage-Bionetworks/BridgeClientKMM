@@ -10,26 +10,13 @@ import org.sagebionetworks.bridge.kmm.shared.models.UploadFile
 import org.sagebionetworks.bridge.kmm.shared.models.UploadFileId
 import org.sagebionetworks.bridge.kmm.shared.repo.*
 
-open class NativeUploadManager(
-    private val studyId: String,
-    private val updatePendingUploadCount: (Long) -> Unit
+class NativeUploadManager(
+    private val studyId: String
 ) : KoinComponent {
 
     private val repo : UploadRepo by inject(mode = LazyThreadSafetyMode.NONE)
     private val adherenceRecordRepo : AdherenceRecordRepo by inject(mode = LazyThreadSafetyMode.NONE)
-
     private val scope = MainScope()
-
-    private var pendingCountJob: Job? = null
-
-    fun observePendingUploadCount() {
-        runCatching { pendingCountJob?.cancel() }
-        pendingCountJob = scope.launch {
-            repo.database.getPendingUploadCountAsFlow().collect {
-                updatePendingUploadCount(it)
-            }
-        }
-    }
 
     fun queueAndRequestUploadSession(uploadFile: UploadFile, callBack: (S3UploadSession?) -> Unit) {
         scope.launch {
@@ -80,5 +67,23 @@ open class NativeUploadManager(
         }
     }
 
+}
+
+class PendingUploadObserver(
+    private val updatePendingUploadCount: (Long) -> Unit
+) : KoinComponent {
+
+    private val repo: UploadRepo by inject(mode = LazyThreadSafetyMode.NONE)
+    private val scope = MainScope()
+    private var pendingCountJob: Job? = null
+
+    fun observePendingUploadCount() {
+        runCatching { pendingCountJob?.cancel() }
+        pendingCountJob = scope.launch {
+            repo.database.getPendingUploadCountAsFlow().collect {
+                updatePendingUploadCount(it)
+            }
+        }
+    }
 }
 

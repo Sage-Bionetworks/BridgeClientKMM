@@ -24,22 +24,22 @@ struct ParticipantFile: Codable, BridgeUploadTrackingData {
 
 extension Notification.Name {
     /// Notification name posted by the `BridgeFileUploadManager` when a participant file upload completes.
-    public static let SBBParticipantFileUploaded = Notification.Name(rawValue: "SBBParticipantFileUploaded")
+    static let SBBParticipantFileUploaded = Notification.Name(rawValue: "SBBParticipantFileUploaded")
 
     /// Notification name posted by the `BridgeFileUploadManager` when a participant file upload request to Bridge fails.
-    public static let SBBParticipantFileUploadRequestFailed = Notification.Name(rawValue: "SBBParticipantFileUploadRequestFailed")
+    static let SBBParticipantFileUploadRequestFailed = Notification.Name(rawValue: "SBBParticipantFileUploadRequestFailed")
 
     /// Notification name posted by the `BridgeFileUploadManager` when a participant file upload attempt to S3 fails unrecoverably.
-    public static let SBBParticipantFileUploadToS3Failed = Notification.Name(rawValue: "SBBParticipantFileUploadToS3Failed")
+    static let SBBParticipantFileUploadToS3Failed = Notification.Name(rawValue: "SBBParticipantFileUploadToS3Failed")
 }
 
-public class ParticipantFileUploadAPI: BridgeFileUploadAPITyped {
+class ParticipantFileUploadAPI: BridgeFileUploadAPITyped {
     typealias TrackingType = ParticipantFile
     typealias UploadRequestType = ParticipantFile
     typealias UploadRequestResponseType = ParticipantFile
     
     /// A singleton instance of the API.
-    public static let shared = ParticipantFileUploadAPI()
+    static let shared = ParticipantFileUploadAPI()
 
     /// The Notification.userInfo key for the uploaded file's ParticipantFile object from Bridge.
     let participantFileKey = "ParticipantFile"
@@ -51,13 +51,13 @@ public class ParticipantFileUploadAPI: BridgeFileUploadAPITyped {
     /// DELETE the uploaded file, or GET it back (via redirect).
     let requestUrlKey = "RequestUrl"
 
-    public private(set) var apiString: String = "v3/participants/self/files/"
+    private(set) var apiString: String = "v3/participants/self/files/"
     
-    public private(set) var tempUploadDirURL: URL
+    private(set) var tempUploadDirURL: URL
     
-    public private(set) var notifiesBridgeWhenUploaded: Bool = false
+    private(set) var notifiesBridgeWhenUploaded: Bool = false
     
-    public private(set) var uploadManager: BridgeFileUploadManager
+    private(set) var uploadManager: BridgeFileUploadManager
     
     /// Private initializer so only the singleton can ever get created.
     private init() {

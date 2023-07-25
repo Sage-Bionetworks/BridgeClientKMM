@@ -245,7 +245,7 @@ protocol BridgeFileUploadAPI {
     @discardableResult
     func dequeueForRetry(relativePath: String) -> BridgeFileRetryInfoBlob?
     
-    /// This method is the public face of the Bridge upload APIs.
+    /// This method is the face of the Bridge upload APIs.
     func upload(fileId: String, fileUrl: URL, contentType: String?, extras: Codable?)
     
     /// Behaves identically to `upload(fileId:fileUrl:contentType:extras:)` but
@@ -313,7 +313,7 @@ extension BridgeFileUploadAPITyped {
         return self.uploadManager.removeMapping(BridgeFileUploadMetadata<TrackingType>.self, from: relativePath, defaultsKey: self.uploadManager.uploadingToS3Key)
     }
     
-    // Not exposed in public API; cast uploadApi to BridgeFileUploadAPITyped to use this function.
+    // Not exposed in API; cast uploadApi to BridgeFileUploadAPITyped to use this function.
     func retrieveMetadata(from key: String, mappings: [String : Any]?) -> BridgeFileUploadMetadataBlob? {
         return self.uploadManager.retrieveMapping(BridgeFileUploadMetadata<TrackingType>.self, from: key, mappings: mappings)
     }
@@ -380,15 +380,15 @@ extension BridgeFileUploadAPITyped {
         return self.uploadManager.dequeueForRetry(TrackingType.self, relativePath: relativePath)
     }
 
-    public func upload(fileId: String, fileUrl: URL, contentType: String? = nil, extras: Codable? = nil) {
+    func upload(fileId: String, fileUrl: URL, contentType: String? = nil, extras: Codable? = nil) {
         self.uploadManager.upload(TrackingType.self, uploadApi: self, fileId: fileId, fileUrl: fileUrl, contentType: contentType, extras: extras)
     }
 
-    public func uploadInternal(fileId: String, fileUrl: URL, contentType: String? = nil, extras: Codable? = nil) -> URL? {
+    func uploadInternal(fileId: String, fileUrl: URL, contentType: String? = nil, extras: Codable? = nil) -> URL? {
         return self.uploadManager.uploadInternal(TrackingType.self, uploadApi: self, fileId: fileId, fileUrl: fileUrl, contentType: contentType, extras: extras)
     }
     
-    public func sendUploadRequest(for relativePath: String, uploadMetadata: BridgeFileUploadMetadataBlob) {
+    func sendUploadRequest(for relativePath: String, uploadMetadata: BridgeFileUploadMetadataBlob) {
         // Get the bridge upload object
         guard let bridgeUploadObject = self.uploadRequestObject(for: uploadMetadata) as? UploadRequestType else {
             Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .wrongType, message: "Unable to get upload request object (type \(UploadRequestType.self)) from uploadMetadata: \(uploadMetadata)"))
@@ -416,7 +416,7 @@ extension BridgeFileUploadAPITyped {
         }
     }
     
-    public func notifyBridgeUploadSucceeded(relativePath: String, uploadMetadata: BridgeFileUploadMetadataBlob) {
+    func notifyBridgeUploadSucceeded(relativePath: String, uploadMetadata: BridgeFileUploadMetadataBlob) {
         guard let notifyUrl = self.notifyBridgeUrlString(for: uploadMetadata) else {
             // Do not log any error. Logging is handled by the method called if it is an error. - syoung 02/13/2022
             return
@@ -444,9 +444,9 @@ extension BridgeFileUploadAPITyped {
 /// The BridgeFileUploadManager handles uploading files to Bridge using an iOS URLSession
 /// background session. This allows iOS to deal with any connectivity issues and lets the upload proceed
 /// even when the app is suspended.
-public class BridgeFileUploadManager: SandboxFileManager, URLSessionBackgroundDelegate {
+class BridgeFileUploadManager: SandboxFileManager, URLSessionBackgroundDelegate {
     /// A singleton instance of the manager.
-    public static let shared = BridgeFileUploadManager()
+    static let shared = BridgeFileUploadManager()
     
     /// The extended file attribute for which API is to be used to upload the file.
     let uploadApiAttributeName = "org.sagebionetworks.bridge.uploadApi"
@@ -764,7 +764,7 @@ public class BridgeFileUploadManager: SandboxFileManager, URLSessionBackgroundDe
     }
     
     /// Download delegate method.
-    public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         // get the sandbox-relative path to the temp copy of the participant file
         guard let invariantFilePath = downloadTask.taskDescription else {
             let message = "Finished a download task with no taskDescription set"
@@ -1068,7 +1068,7 @@ public class BridgeFileUploadManager: SandboxFileManager, URLSessionBackgroundDe
     }
     
     /// Call this function to check for and retry any orphaned uploads, and update the app's isUploading state  accordingly.
-    public func checkAndRetryOrphanedUploads() {
+    func checkAndRetryOrphanedUploads() {
         Logger.log(severity: .info, message: "in checkAndRetryOrphanedUploads()")
         // This needs to start out from the main queue to avoid an EXC_BAD_ACCESS crash in
         // checkForOrphanedUploads(), but we also need that function to do its thing before
@@ -1211,7 +1211,7 @@ public class BridgeFileUploadManager: SandboxFileManager, URLSessionBackgroundDe
     }
 
     /// Task delegate method.
-    public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         
         // get the sandbox-relative path to the temp copy of the participant file
         guard let invariantFilePath = task.taskDescription else {
@@ -1307,7 +1307,7 @@ public class BridgeFileUploadManager: SandboxFileManager, URLSessionBackgroundDe
     }
     
     /// Session delegate method.
-    public func urlSession(_ session: URLSession, didBecomeInvalidWithError error: Error?) {
+    func urlSession(_ session: URLSession, didBecomeInvalidWithError error: Error?) {
         guard error != nil else {
             // If the URLSession was deliberately invalidated (i.e., error is nil) then we assume
             // the intention is to cancel and forget all incomplete uploads, including retries.

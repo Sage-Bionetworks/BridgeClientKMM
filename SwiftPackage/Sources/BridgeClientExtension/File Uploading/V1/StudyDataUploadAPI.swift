@@ -55,7 +55,7 @@ struct StudyDataUploadObject: Codable, BridgeUploadTrackingData {
     }
 }
 
-public struct StudyDataUploadExtras: Codable {
+struct StudyDataUploadExtras: Codable {
     var encrypted: Bool?
     var metadata: JsonElement?
     var zipped: Bool?
@@ -63,37 +63,37 @@ public struct StudyDataUploadExtras: Codable {
 
 extension Notification.Name {
     /// Notification name posted by the `BridgeFileUploadManager` when a study file upload completes.
-    public static let SBBStudyFileUploaded = Notification.Name(rawValue: "SBBStudyFileUploaded")
+    static let SBBStudyFileUploaded = Notification.Name(rawValue: "SBBStudyFileUploaded")
     
     /// Notification name posted by the `BridgeFileUploadManager` when a study file upload request to Bridge fails.
-    public static let SBBStudyFileUploadRequestFailed = Notification.Name(rawValue: "SBBStudyFileUploadRequestFailed")
+    static let SBBStudyFileUploadRequestFailed = Notification.Name(rawValue: "SBBStudyFileUploadRequestFailed")
     
     /// Notification name posted by the `BridgeFileUploadManager` when a study file upload attempt to S3 fails unrecoverably.
-    public static let SBBStudyFileUploadToS3Failed = Notification.Name(rawValue: "SBBStudyFileUploadToS3Failed")
+    static let SBBStudyFileUploadToS3Failed = Notification.Name(rawValue: "SBBStudyFileUploadToS3Failed")
     
     /// Notification name posted by the `BridgeFileUploadManager` when attempting to notify Bridge
     /// of a successful upload fails unrecoverably.
-    public static let SBBStudyFileUploadBridgeNotificationFailed = Notification.Name(rawValue: "SBBStudyFileUploadBridgeNotificationFailed")
+    static let SBBStudyFileUploadBridgeNotificationFailed = Notification.Name(rawValue: "SBBStudyFileUploadBridgeNotificationFailed")
 }
 
-public class StudyDataUploadAPI: BridgeFileUploadAPITyped {
+class StudyDataUploadAPI: BridgeFileUploadAPITyped {
     typealias TrackingType = StudyDataUploadObject
     typealias UploadRequestType = UploadRequest
     typealias UploadRequestResponseType = UploadSession
 
     /// A singleton instance of the API.
-    public static let shared = StudyDataUploadAPI()
+    static let shared = StudyDataUploadAPI()
 
     /// The Notification.userInfo key for the uploaded file's fileId.
     let fileNameKey = "FileName"
     
-    public private(set) var apiString: String = "v3/uploads"
+    private(set) var apiString: String = "v3/uploads"
     
-    public private(set) var tempUploadDirURL: URL
+    private(set) var tempUploadDirURL: URL
     
-    public private(set) var notifiesBridgeWhenUploaded: Bool = true
+    private(set) var notifiesBridgeWhenUploaded: Bool = true
     
-    public private(set) var uploadManager: BridgeFileUploadManager
+    private(set) var uploadManager: BridgeFileUploadManager
     
     /// Private initializer so only the singleton can ever get created.
     private init() {

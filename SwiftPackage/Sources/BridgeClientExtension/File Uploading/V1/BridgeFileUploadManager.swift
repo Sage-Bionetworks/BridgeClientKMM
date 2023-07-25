@@ -142,18 +142,6 @@ extension URL {
     }
 }
 
-extension FileManager {
-    func sharedUploadDirectory() throws -> URL {
-        if let appGroupId = BridgeClient.IOSBridgeConfig().appGroupIdentifier,
-           let url = self.containerURL(forSecurityApplicationGroupIdentifier: appGroupId) {
-            return url
-        }
-        else {
-            return try self.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
-        }
-    }
-}
-
 /// BridgeFileUploadAPI is a protocol for BridgeFileUploadManager to call for a given Bridge API as it
 /// progresses through the upload dance.
 protocol BridgeFileUploadAPI {
@@ -456,7 +444,7 @@ extension BridgeFileUploadAPITyped {
 /// The BridgeFileUploadManager handles uploading files to Bridge using an iOS URLSession
 /// background session. This allows iOS to deal with any connectivity issues and lets the upload proceed
 /// even when the app is suspended.
-public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
+public class BridgeFileUploadManager: SandboxFileManager, URLSessionBackgroundDelegate {
     /// A singleton instance of the manager.
     public static let shared = BridgeFileUploadManager()
     
@@ -553,73 +541,19 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
         self.checkAndRetryOrphanedUploads()
     }
     
-    fileprivate func touch(fileUrl: URL) {
-        let coordinator = NSFileCoordinator(filePresenter: nil)
-        coordinator.coordinate(writingItemAt: fileUrl, options: .contentIndependentMetadataOnly, error: nil) { (writeUrl) in
-            do {
-                try FileManager.default.setAttributes([.modificationDate : Date()], ofItemAtPath: writeUrl.path)
-            } catch let err {
-                Logger.log(tag: .upload, error: err, message: "FileManager failed to update the modification date of \(fileUrl)")
-            }
-        }
-    }
-    
-    fileprivate func modificationDate(of fileUrl: URL) -> Date? {
-        let coordinator = NSFileCoordinator(filePresenter: nil)
-        var modDate: Date? = nil
-        coordinator.coordinate(readingItemAt: fileUrl, options: .immediatelyAvailableMetadataOnly, error: nil) { (readUrl) in
-            do {
-                let attributes = try FileManager.default.attributesOfItem(atPath: readUrl.path)
-                modDate = attributes[.modificationDate] as? Date
-            } catch let err {
-                Logger.log(tag: .upload, error: err, message: "FileManager failed to read the modification date of \(fileUrl)")
-            }
-        }
-        return modDate
-    }
-    
     fileprivate func tempFileFor(inFileURL: URL, uploadApi: BridgeFileUploadAPI) -> URL? {
-        // Normalize the file url--i.e. /private/var-->/var (see docs for
-        // resolvingSymlinksInPath, which removes /private as a special case
-        // even though /var is actually a symlink to /private/var in this case).
-        let fileURL = inFileURL.resolvingSymlinksInPath()
-        
-        let filePath = fileURL.path
-        
-        // Use a UUID for the temp file's name
-        let tempFileURL = uploadApi.tempUploadDirURL.appendingPathComponent(UUID().uuidString)
-        
+        guard let (fileURL, tempFileURL) = tempFileFor(inFileURL: inFileURL, uploadDirURL: uploadApi.tempUploadDirURL)
+        else {
+            return nil
+        }
+
         // ...and get its sandbox-relative part since there are circumstances under
         // which the full path might change (e.g. app update, or during debugging--
         // sim vs device, subsequent run of the same app after a new build)
         let invariantTempFilePath = self.sandboxRelativePath(of: tempFileURL)
-
-        // Use a NSFileCoordinator to make a temp local copy so the app can delete
-        // the original as soon as the upload call returns.
-        let coordinator = NSFileCoordinator(filePresenter: nil)
-        var coordError: NSError?
-        var copyError: Any?
-        coordinator.coordinate(readingItemAt: fileURL, options: .forUploading, writingItemAt: tempFileURL, options: NSFileCoordinator.WritingOptions(rawValue: 0), error: &coordError) { (readURL, writeURL) in
-            do {
-                try FileManager.default.copyItem(at: readURL, to: writeURL)
-            } catch let err {
-                Logger.log(tag: .upload, error: err, message: "Error copying upload file \(fileURL) to temp file \(String(describing: invariantTempFilePath)) for upload.")
-                copyError = err
-            }
-        }
-        if copyError != nil {
-            return nil
-        }
-        if let err = coordError {
-            Logger.log(tag: .upload, error: err, message: "File coordinator error copying upload file \(fileURL) to temp file \(String(describing: invariantTempFilePath)) for upload.")
-            return nil
-        }
-        
-        // "touch" the temp file for retry accounting purposes
-        self.touch(fileUrl: tempFileURL)
         
         // Keep track of what file it's a copy of.
-        self.persistMapping(from: invariantTempFilePath, to: filePath, defaultsKey: self.bridgeFileUploadsKey)
+        self.persistMapping(from: invariantTempFilePath, to: fileURL.path, defaultsKey: self.bridgeFileUploadsKey)
         
         return tempFileURL
     }
@@ -722,22 +656,6 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
             for invariantFilePath in invariantFilePaths {
                 self.cleanUpTempFile(filePath: invariantFilePath)
             }
-        }
-    }
-    
-    fileprivate func mimeTypeFor(fileUrl: URL) -> String {
-        if #available(iOS 14.0, *) {
-            guard let typeRef = UTTypeReference(filenameExtension: fileUrl.pathExtension),
-                  let mimeType = typeRef.preferredMIMEType else {
-                return "application/octet-stream"
-            }
-            return mimeType
-        } else {
-            guard let UTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, fileUrl.pathExtension as CFString, nil),
-                  let mimeType = UTTypeCopyPreferredTagWithClass(UTI as! CFString, kUTTagClassMIMEType)?.takeUnretainedValue() else {
-                return "application/octet-stream"
-            }
-            return mimeType as String
         }
     }
     
@@ -994,14 +912,6 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
             task.cancel()
         }
         return notCanceledTasks
-    }
-    
-    fileprivate func fileIsADayOld(invariantFilePath: String, fileUrl: inout URL!) -> Bool {
-        let oneDay: TimeInterval = 60 * 60 * 24
-        let fullPath = self.fullyQualifiedPath(of: invariantFilePath)
-        fileUrl = URL(fileURLWithPath: fullPath)
-        guard let modDate = self.modificationDate(of: fileUrl) else { return false }
-        return Date().timeIntervalSince(modDate) > oneDay
     }
     
     // Check for orphaned uploads and enqueue them for retry. This needs to *not* be run in the
@@ -1488,103 +1398,10 @@ public class BridgeFileUploadManager: NSObject, URLSessionBackgroundDelegate {
     
     func cleanUpTempFile(filePath: String) {
         self.runOnQueue(self.uploadQueue, sync: false) {
-            let fullPath = self.fullyQualifiedPath(of: filePath)
-            guard FileManager.default.fileExists(atPath: fullPath) else {
-                let message = "Unexpected: Attempting to clean up temp file with invariant path '\(filePath) but temp file does not exist at '\(fullPath)"
-                Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .missingFile, message: message))
-                return
-            }
-            let tempFile = URL(fileURLWithPath: fullPath)
-            let coordinator = NSFileCoordinator(filePresenter: nil)
-            var fileCoordinatorError: NSError?
-            coordinator.coordinate(writingItemAt: tempFile, options: .forDeleting, error: &fileCoordinatorError) { fileUrl in
-                do {
-                    try FileManager.default.removeItem(at: fileUrl)
-                } catch let err {
-                    Logger.log(tag: .upload, error: err, message: "Error attempting to remove file at \(fileUrl)")
-                }
-            }
-            if let fileCoordinatorError = fileCoordinatorError {
-                Logger.log(tag: .upload, error: fileCoordinatorError, message: "Error coordinating deletion of file \(tempFile)")
-            }
+            self.removeTempFile(filePath: filePath)
         }
-    }
-    
-    /// MARK: Handle converting between sandbox-relative and fully-qualified file paths.
-    private lazy var baseDirectory: String = {
-        var baseDirectory: String
-        if let appGroupIdentifier = IOSBridgeConfig().appGroupIdentifier, !appGroupIdentifier.isEmpty,
-           let baseDirUrl = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupIdentifier) {
-            // normalize the path--i.e. /private/var-->/var (see docs for URL.resolvingSymlinksInPath, which removes /private as a special case
-            // even though /var is actually a symlink to /private/var in this case)
-            baseDirectory = baseDirUrl.pathResolvingAllSymlinks()
-        }
-        else {
-            baseDirectory = NSHomeDirectory()
-        }
-        return baseDirectory
-    }()
-    
-    private lazy var sandboxRegex: String = {
-        let UUIDRegexPattern = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
-        let sandboxPath = self.baseDirectory
-        // simulator and device have the app uuid in a different location in the path,
-        // and it might change in the future, so:
-        let rangeOfLastUUID = sandboxPath.range(of: UUIDRegexPattern, options: [.regularExpression, .backwards])
-        let beforeUUID = sandboxPath[..<(rangeOfLastUUID?.lowerBound ?? sandboxPath.startIndex)]
-        let afterUUID = sandboxPath[(rangeOfLastUUID?.upperBound ?? sandboxPath.startIndex)...]
-        var regex = "^"
-        if beforeUUID.count > 0 {
-            regex.append("\\Q\(beforeUUID)\\E")
-        }
-        regex.append(UUIDRegexPattern)
-        if afterUUID.count > 0 {
-            regex.append("\\Q\(afterUUID)\\E")
-        }
-        return regex
-    }()
-    
-    func sandboxRelativePath(of url: URL) -> String {
-        // normalize the path--i.e. /private/var-->/var (see docs for URL.resolvingSymlinksInPath, which removes /private as a special case
-        // even though /var is actually a symlink to /private/var in this case)
-        let normalizedPath = url.pathResolvingAllSymlinks()
-        let range = normalizedPath.range(of: self.sandboxRegex, options: [.regularExpression])
-        // if it didn't match the sandbox regex, this will just give back normalizedPath
-        return String(normalizedPath[(range?.upperBound ?? normalizedPath.startIndex)...])
-    }
-    
-    func fullyQualifiedPath(of path: String) -> String {
-        // normalize the path--i.e. /private/var-->/var (see docs for URL.resolvingSymlinksInPath, which removes /private as a special case
-        // even though /var is actually a symlink to /private/var in this case)
-        let normalizedPath = URL(fileURLWithPath: path).pathResolvingAllSymlinks()
-
-        // check if it's already a full path first
-        guard let range = normalizedPath.range(of: self.sandboxRegex, options: [.regularExpression]), !range.isEmpty else {
-            // nope, not already a full path
-            return (self.baseDirectory as NSString).appendingPathComponent(path) as String
-        }
-        
-        // if we matched the sandboxRegex it was a full path already
-        // so just return the normalized version of it.
-        return normalizedPath
     }
 
-}
-
-extension URL {
-    func pathResolvingAllSymlinks() -> String {
-        guard self.isFileURL else { return path }
-        // resolvingSymlinksInPath will only work if the file exists. This checks for the case where the file
-        // has not been created yet. syoung 08/22/2022
-        let path = self.resolvingSymlinksInPath().path
-        let privatePrefix = "/private"
-        if path.hasPrefix(privatePrefix) {
-            return String(path[privatePrefix.endIndex...])
-        }
-        else {
-            return path
-        }
-    }
 }
 
 struct BridgeAuthError : Error, CustomNSError {

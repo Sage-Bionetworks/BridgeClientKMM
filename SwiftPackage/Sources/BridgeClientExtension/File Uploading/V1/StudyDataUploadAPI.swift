@@ -101,7 +101,7 @@ public class StudyDataUploadAPI: BridgeFileUploadAPITyped {
         
         // Set up a directory to keep temp copies of files being uploaded
         do {
-            let appSupportDir = try FileManager.default.sharedUploadDirectory()
+            let appSupportDir = try FileManager.default.sharedAppSupportDirectory()
             self.tempUploadDirURL = appSupportDir.appendingPathComponent("StudyDataUploads")
             try FileManager.default.createDirectory(at: self.tempUploadDirURL, withIntermediateDirectories: true, attributes: nil)
         }

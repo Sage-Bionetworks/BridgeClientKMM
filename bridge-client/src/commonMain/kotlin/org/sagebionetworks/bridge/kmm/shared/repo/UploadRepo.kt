@@ -156,7 +156,7 @@ internal open class UploadRepo(
                     TimeZone.currentSystemDefault()
                 )
                 val expires = Instant.parse(uploadSession.expires)
-                if (expires < desiredMinimumExpiration) {
+                if (desiredMinimumExpiration < expires) {
                     //return cached upload session
                     return uploadSession
                 }

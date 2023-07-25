@@ -8,7 +8,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import kotlinx.datetime.Clock
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.plus
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.junit.Rule
@@ -27,6 +30,7 @@ import org.sagebionetworks.bridge.kmm.shared.models.UploadSession
 import org.sagebionetworks.bridge.kmm.shared.models.UploadStatus
 import org.sagebionetworks.bridge.kmm.shared.models.UploadValidationStatus
 import org.sagebionetworks.bridge.kmm.shared.models.getUploadFileResourceId
+import org.sagebionetworks.bridge.kmm.shared.randomUUID
 import org.sagebionetworks.bridge.kmm.shared.testDatabaseDriver
 import java.io.File
 import java.io.PrintWriter
@@ -62,13 +66,27 @@ class UploadManagerTest {
         return uploadManager
     }
 
+    fun mockUploadSession(): UploadSession {
+        val expires = Clock.System.now().plus(
+            24,
+            DateTimeUnit.HOUR,
+            TimeZone.currentSystemDefault()
+        )
+        return UploadSession(
+            id = randomUUID(),
+            url = "http://testurl/${randomUUID()}",
+            expires = expires.toString(),
+            type = "UploadSession"
+        )
+    }
+
     @Test
     fun testUploadManagerHappyCase() {
         runBlocking {
             val tempFile = tempFolder.newFile("tempFileHappyCase.txt")
 
-            val sessionId = "uploadSessionId"
-            val uploadSession = UploadSession(sessionId, "http://testurl", "expires", "UploadSession")
+            val uploadSession = mockUploadSession()
+            val sessionId = uploadSession.id!!
             val uploadValidationStatus = UploadValidationStatus(sessionId, null, UploadStatus.VALIDATION_IN_PROGRESS, null, null)
 
             val mockEngine = MockEngine.config {
@@ -109,8 +127,8 @@ class UploadManagerTest {
         runBlocking {
             val tempFile = tempFolder.newFile("tempFileFailAfterGetUploadSession.txt")
 
-            val sessionId = "uploadSessionId"
-            val uploadSession = UploadSession(sessionId, "http://testurl", Clock.System.now().toString(), "UploadSession")
+            val uploadSession = mockUploadSession()
+            val sessionId = uploadSession.id!!
             val uploadValidationStatus = UploadValidationStatus(sessionId, null, UploadStatus.VALIDATION_IN_PROGRESS, null, null)
 
             val mockEngine = MockEngine.config {
@@ -139,8 +157,11 @@ class UploadManagerTest {
             } catch (_: Throwable) {
 
             }
+
+            // Check that after the first call, the file marker and upload session are there.
             assertFalse(database.getResources(ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID).isEmpty())
             assertFalse(database.getResources(ResourceType.UPLOAD_SESSION, APP_WIDE_STUDY_ID).isEmpty())
+
             //Retry processing uploads, this time should reuse cached uploadSession
             uploadManager.processUploads()
             assertTrue(database.getResources(ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID).isEmpty())
@@ -154,8 +175,8 @@ class UploadManagerTest {
         runBlocking {
             val tempFile = tempFolder.newFile("tempFileFailAfterGetUploadSession.txt")
 
-            val sessionId = "uploadSessionId"
-            val uploadSession = UploadSession(sessionId, "http://testurl", Clock.System.now().toString(), "UploadSession")
+            val uploadSession = mockUploadSession()
+            val sessionId = uploadSession.id!!
             val uploadValidationStatus = UploadValidationStatus(sessionId, null, UploadStatus.VALIDATION_IN_PROGRESS, null, null)
 
             val mockEngine = MockEngine.config {
@@ -179,13 +200,19 @@ class UploadManagerTest {
             val uploadManager = setupUploadManager(testClient, tempFile)
             val database = uploadManager.database
 
+            // Check assumptions
             assertFalse(database.getResources(ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID).isEmpty())
+
+            // Run process uploads first time. Should fail on completion.
+            var didThrow = false
             try {
                 //First try will throw an error with the completeUploadSession call
                 uploadManager.processUploads()
             } catch (_: Throwable) {
-
+                didThrow = true
             }
+            assertTrue(didThrow)
+
             //File upload and temp file should be gone
             assertTrue(database.getResources(ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID).isEmpty())
             assertFalse(tempFile.exists())

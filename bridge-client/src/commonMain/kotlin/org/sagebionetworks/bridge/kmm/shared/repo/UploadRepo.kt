@@ -99,7 +99,7 @@ internal open class UploadRepo(
     /**
      * Get the cached [UploadFile] for a given `filePath`.
      */
-    fun getUploadFile(filePath: String): UploadFile? {
+    private fun getUploadFile(filePath: String): UploadFile? {
         val fileId = UploadFileId(filePath)
         return database.getResourcesById(
             fileId.getUploadFileResourceId(),

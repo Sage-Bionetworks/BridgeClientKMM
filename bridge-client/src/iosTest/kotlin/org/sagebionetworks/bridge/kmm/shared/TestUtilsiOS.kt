@@ -24,3 +24,5 @@ internal actual fun testDatabaseDriver(): SqlDriver {
             )
         )
     }
+
+internal actual fun randomUUID() = NSUUID().UUIDString

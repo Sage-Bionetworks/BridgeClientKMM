@@ -5,6 +5,7 @@ import co.touchlab.stately.ensureNeverFrozen
 import io.ktor.client.HttpClient
 import io.ktor.http.headers
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.Instant
@@ -109,6 +110,14 @@ internal open class UploadRepo(
     }
 
     /**
+     * Add the given upload file to the queue and request the S3 upload session.
+     */
+    suspend fun queueAndRequestUploadSession(uploadFile: UploadFile): S3UploadSession? {
+        database.storeUploadFile(uploadFile)
+        return getS3UploadSession(uploadFile)
+    }
+
+    /**
      * Get the S3 Upload Session for the given file path.
      *
      * Note: Currently, only uploading study data (archives) is supported. syoung 07/20/2023
@@ -117,7 +126,7 @@ internal open class UploadRepo(
         return getUploadFile(filePath)?.let { getS3UploadSession(it) }
     }
 
-    internal suspend fun getS3UploadSession(uploadFile: UploadFile): S3UploadSession? {
+    suspend fun getS3UploadSession(uploadFile: UploadFile): S3UploadSession? {
         val uploadSession = getUploadSession(uploadFile)
         return if (uploadSession?.id == null) null
         else S3UploadSession(

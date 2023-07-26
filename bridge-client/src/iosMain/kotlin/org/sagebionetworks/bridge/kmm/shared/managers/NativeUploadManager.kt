@@ -10,12 +10,11 @@ import org.sagebionetworks.bridge.kmm.shared.models.UploadFile
 import org.sagebionetworks.bridge.kmm.shared.models.UploadFileId
 import org.sagebionetworks.bridge.kmm.shared.repo.*
 
-class NativeUploadManager(
-    private val studyId: String
-) : KoinComponent {
+class NativeUploadManager : KoinComponent {
 
     private val repo : UploadRepo by inject(mode = LazyThreadSafetyMode.NONE)
     private val adherenceRecordRepo : AdherenceRecordRepo by inject(mode = LazyThreadSafetyMode.NONE)
+    private val authManager : AuthenticationRepository by inject(mode = LazyThreadSafetyMode.NONE)
     private val scope = MainScope()
 
     fun queueAndRequestUploadSession(uploadFile: UploadFile, callBack: (S3UploadSession?) -> Unit) {
@@ -59,7 +58,9 @@ class NativeUploadManager(
             }
             try {
                 repo.processFinishedUploads()
-                adherenceRecordRepo.processAdherenceRecordUpdates(studyId)
+                authManager.currentStudyId()?.let {
+                    adherenceRecordRepo.processAdherenceRecordUpdates(it)
+                }
                 callBack(true)
             } catch (_: Throwable) {
                 callBack(false)

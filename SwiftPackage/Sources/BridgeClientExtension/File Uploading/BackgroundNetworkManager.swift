@@ -37,7 +37,7 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
 
     /// The identifier (base) for the background URLSession. App extensions will append a unique string to this to distinguish
     /// their background sessions.
-    static let backgroundSessionIdentifier = "org.sagebase.backgroundnetworkmanager.session"
+    let backgroundSessionIdentifier = "org.sagebase.backgroundnetworkmanager.session"
     
     /// BackgroundNetworkManager needs access to app configuration and user session info. The app manager should create the singleton
     /// instance and immediately set this value to itself.
@@ -56,14 +56,14 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
     /// The queue used for calling background session delegate methods.
     ///  Also used for creating the singleton background session itself in a thread-safe way.
     ///  Created lazily.
-    static let sessionDelegateQueue: OperationQueue = {
+    let sessionDelegateQueue: OperationQueue = {
         let delegateQueue = OperationQueue()
         delegateQueue.maxConcurrentOperationCount = 1
         return delegateQueue
     }()
             
     /// The singleton background URLSession.
-    static var _backgroundSession: URLSession? = nil
+    var _backgroundSession: URLSession? = nil
     
     /// A singleton map of pending background URLSession completion handlers that have been passed in from the app delegate and not yet called.
     var backgroundSessionCompletionHandlers = [String : () -> Void]()
@@ -95,15 +95,15 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
     /// Access (and if necessary, create) the singleton background URLSession used by the singleton BackgroundNetworkManager.
     /// Make sure it only gets created once, regardless of threading.
     func backgroundSession() -> URLSession {
-        if BackgroundNetworkManager._backgroundSession == nil {
+        if _backgroundSession == nil {
             // If it doesn't yet exist, queue up a block of code to create it.
             let createSessionOperation = BlockOperation {
                 // Once it's our turn in the operation queue, check if someone else created it
                 // in the meantime so we don't clobber it.
-                guard BackgroundNetworkManager._backgroundSession == nil else { return }
+                guard self._backgroundSession == nil else { return }
                 
                 // OK, create it.
-                var sessionIdentifier = BackgroundNetworkManager.backgroundSessionIdentifier
+                var sessionIdentifier = self.backgroundSessionIdentifier
                 if self.isRunningInAppExtension() {
                     // Uniquify it from the containing app's BridgeClient background session and those of any other
                     // app extensions or instances thereof with the same containing app that use BridgeClient. Note
@@ -117,9 +117,9 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
                 
                 self.createBackgroundSession(with: sessionIdentifier)
             }
-            BackgroundNetworkManager.sessionDelegateQueue.addOperations([createSessionOperation], waitUntilFinished: true)
+            sessionDelegateQueue.addOperations([createSessionOperation], waitUntilFinished: true)
         }
-        return BackgroundNetworkManager._backgroundSession!
+        return _backgroundSession!
     }
     
     // internal-use-only method, must always be called on the session delegate queue
@@ -129,7 +129,7 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
             config.sharedContainerIdentifier = appGroupIdentifier
         }
         
-        BackgroundNetworkManager._backgroundSession = URLSession(configuration: config, delegate: self, delegateQueue: BackgroundNetworkManager.sessionDelegateQueue)
+        _backgroundSession = URLSession(configuration: config, delegate: self, delegateQueue: sessionDelegateQueue)
     }
     
     func bridgeBaseURL() -> URL {
@@ -248,10 +248,10 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
     }
     
     func restore(backgroundSession: String, completionHandler: @escaping () -> Void) {
-        guard backgroundSession.starts(with: BackgroundNetworkManager.backgroundSessionIdentifier) else { return }
+        guard backgroundSession.starts(with: self.backgroundSessionIdentifier) else { return }
         self.backgroundSessionCompletionHandlers[backgroundSession] = completionHandler
-        BackgroundNetworkManager.sessionDelegateQueue.addOperation {
-            if BackgroundNetworkManager._backgroundSession == nil {
+        self.sessionDelegateQueue.addOperation {
+            if self._backgroundSession == nil {
                 self.createBackgroundSession(with: backgroundSession)
             }
         }
@@ -394,7 +394,7 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
         if error != nil,
            let identifier = session.configuration.identifier {
             // if it became invalid unintentionally (i.e. due to an error), re-create the session:
-            BackgroundNetworkManager.sessionDelegateQueue.addOperation {
+            self.sessionDelegateQueue.addOperation {
                 self.createBackgroundSession(with: identifier)
             }
         }

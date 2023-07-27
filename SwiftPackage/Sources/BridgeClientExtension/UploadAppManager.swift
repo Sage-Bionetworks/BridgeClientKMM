@@ -46,7 +46,7 @@ open class UploadAppManager : ObservableObject {
     /// - Note: Data should be encrypted so that it is not stored insecurely on the phone (while waiting
     ///         for an upload connection).
     public var pemPath: String? { uploadProcessor.pemPath }
-    private let uploadProcessor: ArchiveUploadProcessor
+    private(set) var uploadProcessor: ArchiveUploadProcessor!
         
     /// The title of the app to display. By default, this is the localized display name of the app that is shown
     /// to the participant in their phone home screen.
@@ -195,6 +195,7 @@ open class UploadAppManager : ObservableObject {
     
     private var appConfigManager: NativeAppConfigManager!
     public private(set) var authManager: NativeAuthenticationManager!
+    private var pendingUploadObserver: PendingUploadObserver!
     
     /// Convenience initializer for intializing a bridge manager with just an app id and pem file.
     ///
@@ -217,7 +218,6 @@ open class UploadAppManager : ObservableObject {
     ///   - pemPath: The path to the location of the pem file to use when encrypting uploads.
     public init(platformConfig: IOSPlatformConfig, pemPath: String? = nil) {
         let pemPath = pemPath ?? Bundle.main.path(forResource: platformConfig.appId, ofType: "pem")
-        self.uploadProcessor = .init(pemPath: pemPath)
         self.title = platformConfig.localizedAppName
         self.platformConfig = platformConfig
         
@@ -230,14 +230,17 @@ open class UploadAppManager : ObservableObject {
             self.sharedUserDefaults = UserDefaults.standard
         }
         
+        // Setup upload processor
+        self.uploadProcessor = .init(pemPath: pemPath, sharedUserDefaults: self.sharedUserDefaults)
+        
         // Is this a new login (in which case we need to get the adherence records)
         self.isNewLogin = (self.userSessionId == nil)
         
         // Set up the background manager
-        setupBackgroundManager()
+        setupBackgroundManagerV1()
     }
     
-    private func setupBackgroundManager() {
+    private func setupBackgroundManagerV1() {
 
         // Hookup the background network manager singleton and make us its app manager
         let bnm = BackgroundNetworkManager.shared
@@ -292,6 +295,12 @@ open class UploadAppManager : ObservableObject {
             self.updateUserSessionStatus(session, updateType: .launch)
         }
         self.authManager.observeUserSessionInfo()
+        
+        // Hook up upload observer
+        self.pendingUploadObserver = PendingUploadObserver() { count in
+            self.isUploading = (count.intValue > 0)
+        }
+        self.pendingUploadObserver.observePendingUploadCount()
     }
     
     /// **Required:** This method should be called by the app delegate in the implementation of
@@ -428,14 +437,6 @@ open class UploadAppManager : ObservableObject {
         uploadProcessor.encryptAndUpload(using: builder)
     }
     
-    @available(*, deprecated, message: "Encrypt and upload with an `ArchiveBuilder` instead. Batch upload of multiple archives is no longer supported and will be deleted in a future version.")
-    public final func encryptAndUpload(_ archives: [DataArchive]) {
-        OperationQueue.main.addOperation {
-            self.isUploading = true
-        }
-        uploadProcessor.encryptAndUpload(archives)
-    }
-    
     func notifyUIOfBridgeError(_ value: Int32, description: String) {
         DispatchQueue.main.async {
             self.authManager.notifyUIOfBridgeError(statusCode: .init(value: value, description: description))
@@ -459,123 +460,6 @@ open class UploadAppManager : ObservableObject {
                 completion(error == nil)
             }
         }
-    }
-}
-
-final class ArchiveUploadProcessor {
-    
-    let pemPath: String?
-    var isTestUser: Bool = false
-    
-    init(pemPath: String?) {
-        self.pemPath = pemPath
-    }
-    
-    func encryptAndUpload(using builder: ArchiveBuilder) {
-        Task.detached(priority: .medium) {
-            await self._encryptAndUpload(using: builder)
-        }
-    }
-    
-    @MainActor
-    private func _encryptAndUpload(using builder: ArchiveBuilder) async {
-        do {
-            let archive = try await builder.buildArchive()
-            // Copy the startedOn date (if available) from the builder to the archive.
-            if let resultBuilder = builder as? ResultArchiveBuilder, archive.adherenceStartedOn == nil {
-                archive.adherenceStartedOn = resultBuilder.startedOn
-            }
-            await _copyTest(archive: archive)
-            let encrypted = await _encrypt(archive: archive)
-            await _upload(archive: archive, encrypted: encrypted)
-        } catch {
-            Logger.log(error: error, message: "Failed to archive and upload \(builder.identifier)")
-        }
-    }
-    
-    @available(*, deprecated)
-    func encryptAndUpload(_ archives: [DataArchive]) {
-        Task.detached(priority: .medium) {
-            await self._encryptAndUpload(archives)
-        }
-    }
-
-    @MainActor
-    @available(*, deprecated)
-    private func _encryptAndUpload(_ archives: [DataArchive]) async {
-        await withTaskGroup(of: Void.self) { group in
-            archives.forEach { archive in
-                group.addTask {
-                    await self._copyTest(archive: archive)
-                    let encrypted = await self._encrypt(archive: archive)
-                    await self._upload(archive: archive, encrypted: encrypted)
-                }
-            }
-        }
-    }
-    
-    private func _copyTest(archive: DataArchive) async {
-        #if DEBUG
-        if isTestUser {
-            archive.copyTestArchive()
-        }
-        #endif
-    }
-    
-    private func _encrypt(archive: DataArchive) async -> Bool {
-        guard let path = self.pemPath else { return false }
-        do {
-            try archive.encryptArchive(using: path)
-            return true
-        } catch {
-            Logger.log(error: error, message: "Failed to encrypt \(archive.identifier)")
-            return false
-        }
-    }
-    
-    @MainActor
-    private func _upload(archive: DataArchive, encrypted: Bool) async {
-        guard let url = archive.encryptedURL else {
-            let message = "Cannot upload archive. Missing encryption."
-            assertionFailure(message)   // Throw an assert to alert the developer that the pem file is missing.
-            Logger.log(error: BridgeUnexpectedNullError(category: .missingFile, message: message))
-            return
-        }
-        _uploadEncrypted(id: archive.identifier, url: url, schedule: archive.schedule, startedOn: archive.adherenceStartedOn)
-    }
-    
-    @MainActor
-    private func _uploadEncrypted(id: String, url: URL, schedule: AssessmentScheduleInfo?, startedOn: Date?) {
-        let uploadMetadata = UploadMetadata(schedule: schedule, startedOn: startedOn)
-        let dictionary: [String : JsonSerializable] = {
-            do {
-                return try uploadMetadata.jsonEncodedDictionary()
-            } catch {
-                Logger.log(tag: .upload, error: error)
-                return [:]
-            }
-        }()
-        let exporterV3Metadata: JsonElement? = dictionary.count > 0 ? .object(dictionary) : nil
-        let extras = StudyDataUploadExtras(encrypted: true, metadata: exporterV3Metadata, zipped: true)
-        Logger.log(severity: .info, message: "Uploading file: \(id)", metadata: dictionary)
-        StudyDataUploadAPI.shared.upload(fileId: id, fileUrl: url, contentType: "application/zip", extras: extras)
-        do {
-            try FileManager.default.removeItem(at: url)
-        } catch let err {
-            Logger.log(error: err, message: "Failed to delete encrypted archive \(id) at \(url)")
-        }
-    }
-}
-
-public struct UploadMetadata : Codable {
-    public let instanceGuid: String?
-    public let eventTimestamp: String?
-    public let startedOn: String?
-    
-    init(schedule: AssessmentScheduleInfo?, startedOn: Date?) {
-        self.instanceGuid = schedule?.instanceGuid
-        self.eventTimestamp = schedule?.session.eventTimestamp
-        self.startedOn = startedOn?.jsonObject() as? String
     }
 }
 

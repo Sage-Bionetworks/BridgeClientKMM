@@ -3,10 +3,11 @@
 
 import Foundation
 import UniformTypeIdentifiers
+import CommonCrypto
 import BridgeClient
 
 /// The file manager for converting converting between sandbox-relative and fully-qualified file paths.
-public class SandboxFileManager: NSObject {
+class SandboxFileManager: NSObject {
     
     func touch(fileUrl: URL) {
         let coordinator = NSFileCoordinator(filePresenter: nil)
@@ -173,10 +174,41 @@ public class SandboxFileManager: NSObject {
         // so just return the normalized version of it.
         return normalizedPath
     }
+    
+    /// Return the file size of the file at this URL.
+    func fileContentLength(_ fileUrl: URL) -> Int? {
+        do {
+            guard let contentLength = try fileUrl.resourceValues(forKeys: [.fileSizeKey]).fileSize,
+                  contentLength > 0
+            else {
+                Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .empty, message: "Error: file content length is nil or empty"))
+                return nil
+            }
+            return contentLength
+        } catch let err {
+            Logger.log(tag: .upload, error: err, message: "Error trying to get content length of file at \(self)")
+            return nil
+        }
+    }
+    
+    /// Return the MD5 hash for this file.
+    func fileMD5String(_ fileUrl: URL) -> String? {
+        do {
+            let fileData = try Data(contentsOf: fileUrl, options: [.alwaysMapped, .uncached])
+            return fileData.md5base64()
+        } catch let err {
+            Logger.log(tag: .upload, error: err, message: "Error trying to get memory-mapped data of participant file at \(self) in order to calculate its base64encoded MD5 hash.")
+            return nil
+        }
+    }
 
 }
 
 extension URL {
+    
+    /// Resolves any symlinks in the path of a file URL.
+    ///
+    /// If the `isFileURL` is false, this method returns `self.path`.
     func pathResolvingAllSymlinks() -> String {
         guard self.isFileURL else { return path }
         // resolvingSymlinksInPath will only work if the file exists. This checks for the case where the file
@@ -201,6 +233,27 @@ extension FileManager {
         else {
             return try self.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
         }
+    }
+}
+
+extension Data {
+    // adapted from https://stackoverflow.com/a/32166735
+    func md5base64() -> String {
+        let length = Int(CC_MD5_DIGEST_LENGTH)
+        var digestData = Data(count: length)
+        _ = digestData.withUnsafeMutableBytes { digestBytes -> UInt8 in
+            self.withUnsafeBytes { messageBytes -> UInt8 in
+                if let messageBytesBaseAddress = messageBytes.baseAddress, let digestBytesBlindMemory = digestBytes.bindMemory(to: UInt8.self).baseAddress {
+                    let messageLength = CC_LONG(self.count)
+                    // Ignore the deprecation warning. The form of pre-signed S3 URLs used
+                    // by Bridge for these uploads requires that we give the base64encoded
+                    // MD5 hash in the HTTP headers.
+                    CC_MD5(messageBytesBaseAddress, messageLength, digestBytesBlindMemory)
+                }
+                return 0
+            }
+        }
+        return digestData.base64EncodedString()
     }
 }
 

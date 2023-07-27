@@ -112,25 +112,6 @@ class StudyDataUploadAPI: BridgeFileUploadAPITyped {
         // Register this upload API with the file upload manager
         self.uploadManager.bridgeFileUploadApis[self.apiString] = self
     }
-    
-    // adapted from https://stackoverflow.com/a/32166735
-    func md5base64(data: Data) -> String {
-        let length = Int(CC_MD5_DIGEST_LENGTH)
-        var digestData = Data(count: length)
-        _ = digestData.withUnsafeMutableBytes { digestBytes -> UInt8 in
-            data.withUnsafeBytes { messageBytes -> UInt8 in
-                if let messageBytesBaseAddress = messageBytes.baseAddress, let digestBytesBlindMemory = digestBytes.bindMemory(to: UInt8.self).baseAddress {
-                    let messageLength = CC_LONG(data.count)
-                    // Ignore the deprecation warning. The form of pre-signed S3 URLs used
-                    // by Bridge for these uploads requires that we give the base64encoded
-                    // MD5 hash in the HTTP headers.
-                    CC_MD5(messageBytesBaseAddress, messageLength, digestBytesBlindMemory)
-                }
-                return 0
-            }
-        }
-        return digestData.base64EncodedString()
-    }
         
     func uploadMetadata(for fileId: String, fileUrl: URL, mimeType: String, extras: Codable? = nil) -> BridgeFileUploadMetadataBlob? {
         // Get the file size and MD5 hash before making the temp copy, in case something goes wrong
@@ -149,7 +130,7 @@ class StudyDataUploadAPI: BridgeFileUploadAPITyped {
         var contentMD5String: String
         do {
             let fileData = try Data(contentsOf: fileUrl, options: [.alwaysMapped, .uncached])
-            contentMD5String = self.md5base64(data: fileData)
+            contentMD5String = fileData.md5base64()
         } catch let err {
             Logger.log(tag: .upload, error: err, message: "Error trying to get memory-mapped data of participant file at \(fileUrl) in order to calculate its base64encoded MD5 hash.")
             return nil

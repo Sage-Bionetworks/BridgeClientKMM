@@ -3,6 +3,7 @@
 
 import Foundation
 import BridgeClient
+import JsonModel
 
 fileprivate let UnprocessedUploadsKey = "unprocessedUploads"
 
@@ -71,25 +72,48 @@ final class ArchiveUploadProcessor {
         }
         _uploadEncrypted(id: archive.identifier, url: url, schedule: archive.schedule, startedOn: archive.adherenceStartedOn)
     }
-    
+
     @MainActor
     private func _uploadEncrypted(id: String, url: URL, schedule: AssessmentScheduleInfo?, startedOn: Date?) {
-        let success = uploader.uploadEncryptedArchive(fileUrl: url, schedule: schedule, startedOn: startedOn)
-        if (success) {
-            // Only if the file was successfully queued for upload should the original file be deleted.
-            do {
-                try FileManager.default.removeItem(at: url)
-            } catch let err {
-                Logger.log(error: err, message: "Failed to delete encrypted archive \(id) at \(url)")
-            }
+        let uploadMetadata = schedule.map {
+            UploadMetadata(
+                instanceGuid: $0.instanceGuid,
+                eventTimestamp: $0.session.eventTimestamp,
+                startedOn: startedOn?.jsonObject() as? String
+            )
         }
-        else {
-            // Store the path to the failed upload to allow potentially recovering the file and log error.
-            var failedUploads = (sharedUserDefaults.array(forKey: UnprocessedUploadsKey) as? [String]) ?? []
-            failedUploads.append(url.path)
-            sharedUserDefaults.set(failedUploads, forKey: UnprocessedUploadsKey)
-            let err = BridgeUploadFailedError(errorCode: -99, message: "Failed to queue encrypted file for upload. \(url)")
-            Logger.log(tag: .upload, error: err)
+        let dictionary = uploadMetadata?.toStringMap()
+        let exporterV3Metadata: JsonElement? = dictionary.map { .object($0) }
+        let extras = StudyDataUploadExtras(encrypted: true, metadata: exporterV3Metadata, zipped: true)
+        Logger.log(severity: .info, message: "Uploading file: \(id)", metadata: dictionary)
+        StudyDataUploadAPI.shared.upload(fileId: id, fileUrl: url, contentType: "application/zip", extras: extras)
+        do {
+            try FileManager.default.removeItem(at: url)
+        } catch let err {
+            Logger.log(error: err, message: "Failed to delete encrypted archive \(id) at \(url)")
         }
     }
+    
+    // TODO: syoung 07/27/2023 Replace upload with V2 uploader
+//    @MainActor
+//    private func _uploadEncrypted(id: String, url: URL, schedule: AssessmentScheduleInfo?, startedOn: Date?) {
+//        let success = uploader.uploadEncryptedArchive(fileUrl: url, schedule: schedule, startedOn: startedOn)
+//        if (success) {
+//            // Only if the file was successfully queued for upload should the original file be deleted.
+//            do {
+//                try FileManager.default.removeItem(at: url)
+//            } catch let err {
+//                Logger.log(error: err, message: "Failed to delete encrypted archive \(id) at \(url)")
+//            }
+//        }
+//        else {
+//            // Store the path to the failed upload to allow potentially recovering the file and log error.
+//            var failedUploads = (sharedUserDefaults.array(forKey: UnprocessedUploadsKey) as? [String]) ?? []
+//            failedUploads.append(url.path)
+//            sharedUserDefaults.set(failedUploads, forKey: UnprocessedUploadsKey)
+//            let err = BridgeUploadFailedError(errorCode: -99, message: "Failed to queue encrypted file for upload. \(url)")
+//            Logger.log(tag: .upload, error: err)
+//        }
+//    }
+    
 }

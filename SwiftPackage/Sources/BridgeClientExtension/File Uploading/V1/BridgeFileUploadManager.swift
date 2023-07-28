@@ -444,7 +444,7 @@ extension BridgeFileUploadAPITyped {
 /// The BridgeFileUploadManager handles uploading files to Bridge using an iOS URLSession
 /// background session. This allows iOS to deal with any connectivity issues and lets the upload proceed
 /// even when the app is suspended.
-class BridgeFileUploadManager: SandboxFileManager, URLSessionBackgroundDelegate {
+class BridgeFileUploadManager: SandboxFileManager, BridgeURLSessionDelegate {
     /// A singleton instance of the manager.
     static let shared = BridgeFileUploadManager()
     
@@ -764,7 +764,7 @@ class BridgeFileUploadManager: SandboxFileManager, URLSessionBackgroundDelegate 
     }
     
     /// Download delegate method.
-    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+    func urlSession(_ session: BridgeURLSession, downloadTask: BridgeURLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         // get the sandbox-relative path to the temp copy of the participant file
         guard let invariantFilePath = downloadTask.taskDescription else {
             let message = "Finished a download task with no taskDescription set"
@@ -902,10 +902,10 @@ class BridgeFileUploadManager: SandboxFileManager, URLSessionBackgroundDelegate 
         }
     }
     
-    fileprivate func cancelTasks(for relativePath: String, tasks: [URLSessionTask]) -> [URLSessionTask] {
-        var notCanceledTasks = [URLSessionTask]()
+    fileprivate func cancelTasks(for relativePath: String, tasks: [BridgeURLSessionTask]) -> [BridgeURLSessionTask] {
+        var notCanceledTasks = [BridgeURLSessionTask]()
         for task in tasks {
-            if task.description != relativePath {
+            if task.taskDescription != relativePath {
                 notCanceledTasks.append(task)
                 continue
             }
@@ -924,7 +924,7 @@ class BridgeFileUploadManager: SandboxFileManager, URLSessionBackgroundDelegate 
         // Do not attempt to check and retry orphaned uploads if the session token isn't set up.
         guard self.appManager?.sessionToken != nil else { return }
         
-        self.netManager.backgroundSession().getAllTasks { tasks in
+        self.netManager.backgroundSession().getAllBridgeTasks { tasks in
             var tasks = tasks
             let defaults = self.userDefaults
             
@@ -1124,7 +1124,7 @@ class BridgeFileUploadManager: SandboxFileManager, URLSessionBackgroundDelegate 
     
     // Helper for task delegate method in case of HTTP error on Bridge upload request or
     // upload success notification request.
-    fileprivate func handleHTTPDownloadStatusCode(_ statusCode: Int, uploadApi: BridgeFileUploadAPI, downloadTask: URLSessionDownloadTask, invariantFilePath: String) {
+    fileprivate func handleHTTPDownloadStatusCode(_ statusCode: Int, uploadApi: BridgeFileUploadAPI, downloadTask: BridgeURLSessionDownloadTask, invariantFilePath: String) {
         
         // remove the participant file from either the uploadRequested or notifyingBridge list,
         // retrieving its associated upload metadata
@@ -1211,7 +1211,7 @@ class BridgeFileUploadManager: SandboxFileManager, URLSessionBackgroundDelegate 
     }
 
     /// Task delegate method.
-    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+    func urlSession(_ session: BridgeURLSession, task: BridgeURLSessionTask, didCompleteWithError error: Error?) {
         
         // get the sandbox-relative path to the temp copy of the participant file
         guard let invariantFilePath = task.taskDescription else {
@@ -1232,7 +1232,7 @@ class BridgeFileUploadManager: SandboxFileManager, URLSessionBackgroundDelegate 
             return
         }
 
-        if let downloadTask = task as? URLSessionDownloadTask {
+        if let downloadTask = task as? BridgeURLSessionDownloadTask {
             // If an HTTP error response from Bridge gets through to here, we need to handle it.
             // Otherwise, we're done here.
             guard let httpResponse = task.response as? HTTPURLResponse,
@@ -1307,7 +1307,7 @@ class BridgeFileUploadManager: SandboxFileManager, URLSessionBackgroundDelegate 
     }
     
     /// Session delegate method.
-    func urlSession(_ session: URLSession, didBecomeInvalidWithError error: Error?) {
+    func urlSession(_ session: BridgeURLSession, didBecomeInvalidWithError error: Error?) {
         guard error != nil else {
             // If the URLSession was deliberately invalidated (i.e., error is nil) then we assume
             // the intention is to cancel and forget all incomplete uploads, including retries.

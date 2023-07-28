@@ -17,7 +17,7 @@ protocol BridgeFileUploadManagerTestCase : XCTWaiterDelegate {
     var mockAppManager: MockBridgeClientAppManager { get }
     var testFileId: String { get }
     
-    var savedSession: URLSession? { get set }
+    var savedSession: BridgeURLSession? { get set }
     var savedDelay: TimeInterval? { get set }
     var savedAppManager: UploadAppManager? { get set }
     
@@ -47,7 +47,7 @@ extension BridgeFileUploadManagerTestCaseTyped {
         bnm.appManager = mockAppManager
         mockAppManager.mockAuthManager.reset()
         savedSession = bnm.backgroundSession()
-        mockURLSession.mockDelegate = savedSession!.delegate
+        mockURLSession.mockDelegate = savedSession!.bridgeDelegate
         mockURLSession.mockDelegateQueue = savedSession!.delegateQueue
         let setMockSession = BlockOperation {
             bnm._backgroundSession = self.mockURLSession

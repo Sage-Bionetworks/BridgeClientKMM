@@ -4,6 +4,7 @@
 //
 
 import Foundation
+@testable import BridgeClientExtension
 
 // MARK: MockHTTPURLResponse
 class MockHTTPURLResponse : HTTPURLResponse {
@@ -73,9 +74,9 @@ class MockDownloadTask: URLSessionDownloadTask {
 
 // MARK: MockURLSession
 class MockURLSession: URLSession {
-    var mockDelegate: URLSessionDelegate?
+    var mockDelegate: BridgeURLSessionDelegate?
     public override var delegate: URLSessionDelegate? {
-        return mockDelegate
+        return mockDelegate as? URLSessionDelegate
     }
 
     var mockDelegateQueue: OperationQueue?

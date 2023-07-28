@@ -56,11 +56,14 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate, BridgeUR
         return delegateQueue
     }()
             
-    /// The singleton background URLSession.
-    var _backgroundSession: BridgeURLSession? = nil
+    /// The primary background URLSession.
+    var primaryBackgroundSession: BridgeURLSession? = nil
     
-    /// A singleton map of pending background URLSession completion handlers that have been passed in from the app delegate and not yet called.
+    /// A map of pending background URLSession completion handlers that have been passed in from the app delegate and not yet called.
     var backgroundSessionCompletionHandlers = [String : () -> Void]()
+    
+    /// A map of the restored background sessions.
+    var restoredSessions = [String : BridgeURLSession]()
     
     func isRunningInAppExtension() -> Bool {
         // "An app extension target’s Info.plist file identifies the extension point and may specify some details
@@ -89,12 +92,12 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate, BridgeUR
     /// Access (and if necessary, create) the singleton background URLSession used by the singleton BackgroundNetworkManager.
     /// Make sure it only gets created once, regardless of threading.
     func backgroundSession() -> BridgeURLSession {
-        if _backgroundSession == nil {
+        if primaryBackgroundSession == nil {
             // If it doesn't yet exist, queue up a block of code to create it.
             let createSessionOperation = BlockOperation {
                 // Once it's our turn in the operation queue, check if someone else created it
                 // in the meantime so we don't clobber it.
-                guard self._backgroundSession == nil else { return }
+                guard self.primaryBackgroundSession == nil else { return }
                 
                 // OK, create it.
                 var sessionIdentifier = self.backgroundSessionIdentifier
@@ -109,21 +112,20 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate, BridgeUR
                     sessionIdentifier.append(UUID().uuidString)
                 }
                 
-                self.createBackgroundSession(with: sessionIdentifier)
+                self.primaryBackgroundSession = self.createBackgroundSession(with: sessionIdentifier)
             }
             sessionDelegateQueue.addOperations([createSessionOperation], waitUntilFinished: true)
         }
-        return _backgroundSession!
+        return primaryBackgroundSession!
     }
     
     // internal-use-only method, must always be called on the session delegate queue
-    fileprivate func createBackgroundSession(with sessionIdentifier: String) {
+    fileprivate func createBackgroundSession(with sessionIdentifier: String) -> BridgeURLSession {
         let config = URLSessionConfiguration.background(withIdentifier: sessionIdentifier)
         if let appGroupIdentifier = IOSBridgeConfig().appGroupIdentifier, !appGroupIdentifier.isEmpty {
             config.sharedContainerIdentifier = appGroupIdentifier
         }
-        
-        _backgroundSession = URLSession(configuration: config, delegate: self, delegateQueue: sessionDelegateQueue)
+        return URLSession(configuration: config, delegate: self, delegateQueue: sessionDelegateQueue)
     }
     
     func bridgeBaseURL() -> URL {
@@ -245,8 +247,12 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate, BridgeUR
         guard backgroundSession.starts(with: self.backgroundSessionIdentifier) else { return }
         self.backgroundSessionCompletionHandlers[backgroundSession] = completionHandler
         self.sessionDelegateQueue.addOperation {
-            if self._backgroundSession == nil {
-                self.createBackgroundSession(with: backgroundSession)
+            if self.restoredSessions[backgroundSession] == nil {
+                let session = self.createBackgroundSession(with: backgroundSession)
+                self.restoredSessions[backgroundSession] = session
+                if backgroundSession == self.backgroundSessionIdentifier {
+                    self.primaryBackgroundSession = session
+                }
             }
         }
     }
@@ -273,12 +279,18 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate, BridgeUR
         self.urlSessionDidFinishEvents(forBackgroundURLSession: session as BridgeURLSession)
     }
     func urlSessionDidFinishEvents(forBackgroundURLSession session: BridgeURLSession) {
-        if let identifier = session.identifier,
-            let completion = self.backgroundSessionCompletionHandlers[identifier] {
+        guard let identifier = session.identifier else { return }
+        if let completion = self.backgroundSessionCompletionHandlers[identifier] {
             OperationQueue.main.addOperation {
                 completion()
             }
             self.backgroundSessionCompletionHandlers.removeValue(forKey: identifier)
+        }
+        self.sessionDelegateQueue.addOperation {
+            // If this is not the primary url session then release it.
+            if identifier != self.backgroundSessionIdentifier {
+                self.restoredSessions[identifier] = nil
+            }
         }
         self.backgroundTransferDelegate?.urlSessionDidFinishEvents?(forBackgroundURLSession: session)
     }
@@ -291,7 +303,17 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate, BridgeUR
            let identifier = session.identifier {
             // if it became invalid unintentionally (i.e. due to an error), re-create the session:
             self.sessionDelegateQueue.addOperation {
-                self.createBackgroundSession(with: identifier)
+                let hasRestoredSession = self.restoredSessions[identifier] != nil
+                let isPrimary = self.primaryBackgroundSession?.identifier == identifier
+                if hasRestoredSession || isPrimary {
+                    let session = self.createBackgroundSession(with: identifier)
+                    if hasRestoredSession {
+                        self.restoredSessions[identifier] = session
+                    }
+                    if isPrimary {
+                        self.primaryBackgroundSession = session
+                    }
+                }
             }
         }
         self.backgroundTransferDelegate?.urlSession?(session, didBecomeInvalidWithError: error)

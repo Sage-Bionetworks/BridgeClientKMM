@@ -50,7 +50,7 @@ extension BridgeFileUploadManagerTestCaseTyped {
         mockURLSession.mockDelegate = savedSession!.bridgeDelegate
         mockURLSession.mockDelegateQueue = savedSession!.delegateQueue
         let setMockSession = BlockOperation {
-            bnm._backgroundSession = self.mockURLSession
+            bnm.primaryBackgroundSession = self.mockURLSession
         }
         bnm.sessionDelegateQueue.addOperations([setMockSession], waitUntilFinished: true)
         savedDelay = BridgeFileUploadManager.shared.delayForRetry
@@ -77,7 +77,7 @@ extension BridgeFileUploadManagerTestCaseTyped {
         // Call this in the XCTestCase tearDown() func before calling super.tearDown()
         let bnm = BackgroundNetworkManager.shared
         let restoreSession = BlockOperation {
-            bnm._backgroundSession = self.savedSession
+            bnm.primaryBackgroundSession = self.savedSession
         }
         bnm.sessionDelegateQueue.addOperations([restoreSession], waitUntilFinished: true)
         bnm.appManager = savedAppManager

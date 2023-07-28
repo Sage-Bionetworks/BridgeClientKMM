@@ -1211,7 +1211,7 @@ class BridgeFileUploadManager: SandboxFileManager, BridgeURLSessionDelegate {
     }
 
     /// Task delegate method.
-    func urlSession(_ session: BridgeURLSession, task: BridgeURLSessionTask, didCompleteWithError error: Error?) {
+    private func _urlSession(_ session: BridgeURLSession, task: BridgeURLSessionTask, didCompleteWithError error: Error?) {
         
         // get the sandbox-relative path to the temp copy of the participant file
         guard let invariantFilePath = task.taskDescription else {
@@ -1401,6 +1401,127 @@ class BridgeFileUploadManager: SandboxFileManager, BridgeURLSessionDelegate {
             self.removeTempFile(filePath: filePath)
         }
     }
+    
+    // MARK: Moved from BackgroundNetworkManager - syoung 07/27/2023
 
+    /// We use this custom HTTP request header as a hack to keep track of how many times we've retried a request.
+    let retryCountHeader = "X-SageBridge-Retry"
+    
+    /// This sets the maximum number of times we will retry a request before giving up.
+    let maxRetries = 5
+    
+    func urlSession(_ session: BridgeURLSession, task: BridgeURLSessionTask, didCompleteWithError error: Error?) {
+        if let nsError = error as NSError?,
+           let downloadTask = task as? BridgeURLSessionDownloadTask,
+           let resumeData = nsError.userInfo[NSURLSessionDownloadTaskResumeData] as? Data {
+            // if there's resume data from a download task, use it to retry
+            self.retryFailedDownload(downloadTask, for: session, resumeData: resumeData)
+            return
+        }
+
+        var retrying = false
+        if let downloadTask = task as? BridgeURLSessionDownloadTask {
+            let httpResponse = task.response as? HTTPURLResponse
+            let httpError = (httpResponse?.statusCode ?? 0) >= 400
+            if let nsError = error as NSError? {
+                retrying = self.handleError(nsError, session: session, task: downloadTask)
+            }
+            else if httpError {
+                retrying = self.handleHTTPErrorResponse(httpResponse!, session: session, task: downloadTask)
+            }
+        }
+        
+        if !retrying {
+            _urlSession(session, task: task, didCompleteWithError: error)
+        }
+    }
+    
+    fileprivate func retryFailedDownload(_ task: BridgeURLSessionDownloadTask, for session: BridgeURLSession, resumeData: Data) {
+        let resumeTask = session.downloadBridgeTask(withResumeData: resumeData)
+        resumeTask.taskDescription = task.taskDescription
+        resumeTask.resume()
+    }
+    
+    func isTemporaryError(errorCode: Int) -> Bool {
+        return (errorCode == NSURLErrorTimedOut || errorCode == NSURLErrorCannotFindHost || errorCode == NSURLErrorCannotConnectToHost || errorCode == NSURLErrorNotConnectedToInternet || errorCode == NSURLErrorSecureConnectionFailed)
+    }
+    
+    // Make sure to only ever call this from the main thread--the session token
+    // lives in Kotlin Native code which only allows access from the thread on which
+    // the object was originally created. ~emm 2021-09-17
+    @discardableResult
+    func retry(task: BridgeURLSessionDownloadTask) -> Bool {
+        guard var request = task.originalRequest else {
+            let message = "Unable to retry upload task, as originalRequest is nil:\n\(task)"
+            Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .corruptData, message: message))
+            return false
+        }
+        
+        // Try, try again, until we run out of retries.
+        var retry = Int(request.value(forHTTPHeaderField: retryCountHeader) ?? "") ?? 0
+        guard retry < maxRetries else {
+            Logger.log(severity: .info, message: "Retry attempts (\(retry)) exceeds max retry count (\(maxRetries)).")
+            return false
+        }
+        
+        guard let sessionToken = appManager.sessionToken else {
+            Logger.log(severity: .warn, tag: .upload, message: "Unable to retry task--not signed in (auth manager's UserSessionInfo is nil)")
+            return false
+        }
+
+        retry += 1
+        request.setValue("\(retry)", forHTTPHeaderField: retryCountHeader)
+        request.setValue(sessionToken, forHTTPHeaderField: "Bridge-Session")
+
+        let newTask = netManager.backgroundSession().downloadBridgeTask(with: request)
+        newTask.taskDescription = task.taskDescription
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + pow(2.0, Double(retry))) {
+            newTask.resume()
+        }
+        
+        return true
+    }
+    
+    func handleError(_ error: NSError, session: BridgeURLSession, task: BridgeURLSessionDownloadTask) -> Bool {
+        if isTemporaryError(errorCode: error.code) {
+            // Retry, and let the caller know we're retrying.
+            return retry(task: task)
+        }
+        
+        return false
+    }
+    
+    func handleUnsupportedAppVersion() {
+        self.appManager.notifyUIOfBridgeError(410, description: "Unsupported app version")
+    }
+    
+    func handleServerPreconditionNotMet() {
+        self.appManager.notifyUIOfBridgeError(412, description: "User not consented")
+    }
+    
+    func handleHTTPErrorResponse(_ response: HTTPURLResponse, session: BridgeURLSession, task: BridgeURLSessionDownloadTask) -> Bool {
+        switch response.statusCode {
+        case 401:
+            self.appManager.reauthenticate { success in
+                if success {
+                    Logger.log(severity: .info, tag: .upload, message: "Session token auto-refresh succeeded, retrying original request")
+                    self.retry(task: task)
+                }
+            }
+            return true
+                
+        case 410:
+            handleUnsupportedAppVersion()
+            
+        case 412:
+            handleServerPreconditionNotMet()
+            
+        default:
+            // Let the backgroundTransferDelegate deal with it
+            break
+        }
+        
+        return false
+    }
 }
 

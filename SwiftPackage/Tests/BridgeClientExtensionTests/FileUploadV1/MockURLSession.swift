@@ -11,24 +11,29 @@ class MockHTTPURLResponse : HTTPURLResponse {
 }
 
 // MARK: MockUploadTask
-class MockUploadTask : URLSessionUploadTask {
+class MockUploadTask : NSObject, BridgeURLSessionUploadTask {
+    var taskDescription: String?
     var session: MockURLSession
     var request: URLRequest
     var mockResponse: MockHTTPURLResponse?
     
-    override func resume() {
+    func resume() {
         session.delegateQueue.addOperation { [self] in
             (_, mockResponse) = session.dataAndResponse(for: request)
-            (session.delegate as? URLSessionTaskDelegate)?.urlSession?(session, task: self, didCompleteWithError: nil)
+            session.bridgeDelegate?.urlSession(session, task: self, didCompleteWithError: nil)
             session.remove(mockTask: self)
         }
     }
     
-    override var response: URLResponse? {
+    func cancel() {
+        fatalError("Not Implemented")
+    }
+    
+    var response: URLResponse? {
         return mockResponse
     }
     
-    override var originalRequest: URLRequest? {
+    var originalRequest: URLRequest? {
         return self.request
     }
     
@@ -39,12 +44,13 @@ class MockUploadTask : URLSessionUploadTask {
 }
 
 // MARK: MockDownloadTask
-class MockDownloadTask: URLSessionDownloadTask {
+class MockDownloadTask: NSObject, BridgeURLSessionDownloadTask {
+    var taskDescription: String?
     var session: MockURLSession
     var request: URLRequest
     var mockResponse: MockHTTPURLResponse?
     
-    override func resume() {
+    func resume() {
         session.delegateQueue.addOperation { [self] in
             (_, mockResponse) = session.dataAndResponse(for: request)
             let (fileUrl, error) = session.downloadFileUrlAndError(for: request)
@@ -53,16 +59,20 @@ class MockDownloadTask: URLSessionDownloadTask {
                 debugPrint("TEST SETUP ERROR: No download file URL provided for mock download task request: \(String(describing: self.request.url))")
                 return
             }
-            (session.delegate as? URLSessionDownloadDelegate)?.urlSession(self.session, downloadTask: self, didFinishDownloadingTo: fileUrl)
-            (session.delegate as? URLSessionTaskDelegate)?.urlSession?(session, task: self, didCompleteWithError: error)
+            session.bridgeDelegate?.urlSession?(self.session, downloadTask: self, didFinishDownloadingTo: fileUrl)
+            session.bridgeDelegate?.urlSession(session, task: self, didCompleteWithError: error)
         }
     }
     
-    override var response: URLResponse? {
+    func cancel() {
+        fatalError("Not Implemented")
+    }
+    
+    var response: URLResponse? {
         return mockResponse
     }
     
-    override var originalRequest: URLRequest? {
+    var originalRequest: URLRequest? {
         return self.request
     }
     
@@ -73,14 +83,16 @@ class MockDownloadTask: URLSessionDownloadTask {
 }
 
 // MARK: MockURLSession
-class MockURLSession: URLSession {
+class MockURLSession: NSObject, BridgeURLSession {
+    var identifier: String?
+    
     var mockDelegate: BridgeURLSessionDelegate?
-    public override var delegate: URLSessionDelegate? {
-        return mockDelegate as? URLSessionDelegate
+    var bridgeDelegate: BridgeURLSessionDelegate? {
+        return mockDelegate
     }
 
     var mockDelegateQueue: OperationQueue?
-    public override var delegateQueue: OperationQueue {
+    var delegateQueue: OperationQueue {
         if mockDelegateQueue == nil {
             let mockDelegateQueue = OperationQueue()
             mockDelegateQueue.maxConcurrentOperationCount = 1
@@ -259,33 +271,37 @@ class MockURLSession: URLSession {
         }
     }
     
-    func add(mockTask: URLSessionTask) {
+    func add(mockTask: BridgeURLSessionTask) {
         doSyncInDelegateQueue {
             self.mockTasks.add(mockTask)
         }
     }
     
-    func remove(mockTask: URLSessionTask) {
+    func remove(mockTask: BridgeURLSessionTask) {
         doSyncInDelegateQueue {
             self.mockTasks.remove(mockTask)
         }
     }
     
-    override func uploadTask(with request: URLRequest, fromFile fileURL: URL) -> URLSessionUploadTask {
+    func uploadBridgeTask(with request: URLRequest, fromFile fileURL: URL) -> BridgeURLSessionUploadTask {
         let task = MockUploadTask(session: self, request: request)
         add(mockTask: task)
         return task
     }
     
-    override func downloadTask(with request: URLRequest) -> URLSessionDownloadTask {
+    func downloadBridgeTask(with request: URLRequest) -> BridgeURLSessionDownloadTask {
         let task = MockDownloadTask(session: self, request: request)
         add(mockTask: task)
         return task
     }
     
-    override func getAllTasks(completionHandler: @escaping ([URLSessionTask]) -> Void) {
+    func downloadBridgeTask(withResumeData data: Data) -> BridgeURLSessionDownloadTask {
+        fatalError("Not Implemented")
+    }
+    
+    func getAllBridgeTasks(completionHandler: @escaping ([BridgeURLSessionTask]) -> Void) {
         self.delegateQueue.addOperation {
-            completionHandler(self.mockTasks as? [URLSessionTask] ?? [])
+            completionHandler(self.mockTasks as? [BridgeURLSessionTask] ?? [])
         }
     }
 }

@@ -37,9 +37,6 @@ class ParticipantFileUploadAPI: BridgeFileUploadAPITyped {
     typealias TrackingType = ParticipantFile
     typealias UploadRequestType = ParticipantFile
     typealias UploadRequestResponseType = ParticipantFile
-    
-    /// A singleton instance of the API.
-    static let shared = ParticipantFileUploadAPI()
 
     /// The Notification.userInfo key for the uploaded file's ParticipantFile object from Bridge.
     let participantFileKey = "ParticipantFile"
@@ -57,11 +54,10 @@ class ParticipantFileUploadAPI: BridgeFileUploadAPITyped {
     
     private(set) var notifiesBridgeWhenUploaded: Bool = false
     
-    private(set) var uploadManager: BridgeFileUploadManager
+    weak private(set) var uploadManager: BridgeFileUploadManager!
     
-    /// Private initializer so only the singleton can ever get created.
-    private init() {
-        self.uploadManager = BridgeFileUploadManager.shared
+    init(uploadManager: BridgeFileUploadManager) {
+        self.uploadManager = uploadManager
         
         // Set up a directory to keep temp copies of files being uploaded
         do {

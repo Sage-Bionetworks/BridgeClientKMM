@@ -17,10 +17,6 @@ protocol BridgeFileUploadManagerTestCase : XCTWaiterDelegate {
     var mockAppManager: MockBridgeClientAppManager { get }
     var testFileId: String { get }
     
-    var savedSession: (any BridgeURLSession)? { get set }
-    var savedDelay: TimeInterval? { get set }
-    var savedAppManager: UploadAppManager? { get set }
-    
     var requestEndpoint: String { get }
     var uploadRequestSuccessResponseFile: String { get }
     var uploadRequestExpiredResponseFile: String { get }
@@ -42,22 +38,19 @@ protocol BridgeFileUploadManagerTestCaseTyped: BridgeFileUploadManagerTestCase {
 extension BridgeFileUploadManagerTestCaseTyped {
     func genericSetUp() {
         // Call this in the XCTestCase setUp() func after calling super.setUp()
-        let bnm = BackgroundNetworkManager.shared
-        savedAppManager = bnm.appManager
-        bnm.appManager = mockAppManager
+        let bnm = mockAppManager.backgroundNetworkManager
         mockAppManager.mockAuthManager.reset()
-        savedSession = bnm.backgroundSession()
-        mockURLSession.mockDelegate = savedSession!.bridgeDelegate
-        mockURLSession.mockDelegateQueue = savedSession!.delegateQueue
+
+        mockURLSession.mockDelegate = bnm
+        mockURLSession.mockDelegateQueue = bnm.sessionDelegateQueue
         let setMockSession = BlockOperation {
             bnm.primaryBackgroundSession = self.mockURLSession
         }
         bnm.sessionDelegateQueue.addOperations([setMockSession], waitUntilFinished: true)
-        savedDelay = BridgeFileUploadManager.shared.delayForRetry
-        BridgeFileUploadManager.shared.delayForRetry = 0 // don't delay retries for tests
+        mockAppManager.uploadManagerV1.delayForRetry = 0 // don't delay retries for tests
         
         // Clear user defaults - may have leftover cruft from previous failed test run
-        let bfum = BridgeFileUploadManager.shared
+        let bfum = mockAppManager.uploadManagerV1
         let defaults = bfum.userDefaults
         defaults.set(nil, forKey: bfum.retryUploadsKey)
         defaults.set(nil, forKey: bfum.bridgeFileUploadsKey)
@@ -75,13 +68,6 @@ extension BridgeFileUploadManagerTestCaseTyped {
 
     func genericTearDown() {
         // Call this in the XCTestCase tearDown() func before calling super.tearDown()
-        let bnm = BackgroundNetworkManager.shared
-        let restoreSession = BlockOperation {
-            bnm.primaryBackgroundSession = self.savedSession
-        }
-        bnm.sessionDelegateQueue.addOperations([restoreSession], waitUntilFinished: true)
-        bnm.appManager = savedAppManager
-        BridgeFileUploadManager.shared.delayForRetry = savedDelay!
     }
     
     func check(file: URL, willRetry: Bool, message: String) {
@@ -89,7 +75,7 @@ extension BridgeFileUploadManagerTestCaseTyped {
     }
     
     func removeMappings(for relativeFilePath: String) {
-        let bfum = BridgeFileUploadManager.shared
+        let bfum = mockAppManager.uploadManagerV1
         bfum.removeMapping(String.self, from: relativeFilePath, defaultsKey: bfum.bridgeFileUploadsKey)
         let _ = uploadApi.fetchUploadRequested(for: relativeFilePath)
         let _ = uploadApi.fetchUploadingToS3(for: relativeFilePath)
@@ -102,7 +88,7 @@ extension BridgeFileUploadManagerTestCaseTyped {
             var willRetryCheck = false
             let tempFilePath = file.path
             let fileExists = FileManager.default.fileExists(atPath: tempFilePath)
-            let bfum = BridgeFileUploadManager.shared
+            let bfum = self.mockAppManager.uploadManagerV1
             let userDefaults = bfum.userDefaults
             var retryUploads = userDefaults.dictionary(forKey: bfum.retryUploadsKey)
             for relativeFilePath in retryUploads?.keys ?? [String: Any]().keys {
@@ -178,7 +164,7 @@ extension BridgeFileUploadManagerTestCaseTyped {
             XCTAssert(false, "Unable to find test response file 'failed-upload-request-response.json' for upload api \(self.uploadApi.apiString) upload failure tests")
             return
         }
-        let bfum = BridgeFileUploadManager.shared
+        let bfum = mockAppManager.uploadManagerV1
         var tempCopyUrl: URL?
         
         // NOTE: If I move this block any further up in the function, it causes a compiler crash. Not
@@ -208,7 +194,7 @@ extension BridgeFileUploadManagerTestCaseTyped {
             }
             
             // make sure we didn't generate any spurious uploads or retries
-            let defaults = BridgeFileUploadManager.shared.userDefaults
+            let defaults = self.mockAppManager.uploadManagerV1.userDefaults
             let retryUploads = defaults.dictionary(forKey: bfum.retryUploadsKey)
             let fileUploads = defaults.dictionary(forKey: bfum.bridgeFileUploadsKey)
             let uploadRequests = defaults.dictionary(forKey: bfum.uploadURLsRequestedKey)
@@ -341,7 +327,7 @@ extension BridgeFileUploadManagerTestCaseTyped {
             XCTAssert(false, "Unable to find test response file 'failed-upload-request-response.json' for upload api \(self.uploadApi.apiString) upload failure tests")
             return
         }
-        let bfum = BridgeFileUploadManager.shared
+        let bfum = mockAppManager.uploadManagerV1
         var tempCopyUrl: URL?
         
         // NOTE: If I move this block any further up in the function, it causes a compiler crash. Not
@@ -375,7 +361,7 @@ extension BridgeFileUploadManagerTestCaseTyped {
             }
             
             // make sure we didn't generate any spurious uploads or retries
-            let defaults = BridgeFileUploadManager.shared.userDefaults
+            let defaults = self.mockAppManager.uploadManagerV1.userDefaults
             let retryUploads = defaults.dictionary(forKey: bfum.retryUploadsKey)
             let fileUploads = defaults.dictionary(forKey: bfum.bridgeFileUploadsKey)
             let uploadRequests = defaults.dictionary(forKey: bfum.uploadURLsRequestedKey)
@@ -609,7 +595,7 @@ extension BridgeFileUploadManagerTestCaseTyped {
         }
 
         // -- try it
-        let bfum = BridgeFileUploadManager.shared
+        let bfum = mockAppManager.uploadManagerV1
         let expectUploaded = XCTestExpectation(description: "Should have successfully uploaded")
         var tempCopyUrl: URL?
         var succeeded = false
@@ -622,7 +608,7 @@ extension BridgeFileUploadManagerTestCaseTyped {
             }
             
             // make sure we didn't generate any spurious uploads or retries
-            let defaults = BridgeFileUploadManager.shared.userDefaults
+            let defaults = bfum.userDefaults
             let retryUploads = defaults.dictionary(forKey: bfum.retryUploadsKey)
             let fileUploads = defaults.dictionary(forKey: bfum.bridgeFileUploadsKey)
             let uploadRequests = defaults.dictionary(forKey: bfum.uploadURLsRequestedKey)
@@ -690,7 +676,7 @@ extension BridgeFileUploadManagerTestCaseTyped {
     func keysEmptyAfterUpload(for mockURLSessionList: NSMutableDictionary) -> [String] {
         let allKeys = mockURLSessionList.allKeys as! [String]
         return allKeys.filter { key in
-            key == BridgeFileUploadManager.shared.notifyingBridgeUploadSucceededKey
+            key == mockAppManager.uploadManagerV1.notifyingBridgeUploadSucceededKey
         }
     }
 }

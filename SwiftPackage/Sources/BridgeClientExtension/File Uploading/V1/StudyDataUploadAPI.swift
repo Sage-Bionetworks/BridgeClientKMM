@@ -81,9 +81,6 @@ class StudyDataUploadAPI: BridgeFileUploadAPITyped {
     typealias UploadRequestType = UploadRequest
     typealias UploadRequestResponseType = UploadSession
 
-    /// A singleton instance of the API.
-    static let shared = StudyDataUploadAPI()
-
     /// The Notification.userInfo key for the uploaded file's fileId.
     let fileNameKey = "FileName"
     
@@ -93,11 +90,10 @@ class StudyDataUploadAPI: BridgeFileUploadAPITyped {
     
     private(set) var notifiesBridgeWhenUploaded: Bool = true
     
-    private(set) var uploadManager: BridgeFileUploadManager
+    weak private(set) var uploadManager: BridgeFileUploadManager!
     
-    /// Private initializer so only the singleton can ever get created.
-    private init() {
-        self.uploadManager = BridgeFileUploadManager.shared
+    init(uploadManager: BridgeFileUploadManager) {
+        self.uploadManager = uploadManager
         
         // Set up a directory to keep temp copies of files being uploaded
         do {

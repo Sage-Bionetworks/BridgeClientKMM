@@ -13,8 +13,7 @@ final class ArchiveUploadProcessor {
     let sharedUserDefaults: UserDefaults
     var isTestUser: Bool = false
     
-    @MainActor
-    lazy var uploader: BridgeUploader = UploadManager.shared
+    weak var uploadManager: BridgeFileUploadManager!
     
     init(pemPath: String?, sharedUserDefaults: UserDefaults) {
         self.pemPath = pemPath
@@ -86,7 +85,7 @@ final class ArchiveUploadProcessor {
         let exporterV3Metadata: JsonElement? = dictionary.map { .object($0) }
         let extras = StudyDataUploadExtras(encrypted: true, metadata: exporterV3Metadata, zipped: true)
         Logger.log(severity: .info, message: "Uploading file: \(id)", metadata: dictionary)
-        StudyDataUploadAPI.shared.upload(fileId: id, fileUrl: url, contentType: "application/zip", extras: extras)
+        uploadManager.studyDataUploadAPI.upload(fileId: id, fileUrl: url, contentType: "application/zip", extras: extras)
         do {
             try FileManager.default.removeItem(at: url)
         } catch let err {

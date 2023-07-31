@@ -46,7 +46,7 @@ open class UploadAppManager : ObservableObject {
     /// - Note: Data should be encrypted so that it is not stored insecurely on the phone (while waiting
     ///         for an upload connection).
     public var pemPath: String? { uploadProcessor.pemPath }
-    private(set) var uploadProcessor: ArchiveUploadProcessor!
+    private let uploadProcessor: ArchiveUploadProcessor
         
     /// The title of the app to display. By default, this is the localized display name of the app that is shown
     /// to the participant in their phone home screen.
@@ -189,13 +189,15 @@ open class UploadAppManager : ObservableObject {
         // If we have a session token and it is different from the old one then check orphaned files.
         if let newToken = session?.sessionToken, !newToken.isEmpty, newToken != oldToken {
             Logger.log(severity: .info, message: "Session token updated: newToken='\(newToken)', oldToken='\(oldToken ?? "")'")
-            BridgeFileUploadManager.shared.onSessionTokenChanged()
+            uploadManagerV1.onSessionTokenChanged()
         }
     }
     
     private var appConfigManager: NativeAppConfigManager!
     public private(set) var authManager: NativeAuthenticationManager!
     private var pendingUploadObserver: PendingUploadObserver!
+    lazy var backgroundNetworkManager: BackgroundNetworkManager = .init()
+    lazy var uploadManagerV1: BridgeFileUploadManager = .init(netManager: backgroundNetworkManager, appManager: self)
     
     /// Convenience initializer for intializing a bridge manager with just an app id and pem file.
     ///
@@ -230,25 +232,11 @@ open class UploadAppManager : ObservableObject {
             self.sharedUserDefaults = UserDefaults.standard
         }
         
-        // Setup upload processor
+        // Create the archive upload processor
         self.uploadProcessor = .init(pemPath: pemPath, sharedUserDefaults: self.sharedUserDefaults)
         
         // Is this a new login (in which case we need to get the adherence records)
         self.isNewLogin = (self.userSessionId == nil)
-        
-        // Set up the background manager
-        setupBackgroundManagerV1()
-    }
-    
-    private func setupBackgroundManagerV1() {
-
-        // Hookup the background network manager singleton and make us its app manager
-        let bnm = BackgroundNetworkManager.shared
-        bnm.appManager = self
-        
-        // Register the file upload APIs so that retries can happen
-        let _ = ParticipantFileUploadAPI.shared
-        let _ = StudyDataUploadAPI.shared
     }
     
     /// **Required:** This method should be called by the app delegate when the app is launching in either `willLaunch` or `didLaunch`.
@@ -266,6 +254,10 @@ open class UploadAppManager : ObservableObject {
             let enableNetworkLogs = false
         #endif
         KoinKt.doInitKoin(enableNetworkLogs: enableNetworkLogs)
+        
+        // Setup upload processor
+        Logger.log(severity: .info, message: "Hook up upload processor")
+        self.uploadProcessor.uploadManager = uploadManagerV1
         
         // Hook up app config
         Logger.log(severity: .info, message: "Hook up app config")
@@ -308,7 +300,7 @@ open class UploadAppManager : ObservableObject {
     /// restore a background upload session.
     @MainActor
     public final func handleEvents(for backgroundSession: String, completionHandler: @escaping () -> Void) {
-        BackgroundNetworkManager.shared.restore(backgroundSession: backgroundSession, completionHandler: completionHandler)
+        backgroundNetworkManager.restore(backgroundSession: backgroundSession, completionHandler: completionHandler)
     }
     
     /// Wrapper used to allow `BridgeClientAppManager` to call through to a single sign-in handler.

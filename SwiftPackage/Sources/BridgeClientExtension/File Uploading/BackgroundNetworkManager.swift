@@ -32,16 +32,9 @@ enum HTTPMethod : String {
 
 class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate, BridgeURLSessionDelegate {
 
-    /// A singleton instance of the manager.
-    static let shared = BackgroundNetworkManager()
-
     /// The identifier (base) for the background URLSession. App extensions will append a unique string to this to distinguish
     /// their background sessions.
     let backgroundSessionIdentifier = "org.sagebase.backgroundnetworkmanager.session"
-    
-    /// BackgroundNetworkManager needs access to app configuration and user session info. The app manager should create the singleton
-    /// instance and immediately set this value to itself.
-    var appManager: UploadAppManager!
     
     /// If set, URLSession(Data/Download)Delegate method calls received by the BackgroundNetworkManager
     /// will be passed through to this object for further handling.
@@ -76,11 +69,6 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate, BridgeUR
               let packageType = infoDict["CFBundlePackageType"] as? String
             else { return false }
         return (packageType != "APPL") && infoDict["NSExtension"] != nil
-    }
-    
-    /// Private initializer so only the singleton can ever get created.
-    private override init() {
-        super.init()
     }
     
     /// For encoding objects to be passed to Bridge.

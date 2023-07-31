@@ -163,7 +163,7 @@ protocol BridgeFileUploadAPI {
     var notifiesBridgeWhenUploaded: Bool { get }
     
     /// The BridgeFileUploadManager this API implementation should use.
-    var uploadManager: BridgeFileUploadManager { get }
+    var uploadManager: BridgeFileUploadManager! { get }
     
     /// Create an instance of BridgeFileUploadMetadata for a file upload.
     func uploadMetadata(for fileId: String, fileUrl: URL, mimeType: String, extras: Codable?) -> BridgeFileUploadMetadataBlob?
@@ -445,9 +445,7 @@ extension BridgeFileUploadAPITyped {
 /// background session. This allows iOS to deal with any connectivity issues and lets the upload proceed
 /// even when the app is suspended.
 class BridgeFileUploadManager: SandboxFileManager, BridgeURLSessionDelegate {
-    /// A singleton instance of the manager.
-    static let shared = BridgeFileUploadManager()
-    
+
     /// The extended file attribute for which API is to be used to upload the file.
     let uploadApiAttributeName = "org.sagebionetworks.bridge.uploadApi"
     
@@ -493,12 +491,14 @@ class BridgeFileUploadManager: SandboxFileManager, BridgeURLSessionDelegate {
     var delayForRetry: TimeInterval = 5 * 60
     
     /// BridgeFileUploadManager uses the BackgroundNetworkManager singleton to manage its background URLSession tasks.
-    let netManager: BackgroundNetworkManager
+    weak private(set) var netManager: BackgroundNetworkManager!
     
     /// BridgeFileUploadManager needs access to app configuration and user session info.
-    var appManager: UploadAppManager! {
-        BackgroundNetworkManager.shared.appManager
-    }
+    weak private(set) var appManager: UploadAppManager!
+    
+    // Register the file upload APIs so that retries can happen
+    lazy private(set) var particpantFileUploadAPI: ParticipantFileUploadAPI = .init(uploadManager: self)
+    lazy private(set) var studyDataUploadAPI: StudyDataUploadAPI = .init(uploadManager: self)
     
     /// Serial queue for updates to temp file -> original file mappings and upload process state.
     let uploadQueue: OperationQueue
@@ -512,15 +512,13 @@ class BridgeFileUploadManager: SandboxFileManager, BridgeURLSessionDelegate {
         return UserDefaults.standard
     }()
 
-    /// Private initializer so only the singleton can ever get created.
-    private override init() {
-        netManager = BackgroundNetworkManager.shared
-        
-        self.uploadQueue = self.netManager.backgroundSession().delegateQueue
-        
+    init(netManager: BackgroundNetworkManager, appManager: UploadAppManager) {
+        self.uploadQueue = netManager.backgroundSession().delegateQueue
         super.init()
         
-        self.netManager.backgroundTransferDelegate = self
+        self.netManager = netManager
+        netManager.backgroundTransferDelegate = self
+        self.appManager = appManager
     }
     
     internal var appDidBecomeActiveObserver: Any?

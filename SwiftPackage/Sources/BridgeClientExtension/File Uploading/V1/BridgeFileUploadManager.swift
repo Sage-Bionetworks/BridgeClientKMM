@@ -444,7 +444,7 @@ extension BridgeFileUploadAPITyped {
 /// The BridgeFileUploadManager handles uploading files to Bridge using an iOS URLSession
 /// background session. This allows iOS to deal with any connectivity issues and lets the upload proceed
 /// even when the app is suspended.
-class BridgeFileUploadManager: SandboxFileManager, BridgeURLSessionDelegate {
+class BridgeFileUploadManager: SandboxFileManager, BridgeURLSessionDownloadDelegate {
 
     /// The extended file attribute for which API is to be used to upload the file.
     let uploadApiAttributeName = "org.sagebionetworks.bridge.uploadApi"

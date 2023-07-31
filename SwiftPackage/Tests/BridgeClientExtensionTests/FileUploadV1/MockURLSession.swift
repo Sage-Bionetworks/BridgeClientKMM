@@ -74,8 +74,8 @@ class MockDownloadTask: MockTask, BridgeURLSessionDownloadTask {
 class MockURLSession: NSObject, BridgeURLSession {
     var identifier: String?
     
-    var mockDelegate: BridgeURLSessionDelegate?
-    var bridgeDelegate: BridgeURLSessionDelegate? {
+    var mockDelegate: BridgeURLSessionBackgroundDelegate?
+    var bridgeDelegate: BridgeURLSessionBackgroundDelegate? {
         return mockDelegate
     }
 

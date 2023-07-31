@@ -30,7 +30,7 @@ enum HTTPMethod : String {
     case GET, POST, PUT, DELETE
 }
 
-class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate, BridgeURLSessionDelegate {
+class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate, BridgeURLSessionBackgroundDelegate {
 
     /// The identifier (base) for the background URLSession. App extensions will append a unique string to this to distinguish
     /// their background sessions.
@@ -38,7 +38,7 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate, BridgeUR
     
     /// If set, URLSession(Data/Download)Delegate method calls received by the BackgroundNetworkManager
     /// will be passed through to this object for further handling.
-    var backgroundTransferDelegate: BridgeURLSessionDelegate?
+    var backgroundTransferDelegate: BridgeURLSessionDownloadDelegate?
     
     /// The queue used for calling background session delegate methods.
     ///  Also used for creating the singleton background session itself in a thread-safe way.
@@ -315,8 +315,9 @@ protocol BridgeURLSession : NSObjectProtocol {
     associatedtype SessionTask : BridgeURLSessionTask
     
     var identifier: String? { get }
-    var bridgeDelegate: BridgeURLSessionDelegate? { get }
+    var bridgeDelegate: BridgeURLSessionBackgroundDelegate? { get }
     var delegateQueue: OperationQueue { get }
+    
     func uploadTask(with request: URLRequest, fromFile fileURL: URL) -> UploadTask
     func downloadTask(with request: URLRequest) -> DownloadTask
     func downloadTask(withResumeData data: Data) -> DownloadTask
@@ -342,31 +343,26 @@ protocol BridgeURLSessionUploadDelegate : NSObjectProtocol {
     func bridgeUrlSession(_ session: any BridgeURLSession, didBecomeInvalidWithError error: Error?)
 }
 
-protocol BridgeURLSessionDelegate : BridgeURLSessionUploadDelegate {
+protocol BridgeURLSessionDownloadDelegate : BridgeURLSessionUploadDelegate {
     func bridgeUrlSession(_ session: any BridgeURLSession, downloadTask: BridgeURLSessionDownloadTask, didFinishDownloadingTo location: URL)
 }
 
-protocol BridgeURLSessionBackgroundDelegate : BridgeURLSessionDelegate {
+protocol BridgeURLSessionBackgroundDelegate : BridgeURLSessionDownloadDelegate {
     func bridgeUrlSessionDidFinishEvents(forBackgroundURLSession session: any BridgeURLSession)
 }
 
 extension URLSession : BridgeURLSession {
     typealias UploadTask = URLSessionUploadTask
-    
     typealias DownloadTask = URLSessionDownloadTask
-    
     typealias SessionTask = URLSessionTask
-    
 
     var identifier: String? {
         configuration.identifier
     }
     
-    var bridgeDelegate: BridgeURLSessionDelegate? {
-        delegate as? BridgeURLSessionDelegate
+    var bridgeDelegate: BridgeURLSessionBackgroundDelegate? {
+        delegate as? BridgeURLSessionBackgroundDelegate
     }
-    
-    
 }
 
 extension URLSessionTask : BridgeURLSessionTask {

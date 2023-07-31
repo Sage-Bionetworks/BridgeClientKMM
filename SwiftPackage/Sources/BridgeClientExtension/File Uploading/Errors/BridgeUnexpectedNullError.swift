@@ -27,5 +27,6 @@ struct BridgeUnexpectedNullError : Error, CustomNSError {
         case corruptData = -106
         case missingMetadata = -107
         case missingMapping = -108
+        case notFound = -109
     }
 }

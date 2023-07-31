@@ -280,6 +280,8 @@ protocol BridgeFileUploadAPITyped : BridgeFileUploadAPI {
     
     /// Return the URL string at which BridgeFileUploadManager should request an upload.
     func uploadRequestUrlString(for uploadMetadata: BridgeFileUploadMetadataBlob) -> String
+    
+    static var uploadSubdirectory: String { get }
 }
     
 /// Implementations of functions that require compile-time knowledge of the associated type, but are
@@ -485,7 +487,10 @@ class BridgeFileUploadManager: SandboxFileManager, BridgeURLSessionDownloadDeleg
     let retryUploadsKey = "RetryUploadsKey"
     
     /// A mapping for implementation-specific details for each registered Bridge upload API.
-    var bridgeFileUploadApis = [String : BridgeFileUploadAPI]()
+    lazy private var bridgeFileUploadApis: [String : BridgeFileUploadAPI] = [
+        participantFileUploadAPI.apiString : participantFileUploadAPI,
+        studyDataUploadAPI.apiString : studyDataUploadAPI
+    ]
     
     /// The minimum delay before retrying a failed upload (in seconds).
     var delayForRetry: TimeInterval = 5 * 60
@@ -497,7 +502,7 @@ class BridgeFileUploadManager: SandboxFileManager, BridgeURLSessionDownloadDeleg
     weak private(set) var appManager: UploadAppManager!
     
     // Register the file upload APIs so that retries can happen
-    lazy private(set) var particpantFileUploadAPI: ParticipantFileUploadAPI = .init(uploadManager: self)
+    lazy private(set) var participantFileUploadAPI: ParticipantFileUploadAPI = .init(uploadManager: self)
     lazy private(set) var studyDataUploadAPI: StudyDataUploadAPI = .init(uploadManager: self)
     
     /// Serial queue for updates to temp file -> original file mappings and upload process state.
@@ -513,11 +518,11 @@ class BridgeFileUploadManager: SandboxFileManager, BridgeURLSessionDownloadDeleg
     }()
 
     init(netManager: BackgroundNetworkManager, appManager: UploadAppManager) {
-        self.uploadQueue = netManager.backgroundSession().delegateQueue
+        self.uploadQueue = netManager.sessionDelegateQueue
         super.init()
         
         self.netManager = netManager
-        netManager.backgroundTransferDelegate = self
+        netManager.registerBackgroundTransferHandler(self)
         self.appManager = appManager
     }
     
@@ -1523,3 +1528,12 @@ class BridgeFileUploadManager: SandboxFileManager, BridgeURLSessionDownloadDeleg
     }
 }
 
+extension BridgeFileUploadManager : BridgeURLSessionHandler {
+    func canHandle(task: BridgeURLSessionTask) -> Bool {
+        // If the
+        task.taskDescription.map {
+            $0.contains(ParticipantFileUploadAPI.uploadSubdirectory) ||
+            $0.contains(StudyDataUploadAPI.uploadSubdirectory)
+        } ?? false
+    }
+}

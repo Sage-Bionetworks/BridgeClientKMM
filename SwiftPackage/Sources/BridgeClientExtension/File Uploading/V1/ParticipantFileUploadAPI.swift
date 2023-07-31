@@ -56,21 +56,21 @@ class ParticipantFileUploadAPI: BridgeFileUploadAPITyped {
     
     weak private(set) var uploadManager: BridgeFileUploadManager!
     
+    static var uploadSubdirectory: String = "ParticipantFileUploads"
+    
     init(uploadManager: BridgeFileUploadManager) {
-        self.uploadManager = uploadManager
-        
+
         // Set up a directory to keep temp copies of files being uploaded
         do {
             let appSupportDir = try FileManager.default.sharedAppSupportDirectory()
-            self.tempUploadDirURL = appSupportDir.appendingPathComponent("ParticipantFileUploads")
+            self.tempUploadDirURL = appSupportDir.appendingPathComponent(Self.uploadSubdirectory)
             try FileManager.default.createDirectory(at: self.tempUploadDirURL, withIntermediateDirectories: true, attributes: nil)
         }
         catch {
             fatalError("ParticipantFileUploadAPI unable to create participant file temp upload dir: \(error)")
         }
         
-        // Register this upload API with the file upload manager
-        self.uploadManager.bridgeFileUploadApis[self.apiString] = self
+        self.uploadManager = uploadManager
     }
     
     func uploadMetadata(for fileId: String, fileUrl: URL, mimeType: String, extras: Codable? = nil) -> BridgeFileUploadMetadataBlob? {

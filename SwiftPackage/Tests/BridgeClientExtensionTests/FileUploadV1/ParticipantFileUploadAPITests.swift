@@ -16,7 +16,7 @@ class ParticipantFileUploadAPITests : XCTestCase, BridgeFileUploadManagerTestCas
     var mockAppManager: MockBridgeClientAppManager = MockBridgeClientAppManager(appId: "not-a-real-appid")
     var testFileId: String = "TestFileId"
     var uploadApi: BridgeFileUploadAPI {
-        mockAppManager.uploadManagerV1.particpantFileUploadAPI
+        mockAppManager.uploadManagerV1.participantFileUploadAPI
     }
     var uploadExtras: Codable?
     
@@ -42,7 +42,7 @@ class ParticipantFileUploadAPITests : XCTestCase, BridgeFileUploadManagerTestCas
     }
     
     func uploadRequestFailed412Tests(userInfo: [AnyHashable : Any]) {
-        let pfua = mockAppManager.uploadManagerV1.particpantFileUploadAPI
+        let pfua = mockAppManager.uploadManagerV1.participantFileUploadAPI
         let fileId = userInfo[pfua.fileIdKey] as? String
         XCTAssertNotNil(fileId, "SBBParticipantFileUploadRequestFailed notification userInfo has no file id string at '\(pfua.fileIdKey)'")
         let participantFile = userInfo[pfua.participantFileKey] as? ParticipantFile
@@ -50,7 +50,7 @@ class ParticipantFileUploadAPITests : XCTestCase, BridgeFileUploadManagerTestCas
     }
     
     func uploadSucceededRetriedTests(userInfo: [AnyHashable : Any]) {
-        let pfua = mockAppManager.uploadManagerV1.particpantFileUploadAPI
+        let pfua = mockAppManager.uploadManagerV1.participantFileUploadAPI
         let fileId = userInfo[pfua.fileIdKey] as? String
         XCTAssertNotNil(fileId, "SBBParticipantFileUploaded notification userInfo has no file id string at '\(pfua.fileIdKey)'")
         let participantFile = userInfo[pfua.participantFileKey] as? ParticipantFile

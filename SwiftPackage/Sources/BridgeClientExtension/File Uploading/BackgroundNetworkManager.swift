@@ -36,10 +36,6 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate, BridgeUR
     /// their background sessions.
     let backgroundSessionIdentifier = "org.sagebase.backgroundnetworkmanager.session"
     
-    /// If set, URLSession(Data/Download)Delegate method calls received by the BackgroundNetworkManager
-    /// will be passed through to this object for further handling.
-    var backgroundTransferDelegate: BridgeURLSessionDownloadDelegate?
-    
     /// The queue used for calling background session delegate methods.
     ///  Also used for creating the singleton background session itself in a thread-safe way.
     ///  Created lazily.
@@ -114,6 +110,25 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate, BridgeUR
             config.sharedContainerIdentifier = appGroupIdentifier
         }
         return URLSession(configuration: config, delegate: self, delegateQueue: sessionDelegateQueue)
+    }
+    
+    
+    /// If set, URLSession(Data/Download)Delegate method calls received by the BackgroundNetworkManager
+    /// will be passed through to this object for further handling.
+    var backgroundTransferHandlers: [BridgeURLSessionHandler] = []
+    
+    func registerBackgroundTransferHandler(_ handler: BridgeURLSessionHandler) {
+        backgroundTransferHandlers.append(handler)
+    }
+    
+    func backgroundTransferHandler(for task: BridgeURLSessionTask) -> BridgeURLSessionHandler? {
+        guard let handler = backgroundTransferHandlers.first(where: { $0.canHandle(task: task) })
+        else {
+            let error = BridgeUnexpectedNullError(category: .notFound, message: "Could not find a handler for URLSessionTask \(task.description).")
+            Logger.log(tag: .upload, error: error)
+            return nil
+        }
+        return handler
     }
     
     func bridgeBaseURL() -> URL {
@@ -250,7 +265,8 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate, BridgeUR
         self.bridgeUrlSession(session, downloadTask: downloadTask, didFinishDownloadingTo: location)
     }
     func bridgeUrlSession(_ session: any BridgeURLSession, downloadTask: BridgeURLSessionDownloadTask, didFinishDownloadingTo location: URL) {
-        self.backgroundTransferDelegate?.bridgeUrlSession(session, downloadTask: downloadTask, didFinishDownloadingTo: location)
+        (self.backgroundTransferHandler(for: downloadTask) as? BridgeURLSessionDownloadDelegate)?
+            .bridgeUrlSession(session, downloadTask: downloadTask, didFinishDownloadingTo: location)
     }
     
     // MARK: URLSessionTaskDelegate
@@ -259,7 +275,7 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate, BridgeUR
         self.bridgeUrlSession(session, task: task, didCompleteWithError: error)
     }
     func bridgeUrlSession(_ session: any BridgeURLSession, task: BridgeURLSessionTask, didCompleteWithError error: Error?) {
-        self.backgroundTransferDelegate?.bridgeUrlSession(session, task: task, didCompleteWithError: error)
+        self.backgroundTransferHandler(for: task)?.bridgeUrlSession(session, task: task, didCompleteWithError: error)
     }
     
     // MARK: URLSessionDelegate
@@ -303,7 +319,9 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate, BridgeUR
                 }
             }
         }
-        self.backgroundTransferDelegate?.bridgeUrlSession(session, didBecomeInvalidWithError: error)
+        self.backgroundTransferHandlers.forEach {
+            $0.bridgeUrlSession(session, didBecomeInvalidWithError: error)
+        }
     }
 }
 
@@ -336,6 +354,10 @@ protocol BridgeURLSessionDownloadTask : BridgeURLSessionTask {
 }
 
 protocol BridgeURLSessionUploadTask : BridgeURLSessionTask {
+}
+
+protocol BridgeURLSessionHandler : BridgeURLSessionUploadDelegate {
+    func canHandle(task: BridgeURLSessionTask) -> Bool
 }
 
 protocol BridgeURLSessionUploadDelegate : NSObjectProtocol {

@@ -68,3 +68,18 @@ WHERE url = ? ;
 
 removeAllEtags:
 DELETE FROM EtagCache;
+
+countResourceInList:
+SELECT COUNT(*)
+FROM Resource
+WHERE type IN ?;
+
+countPendingUploads:
+SELECT
+(SELECT COUNT(*)
+ FROM Resource
+ WHERE needSave = 1 AND type IN ?)
++
+(SELECT COUNT(*)
+ FROM AdherenceRecords
+ WHERE needSave = 1);

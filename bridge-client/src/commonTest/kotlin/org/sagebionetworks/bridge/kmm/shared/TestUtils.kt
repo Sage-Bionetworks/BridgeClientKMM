@@ -25,6 +25,8 @@ import org.sagebionetworks.bridge.kmm.shared.repo.TestBridgeConfig
 
 internal expect fun testDatabaseDriver() : SqlDriver
 
+internal expect fun randomUUID(): String
+
 data class MockAuthenticationProvider(
     var userSessionInfo: UserSessionInfo? = createUserSessionInfo(),
     val reauthSessionToken: String = "newTestSessionToken",

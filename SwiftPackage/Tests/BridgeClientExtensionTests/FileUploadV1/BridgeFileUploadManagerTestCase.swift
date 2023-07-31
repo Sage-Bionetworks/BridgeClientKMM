@@ -17,7 +17,7 @@ protocol BridgeFileUploadManagerTestCase : XCTWaiterDelegate {
     var mockAppManager: MockBridgeClientAppManager { get }
     var testFileId: String { get }
     
-    var savedSession: BridgeURLSession? { get set }
+    var savedSession: (any BridgeURLSession)? { get set }
     var savedDelay: TimeInterval? { get set }
     var savedAppManager: UploadAppManager? { get set }
     

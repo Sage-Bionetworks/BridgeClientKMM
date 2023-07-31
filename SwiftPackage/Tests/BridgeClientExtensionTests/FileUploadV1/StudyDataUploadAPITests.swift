@@ -15,7 +15,7 @@ class StudyDataUploadAPITests : XCTestCase, BridgeFileUploadManagerTestCaseTyped
     var mockURLSession: MockURLSession = MockURLSession()
     var mockAppManager: MockBridgeClientAppManager = MockBridgeClientAppManager(appId: "not-a-real-appid")
     var testFileId: String = "TestFileId"
-    var savedSession: BridgeURLSession?
+    var savedSession: (any BridgeURLSession)? = nil
     var savedDelay: TimeInterval?
     var savedAppManager: UploadAppManager?
     var uploadApi: BridgeFileUploadAPI = StudyDataUploadAPI.shared

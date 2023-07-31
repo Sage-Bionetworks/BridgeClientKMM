@@ -764,7 +764,7 @@ class BridgeFileUploadManager: SandboxFileManager, BridgeURLSessionDelegate {
     }
     
     /// Download delegate method.
-    func urlSession(_ session: BridgeURLSession, downloadTask: BridgeURLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+    func bridgeUrlSession(_ session: any BridgeURLSession, downloadTask: BridgeURLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         // get the sandbox-relative path to the temp copy of the participant file
         guard let invariantFilePath = downloadTask.taskDescription else {
             let message = "Finished a download task with no taskDescription set"
@@ -924,7 +924,7 @@ class BridgeFileUploadManager: SandboxFileManager, BridgeURLSessionDelegate {
         // Do not attempt to check and retry orphaned uploads if the session token isn't set up.
         guard self.appManager?.sessionToken != nil else { return }
         
-        self.netManager.backgroundSession().getAllBridgeTasks { tasks in
+        self.netManager.backgroundSession().getAllTasks { tasks in
             var tasks = tasks
             let defaults = self.userDefaults
             
@@ -1211,7 +1211,7 @@ class BridgeFileUploadManager: SandboxFileManager, BridgeURLSessionDelegate {
     }
 
     /// Task delegate method.
-    private func _urlSession(_ session: BridgeURLSession, task: BridgeURLSessionTask, didCompleteWithError error: Error?) {
+    private func _urlSession(_ session: any BridgeURLSession, task: BridgeURLSessionTask, didCompleteWithError error: Error?) {
         
         // get the sandbox-relative path to the temp copy of the participant file
         guard let invariantFilePath = task.taskDescription else {
@@ -1307,7 +1307,7 @@ class BridgeFileUploadManager: SandboxFileManager, BridgeURLSessionDelegate {
     }
     
     /// Session delegate method.
-    func urlSession(_ session: BridgeURLSession, didBecomeInvalidWithError error: Error?) {
+    func bridgeUrlSession(_ session: any BridgeURLSession, didBecomeInvalidWithError error: Error?) {
         guard error != nil else {
             // If the URLSession was deliberately invalidated (i.e., error is nil) then we assume
             // the intention is to cancel and forget all incomplete uploads, including retries.
@@ -1410,7 +1410,7 @@ class BridgeFileUploadManager: SandboxFileManager, BridgeURLSessionDelegate {
     /// This sets the maximum number of times we will retry a request before giving up.
     let maxRetries = 5
     
-    func urlSession(_ session: BridgeURLSession, task: BridgeURLSessionTask, didCompleteWithError error: Error?) {
+    func bridgeUrlSession(_ session: any BridgeURLSession, task: BridgeURLSessionTask, didCompleteWithError error: Error?) {
         if let nsError = error as NSError?,
            let downloadTask = task as? BridgeURLSessionDownloadTask,
            let resumeData = nsError.userInfo[NSURLSessionDownloadTaskResumeData] as? Data {
@@ -1436,8 +1436,8 @@ class BridgeFileUploadManager: SandboxFileManager, BridgeURLSessionDelegate {
         }
     }
     
-    fileprivate func retryFailedDownload(_ task: BridgeURLSessionDownloadTask, for session: BridgeURLSession, resumeData: Data) {
-        let resumeTask = session.downloadBridgeTask(withResumeData: resumeData)
+    fileprivate func retryFailedDownload(_ task: BridgeURLSessionDownloadTask, for session: any BridgeURLSession, resumeData: Data) {
+        let resumeTask = session.downloadTask(withResumeData: resumeData)
         resumeTask.taskDescription = task.taskDescription
         resumeTask.resume()
     }
@@ -1473,7 +1473,7 @@ class BridgeFileUploadManager: SandboxFileManager, BridgeURLSessionDelegate {
         request.setValue("\(retry)", forHTTPHeaderField: retryCountHeader)
         request.setValue(sessionToken, forHTTPHeaderField: "Bridge-Session")
 
-        let newTask = netManager.backgroundSession().downloadBridgeTask(with: request)
+        let newTask = netManager.backgroundSession().downloadTask(with: request)
         newTask.taskDescription = task.taskDescription
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + pow(2.0, Double(retry))) {
             newTask.resume()
@@ -1482,7 +1482,7 @@ class BridgeFileUploadManager: SandboxFileManager, BridgeURLSessionDelegate {
         return true
     }
     
-    func handleError(_ error: NSError, session: BridgeURLSession, task: BridgeURLSessionDownloadTask) -> Bool {
+    func handleError(_ error: NSError, session: any BridgeURLSession, task: BridgeURLSessionDownloadTask) -> Bool {
         if isTemporaryError(errorCode: error.code) {
             // Retry, and let the caller know we're retrying.
             return retry(task: task)
@@ -1499,7 +1499,7 @@ class BridgeFileUploadManager: SandboxFileManager, BridgeURLSessionDelegate {
         self.appManager.notifyUIOfBridgeError(412, description: "User not consented")
     }
     
-    func handleHTTPErrorResponse(_ response: HTTPURLResponse, session: BridgeURLSession, task: BridgeURLSessionDownloadTask) -> Bool {
+    func handleHTTPErrorResponse(_ response: HTTPURLResponse, session: any BridgeURLSession, task: BridgeURLSessionDownloadTask) -> Bool {
         switch response.statusCode {
         case 401:
             self.appManager.reauthenticate { success in

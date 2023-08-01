@@ -262,6 +262,13 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate, BridgeUR
     
     // MARK: URLSessionDownloadDelegate
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+        let httpResponseCode = (downloadTask.response as? HTTPURLResponse)?.statusCode ?? 0
+        let url = downloadTask.originalRequest?.url?.absoluteString ?? "null"
+        Logger.log(severity: .info, tag: .upload, message: """
+            \(type(of: downloadTask)) didFinishDownloading
+            status=\(httpResponseCode)
+            url='\(url)'
+        """)
         self.bridgeUrlSession(session, downloadTask: downloadTask, didFinishDownloadingTo: location)
     }
     func bridgeUrlSession(_ session: any BridgeURLSession, downloadTask: BridgeURLSessionDownloadTask, didFinishDownloadingTo location: URL) {
@@ -272,6 +279,13 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate, BridgeUR
     // MARK: URLSessionTaskDelegate
 
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        let httpResponseCode = (task.response as? HTTPURLResponse)?.statusCode ?? 0
+        let url = task.originalRequest?.url?.absoluteString.split(separator: "?").first ?? "null"
+        Logger.log(severity: .info, tag: .upload, message: """
+            \(type(of: task)) didCompleteWithError: \(String(describing: error))
+            status=\(httpResponseCode)
+            url='\(url)'
+        """)
         self.bridgeUrlSession(session, task: task, didCompleteWithError: error)
     }
     func bridgeUrlSession(_ session: any BridgeURLSession, task: BridgeURLSessionTask, didCompleteWithError error: Error?) {
@@ -280,6 +294,7 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate, BridgeUR
     
     // MARK: URLSessionDelegate
     func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
+        Logger.log(severity: .info, tag: .upload, message: "URLSession \(String(describing: session.configuration.identifier)) didFinishEvents")
         self.bridgeUrlSessionDidFinishEvents(forBackgroundURLSession: session)
     }
     func bridgeUrlSessionDidFinishEvents(forBackgroundURLSession session: any BridgeURLSession) {
@@ -299,6 +314,7 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate, BridgeUR
     }
     
     func urlSession(_ session: URLSession, didBecomeInvalidWithError error: Error?) {
+        Logger.log(severity: .warn, tag: .upload, message: "URLSession \(String(describing: session.configuration.identifier)) didBecomeInvalidWithError: \(String(describing: error))")
         self.bridgeUrlSession(session, didBecomeInvalidWithError: error)
     }
     func bridgeUrlSession(_ session: any BridgeURLSession, didBecomeInvalidWithError error: Error?) {

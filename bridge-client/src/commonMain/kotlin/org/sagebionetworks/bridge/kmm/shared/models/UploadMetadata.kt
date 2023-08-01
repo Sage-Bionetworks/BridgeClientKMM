@@ -24,12 +24,4 @@ data class UploadMetadata(
         }
         return jsonCoder.encodeToJsonElement(UploadMetadata.serializer(),this).jsonObject.toMap()
     }
-
-    /**
-     * Used on iOS to encode metadata.
-     * (`JsonElement` does not implement the Swift Codable protocol - syoung 07/10/2023)
-     */
-    fun toStringMap(): Map<String, String> {
-        return toJsonMap().mapValues { it.toString() }
-    }
 }

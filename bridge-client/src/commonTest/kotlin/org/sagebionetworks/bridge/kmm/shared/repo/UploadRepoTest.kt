@@ -14,6 +14,8 @@ import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonPrimitive
 import org.sagebionetworks.bridge.kmm.shared.BaseTest
 import org.sagebionetworks.bridge.kmm.shared.cache.Resource
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
@@ -25,6 +27,7 @@ import org.sagebionetworks.bridge.kmm.shared.models.S3UploadSession
 import org.sagebionetworks.bridge.kmm.shared.models.UploadFile
 import org.sagebionetworks.bridge.kmm.shared.models.UploadFileId
 import org.sagebionetworks.bridge.kmm.shared.models.UploadFileIdentifiable
+import org.sagebionetworks.bridge.kmm.shared.models.UploadMetadata
 import org.sagebionetworks.bridge.kmm.shared.models.UploadSession
 import org.sagebionetworks.bridge.kmm.shared.models.UploadStatus
 import org.sagebionetworks.bridge.kmm.shared.models.UploadValidationStatus
@@ -53,10 +56,10 @@ class UploadRepoTest : BaseTest() {
 
     fun mockUploadFile(): UploadFile {
         return UploadFile(
-            randomUUID(),
-            "application/zip",
-            1024,
-            randomUUID(),
+            filePath = randomUUID(),
+            contentType = "application/zip",
+            fileLength = 1024,
+            md5Hash = randomUUID(),
         )
     }
 
@@ -376,4 +379,15 @@ class UploadRepoTest : BaseTest() {
         }
     }
 
+    @Test
+    fun testUploadMetadata_toJsonMap() {
+        val metadata = UploadMetadata("foo", "goo", "maloo")
+        val json = metadata.toJsonMap()
+        val expectedJson: Map <String, JsonElement> = mapOf(
+            "instanceGuid" to JsonPrimitive("foo"),
+            "eventTimestamp" to JsonPrimitive("goo"),
+            "startedOn" to JsonPrimitive("maloo"),
+        )
+        assertEquals(expectedJson, json)
+    }
 }

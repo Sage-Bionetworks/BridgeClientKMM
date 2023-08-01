@@ -175,6 +175,10 @@ class SandboxFileManager: NSObject {
         return normalizedPath
     }
     
+    func fileURL(of path: String) -> URL {
+        URL(fileURLWithPath: fullyQualifiedPath(of: path))
+    }
+    
     /// Return the file size of the file at this URL.
     func fileContentLength(_ fileUrl: URL) -> Int? {
         do {

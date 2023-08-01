@@ -18,6 +18,10 @@ class MockTask : NSObject, BridgeURLSessionTask {
     
     var taskDescription: String?
     
+    var taskType: BridgeURLSessionTaskType {
+        .unknown
+    }
+    
     var response: URLResponse? {
         return mockResponse
     }
@@ -42,6 +46,10 @@ class MockTask : NSObject, BridgeURLSessionTask {
 
 // MARK: MockUploadTask
 class MockUploadTask : MockTask, BridgeURLSessionUploadTask {
+    
+    override var taskType: BridgeURLSessionTaskType {
+        .upload
+    }
      
     override func resume() {
         session.delegateQueue.addOperation { [self] in
@@ -54,6 +62,10 @@ class MockUploadTask : MockTask, BridgeURLSessionUploadTask {
 
 // MARK: MockDownloadTask
 class MockDownloadTask: MockTask, BridgeURLSessionDownloadTask {
+    
+    override var taskType: BridgeURLSessionTaskType {
+        .download
+    }
     
     override func resume() {
         session.delegateQueue.addOperation { [self] in

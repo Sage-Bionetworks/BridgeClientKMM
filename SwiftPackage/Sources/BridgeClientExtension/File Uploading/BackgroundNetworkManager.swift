@@ -327,6 +327,10 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate, BridgeUR
 
 // MARK: URLSession Mocking
 
+enum BridgeURLSessionTaskType : String {
+    case upload, download, unknown
+}
+
 protocol BridgeURLSession : NSObjectProtocol {
     associatedtype UploadTask : BridgeURLSessionUploadTask
     associatedtype DownloadTask : BridgeURLSessionDownloadTask
@@ -344,6 +348,7 @@ protocol BridgeURLSession : NSObjectProtocol {
 
 protocol BridgeURLSessionTask : NSObjectProtocol {
     var taskDescription: String? { get set }
+    var taskType: BridgeURLSessionTaskType { get }
     var originalRequest: URLRequest? { get }
     var response: URLResponse? { get }
     func resume()
@@ -388,6 +393,16 @@ extension URLSession : BridgeURLSession {
 }
 
 extension URLSessionTask : BridgeURLSessionTask {
+    var taskType: BridgeURLSessionTaskType {
+        switch (self) {
+        case is URLSessionDownloadTask:
+            return .download
+        case is URLSessionUploadTask:
+            return .upload
+        default:
+            return .unknown
+        }
+    }
 }
 
 extension URLSessionDownloadTask : BridgeURLSessionDownloadTask {

@@ -1127,7 +1127,7 @@ class BridgeFileUploadManager: SandboxFileManager, BridgeURLSessionDownloadDeleg
     
     // Helper for task delegate method in case of HTTP error on Bridge upload request or
     // upload success notification request.
-    fileprivate func handleHTTPDownloadStatusCode(_ statusCode: Int, uploadApi: BridgeFileUploadAPI, downloadTask: BridgeURLSessionDownloadTask, invariantFilePath: String) {
+    fileprivate func handleHTTPDownloadStatusCode(_ statusCode: Int, uploadApi: BridgeFileUploadAPI, downloadTask: BridgeURLSessionTask, invariantFilePath: String) {
         
         // remove the participant file from either the uploadRequested or notifyingBridge list,
         // retrieving its associated upload metadata
@@ -1235,15 +1235,14 @@ class BridgeFileUploadManager: SandboxFileManager, BridgeURLSessionDownloadDeleg
             return
         }
 
-        if let downloadTask = task as? BridgeURLSessionDownloadTask {
+        // Only need to continue if this is an upload task, otherwise, look for an error code.
+        guard task.taskType == .upload else {
             // If an HTTP error response from Bridge gets through to here, we need to handle it.
             // Otherwise, we're done here.
-            guard let httpResponse = task.response as? HTTPURLResponse,
-                  httpResponse.statusCode >= 400 else {
-                return
+            if let httpResponse = task.response as? HTTPURLResponse,
+                  httpResponse.statusCode >= 400 {
+                self.handleHTTPDownloadStatusCode(httpResponse.statusCode, uploadApi: uploadApi, downloadTask: task, invariantFilePath: invariantFilePath)
             }
-                        
-            self.handleHTTPDownloadStatusCode(httpResponse.statusCode, uploadApi: uploadApi, downloadTask: downloadTask, invariantFilePath: invariantFilePath)
             return
         }
         
@@ -1415,22 +1414,22 @@ class BridgeFileUploadManager: SandboxFileManager, BridgeURLSessionDownloadDeleg
     
     func bridgeUrlSession(_ session: any BridgeURLSession, task: BridgeURLSessionTask, didCompleteWithError error: Error?) {
         if let nsError = error as NSError?,
-           let downloadTask = task as? BridgeURLSessionDownloadTask,
+           task.taskType == .download,
            let resumeData = nsError.userInfo[NSURLSessionDownloadTaskResumeData] as? Data {
             // if there's resume data from a download task, use it to retry
-            self.retryFailedDownload(downloadTask, for: session, resumeData: resumeData)
+            self.retryFailedDownload(task, for: session, resumeData: resumeData)
             return
         }
 
         var retrying = false
-        if let downloadTask = task as? BridgeURLSessionDownloadTask {
+        if task.taskType == .download {
             let httpResponse = task.response as? HTTPURLResponse
             let httpError = (httpResponse?.statusCode ?? 0) >= 400
             if let nsError = error as NSError? {
-                retrying = self.handleError(nsError, session: session, task: downloadTask)
+                retrying = self.handleDownloadError(nsError, session: session, task: task)
             }
             else if httpError {
-                retrying = self.handleHTTPErrorResponse(httpResponse!, session: session, task: downloadTask)
+                retrying = self.handleDownloadHTTPErrorResponse(httpResponse!, session: session, task: task)
             }
         }
         
@@ -1439,7 +1438,7 @@ class BridgeFileUploadManager: SandboxFileManager, BridgeURLSessionDownloadDeleg
         }
     }
     
-    fileprivate func retryFailedDownload(_ task: BridgeURLSessionDownloadTask, for session: any BridgeURLSession, resumeData: Data) {
+    fileprivate func retryFailedDownload(_ task: BridgeURLSessionTask, for session: any BridgeURLSession, resumeData: Data) {
         let resumeTask = session.downloadTask(withResumeData: resumeData)
         resumeTask.taskDescription = task.taskDescription
         resumeTask.resume()
@@ -1453,7 +1452,7 @@ class BridgeFileUploadManager: SandboxFileManager, BridgeURLSessionDownloadDeleg
     // lives in Kotlin Native code which only allows access from the thread on which
     // the object was originally created. ~emm 2021-09-17
     @discardableResult
-    func retry(task: BridgeURLSessionDownloadTask) -> Bool {
+    func retryDownload(task: BridgeURLSessionTask) -> Bool {
         guard var request = task.originalRequest else {
             let message = "Unable to retry upload task, as originalRequest is nil:\n\(task)"
             Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .corruptData, message: message))
@@ -1485,10 +1484,10 @@ class BridgeFileUploadManager: SandboxFileManager, BridgeURLSessionDownloadDeleg
         return true
     }
     
-    func handleError(_ error: NSError, session: any BridgeURLSession, task: BridgeURLSessionDownloadTask) -> Bool {
+    func handleDownloadError(_ error: NSError, session: any BridgeURLSession, task: BridgeURLSessionTask) -> Bool {
         if isTemporaryError(errorCode: error.code) {
             // Retry, and let the caller know we're retrying.
-            return retry(task: task)
+            return retryDownload(task: task)
         }
         
         return false
@@ -1502,13 +1501,13 @@ class BridgeFileUploadManager: SandboxFileManager, BridgeURLSessionDownloadDeleg
         self.appManager.notifyUIOfBridgeError(412, description: "User not consented")
     }
     
-    func handleHTTPErrorResponse(_ response: HTTPURLResponse, session: any BridgeURLSession, task: BridgeURLSessionDownloadTask) -> Bool {
+    func handleDownloadHTTPErrorResponse(_ response: HTTPURLResponse, session: any BridgeURLSession, task: BridgeURLSessionTask) -> Bool {
         switch response.statusCode {
         case 401:
             self.appManager.reauthenticate { success in
                 if success {
                     Logger.log(severity: .info, tag: .upload, message: "Session token auto-refresh succeeded, retrying original request")
-                    self.retry(task: task)
+                    self.retryDownload(task: task)
                 }
             }
             return true

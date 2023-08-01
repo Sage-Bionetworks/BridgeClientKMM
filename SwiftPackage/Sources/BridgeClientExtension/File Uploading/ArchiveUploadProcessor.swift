@@ -74,14 +74,16 @@ final class ArchiveUploadProcessor {
 
     @MainActor
     private func _uploadEncrypted(id: String, url: URL, schedule: AssessmentScheduleInfo?, startedOn: Date?) {
-        let uploadMetadata = schedule.map {
-            UploadMetadata(
-                instanceGuid: $0.instanceGuid,
-                eventTimestamp: $0.session.eventTimestamp,
-                startedOn: startedOn?.jsonObject() as? String
-            )
+        let dictionary = schedule.map {
+            var ret = [
+                "instanceGuid": $0.instanceGuid,
+                "eventTimestamp": $0.session.eventTimestamp,
+            ]
+            if let startedOn = startedOn?.jsonObject() as? String {
+                ret["startedOn"] = startedOn
+            }
+            return ret
         }
-        let dictionary = uploadMetadata?.toStringMap()
         let exporterV3Metadata: JsonElement? = dictionary.map { .object($0) }
         let extras = StudyDataUploadExtras(encrypted: true, metadata: exporterV3Metadata, zipped: true)
         Logger.log(severity: .info, message: "Uploading file: \(id)", metadata: dictionary)

@@ -196,8 +196,9 @@ open class UploadAppManager : ObservableObject {
     private var appConfigManager: NativeAppConfigManager!
     public private(set) var authManager: NativeAuthenticationManager!
     private var pendingUploadObserver: PendingUploadObserver!
-    lazy var backgroundNetworkManager: BackgroundNetworkManager = .init()
-    lazy var uploadManagerV1: BridgeFileUploadManager = .init(netManager: backgroundNetworkManager, appManager: self)
+    let backgroundNetworkManager: BackgroundNetworkManager = .init()
+    lazy private(set) var uploadManagerV1: BridgeFileUploadManager = .init(netManager: backgroundNetworkManager, appManager: self)
+    lazy private(set) var uploadManagerV2: UploadManager = .init(backgroundNetworkManager: backgroundNetworkManager)
     
     /// Convenience initializer for intializing a bridge manager with just an app id and pem file.
     ///

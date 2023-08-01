@@ -26,17 +26,31 @@ protocol BridgeUploader {
     @MainActor func upload(fileUrl: URL, contentType: String, encrypted: Bool, metadata: UploadMetadata?, s3UploadType: S3UploadType) -> Bool
 }
 
-class UploadManager : NSObject, BridgeUploader {
-    static let shared: UploadManager = .init()
+class UploadManager : NSObject, BridgeUploader, BridgeURLSessionHandler {
+
+    weak private(set) var backgroundNetworkManager: BackgroundNetworkManager!
+    let sandboxFileManager: SandboxFileManager
+    let nativeUploadManager: BridgeClientUploadManager
     
-    lazy var sandboxFileManager: SandboxFileManager = .init()
-    lazy var nativeUploadManager: BridgeClientUploadManager = NativeUploadManager()
+    init(backgroundNetworkManager: BackgroundNetworkManager,
+         sandboxFileManager: SandboxFileManager = .init(),
+         nativeUploadManager: BridgeClientUploadManager = NativeUploadManager()
+    ) {
+        // Set up pointers
+        self.sandboxFileManager = sandboxFileManager
+        self.nativeUploadManager = nativeUploadManager
+        super.init()
+        
+        // register self with the background network manager
+        self.backgroundNetworkManager = backgroundNetworkManager
+        backgroundNetworkManager.registerBackgroundTransferHandler(self)
+    }
     
+    private let subdir = "BridgeUploadsV2"
     lazy var uploadDirURL: URL? = {
         do {
             let baseURL = try FileManager.default.sharedAppSupportDirectory()
             let url: URL
-            let subdir = "BridgeUploads"
             if #available(iOS 16.0, *) {
                 url = baseURL.appending(component: subdir, directoryHint: .isDirectory)
             } else {
@@ -105,6 +119,29 @@ class UploadManager : NSObject, BridgeUploader {
         // TODO: Implement syoung 07/26/2023
     }
     
+    // MARK: BridgeURLSessionHandler
+    
+    func canHandle(task: BridgeURLSessionTask) -> Bool {
+        // TODO: syoung 08/01/2023 Use the taskDescription to parse out whether or not the task should be handled by this handler.
+        return false
+    }
+
+    func bridgeUrlSession(_ session: any BridgeURLSession, task: BridgeURLSessionTask, didCompleteWithError error: Error?) {
+        // TODO: syoung 08/01/2023 Handle responding to an S3 upload success/failure.
+    }
+
+    func bridgeUrlSession(_ session: any BridgeURLSession, didBecomeInvalidWithError error: Error?) {
+        // TODO: syoung 08/01/2023 Manage any cleanup needed to handle S3 session becoming invalid. Retry?
+    }
+}
+
+// Use a protocol to wrap the background network manager - this is to allow using a mock for testing.
+protocol SharedBackgroundUploadManager : AnyObject {
+    @discardableResult
+    func uploadFile(_ fileURL: URL, httpHeaders: [String : String]?, to urlString: String, taskDescription: String) -> BridgeURLSessionUploadTask?
+}
+
+extension BackgroundNetworkManager : SharedBackgroundUploadManager {
 }
 
 // Use a protocol to wrap the native upload manager - this is to allow using a mock for testing.

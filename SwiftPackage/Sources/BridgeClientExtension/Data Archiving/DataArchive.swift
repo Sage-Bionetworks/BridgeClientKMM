@@ -120,9 +120,12 @@ open class DataArchive : NSObject, Identifiable {
     
     /// Close the archive (but do not encrypt or delete).
     public final func completeArchive() throws {
+        guard !isCompleted else { return }
         let metadata = ArchiveMetadata(files: manifest)
         let metadataDictionary = try metadata.jsonEncodedDictionary()
         try addMetadata(metadataDictionary)
+        // Add info.json file b/c otherwise the upload is marked as failed. syoung 08/03/2023
+        try addBridgeV2Info()
         isCompleted = true
     }
     
@@ -191,6 +194,42 @@ open class DataArchive : NSObject, Identifiable {
         }
     }
     #endif
+    
+    func addBridgeV2Info(dataFilename: String = "answers.json",
+                         format: BridgeUploaderInfoV2.FormatVersion = .v2_generic,
+                         schemaIdentifier: String? = nil,
+                         schemaRevision: Int? = nil) throws {
+        let platformConfig = PlatformConfigImpl()
+        let info = BridgeUploaderInfoV2(files: files,
+                                        dataFilename: dataFilename,
+                                        format: format,
+                                        item: schemaIdentifier ?? identifier,
+                                        schemaRevision: schemaRevision,
+                                        appName: platformConfig.appName,
+                                        appVersion: platformConfig.appVersionName,
+                                        phoneInfo: platformConfig.deviceInfo)
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(info)
+        try _addFile(data: data, filepath: kBridgeV2InfoFilename, createdOn: Date(), contentType: "application/json")
+    }
+}
+
+fileprivate let kBridgeV2InfoFilename = "info.json"
+
+public struct BridgeUploaderInfoV2 : Encodable {
+    
+    let files: [FileEntry]
+    let dataFilename: String
+    let format: FormatVersion
+    let item: String
+    let schemaRevision: Int?
+    let appName: String
+    let appVersion: String
+    let phoneInfo: String
+    
+    public enum FormatVersion : String, Codable {
+        case v1_legacy, v2_generic
+    }
 }
 
 struct BridgeArchiveError : Error, CustomNSError {

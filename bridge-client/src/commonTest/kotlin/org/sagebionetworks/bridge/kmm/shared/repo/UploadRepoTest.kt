@@ -66,7 +66,7 @@ class UploadRepoTest : BaseTest() {
             val mockEngine = MockEngine.config {
                 // Should never be called
                 addHandler { respondError(HttpStatusCode.ExpectationFailed) }
-                
+
                 reuseHandlers = false
             }
             val testClient = getTestClient(mockEngine)

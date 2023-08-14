@@ -124,7 +124,7 @@ open class DataArchive : NSObject, Identifiable {
         let metadata = ArchiveMetadata(files: manifest)
         let metadataDictionary = try metadata.jsonEncodedDictionary()
         try addMetadata(metadataDictionary)
-        // Add info.json file b/c otherwise the upload is marked as failed. syoung 08/03/2023
+        // TODO: syoung 08/03/2023 Remove work-around. Add info.json file b/c otherwise the upload is marked as failed. 
         try addBridgeV2Info()
         isCompleted = true
     }

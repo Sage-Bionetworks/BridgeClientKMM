@@ -113,8 +113,8 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate, BridgeUR
     }
     
     
-    /// If set, URLSession(Data/Download)Delegate method calls received by the BackgroundNetworkManager
-    /// will be passed through to this object for further handling.
+    /// If registered, URLSession(Data/Download)Delegate method calls received by the BackgroundNetworkManager
+    /// will be passed through to these objects for further handling.
     var backgroundTransferHandlers: [BridgeURLSessionHandler] = []
     
     func registerBackgroundTransferHandler(_ handler: BridgeURLSessionHandler) {

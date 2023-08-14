@@ -495,7 +495,7 @@ class BridgeFileUploadManager: SandboxFileManager, BridgeURLSessionDownloadDeleg
     /// The minimum delay before retrying a failed upload (in seconds).
     var delayForRetry: TimeInterval = 5 * 60
     
-    /// BridgeFileUploadManager uses the BackgroundNetworkManager singleton to manage its background URLSession tasks.
+    /// BridgeFileUploadManager uses a BackgroundNetworkManager instance to manage its background URLSession tasks.
     weak private(set) var netManager: BackgroundNetworkManager!
     
     /// BridgeFileUploadManager needs access to app configuration and user session info.

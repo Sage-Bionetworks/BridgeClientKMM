@@ -129,21 +129,16 @@ class UploadManager : NSObject, BridgeURLSessionHandler {
                                     s3UploadType: s3UploadType)
         
         // Finally, queue the upload using the native upload manager.
-        let success: Bool = await withCheckedContinuation { continuation in
-            nativeUploadManager.queueAndRequestUploadSession(uploadFile: uploadFile) { [weak self] uploadSession in
-                if let uploadSession = uploadSession {
-                    // If there is an upload session then start the upload
-                    self?.startS3Upload(uploadSession)
-                } else {
-                    // If the callback is nil then services are offline. Try again later.
-                    // TODO: syoung 08/02/2023 Retry after delay? Check for network and then retry when connected?
-                }
-                // Always return true - encryption and copy was successful.
-                continuation.resume(returning: true)
-            }
+        if let uploadSession = await nativeUploadManager.queueAndRequestUploadSession(uploadFile: uploadFile) {
+            // If there is an upload session then start the upload
+            startS3Upload(uploadSession)
+        }
+        else {
+            // If the callback is nil then services are offline. Try again later.
+            // TODO: syoung 08/02/2023 Retry after delay? Check for network and then retry when connected?
         }
 
-        return success
+        return true
     }
     
     @MainActor
@@ -268,11 +263,43 @@ extension BackgroundNetworkManager : SharedBackgroundUploadManager {
 protocol BridgeClientUploadManager : AnyObject {
     func hasPendingUploads() -> Bool
     func getUploadFiles() -> [String]
-    func queueAndRequestUploadSession(uploadFile: UploadFile, callBack: @escaping (S3UploadSession?) -> Void)
-    func requestUploadSession(filePath: String, callBack: @escaping (S3UploadSession?) -> Void)
-    func markUploadFileFinished(filePath: String, callBack: @escaping (KotlinBoolean) -> Void)
-    func processFinishedUploads(callBack: @escaping (KotlinBoolean) -> Void)
+    func queueAndRequestUploadSession(uploadFile: UploadFile) async -> S3UploadSession?
+    func requestUploadSession(filePath: String) async -> S3UploadSession?
+    func markUploadFileFinished(filePath: String) async -> Bool
+    func processFinishedUploads() async -> Bool
 }
 
 extension NativeUploadManager : BridgeClientUploadManager {
+    
+    func queueAndRequestUploadSession(uploadFile: UploadFile) async -> S3UploadSession? {
+        return await withCheckedContinuation { continuation in
+            self.queueAndRequestUploadSession(uploadFile: uploadFile) { session in
+                continuation.resume(returning: session)
+            }
+        }
+    }
+    
+    func requestUploadSession(filePath: String) async -> S3UploadSession? {
+        return await withCheckedContinuation { continuation in
+            self.requestUploadSession(filePath: filePath) { session in
+                continuation.resume(returning: session)
+            }
+        }
+    }
+    
+    func markUploadFileFinished(filePath: String) async -> Bool {
+        return await withCheckedContinuation { continuation in
+            self.markUploadFileFinished(filePath: filePath) { result in
+                continuation.resume(returning: result.boolValue)
+            }
+        }
+    }
+    
+    func processFinishedUploads() async -> Bool {
+        return await withCheckedContinuation { continuation in
+            self.processFinishedUploads() { result in
+                continuation.resume(returning: result.boolValue)
+            }
+        }
+    }
 }

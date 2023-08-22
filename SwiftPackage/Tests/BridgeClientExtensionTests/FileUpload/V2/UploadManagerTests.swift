@@ -57,7 +57,7 @@ final class UploadManagerTests: XCTestCase {
     }
     
     @MainActor
-    func testUploadArchive_Online() async {
+    func testUploadArchive_Online_HappyPath() async {
         let (manager, mockNetworkManager, mockSandboxFileManager, mockNativeManager) = createUploadManager()
         let (fileURL, schedule, startedOn) = mockSandboxFileManager.setupFakeArchive()
         let requestHeaders = ["foo" : "magoo"]
@@ -100,6 +100,7 @@ final class UploadManagerTests: XCTestCase {
         
         // Check if the manager can handle the upload response
         XCTAssertTrue(manager.canHandle(task: uploadTask))
+        
         
     }
     
@@ -247,8 +248,8 @@ class MockNativeUploadManager : NSObject, BridgeClientUploadManager {
     var uploadFiles: [String] = []
     var s3Uploads: [String : S3UploadSession] = [:]
     var uploadFinished: [String] = []
-    var uploadFinishedResponse: [String : KotlinBoolean] = [:]
-    var processFinishedUploadsResponse: KotlinBoolean = false
+    var uploadFinishedResponse: [String : Bool] = [:]
+    var processFinishedUploadsResponse: Bool = false
     
     func getUploadFiles() -> [String] {
         uploadFiles
@@ -257,34 +258,28 @@ class MockNativeUploadManager : NSObject, BridgeClientUploadManager {
     func hasPendingUploads() -> Bool {
         uploadFiles.count > 0
     }
-
-    func queueAndRequestUploadSession(uploadFile: UploadFile, callBack: @escaping (S3UploadSession?) -> Void) {
+    
+    func queueAndRequestUploadSession(uploadFile: UploadFile) async -> S3UploadSession? {
         queuedUploadFiles.append(uploadFile)
-        let ret: S3UploadSession? = queuedS3UploadSession.map {
+        return queuedS3UploadSession.map {
             .init(filePath: uploadFile.filePath,
                   contentType: $0.contentType,
                   uploadSessionId: $0.uploadSessionId,
                   url: $0.url,
                   requestHeaders: $0.requestHeaders)
         }
-        callBack(ret)
     }
     
-    func requestUploadSession(filePath: String, callBack: @escaping (S3UploadSession?) -> Void) {
-        let ret = s3Uploads[filePath]
-        callBack(ret)
+    func requestUploadSession(filePath: String) async -> S3UploadSession? {
+        return s3Uploads[filePath]
     }
     
-    func markUploadFileFinished(filePath: String, callBack: @escaping (KotlinBoolean) -> Void) {
+    func markUploadFileFinished(filePath: String) async -> Bool {
         uploadFinished.append(filePath)
-        let ret = uploadFinishedResponse[filePath] ?? false
-        if ret.boolValue {
-            uploadFinishedResponse[filePath] = nil
-        }
-        callBack(ret)
+        return uploadFinishedResponse[filePath] ?? false
     }
     
-    func processFinishedUploads(callBack: @escaping (KotlinBoolean) -> Void) {
-        callBack(processFinishedUploadsResponse)
+    func processFinishedUploads() async -> Bool {
+        return processFinishedUploadsResponse
     }
 }

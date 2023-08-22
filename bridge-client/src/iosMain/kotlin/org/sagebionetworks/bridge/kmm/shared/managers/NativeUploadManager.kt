@@ -28,6 +28,10 @@ class NativeUploadManager : KoinComponent {
         }
     }
 
+    fun hasPendingUploads(): Boolean {
+        return repo.database.getPendingUploadCount() > 0
+    }
+
     fun getUploadFiles(): List<String> {
         return repo.getUploadFiles().map { it.filePath }
     }

@@ -9,6 +9,8 @@ struct BridgeUploadFailedError : Error, CustomNSError {
     let errorCode: Int
     let message: String
     
+    static let backgroundTaskTimeout = BridgeUploadFailedError(errorCode: -57, message: "Failed to finish background task before timeout")
+    
     init(errorCode: Int = -1, message: String = "Bridge upload failed") {
         self.errorCode = errorCode
         self.message = message

@@ -5,6 +5,10 @@ import Foundation
 import BridgeClient
 import JsonModel
 
+#if canImport(UIKit)
+import UIKit
+#endif
+
 fileprivate let UnprocessedUploadsKey = "unprocessedUploads"
 
 final class ArchiveUploadProcessor {
@@ -13,7 +17,7 @@ final class ArchiveUploadProcessor {
     let sharedUserDefaults: UserDefaults
     var isTestUser: Bool = false
     
-    weak var uploadManager: BridgeFileUploadManager!
+    weak var uploadManager: BridgeUploader!
     
     init(pemPath: String?, sharedUserDefaults: UserDefaults) {
         self.pemPath = pemPath
@@ -21,13 +25,21 @@ final class ArchiveUploadProcessor {
     }
     
     func encryptAndUpload(using builder: ArchiveBuilder) {
-        Task.detached(priority: .medium) {
+        Task.detached(priority: .userInitiated) {
             await self._encryptAndUpload(using: builder)
         }
     }
     
     @MainActor
     private func _encryptAndUpload(using builder: ArchiveBuilder) async {
+
+        #if canImport(UIKit)
+        let taskId = UIApplication.shared.beginBackgroundTask {
+            Logger.log(tag: .upload, error: BridgeUploadFailedError.backgroundTaskTimeout,
+                       message: "Timed out when archiving and starting background upload.")
+        }
+        #endif
+        
         do {
             let archive = try await builder.buildArchive()
             // Copy the startedOn date (if available) from the builder to the archive.
@@ -40,6 +52,10 @@ final class ArchiveUploadProcessor {
         } catch {
             Logger.log(error: error, message: "Failed to archive and upload \(builder.identifier)")
         }
+        
+        #if canImport(UIKit)
+        UIApplication.shared.endBackgroundTask(taskId)
+        #endif
     }
     
     private func _copyTest(archive: DataArchive) async {
@@ -69,52 +85,36 @@ final class ArchiveUploadProcessor {
             Logger.log(error: BridgeUnexpectedNullError(category: .missingFile, message: message))
             return
         }
-        _uploadEncrypted(id: archive.identifier, url: url, schedule: archive.schedule, startedOn: archive.adherenceStartedOn)
+        await _uploadEncrypted(id: archive.identifier, url: url, schedule: archive.schedule, startedOn: archive.adherenceStartedOn)
     }
 
     @MainActor
-    private func _uploadEncrypted(id: String, url: URL, schedule: AssessmentScheduleInfo?, startedOn: Date?) {
-        let dictionary = schedule.map {
-            var ret = [
-                "instanceGuid": $0.instanceGuid,
-                "eventTimestamp": $0.session.eventTimestamp,
-            ]
-            if let startedOn = startedOn?.jsonObject() as? String {
-                ret["startedOn"] = startedOn
+    private func _uploadEncrypted(id: String, url: URL, schedule: AssessmentScheduleInfo?, startedOn: Date?) async {
+        let success = await uploadManager.uploadEncryptedArchive(fileUrl: url, schedule: schedule, startedOn: startedOn)
+        if (success) {
+            // Only if the file was successfully queued for upload should the original file be deleted.
+            do {
+                try FileManager.default.removeItem(at: url)
+            } catch let err {
+                Logger.log(error: err, message: "Failed to delete encrypted archive \(id) at \(url)")
             }
-            return ret
         }
-        let exporterV3Metadata: JsonElement? = dictionary.map { .object($0) }
-        let extras = StudyDataUploadExtras(encrypted: true, metadata: exporterV3Metadata, zipped: true)
-        Logger.log(severity: .info, message: "Uploading file: \(id)", metadata: dictionary)
-        uploadManager.studyDataUploadAPI.upload(fileId: id, fileUrl: url, contentType: "application/zip", extras: extras)
-        do {
-            try FileManager.default.removeItem(at: url)
-        } catch let err {
-            Logger.log(error: err, message: "Failed to delete encrypted archive \(id) at \(url)")
+        else {
+            // Store the path to the failed upload to allow potentially recovering the file and log error.
+            var failedUploads = (sharedUserDefaults.array(forKey: UnprocessedUploadsKey) as? [String]) ?? []
+            failedUploads.append(url.path)
+            sharedUserDefaults.set(failedUploads, forKey: UnprocessedUploadsKey)
+            let err = BridgeUploadFailedError(errorCode: -99, message: "Failed to queue encrypted file for upload. \(url)")
+            Logger.log(tag: .upload, error: err)
         }
     }
     
-    // TODO: syoung 07/27/2023 Replace upload with V2 uploader
-//    @MainActor
-//    private func _uploadEncrypted(id: String, url: URL, schedule: AssessmentScheduleInfo?, startedOn: Date?) {
-//        let success = uploader.uploadEncryptedArchive(fileUrl: url, schedule: schedule, startedOn: startedOn)
-//        if (success) {
-//            // Only if the file was successfully queued for upload should the original file be deleted.
-//            do {
-//                try FileManager.default.removeItem(at: url)
-//            } catch let err {
-//                Logger.log(error: err, message: "Failed to delete encrypted archive \(id) at \(url)")
-//            }
-//        }
-//        else {
-//            // Store the path to the failed upload to allow potentially recovering the file and log error.
-//            var failedUploads = (sharedUserDefaults.array(forKey: UnprocessedUploadsKey) as? [String]) ?? []
-//            failedUploads.append(url.path)
-//            sharedUserDefaults.set(failedUploads, forKey: UnprocessedUploadsKey)
-//            let err = BridgeUploadFailedError(errorCode: -99, message: "Failed to queue encrypted file for upload. \(url)")
-//            Logger.log(tag: .upload, error: err)
-//        }
-//    }
-    
+}
+
+protocol BridgeUploader : NSObjectProtocol {
+    @MainActor func uploadEncryptedArchive(fileUrl: URL, schedule: AssessmentScheduleInfo?, startedOn: Date?) async -> Bool
+    @MainActor func upload(fileUrl: URL, contentType: String, encrypted: Bool, metadata: UploadMetadata?, s3UploadType: S3UploadType) async -> Bool
+}
+
+extension UploadManager : BridgeUploader {
 }

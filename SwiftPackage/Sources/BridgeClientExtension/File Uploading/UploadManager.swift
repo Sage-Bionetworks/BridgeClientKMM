@@ -2,37 +2,20 @@
 // swift-tools-version:5.0
 
 import Foundation
+import BackgroundTasks
 import BridgeClient
 
-protocol BridgeUploader {
-    
-    /// Upload an encrypted archive.
-    /// - Parameters:
-    ///   - fileUrl: The file url of the original encrypted archive.
-    ///   - schedule: The schedule (if any) associated with this archive.
-    ///   - startedOn: The `startedOn` value for the associated adherence record that is used to uniquely identify it.
-    /// - Returns: `true` if the file was successfully copied and queued for upload.
-    @MainActor func uploadEncryptedArchive(fileUrl: URL, schedule: AssessmentScheduleInfo?, startedOn: Date?) -> Bool
-    
-    
-    /// Upload a file to Bridge.
-    /// - Parameters:
-    ///   - fileUrl: The original file url for the file to upload.
-    ///   - contentType: The content-type for the file.
-    ///   - encrypted: Whether or not the file is encrypted.
-    ///   - metadata: The metadata associated with this file.
-    ///   - s3UploadType: The upload type.
-    /// - Returns: `true` if the file was successfully copied and queued for upload.
-    @MainActor func upload(fileUrl: URL, contentType: String, encrypted: Bool, metadata: UploadMetadata?, s3UploadType: S3UploadType) -> Bool
-}
+#if canImport(UIKit)
+import UIKit
+#endif
 
-class UploadManager : NSObject, BridgeUploader, BridgeURLSessionHandler {
+class UploadManager : NSObject, BridgeURLSessionHandler {
 
-    weak private(set) var backgroundNetworkManager: BackgroundNetworkManager!
+    weak private(set) var backgroundNetworkManager: SharedBackgroundUploadManager!
     let sandboxFileManager: SandboxFileManager
     let nativeUploadManager: BridgeClientUploadManager
     
-    init(backgroundNetworkManager: BackgroundNetworkManager,
+    init(backgroundNetworkManager: SharedBackgroundUploadManager,
          sandboxFileManager: SandboxFileManager = .init(),
          nativeUploadManager: BridgeClientUploadManager = NativeUploadManager()
     ) {
@@ -46,7 +29,8 @@ class UploadManager : NSObject, BridgeUploader, BridgeURLSessionHandler {
         backgroundNetworkManager.registerBackgroundTransferHandler(self)
     }
     
-    private let subdir = "BridgeUploadsV2"
+    let subdir = "BridgeUploadsV2"
+    
     lazy var uploadDirURL: URL? = {
         do {
             let baseURL = try FileManager.default.sharedAppSupportDirectory()
@@ -64,7 +48,32 @@ class UploadManager : NSObject, BridgeUploader, BridgeURLSessionHandler {
         }
     }()
     
-    func uploadEncryptedArchive(fileUrl: URL, schedule: AssessmentScheduleInfo?, startedOn: Date?) -> Bool {
+    @MainActor
+    func setup(backgroundProcessId: String?) {
+        do {
+            // Register the background process
+            if let backgroundProcessId = backgroundProcessId {
+                try registerBackgroundTasks(backgroundProcessId)
+            }
+            // setup checking and retrying uploads
+            try setupCheckAndRetryUploads()
+            
+        } catch {
+            Logger.log(tag: .upload, error: error)
+        }
+    }
+    
+    
+    // MARK: Upload handling
+    
+    /// Upload an encrypted archive.
+    /// - Parameters:
+    ///   - fileUrl: The file url of the original encrypted archive.
+    ///   - schedule: The schedule (if any) associated with this archive.
+    ///   - startedOn: The `startedOn` value for the associated adherence record that is used to uniquely identify it.
+    /// - Returns: `true` if the file was successfully copied and queued for upload.
+    @MainActor
+    func uploadEncryptedArchive(fileUrl: URL, schedule: AssessmentScheduleInfo?, startedOn: Date?) async -> Bool {
         let metadata: UploadMetadata? = schedule.map {
             UploadMetadata(
                 instanceGuid: $0.instanceGuid,
@@ -72,14 +81,23 @@ class UploadManager : NSObject, BridgeUploader, BridgeURLSessionHandler {
                 startedOn: startedOn?.jsonObject() as? String
             )
         }
-        return upload(fileUrl: fileUrl, contentType: "application/zip", encrypted: true, metadata: metadata, s3UploadType: .studyData)
+        return await upload(fileUrl: fileUrl, contentType: "application/zip", encrypted: true, metadata: metadata, s3UploadType: .studyData)
     }
     
-    func upload(fileUrl: URL, contentType: String, encrypted: Bool, metadata: UploadMetadata?, s3UploadType: S3UploadType) -> Bool {
+    /// Upload a file to Bridge.
+    /// - Parameters:
+    ///   - fileUrl: The original file url for the file to upload.
+    ///   - contentType: The content-type for the file.
+    ///   - encrypted: Whether or not the file is encrypted.
+    ///   - metadata: The metadata associated with this file.
+    ///   - s3UploadType: The upload type.
+    /// - Returns: `true` if the file was successfully copied and queued for upload.
+    @MainActor
+    func upload(fileUrl: URL, contentType: String, encrypted: Bool, metadata: UploadMetadata?, s3UploadType: S3UploadType) async -> Bool {
         
         // Both study data and participant data should first be copied to a temp file.
-        guard let uploadDirURL = self.uploadDirURL,
-              let (_, tempUrl) = sandboxFileManager.tempFileFor(inFileURL: fileUrl, uploadDirURL: uploadDirURL),
+        guard let uploadDirURL = self.uploadDirURL?.appendingPathComponent(s3UploadType.name),
+              let (_, tempUrl) = sandboxFileManager.tempFileFor(inFileURL: fileUrl,uploadDirURL: uploadDirURL),
               let contentLength = sandboxFileManager.fileContentLength(tempUrl)
         else {
             return false
@@ -108,22 +126,41 @@ class UploadManager : NSObject, BridgeUploader, BridgeURLSessionHandler {
                                     md5Hash: contentMD5String,
                                     encrypted: encrypted,
                                     metadata: metadata,
-                                    s3UploadType: .studyData)
+                                    s3UploadType: s3UploadType)
         
         // Finally, queue the upload using the native upload manager.
-        nativeUploadManager.queueAndRequestUploadSession(uploadFile: uploadFile, callBack: startS3Upload)
-        return true
+        let success: Bool = await withCheckedContinuation { continuation in
+            nativeUploadManager.queueAndRequestUploadSession(uploadFile: uploadFile) { [weak self] uploadSession in
+                if let uploadSession = uploadSession {
+                    // If there is an upload session then start the upload
+                    self?.startS3Upload(uploadSession)
+                } else {
+                    // If the callback is nil then services are offline. Try again later.
+                    // TODO: syoung 08/02/2023 Retry after delay? Check for network and then retry when connected?
+                }
+                // Always return true - encryption and copy was successful.
+                continuation.resume(returning: true)
+            }
+        }
+
+        return success
     }
     
-    private func startS3Upload(_ uploadSession: S3UploadSession?) {
-        // TODO: Implement syoung 07/26/2023
+    @MainActor
+    private func startS3Upload(_ uploadSession: S3UploadSession) {
+        let fileURL = sandboxFileManager.fileURL(of: uploadSession.filePath)
+        let taskIdentifier = "\(uploadSession.uploadSessionId)|\(uploadSession.filePath)"
+        backgroundNetworkManager.uploadFile(fileURL,
+                                            httpHeaders: uploadSession.requestHeaders,
+                                            to: uploadSession.url,
+                                            taskDescription: taskIdentifier)
     }
+    
     
     // MARK: BridgeURLSessionHandler
     
     func canHandle(task: BridgeURLSessionTask) -> Bool {
-        // TODO: syoung 08/01/2023 Use the taskDescription to parse out whether or not the task should be handled by this handler.
-        return false
+        return (task.taskType == .upload) && (task.taskDescription?.contains(subdir) ?? false)
     }
 
     func bridgeUrlSession(_ session: any BridgeURLSession, task: BridgeURLSessionTask, didCompleteWithError error: Error?) {
@@ -133,12 +170,95 @@ class UploadManager : NSObject, BridgeUploader, BridgeURLSessionHandler {
     func bridgeUrlSession(_ session: any BridgeURLSession, didBecomeInvalidWithError error: Error?) {
         // TODO: syoung 08/01/2023 Manage any cleanup needed to handle S3 session becoming invalid. Retry?
     }
+    
+    
+    // MARK: Background process handling
+    
+    private var backgroundProcessId: String?
+    private var appBackgroundObserver: Any?
+    
+    @MainActor
+    func registerBackgroundTasks(_ backgroundProcessId: String) throws {
+        guard self.backgroundProcessId == nil, self.backgroundProcessId != backgroundProcessId
+        else {
+            throw BridgeUnexpectedNullError(category: .duplicateCall, message: "Attempting to register for a background process multiple times.")
+        }
+        self.backgroundProcessId = backgroundProcessId
+        BGTaskScheduler.shared.register(forTaskWithIdentifier: backgroundProcessId, using: .main) { task in
+            Task {
+                let success = await self.handleBackgroundProcessing()
+                task.setTaskCompleted(success: success)
+                self.scheduleBackgroundProcessingIfNeeded()
+            }
+        }
+        #if canImport(UIKit)
+        // Set up a listener to retry temporarily-failed uploads whenever the app becomes active
+        self.appBackgroundObserver = NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { notification in
+            Logger.log(severity: .info, message: "App did enter background. Scheduling background processing if needed.")
+            self.scheduleBackgroundProcessingIfNeeded()
+        }
+        #endif
+    }
+    
+    func handleBackgroundProcessing() async -> Bool {
+        // TODO: Implement syoung 08/18/2023 Check for any archives or adherence records that are not uploaded.
+        return true
+    }
+    
+    func scheduleBackgroundProcessingIfNeeded() {
+        // Only schedule background processing if there are pending uploads.
+        guard nativeUploadManager.hasPendingUploads(),
+              let taskId = self.backgroundProcessId
+        else {
+            return
+        }
+        Logger.log(severity: .info, tag: .upload, message: "Pending uploads detected. Scheduling background process: \(taskId)")
+        
+        let request = BGProcessingTaskRequest(identifier: taskId)
+        request.requiresNetworkConnectivity = true                     // Do not attempt processing without network connectivity
+        request.earliestBeginDate = Date(timeIntervalSinceNow: 15*60)  // Wait 15 minutes to allow S3 uploads in progress to complete
+        
+        do {
+            try BGTaskScheduler.shared.submit(request)
+        } catch {
+            Logger.log(tag: .upload, error: error)
+        }
+    }
+    
+    
+    // MARK: Check and retry handling
+    
+    private var appActiveObserver: Any?
+    
+    func setupCheckAndRetryUploads() throws {
+        guard self.appActiveObserver == nil else {
+            throw BridgeUnexpectedNullError(category: .duplicateCall, message: "Attempting to setup listening to app active multiple times")
+        }
+        
+        #if canImport(UIKit)
+        // Set up a listener to retry temporarily-failed uploads whenever the app becomes active
+        self.appActiveObserver = NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: nil) { notification in
+            Logger.log(severity: .info, message: "App did enter foreground. Checking for uploads.")
+            self.checkAndRetryUploads()
+        }
+        #endif
+
+        // Check for uploads that need to be retried
+        checkAndRetryUploads()
+    }
+    
+    /// Check and retry uploads.
+    func checkAndRetryUploads() {
+        // TODO: syoung 08/22/2023 Implement
+    }
 }
 
 // Use a protocol to wrap the background network manager - this is to allow using a mock for testing.
 protocol SharedBackgroundUploadManager : AnyObject {
-    @discardableResult
-    func uploadFile(_ fileURL: URL, httpHeaders: [String : String]?, to urlString: String, taskDescription: String) -> BridgeURLSessionUploadTask?
+    var sessionDelegateQueue: OperationQueue { get }
+    func registerBackgroundTransferHandler(_ handler: BridgeURLSessionHandler)
+    @discardableResult func uploadFile(_ fileURL: URL, httpHeaders: [String : String]?, to urlString: String, taskDescription: String) -> Bool
+    func getAllTasks() async -> [BridgeURLSessionTask]
 }
 
 extension BackgroundNetworkManager : SharedBackgroundUploadManager {
@@ -146,6 +266,7 @@ extension BackgroundNetworkManager : SharedBackgroundUploadManager {
 
 // Use a protocol to wrap the native upload manager - this is to allow using a mock for testing.
 protocol BridgeClientUploadManager : AnyObject {
+    func hasPendingUploads() -> Bool
     func getUploadFiles() -> [String]
     func queueAndRequestUploadSession(uploadFile: UploadFile, callBack: @escaping (S3UploadSession?) -> Void)
     func requestUploadSession(filePath: String, callBack: @escaping (S3UploadSession?) -> Void)

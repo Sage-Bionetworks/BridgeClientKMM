@@ -47,19 +47,16 @@ class NativeUploadManager : KoinComponent {
         }
     }
 
-    fun markUploadFileFinished(filePath: String, callBack: (Boolean) -> Unit) {
-        markAndProcessFinishedUploads(filePath, callBack)
+    fun markUploadUnrecoverableFailure(filePath: String) {
+        repo.removeUploadFile(UploadFileId(filePath))
+    }
+
+    fun markUploadFileFinished(filePath: String) {
+        repo.markUploadFileFinished(UploadFileId(filePath))
     }
 
     fun processFinishedUploads(callBack: (Boolean) -> Unit) {
-        markAndProcessFinishedUploads(null, callBack)
-    }
-
-    private fun markAndProcessFinishedUploads(filePath: String? = null, callBack: (Boolean) -> Unit) {
         scope.launch {
-            if (filePath != null) {
-                repo.markUploadFileFinished(UploadFileId(filePath))
-            }
             try {
                 repo.processFinishedUploads()
                 authManager.currentStudyId()?.let {

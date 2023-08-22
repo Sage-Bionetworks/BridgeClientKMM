@@ -121,6 +121,30 @@ internal open class UploadRepo(
     }
 
     /**
+     * Remove the [UploadFile] from the local cache. This is called after an unrecoverable failure
+     * to upload to S3.
+     *
+     * Note: Deleting the file must be handled natively as a part of S3 upload rather than using
+     * expect/actually. This is done b/c on iOS coordinating file read/write is much more
+     * complicated - the file location can change with app or OS updates and synchronization is
+     * a bit brittle. It's less confusing to handle this in Swift. syoung 07/14/2023
+     */
+    fun removeUploadFile(uploadFile: UploadFileIdentifiable) {
+        database.database.transaction {
+            database.removeResource(
+                uploadFile.getUploadSessionResourceId(),
+                ResourceType.UPLOAD_SESSION,
+                ResourceDatabaseHelper.APP_WIDE_STUDY_ID
+            )
+            database.removeResource(
+                uploadFile.getUploadFileResourceId(),
+                ResourceType.FILE_UPLOAD,
+                ResourceDatabaseHelper.APP_WIDE_STUDY_ID
+            )
+        }
+    }
+
+    /**
      * Get the cached [UploadFile] for a given `filePath`.
      */
     private fun getUploadFile(filePath: String): UploadFile? {

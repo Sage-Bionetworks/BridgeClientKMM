@@ -83,6 +83,12 @@ public struct AssessmentScheduleInfo : Identifiable, Hashable, Codable {
                                    label: assessment.assessmentInfo.label)
     }
     
+    init(instanceGuid: String, session: Session, assessmentInfo: Info) {
+        self.instanceGuid = instanceGuid
+        self.session = session
+        self.assessmentInfo = assessmentInfo
+    }
+    
     /// A thread-safe struct with information required to load and save the results from an assessment.
     public struct Info : Hashable, Codable {
         /// The ``BridgeClient.AssessmentInfo/identifier``.

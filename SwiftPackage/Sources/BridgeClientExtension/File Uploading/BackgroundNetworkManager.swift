@@ -165,7 +165,7 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate, BridgeUR
         }.joined(separator: "&")
     }
     
-    func request(method: HTTPMethod, URLString: String, headers: [String : String]?) -> URLRequest {
+    func downloadRequest(method: HTTPMethod, URLString: String, headers: [String : String]?) -> URLRequest {
         var request = URLRequest(url: bridgeURL(for: URLString))
         request.httpMethod = method.rawValue
         request.httpShouldHandleCookies = false
@@ -175,7 +175,7 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate, BridgeUR
         return request
     }
     
-    func request<T>(method: HTTPMethod, URLString: String, headers: [String : String]?, parameters: T) -> URLRequest where T: Encodable {
+    func downloadRequest<T>(method: HTTPMethod, URLString: String, headers: [String : String]?, parameters: T) -> URLRequest where T: Encodable {
         var URLString = URLString
         let isGet = (method == .GET)
         
@@ -189,7 +189,7 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate, BridgeUR
             }
         }
 
-        var request = self.request(method: method, URLString: URLString, headers: headers)
+        var request = self.downloadRequest(method: method, URLString: URLString, headers: headers)
         
         // for non-GET requests, the parameters (if any) go in the request body
         let contentTypeHeader = "Content-Type"
@@ -212,30 +212,30 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate, BridgeUR
     }
     
     @discardableResult
-    func downloadFile(from URLString: String, method: HTTPMethod, httpHeaders: [String : String]?, taskDescription: String) -> BridgeURLSessionDownloadTask {
-        let request = self.request(method: method, URLString: URLString, headers: httpHeaders)
+    func downloadFile(from URLString: String, method: HTTPMethod, httpHeaders: [String : String]?, taskDescription: String) -> Bool {
+        let request = self.downloadRequest(method: method, URLString: URLString, headers: httpHeaders)
         return self.downloadFile(with: request, taskDescription: taskDescription)
     }
     
     @discardableResult
-    func downloadFile<T>(from URLString: String, method: HTTPMethod, httpHeaders: [String : String]?, parameters: T?, taskDescription: String) -> BridgeURLSessionDownloadTask where T: Encodable {
-        let request =  self.request(method: method, URLString: URLString, headers: httpHeaders, parameters: parameters)
+    func downloadFile<T>(from URLString: String, method: HTTPMethod, httpHeaders: [String : String]?, parameters: T?, taskDescription: String) -> Bool where T: Encodable {
+        let request =  self.downloadRequest(method: method, URLString: URLString, headers: httpHeaders, parameters: parameters)
         return self.downloadFile(with: request, taskDescription: taskDescription)
     }
     
-    private func downloadFile(with request: URLRequest, taskDescription: String) -> BridgeURLSessionDownloadTask {
+    private func downloadFile(with request: URLRequest, taskDescription: String) -> Bool {
         let task = self.backgroundSession().downloadTask(with: request)
         task.taskDescription = taskDescription
         task.resume()
-        return task
+        return true
     }
     
     @discardableResult
-    func uploadFile(_ fileURL: URL, httpHeaders: [String : String]?, to urlString: String, taskDescription: String) -> BridgeURLSessionUploadTask? {
+    func uploadFile(_ fileURL: URL, httpHeaders: [String : String]?, to urlString: String, taskDescription: String) -> Bool {
         guard let url = URL(string: urlString) else {
             let message = "Error: Could not create URL from string '\(urlString)"
             Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .invalidURL, message: message))
-            return nil
+            return false
         }
         var request = URLRequest(url: url)
         request.allHTTPHeaderFields = httpHeaders
@@ -243,7 +243,7 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate, BridgeUR
         let task = backgroundSession().uploadTask(with: request, fromFile: fileURL)
         task.taskDescription = taskDescription
         task.resume()
-        return task
+        return true
     }
     
     func restore(backgroundSession: String, completionHandler: @escaping () -> Void) {
@@ -338,6 +338,28 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate, BridgeUR
         self.backgroundTransferHandlers.forEach {
             $0.bridgeUrlSession(session, didBecomeInvalidWithError: error)
         }
+    }
+    
+    // MARK: Async task handling
+    
+    func getAllTasks() async -> [BridgeURLSessionTask] {
+        let mainSession = backgroundSession()
+        var tasks: [BridgeURLSessionTask] = await withCheckedContinuation { continuation in
+            mainSession.getAllTasks {
+                continuation.resume(returning: $0)
+            }
+        }
+        for pair in self.restoredSessions {
+            let session = pair.value as any BridgeURLSession
+            if session.identifier != mainSession.identifier {
+                tasks.append(contentsOf: await withCheckedContinuation { continuation in
+                    session.getAllTasks {
+                        continuation.resume(returning: $0)
+                    }
+                })
+            }
+        }
+        return tasks
     }
 }
 

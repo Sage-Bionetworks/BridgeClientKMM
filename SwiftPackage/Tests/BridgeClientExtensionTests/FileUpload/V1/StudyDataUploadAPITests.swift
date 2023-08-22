@@ -13,7 +13,7 @@ class StudyDataUploadAPITests : XCTestCase, BridgeFileUploadManagerTestCaseTyped
     var uploadRequestSuccessResponseFile: String = "sd-upload-request-success"
     var uploadRequestExpiredResponseFile: String = "sd-upload-request-expired"
     var mockURLSession: MockURLSession = MockURLSession()
-    var mockAppManager: MockBridgeClientAppManager = MockBridgeClientAppManager(appId: "not-a-real-appid")
+    var mockAppManager: MockBridgeClientAppManager = MockBridgeClientAppManager(mockType: .unitTest)
     var testFileId: String = "TestFileId"
     var uploadApi: BridgeFileUploadAPI {
         mockAppManager.uploadManagerV1.studyDataUploadAPI

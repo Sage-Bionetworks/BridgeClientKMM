@@ -44,8 +44,7 @@ open class UploadAppManager : ObservableObject {
     ///
     /// - Note: Data should be encrypted so that it is not stored insecurely on the phone (while waiting
     ///         for an upload connection).
-    public var pemPath: String? { uploadProcessor.pemPath }
-    private let uploadProcessor: ArchiveUploadProcessor
+    public var pemPath: String? { self.uploadProcessor.pemPath }
         
     /// The title of the app to display. By default, this is the localized display name of the app that is shown
     /// to the participant in their phone home screen.
@@ -192,6 +191,8 @@ open class UploadAppManager : ObservableObject {
         }
     }
     
+    private let uploadProcessor: ArchiveUploadProcessor
+    private let backgroundProcessId: String?
     private var appConfigManager: NativeAppConfigManager!
     public private(set) var authManager: NativeAuthenticationManager!
     private var pendingUploadObserver: PendingUploadObserver!
@@ -199,7 +200,7 @@ open class UploadAppManager : ObservableObject {
     lazy private(set) var uploadManagerV1: BridgeFileUploadManager = .init(netManager: backgroundNetworkManager, appManager: self)
     lazy private(set) var uploadManagerV2: UploadManager = .init(backgroundNetworkManager: backgroundNetworkManager)
     
-    /// Convenience initializer for intializing a bridge manager with just an app id and pem file.
+    /// Convenience initializer for intializing a bridge manager with just required properties.
     ///
     /// Both the APP ID and the CMS Public Key (ie. pem file) are accessible through the [Bridge Study Manager](https://research.sagebridge.org).
     /// Once logged into an "app" (which can host multiple "studies"), select "Server Config -> Settings" from the menu.
@@ -209,8 +210,34 @@ open class UploadAppManager : ObservableObject {
     ///   - pemPath: The path to the pem file (as an embedded resource) to use for encrypting uploads. The pem file can be downloaded
     ///     from the [Bridge Study Manager](https://research.sagebridge.org) by going "Server Settings -> Settings"
     ///     and tapping on the button labeled "Download CMS Public Key..." and saving the file to a secure location.
+    ///   - backgroundProcessId: The background process ID registered in the "info.plist" used to allow processing pending uploads
+    ///     in the background.
+    ///   - appGroupId: The app group ID to use when setting up files that are shared with an app extension.
+    ///   - defaultConsentGuid: The default consent guid for this app (where the app includes in-app consent).
+    public convenience init(appId: String, pemPath: String, backgroundProcessId: String, appGroupId: String? = nil, defaultConsentGuid: String? = nil) {
+        self.init(platformConfig: PlatformConfigImpl(appId: appId, appGroupIdentifier: appGroupId, defaultConsentGuid: defaultConsentGuid), pemPath: pemPath, backgroundProcessId: backgroundProcessId)
+    }
+    
+    public enum MockType {
+        case unitTest, preview
+    }
+    
+    /// A special manager that is used in unit testing and SwiftUI preview.
+    /// - Parameter mockType: The type of mock manager to initialize.
+    public convenience init(mockType: MockType) {
+        let appId = mockType == .preview ? kPreviewStudyId : "not-a-real-appid"
+        self.init(appId: appId, pemPath: "", backgroundProcessId: "")
+    }
+    
+    @available(*, deprecated, message: "Use initializer with non-nil pem path and background process Id")
     public convenience init(appId: String, appGroupId: String? = nil, pemPath: String? = nil, defaultConsentGuid: String? = nil) {
         self.init(platformConfig: PlatformConfigImpl(appId: appId, appGroupIdentifier: appGroupId, defaultConsentGuid: defaultConsentGuid), pemPath: pemPath)
+    }
+    
+    @available(*, deprecated, message: "Use initializer with non-nil pem path and background process Id")
+    public convenience init(platformConfig: IOSPlatformConfig, pemPath: String? = nil) {
+        let pemPath = pemPath ?? Bundle.main.path(forResource: platformConfig.appId, ofType: "pem") ?? ""
+        self.init(platformConfig: platformConfig, pemPath: pemPath, backgroundProcessId: "")
     }
     
     /// Initialize the bridge manager with a custom platform config.
@@ -218,8 +245,8 @@ open class UploadAppManager : ObservableObject {
     /// - Parameters:
     ///   - platformConfig: The platform config to use to set up the connection to Bridge.
     ///   - pemPath: The path to the location of the pem file to use when encrypting uploads.
-    public init(platformConfig: IOSPlatformConfig, pemPath: String? = nil) {
-        let pemPath = pemPath ?? Bundle.main.path(forResource: platformConfig.appId, ofType: "pem")
+    ///   - backgroundProcessId: The background process ID registered in the "info.plist" used to allow processing pending uploads in the background.
+    public init(platformConfig: IOSPlatformConfig, pemPath: String, backgroundProcessId: String) {
         self.title = platformConfig.localizedAppName
         self.platformConfig = platformConfig
         
@@ -234,6 +261,7 @@ open class UploadAppManager : ObservableObject {
         
         // Create the archive upload processor
         self.uploadProcessor = .init(pemPath: pemPath, sharedUserDefaults: self.sharedUserDefaults)
+        self.backgroundProcessId = backgroundProcessId.isEmpty ? nil : backgroundProcessId
         
         // Is this a new login (in which case we need to get the adherence records)
         self.isNewLogin = (self.userSessionId == nil)
@@ -257,7 +285,7 @@ open class UploadAppManager : ObservableObject {
         
         // Setup upload processor
         Logger.log(severity: .info, message: "Hook up upload processor")
-        self.uploadProcessor.uploadManager = uploadManagerV1
+        self.uploadProcessor.uploadManager = uploadManagerV2
         
         // Hook up app config
         Logger.log(severity: .info, message: "Hook up app config")
@@ -289,10 +317,15 @@ open class UploadAppManager : ObservableObject {
         self.authManager.observeUserSessionInfo()
         
         // Hook up upload observer
+        Logger.log(severity: .info, message: "Hook up upload observer")
         self.pendingUploadObserver = PendingUploadObserver() { count in
             self.isUploading = (count.intValue > 0)
         }
         self.pendingUploadObserver.observePendingUploadCount()
+        
+        // Setup the upload manager
+        Logger.log(severity: .info, message: "Setup the upload manager")
+        self.uploadManagerV2.setup(backgroundProcessId: backgroundProcessId)
     }
     
     /// **Required:** This method should be called by the app delegate in the implementation of

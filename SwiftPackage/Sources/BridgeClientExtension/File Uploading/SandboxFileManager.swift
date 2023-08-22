@@ -42,7 +42,19 @@ class SandboxFileManager: NSObject {
         
         // Use a UUID for the temp file's name
         let tempFileURL = uploadDirURL.appendingPathComponent(UUID().uuidString)
-
+        
+        // Copy the file to the temp file
+        guard copyFile(from: fileURL, to: tempFileURL) else {
+            return nil
+        }
+        
+        // "touch" the temp file for retry accounting purposes
+        self.touch(fileUrl: tempFileURL)
+        
+        return (fileURL, tempFileURL)
+    }
+    
+    func copyFile(from fileURL: URL, to tempFileURL: URL) -> Bool {
         // Use a NSFileCoordinator to make a temp local copy so the app can delete
         // the original as soon as the upload call returns.
         let coordinator = NSFileCoordinator(filePresenter: nil)
@@ -57,17 +69,13 @@ class SandboxFileManager: NSObject {
             }
         }
         if copyError != nil {
-            return nil
+            return false
         }
         if let err = coordError {
             Logger.log(tag: .upload, error: err, message: "File coordinator error copying upload file \(fileURL) to temp file \(tempFileURL) for upload.")
-            return nil
+            return false
         }
-        
-        // "touch" the temp file for retry accounting purposes
-        self.touch(fileUrl: tempFileURL)
-        
-        return (fileURL, tempFileURL)
+        return true
     }
     
     func mimeTypeFor(fileUrl: URL) -> String {

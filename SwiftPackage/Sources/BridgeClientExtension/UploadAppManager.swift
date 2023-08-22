@@ -6,7 +6,6 @@
 import Foundation
 import BridgeClient
 import JsonModel
-import Network
 
 public let kPreviewStudyId = "xcode_preview"
 public let kStudyIdKey = "studyId"
@@ -378,46 +377,27 @@ open class UploadAppManager : ObservableObject {
         // Do nothing. Allows subclass override setup and app state changes.
     }
     
-    private let networkMonitoringQueue = DispatchQueue(label: "org.sagebase.NetworkConnectivityMonitor.\(UUID())")
-    private var networkMonitor: NWPathMonitor?
+    lazy private var networkMonitor: NetworkMonitor = .init() { [weak self] newStatus in
+        guard let strongSelf = self else { return }
+        let oldStatus = strongSelf.networkStatus
+        if newStatus == .connected, oldStatus != .unknown {
+            // only check for uploads if the new status is connected and the previous
+            // status was *not* connected.
+            strongSelf.uploadManagerV2.checkAndRetryUploads()
+        }
+        DispatchQueue.main.async {
+            strongSelf.networkStatus = newStatus
+        }
+    }
     
     private func updateNetworkMonitoring() {
         // This is not thread protected so it should always be called from the main thread
         if isUploading || !userSessionInfo.isAuthenticated {
-            startMonitoringNetwork()
+            networkMonitor.startIfNeeded()
         }
         else {
-            stopMonitoringNetwork()
+            networkMonitor.cancel()
         }
-    }
-    
-    private func stopMonitoringNetwork() {
-        networkMonitor?.cancel()
-        networkMonitor = nil
-    }
-
-    private func startMonitoringNetwork() {
-        guard networkMonitor == nil else { return }
-        let networkMonitor = NWPathMonitor()
-        self.networkMonitor = networkMonitor
-        networkMonitor.pathUpdateHandler = { [weak self] path in
-            guard let strongSelf = self else { return }
-            DispatchQueue.main.async {
-                switch path.status {
-                case .unsatisfied:
-                    if #available(iOS 14.2, *), path.unsatisfiedReason == .cellularDenied {
-                        strongSelf.networkStatus = .cellularDenied
-                    } else {
-                        strongSelf.networkStatus = .notConnected
-                    }
-                case .satisfied:
-                    strongSelf.networkStatus = .connected
-                default:
-                    strongSelf.networkStatus = .unknown
-                }
-            }
-        }
-        networkMonitor.start(queue: networkMonitoringQueue)
     }
     
     /// Encrypt and upload an archive created with the given builder.

@@ -3,9 +3,7 @@ package org.sagebionetworks.bridge.kmm.shared.repo
 import co.touchlab.kermit.Logger
 import co.touchlab.stately.ensureNeverFrozen
 import io.ktor.client.HttpClient
-import io.ktor.http.headers
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.Instant
@@ -14,7 +12,9 @@ import kotlinx.datetime.plus
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.sagebionetworks.bridge.kmm.shared.apis.UploadsApi
+import org.sagebionetworks.bridge.kmm.shared.cache.Resource
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
+import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
 import org.sagebionetworks.bridge.kmm.shared.cache.loadResource
 import org.sagebionetworks.bridge.kmm.shared.models.S3UploadSession
@@ -23,8 +23,10 @@ import org.sagebionetworks.bridge.kmm.shared.models.UploadFileId
 import org.sagebionetworks.bridge.kmm.shared.models.UploadFileIdentifiable
 import org.sagebionetworks.bridge.kmm.shared.models.UploadRequest
 import org.sagebionetworks.bridge.kmm.shared.models.UploadSession
+import org.sagebionetworks.bridge.kmm.shared.models.UploadedFileRecord
 import org.sagebionetworks.bridge.kmm.shared.models.getUploadFileResourceId
 import org.sagebionetworks.bridge.kmm.shared.models.getUploadSessionResourceId
+import org.sagebionetworks.bridge.kmm.shared.models.getUploadedFileRecordResourceId
 
 internal open class UploadRepo(
     httpClient: HttpClient,
@@ -82,17 +84,38 @@ internal open class UploadRepo(
      */
     fun markUploadFileFinished(uploadFile: UploadFileIdentifiable) {
         val resourceId = uploadFile.getUploadSessionResourceId()
-        val resource = database.getResource(resourceId, ResourceType.UPLOAD_SESSION,
+        val uploadSessionResource = database.getResource(resourceId, ResourceType.UPLOAD_SESSION,
             ResourceDatabaseHelper.APP_WIDE_STUDY_ID
         )?.copy(needSave = true)
+        val uploadedFileRecord = UploadedFileRecord(
+            filePath = uploadFile.filePath,
+            uploadTimestamp = Clock.System.now(),
+            uploadSessionId = uploadSessionResource?.loadResource<UploadSession>()?.id,
+            metadata = getUploadFile(uploadFile.filePath)?.metadata
+        )
         database.database.transaction {
-            resource?.let {
+            // Mark the upload session as "completed" by updating with `needSave = true`
+            uploadSessionResource?.let {
                 database.insertUpdateResource(it)
             }
+            // Remove the upload file that is queued for upload to S3
             database.removeResource(
                 uploadFile.getUploadFileResourceId(),
                 ResourceType.FILE_UPLOAD,
                 ResourceDatabaseHelper.APP_WIDE_STUDY_ID
+            )
+            // Insert a record with the information for the uploaded file record
+            database.insertUpdateResource(
+                Resource(
+                    identifier = uploadedFileRecord.filePath,
+                    type = ResourceType.UPLOADED_FILE_RECORD,
+                    secondaryId = uploadedFileRecord.metadata?.instanceGuid ?: ResourceDatabaseHelper.DEFAULT_SECONDARY_ID,
+                    studyId = ResourceDatabaseHelper.APP_WIDE_STUDY_ID,
+                    json = Json.encodeToString(uploadedFileRecord),
+                    lastUpdate = uploadedFileRecord.uploadTimestamp.toEpochMilliseconds(),
+                    status = ResourceStatus.SUCCESS,
+                    needSave = false
+                )
             )
         }
     }
@@ -105,6 +128,18 @@ internal open class UploadRepo(
         return database.getResourcesById(
             fileId.getUploadFileResourceId(),
             ResourceType.FILE_UPLOAD,
+            ResourceDatabaseHelper.APP_WIDE_STUDY_ID
+        ).firstOrNull()?.loadResource()
+    }
+
+    /**
+     * If the file has been uploaded, then this will get the record associated with
+     * marking that file as "done".
+     */
+    fun getUploadedFileRecord(filePath: String): UploadedFileRecord? {
+        return database.getResourcesById(
+            filePath,
+            ResourceType.UPLOADED_FILE_RECORD,
             ResourceDatabaseHelper.APP_WIDE_STUDY_ID
         ).firstOrNull()?.loadResource()
     }

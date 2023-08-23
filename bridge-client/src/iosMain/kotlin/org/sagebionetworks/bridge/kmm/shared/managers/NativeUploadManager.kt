@@ -68,6 +68,9 @@ class NativeUploadManager : KoinComponent {
         }
     }
 
+    fun hasMarkedFileAsUploaded(filePath: String): Boolean {
+        return repo.getUploadedFileRecord(filePath) != null
+    }
 }
 
 class PendingUploadObserver(

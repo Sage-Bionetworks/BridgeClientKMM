@@ -35,8 +35,9 @@ final class ArchiveUploadProcessor {
 
         #if canImport(UIKit)
         let taskId = UIApplication.shared.beginBackgroundTask {
-            Logger.log(tag: .upload, error: BridgeUploadFailedError.backgroundTaskTimeout,
-                       message: "Timed out when archiving and starting background upload.")
+            Logger.log(tag: .upload,
+                       error: BridgeUploadFailedError(category: .backgroundTaskTimeout, message: "Timed out when archiving and starting background upload.")
+            )
         }
         #endif
         
@@ -104,7 +105,7 @@ final class ArchiveUploadProcessor {
             var failedUploads = (sharedUserDefaults.array(forKey: UnprocessedUploadsKey) as? [String]) ?? []
             failedUploads.append(url.path)
             sharedUserDefaults.set(failedUploads, forKey: UnprocessedUploadsKey)
-            let err = BridgeUploadFailedError(errorCode: -99, message: "Failed to queue encrypted file for upload. \(url)")
+            let err = BridgeUploadFailedError(category: .fileFailure, message: "Failed to queue encrypted file for upload. \(url)")
             Logger.log(tag: .upload, error: err)
         }
     }

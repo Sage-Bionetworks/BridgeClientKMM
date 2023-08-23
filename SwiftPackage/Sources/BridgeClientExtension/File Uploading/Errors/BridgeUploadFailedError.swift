@@ -18,6 +18,7 @@ struct BridgeUploadFailedError : Error, CustomNSError {
         case backgroundTaskTimeout = -51
         case wrongHandler = -52
         case fileFailure = -53
+        case unexpectedBackgroundCall = -54
     }
     
     var errorUserInfo: [String : Any] {

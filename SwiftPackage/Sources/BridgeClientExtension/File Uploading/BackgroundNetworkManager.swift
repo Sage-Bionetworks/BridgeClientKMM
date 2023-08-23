@@ -386,6 +386,7 @@ protocol BridgeURLSession : NSObjectProtocol {
 
 protocol BridgeURLSessionTask : NSObjectProtocol {
     var taskDescription: String? { get set }
+    var state: URLSessionTask.State { get }
     var taskType: BridgeURLSessionTaskType { get }
     var originalRequest: URLRequest? { get }
     var response: URLResponse? { get }

@@ -36,7 +36,7 @@ final class UploadManagerTests: XCTestCase {
     
     @MainActor
     func testUploadArchive_Offline() async {
-        let (manager, _, mockSandboxFileManager, mockNativeManager) = createUploadManager()
+        let (manager, mockNetworkManager, mockSandboxFileManager, mockNativeManager) = createUploadManager()
         let (fileURL, schedule, startedOn) = mockSandboxFileManager.setupFakeArchive()
         
         // Method under test
@@ -57,7 +57,7 @@ final class UploadManagerTests: XCTestCase {
     }
     
     @MainActor
-    func testUploadArchive_Online_HappyPath() async {
+    func testUploadArchive_Online_HappyPath() async throws {
         let (manager, mockNetworkManager, mockSandboxFileManager, mockNativeManager) = createUploadManager()
         let (fileURL, schedule, startedOn) = mockSandboxFileManager.setupFakeArchive()
         let requestHeaders = ["foo" : "magoo"]
@@ -101,7 +101,18 @@ final class UploadManagerTests: XCTestCase {
         // Check if the manager can handle the upload response
         XCTAssertTrue(manager.canHandle(task: uploadTask))
         
+        // Once the S3 upload is complete, the shared network manager will call back to the upload manager.
+        // This should fire a call to the native upload manager (Kotlin) that will then attempt to mark the
+        // file as done.
+        uploadTask.setResponse(statusCode: 200)
+        try await manager.urlSession(task: uploadTask, didCompleteWithError: nil)
         
+        // Check that the file was marked as uploaded
+        XCTAssertEqual([uploadFile.filePath], mockNativeManager.uploadFinished)
+        // Check for file deleted
+        XCTAssertEqual([uploadFile.filePath], mockSandboxFileManager.removeTempFiles)
+        
+        // TODO: syoung 08/23/2023 Check for processessing uploads requested
     }
     
     func checkUploadFileExpectations(_ uploadFile: UploadFile ) {
@@ -115,6 +126,14 @@ final class UploadManagerTests: XCTestCase {
         XCTAssertEqual("not-a-real-eventTimestamp", uploadFile.metadata?.eventTimestamp)
         XCTAssertNotNil(uploadFile.metadata?.startedOn)
     }
+    
+    func testKotlinDataClassEquality() {
+        // Check to make sure that data classes are properly handling equality and hash value.
+        let obj1 = PendingUploadFile(filePath: "/foo/goo/laroo", uploadSessionId: "1234567890")
+        let obj2 = PendingUploadFile(filePath: "/foo/goo/laroo", uploadSessionId: "1234567890")
+        XCTAssertEqual(obj1, obj2)
+        XCTAssertEqual(obj1.hashValue, obj2.hashValue)
+    }
 
 }
 
@@ -122,6 +141,7 @@ fileprivate let fakeBaseDirectory = "/Foo/48B0BAEB-94C4-4158-953C-74AB0935E5FA"
 
 class MockSandboxFileManager : SandboxFileManager {
     
+    var removeTempFiles: [String] = []
     var copyTempFiles: [URL] = []
     var copyFileCalls: [String : URL] = [:]
     var touchCalls: [URL : Date] = [:]
@@ -138,6 +158,10 @@ class MockSandboxFileManager : SandboxFileManager {
         copyTempFiles.append(tempFileURL)
         copyFileCalls[invariantPath] = fileURL
         return true
+    }
+    
+    override func removeTempFile(filePath: String) {
+        removeTempFiles.append(filePath)
     }
     
     override func touch(fileUrl: URL) {
@@ -175,6 +199,8 @@ class MockSandboxFileManager : SandboxFileManager {
 }
 
 class MockBackgroundNetworkManager : NSObject, SharedBackgroundUploadManager {
+
+    let mockURLSession: MockURLSession = MockURLSession()
     
     let sessionDelegateQueue: OperationQueue = {
         let delegateQueue = OperationQueue()
@@ -182,6 +208,8 @@ class MockBackgroundNetworkManager : NSObject, SharedBackgroundUploadManager {
         return delegateQueue
     }()
 
+    var isAppBackground: Bool = false
+    
     var registeredHandlers: [BridgeURLSessionHandler] = []
     var uploadRequests: [UploadRequest] = []
     var tasks: [BridgeURLSessionTask] = []
@@ -202,6 +230,7 @@ class MockBackgroundNetworkManager : NSObject, SharedBackgroundUploadManager {
         let httpHeaders: [String : String]?
         let urlString: String
         var taskDescription: String?
+        var state: URLSessionTask.State = .running
         
         init(fileURL: URL, httpHeaders: [String : String]?, urlString: String, taskDescription: String) {
             self.fileURL = fileURL
@@ -226,6 +255,10 @@ class MockBackgroundNetworkManager : NSObject, SharedBackgroundUploadManager {
         var didCallResume: Bool = false
         var didCallCancel: Bool = false
         
+        func setResponse(statusCode: Int) {
+            self.response = HTTPURLResponse(url: URL(string: urlString)!, statusCode: statusCode, httpVersion: nil, headerFields: nil)
+        }
+        
         func resume() {
             didCallResume = true
         }
@@ -248,15 +281,18 @@ class MockNativeUploadManager : NSObject, BridgeClientUploadManager {
     var uploadFiles: [String] = []
     var s3Uploads: [String : S3UploadSession] = [:]
     var uploadFinished: [String] = []
+    var uploadFailedPermanently: [String] = []
     var uploadFinishedResponse: [String : Bool] = [:]
     var processFinishedUploadsResponse: Bool = false
     
-    func getUploadFiles() -> [String] {
-        uploadFiles
+    func getPendingUploadFiles() async -> [PendingUploadFile] {
+        uploadFiles.map {
+            .init(filePath: $0, uploadSessionId: s3Uploads[$0]?.uploadSessionId)
+        }
     }
-    
+
     func hasPendingUploads() -> Bool {
-        uploadFiles.count > 0
+        uploadFiles.count > 0 || uploadFinishedResponse.count > 0
     }
     
     func queueAndRequestUploadSession(uploadFile: UploadFile) async -> S3UploadSession? {
@@ -274,9 +310,13 @@ class MockNativeUploadManager : NSObject, BridgeClientUploadManager {
         return s3Uploads[filePath]
     }
     
-    func markUploadFileFinished(filePath: String) async -> Bool {
+    func markUploadFileFinished(filePath: String, uploadSessionId: String) async -> Bool {
         uploadFinished.append(filePath)
         return uploadFinishedResponse[filePath] ?? false
+    }
+    
+    func markUploadUnrecoverableFailure(filePath: String) {
+        uploadFailedPermanently.append(filePath)
     }
     
     func processFinishedUploads() async -> Bool {

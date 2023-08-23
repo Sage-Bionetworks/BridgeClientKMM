@@ -412,14 +412,16 @@ open class UploadAppManager : ObservableObject {
     
     lazy private var networkMonitor: NetworkMonitor = .init() { [weak self] newStatus in
         guard let strongSelf = self else { return }
-        let oldStatus = strongSelf.networkStatus
-        if newStatus == .connected, oldStatus != .unknown {
-            // only check for uploads if the new status is connected and the previous
-            // status was *not* connected.
-            strongSelf.uploadManagerV2.checkAndRetryUploads()
-        }
-        DispatchQueue.main.async {
-            strongSelf.networkStatus = newStatus
+        Task {
+            await MainActor.run {
+                let oldStatus = strongSelf.networkStatus
+                if newStatus == .connected, oldStatus != .unknown {
+                    // only check for uploads if the new status is connected and the previous
+                    // status was *not* connected.
+                    strongSelf.uploadManagerV2.checkAndRetryUploads()
+                }
+                strongSelf.networkStatus = newStatus
+            }
         }
     }
     

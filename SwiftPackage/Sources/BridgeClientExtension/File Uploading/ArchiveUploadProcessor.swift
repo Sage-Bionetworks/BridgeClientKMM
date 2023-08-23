@@ -32,12 +32,14 @@ final class ArchiveUploadProcessor {
     
     @MainActor
     private func _encryptAndUpload(using builder: ArchiveBuilder) async {
+        uploadManager.isArchiving = true
 
         #if canImport(UIKit)
         let taskId = UIApplication.shared.beginBackgroundTask {
             Logger.log(tag: .upload,
                        error: BridgeUploadFailedError(category: .backgroundTaskTimeout, message: "Timed out when archiving and starting background upload.")
             )
+            self.uploadManager.isArchiving = false
         }
         #endif
         
@@ -57,6 +59,8 @@ final class ArchiveUploadProcessor {
         #if canImport(UIKit)
         UIApplication.shared.endBackgroundTask(taskId)
         #endif
+        
+        uploadManager.isArchiving = false
     }
     
     private func _copyTest(archive: DataArchive) async {
@@ -113,6 +117,7 @@ final class ArchiveUploadProcessor {
 }
 
 protocol BridgeUploader : NSObjectProtocol {
+    var isArchiving: Bool { get set }
     @MainActor func uploadEncryptedArchive(fileUrl: URL, schedule: AssessmentScheduleInfo?, startedOn: Date?) async -> Bool
     @MainActor func upload(fileUrl: URL, contentType: String, encrypted: Bool, metadata: UploadMetadata?, s3UploadType: S3UploadType) async -> Bool
 }

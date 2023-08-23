@@ -213,6 +213,16 @@ class SandboxFileManager: NSObject {
             return nil
         }
     }
+    
+    /// Check that the file exists
+    func fileExists(atPath filePath: String) -> Bool {
+        FileManager.default.fileExists(atPath: filePath)
+    }
+    
+    /// Check that the file exists
+    func fileExists(at url: URL) -> Bool {
+        fileExists(atPath: url.absoluteString)
+    }
 
 }
 

@@ -11,7 +11,7 @@ class MockHTTPURLResponse : HTTPURLResponse {
 }
 
 class MockTask : NSObject, BridgeURLSessionTask {
-
+    var state: URLSessionTask.State = .running
     var session: MockURLSession
     var request: URLRequest
     var mockResponse: MockHTTPURLResponse?
@@ -52,8 +52,10 @@ class MockUploadTask : MockTask, BridgeURLSessionUploadTask {
     }
      
     override func resume() {
+        self.state = .running
         session.delegateQueue.addOperation { [self] in
             (_, mockResponse) = session.dataAndResponse(for: request)
+            self.state = .completed
             session.bridgeDelegate?.bridgeUrlSession(session, task: self, didCompleteWithError: nil)
             session.remove(mockTask: self)
         }

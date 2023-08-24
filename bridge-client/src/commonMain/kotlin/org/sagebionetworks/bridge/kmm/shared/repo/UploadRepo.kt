@@ -95,16 +95,15 @@ internal open class UploadRepo(
      * complicated - the file location can change with app or OS updates and synchronization is
      * a bit brittle. It's less confusing to handle this in Swift. syoung 07/14/2023
      */
-    fun markUploadFileFinished(uploadFile: UploadFileIdentifiable): UploadSession? {
+    fun markUploadFileFinished(uploadFile: UploadFileIdentifiable, uploadSessionId: String?) {
         val resourceId = uploadFile.getUploadSessionResourceId()
         val uploadSessionResource = database.getResource(resourceId, ResourceType.UPLOAD_SESSION,
             ResourceDatabaseHelper.APP_WIDE_STUDY_ID
         )?.copy(needSave = true)
-        val uploadSession = uploadSessionResource?.loadResource<UploadSession>()
         val uploadedFileRecord = UploadedFileRecord(
             filePath = uploadFile.filePath,
             uploadTimestamp = Clock.System.now(),
-            uploadSessionId = uploadSession?.id,
+            uploadSessionId = uploadSessionId,
             metadata = getUploadFile(uploadFile.filePath)?.metadata
         )
         database.database.transaction {
@@ -132,8 +131,6 @@ internal open class UploadRepo(
                 )
             )
         }
-
-        return uploadSession
     }
 
     /**

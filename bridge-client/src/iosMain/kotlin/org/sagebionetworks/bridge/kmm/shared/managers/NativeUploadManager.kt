@@ -1,5 +1,7 @@
 package org.sagebionetworks.bridge.kmm.shared.managers
 
+import co.touchlab.kermit.Logger
+import co.touchlab.kermit.Severity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -58,14 +60,15 @@ class NativeUploadManager : KoinComponent {
         repo.removeUploadFile(UploadFileId(filePath))
     }
 
-    fun markUploadFileFinished(filePath: String, callBack: (Boolean) -> Unit) {
+    fun markUploadFileFinished(filePath: String, uploadSessionId: String, callBack: (Boolean) -> Unit) {
+        val uploadFile = UploadFileId(filePath)
+        repo.markUploadFileFinished(uploadFile, uploadSessionId)
         scope.launch {
-            val uploadFile = UploadFileId(filePath)
-            val uploadSession = repo.markUploadFileFinished(uploadFile)
             try {
-                repo.completeUploadSession(uploadSession?.id, uploadFile.getUploadFileResourceId())
+                repo.completeUploadSession(uploadSessionId, uploadFile.getUploadFileResourceId())
                 callBack(true)
-            } catch (_: Throwable) {
+            } catch (throwable: Throwable) {
+                Logger.i("Failed to send upload complete to server: $uploadSessionId", throwable)
                 callBack(false)
             }
         }

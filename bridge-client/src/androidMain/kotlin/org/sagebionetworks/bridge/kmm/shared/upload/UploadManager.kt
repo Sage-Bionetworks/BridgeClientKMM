@@ -69,7 +69,7 @@ internal class UploadManager(
             Logger.d("uploadingToS3 $uploadFile")
             s3UploadApi.uploadFile(uploadSession.url, uploadFile) //TODO: Handle network exceptions -nbrown 4/26/21
             FileSystem.SYSTEM.delete(uploadFile.filePath.toPath()) //TODO: Handle delete failure -nbrown 12/16/20
-            markUploadFileFinished(uploadFile)
+            markUploadFileFinished(uploadFile, uploadSession.id)
         } catch (error: Throwable) {
             Logger.e("Error uploadingToS3 $uploadFile", error)
 

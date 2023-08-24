@@ -54,11 +54,8 @@ class NativeUploadManager : KoinComponent {
         }
     }
 
-    fun markUploadUnrecoverableFailure(filePath: String, callBack: () -> Unit) {
-        scope.launch {
-            repo.removeUploadFile(UploadFileId(filePath))
-            callBack()
-        }
+    fun markUploadUnrecoverableFailure(filePath: String) {
+        repo.removeUploadFile(UploadFileId(filePath))
     }
 
     fun markUploadFileFinished(filePath: String, callBack: (Boolean) -> Unit) {

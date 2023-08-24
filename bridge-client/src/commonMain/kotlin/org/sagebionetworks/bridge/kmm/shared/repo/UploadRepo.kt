@@ -4,6 +4,7 @@ import co.touchlab.kermit.Logger
 import co.touchlab.stately.ensureNeverFrozen
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.Instant
@@ -74,6 +75,18 @@ internal open class UploadRepo(
     }
 
     /**
+     * Get a tuple of the filepath and upload session for all pending uploads.
+     */
+    fun getPendingUploadFiles(): List<PendingUploadFile> {
+        return getUploadFiles().map {
+            PendingUploadFile(
+                it.filePath,
+                getCachedUploadSession(it)?.id
+            )
+        }
+    }
+
+    /**
      * Remove the [UploadFile] from the local cache and mark the upload session as "completed"
      * by setting `needSave = true`. This is called after successfully uploading to S3.
      *
@@ -82,15 +95,16 @@ internal open class UploadRepo(
      * complicated - the file location can change with app or OS updates and synchronization is
      * a bit brittle. It's less confusing to handle this in Swift. syoung 07/14/2023
      */
-    fun markUploadFileFinished(uploadFile: UploadFileIdentifiable) {
+    fun markUploadFileFinished(uploadFile: UploadFileIdentifiable): UploadSession? {
         val resourceId = uploadFile.getUploadSessionResourceId()
         val uploadSessionResource = database.getResource(resourceId, ResourceType.UPLOAD_SESSION,
             ResourceDatabaseHelper.APP_WIDE_STUDY_ID
         )?.copy(needSave = true)
+        val uploadSession = uploadSessionResource?.loadResource<UploadSession>()
         val uploadedFileRecord = UploadedFileRecord(
             filePath = uploadFile.filePath,
             uploadTimestamp = Clock.System.now(),
-            uploadSessionId = uploadSessionResource?.loadResource<UploadSession>()?.id,
+            uploadSessionId = uploadSession?.id,
             metadata = getUploadFile(uploadFile.filePath)?.metadata
         )
         database.database.transaction {
@@ -118,6 +132,8 @@ internal open class UploadRepo(
                 )
             )
         }
+
+        return uploadSession
     }
 
     /**
@@ -185,6 +201,9 @@ internal open class UploadRepo(
         return getUploadFile(filePath)?.let { getS3UploadSession(it) }
     }
 
+    /**
+     * Get the information needed to spawn an S3 upload.
+     */
     suspend fun getS3UploadSession(uploadFile: UploadFile): S3UploadSession? {
         val uploadSession = getUploadSession(uploadFile)
         return if (uploadSession?.id == null) null
@@ -198,39 +217,47 @@ internal open class UploadRepo(
     }
 
     /**
+     * Retrieves cached UploadSession (if one exists). This method is responsible for ensuring
+     * that upload session has not expired and is valid.
+     */
+    fun getCachedUploadSession(uploadFile: UploadFileIdentifiable): UploadSession? {
+        val uploadSession = database.getResource(
+            uploadFile.getUploadSessionResourceId(),
+            ResourceType.UPLOAD_SESSION,
+            ResourceDatabaseHelper.APP_WIDE_STUDY_ID
+        )?.loadResource<UploadSession>()
+        return if (isValid(uploadSession)) uploadSession else null
+    }
+
+    /**
+     * Is the upload session still valid (or has it expired)?
+     */
+    private fun isValid(uploadSession: UploadSession?): Boolean {
+        if (uploadSession?.expires == null) return true
+        val desiredMinimumExpiration = Clock.System.now().plus(
+            UPLOAD_EXPIRY_WINDOW_MINUTES,
+            DateTimeUnit.MINUTE,
+            TimeZone.currentSystemDefault()
+        )
+        val expires = Instant.parse(uploadSession.expires)
+        return (desiredMinimumExpiration < expires)
+    }
+
+    /**
      * Retrieves cached UploadSession (if one exists), else requests one from Bridge and caches session
      * before returning it. This method is responsible for ensuring that upload session has not expired and is valid.
      */
     suspend fun getUploadSession(uploadFile: UploadFile): UploadSession? {
-        val identifier = uploadFile.getUploadSessionResourceId()
-        val resource = database.getResource(identifier, ResourceType.UPLOAD_SESSION,
-            ResourceDatabaseHelper.APP_WIDE_STUDY_ID
-        )
-        resource?.let {
-            val uploadSession = resource.loadResource<UploadSession>()
-            uploadSession?.expires?.let {
-                val desiredMinimumExpiration = Clock.System.now().plus(
-                    UPLOAD_EXPIRY_WINDOW_MINUTES,
-                    DateTimeUnit.MINUTE,
-                    TimeZone.currentSystemDefault()
-                )
-                val expires = Instant.parse(uploadSession.expires)
-                if (desiredMinimumExpiration < expires) {
-                    //return cached upload session
-                    return uploadSession
-                }
-            }
-        }
-        val updatedResource = remoteLoadResource(
+        return getCachedUploadSession(uploadFile) ?:
+        remoteLoadResource(
             database = database,
-            identifier = identifier,
+            identifier = uploadFile.getUploadSessionResourceId(),
             resourceType = ResourceType.UPLOAD_SESSION,
             studyId = ResourceDatabaseHelper.APP_WIDE_STUDY_ID,
             curResource = null,
             remoteLoad = {loadRemoteUploadSession(uploadFile.getUploadRequest())}
-        )
+        ).loadResource()
         //TODO: Need to think through error handling if we are unable to get an UploadSession -nbrown 12/16/20
-        return updatedResource.loadResource()
     }
 
     private suspend fun loadRemoteUploadSession(uploadRequest: UploadRequest): String {
@@ -269,3 +296,9 @@ internal open class UploadRepo(
         }
     }
 }
+
+data class PendingUploadFile(
+    val filePath: String,
+    val uploadSessionId: String?
+)
+

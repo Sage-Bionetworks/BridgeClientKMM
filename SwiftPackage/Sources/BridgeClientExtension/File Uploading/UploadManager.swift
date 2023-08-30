@@ -9,11 +9,12 @@ import BridgeClient
 import UIKit
 #endif
 
-class UploadManager : NSObject, BridgeURLSessionHandler {
-    
+class UploadManager : NSObject, BridgeURLSessionHandler, BackgroundProcessSyncDelegate {
+
     weak private(set) var backgroundNetworkManager: SharedBackgroundUploadManager!
     let sandboxFileManager: SandboxFileManager
     let nativeUploadManager: BridgeClientUploadManager
+    lazy private(set) var syncManager: BackgroundProcessSyncManager = .init(delegate: self)
     
     init(backgroundNetworkManager: SharedBackgroundUploadManager,
          sandboxFileManager: SandboxFileManager = .init(),
@@ -48,27 +49,22 @@ class UploadManager : NSObject, BridgeURLSessionHandler {
         }
     }()
     
-    // MARK: Life-cycle handling
+    var isArchiving: Bool = false
     
-    @MainActor var isArchiving: Bool = false
-    
+    /// **Required:** This method should be called on app launch to register the background
+    /// process id and set up the listeners for app becoming active and entering the
+    /// background.
     @MainActor
-    func setup(backgroundProcessId: String?) {
-        do {
-            // Register the background process
-            if let backgroundProcessId = backgroundProcessId {
-                try registerBackgroundTasks(backgroundProcessId)
-            }
-            // setup checking and retrying uploads
-            try setupCheckAndRetryUploads()
-            
-        } catch {
-            Logger.log(tag: .upload, error: error)
-        }
+    func onLaunch(backgroundProcessId: String?) {
+        syncManager.onLaunch(backgroundProcessId: backgroundProcessId)
     }
     
-    
-    // MARK: Upload handling
+    /// Force check and retry uploads.
+    func checkAndRetryUploads() {
+        Task {
+            await syncManager.retryBackgroundProcessAsync()
+        }
+    }
     
     /// Upload an encrypted archive.
     /// - Parameters:
@@ -133,23 +129,30 @@ class UploadManager : NSObject, BridgeURLSessionHandler {
                                     s3UploadType: s3UploadType)
         
         // Finally, queue the upload using the native upload manager.
-        let uploadSession = await nativeUploadManager.queueAndRequestUploadSession(uploadFile: uploadFile)
-        handleS3UploadRequest(filePath: invariantFilePath, uploadSession: uploadSession)
+        if let uploadSession = await nativeUploadManager.queueAndRequestUploadSession(uploadFile: uploadFile) {
+            // If there is an upload session then start the upload.
+            startS3Upload(uploadSession)
+        }
+        else {
+            // If the callback is nil then services are offline. Try again later.
+            await enqueueForRetry(filePath: invariantFilePath, uploaded: false)
+        }
 
         return true
     }
     
-    @MainActor
-    private func startS3Upload(_ uploadSession: S3UploadSession) {
-        let fileURL = sandboxFileManager.fileURL(of: uploadSession.filePath)
-        let taskIdentifier = "\(uploadSession.uploadSessionId)|\(uploadSession.filePath)"
-        backgroundNetworkManager.uploadFile(fileURL,
-                                            httpHeaders: uploadSession.requestHeaders,
-                                            to: uploadSession.url,
-                                            taskDescription: taskIdentifier)
+    // MARK: BackgroundProcessSyncDelegate
+
+    var shouldScheduleBackgroundProcess: Bool {
+        isArchiving || nativeUploadManager.hasPendingUploads()
     }
     
-    
+    func retryBackgroundProcess(isBackground: Bool) async throws {
+        try await retryUploadToS3()
+        try await processFinishedUploads()
+        try await cleanupLostFiles()
+    }
+
     // MARK: BridgeURLSessionHandler
     
     func canHandle(task: BridgeURLSessionTask) -> Bool {
@@ -197,7 +200,7 @@ class UploadManager : NSObject, BridgeURLSessionHandler {
             
         case .retry:
             // this call failed but we may be able to recover with a retry
-            await enqueueForRetry(filePath: invariantFilePath)
+            await enqueueForRetry(filePath: invariantFilePath, uploaded: false)
             
         case .success:
             // If we get here, then we are done uploading to S3. Mark the file and clean up the temp file.
@@ -209,204 +212,59 @@ class UploadManager : NSObject, BridgeURLSessionHandler {
             }
         }
     }
+
+    func bridgeUrlSession(_ session: any BridgeURLSession, didBecomeInvalidWithError error: Error?) {
+        // TODO: syoung 08/01/2023 Manage any cleanup needed to handle S3 session becoming invalid. Retry?
+    }
+    
+    // MARK: Private methods
+    
+    private func startS3Upload(_ uploadSession: S3UploadSession) {
+        let fileURL = sandboxFileManager.fileURL(of: uploadSession.filePath)
+        let taskIdentifier = "\(uploadSession.uploadSessionId)|\(uploadSession.filePath)"
+        backgroundNetworkManager.uploadFile(fileURL,
+                                            httpHeaders: uploadSession.requestHeaders,
+                                            to: uploadSession.url,
+                                            taskDescription: taskIdentifier)
+    }
     
     private func handleUnrecoverableFailure(filePath: String) {
         nativeUploadManager.markUploadUnrecoverableFailure(filePath: filePath)
         // TODO: syoung 08/24/2023 If something "unrecoverable" happens, do we want to remove the file or just leave it?
         sandboxFileManager.removeTempFile(filePath: filePath)
     }
-
-    func bridgeUrlSession(_ session: any BridgeURLSession, didBecomeInvalidWithError error: Error?) {
-        // TODO: syoung 08/01/2023 Manage any cleanup needed to handle S3 session becoming invalid. Retry?
-    }
-
     
-    // MARK: Background process handling
-    
-    private var backgroundProcessId: String?
-    private var appBackgroundObserver: Any?
-    
-    @MainActor
-    func registerBackgroundTasks(_ backgroundProcessId: String) throws {
-        guard self.backgroundProcessId == nil, self.backgroundProcessId != backgroundProcessId
-        else {
-            throw BridgeUnexpectedNullError(category: .duplicateCall, message: "Attempting to register for a background process multiple times.")
-        }
-        self.backgroundProcessId = backgroundProcessId
-        BGTaskScheduler.shared.register(forTaskWithIdentifier: backgroundProcessId, using: .main) { task in
-            Task {
-                let retry = self.taskToRetryAllPendingUploads(isBackground: true)
-                let _ = await retry.result
-                task.setTaskCompleted(success: true)
-                self.scheduleBackgroundProcessingIfNeeded()
-            }
-        }
-        #if canImport(UIKit)
-        // Set up a listener to retry temporarily-failed uploads whenever the app becomes active
-        self.appBackgroundObserver = NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification) {
-            // when entering the background, we want to cancel waiting to retry uploads
-            Logger.log(severity: .info, tag: .upload, message: "App did enter background. Scheduling background processing if needed.")
-            self.waitRetryTask?.cancel()
-            self.scheduleBackgroundProcessingIfNeeded()
-        }
-        #endif
+    func enqueueForRetry(filePath: String?, uploaded: Bool) async {
+        // TODO: syoung 08/29/2023 Consider if we need to *only* retry the one file?
+        await syncManager.enqueueForRetry()
     }
     
-    @MainActor
-    func scheduleBackgroundProcessingIfNeeded() {
-        // Only schedule background processing if there are pending uploads.
-        guard nativeUploadManager.hasPendingUploads() || isArchiving,
-              let taskId = self.backgroundProcessId
-        else {
-            return
-        }
-        Logger.log(severity: .info, tag: .upload, message: "Pending uploads detected. Scheduling background process: \(taskId)")
-        
-        let request = BGProcessingTaskRequest(identifier: taskId)
-        request.requiresNetworkConnectivity = true                     // Do not attempt processing without network connectivity
-        request.earliestBeginDate = Date(timeIntervalSinceNow: 15*60)  // Wait 15 minutes to allow S3 uploads in progress to complete
-        
-        do {
-            try BGTaskScheduler.shared.submit(request)
-        } catch {
-            Logger.log(tag: .upload, error: error)
-        }
-    }
-    
-    
-    // MARK: Check and retry handling
-
-    /// The minimum delay before retrying a failed upload (in seconds). This is a variable so that unit
-    /// tests can run without waiting.
-    var delayForRetry: TimeInterval = 5 * 60
-    
-    private var appActiveObserver: Any?
-    private var waitRetryTask: Task<Void, Never>?
-    private var checkRetryTask: Task<Void, Never>?
-    
-    @MainActor
-    func setupCheckAndRetryUploads() throws {
-        guard self.appActiveObserver == nil else {
-            throw BridgeUnexpectedNullError(category: .duplicateCall, message: "Attempting to setup listening to app active multiple times")
-        }
-        
-        #if canImport(UIKit)
-        // Set up a listener to retry temporarily-failed uploads whenever the app becomes active
-        self.appActiveObserver = NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification) {
-            Logger.log(severity: .info, message: "App did enter foreground. Check and retry uploads.")
-            self.checkAndRetryUploads()
-        }
-        #endif
-    }
-    
-    @MainActor
-    func checkAndRetryUploads() {
-        guard !backgroundNetworkManager.isAppBackground else {
-            Logger.log(severity: .info, tag: .upload, message: "Attempting to check and retry uploads from the background")
-            return
-        }
-        guard checkRetryTask?.isCancelled ?? true else {
-            Logger.log(severity: .info, tag: .upload, message: "Check and retry already running. Ignoring.")
-            return
-        }
-        
-        #if canImport(UIKit)
-        let taskId = UIApplication.shared.beginBackgroundTask {
-            Logger.log(tag: .upload,
-                       error: BridgeUploadFailedError(category: .backgroundTaskTimeout, message: "Timed out when checking and retrying uploads.")
-            )
-            self.checkRetryTask?.cancel()
-        }
-        #endif
-        
-        checkRetryTask = Task(priority: .background) {
-            
-            // retry all pending uploads
-            let task = taskToRetryAllPendingUploads(isBackground: false)
-            let _ = await task.result
-            
-            // check if we still have pending uploads and schedule a retry
-            if nativeUploadManager.hasPendingUploads() {
-                enqueueForRetry()
-            }
-            
-            #if canImport(UIKit)
-            // finally, send message that we are finished with our background tasks
-            UIApplication.shared.endBackgroundTask(taskId)
-            #endif
-        }
-    }
-    
-    @MainActor
-    var retryTask: Task<Void, Never>?
-       
-    @MainActor
-    func taskToRetryAllPendingUploads(isBackground: Bool) -> Task<Void, Never> {
-        if retryTask == nil {
-            retryTask = Task(priority: .background) {
-                do {
-                    // retry all uploads
-                    try await retryUploadToS3()
-                    try await processFinishedUploads()
-                    try await cleanupLostFiles()
-                    
-                } catch is CancellationError {
-                    Logger.log(severity: .info, tag: .upload, message: "Check and retry uploads cancelled")
-                } catch {
-                    Logger.log(tag: .upload, error: error, message: "Unexpected failure when checking and retrying uploads")
-                }
-            }
-        }
-        return retryTask!
-    }
-    
-    @MainActor
-    private func enqueueForRetry(filePath: String? = nil, uploaded: Bool = false) {
-        guard !backgroundNetworkManager.isAppBackground else {
-            Logger.log(severity: .info, tag: .upload, message: "Attempting to enqueue file for retry in the background. Ignoring.")
-            return
-        }
-        // Start with the simpliest case of retrying everything
-        // TODO: syoung 08/28/2023 Revisit whether or not we need to only retry the one file
-        guard waitRetryTask?.isCancelled ?? true else { return }
-        waitRetryTask = Task(priority: .background) {
-            do {
-                try await Task.sleep(nanoseconds: UInt64(delayForRetry * 1_000_000_000))
-                checkAndRetryUploads()
-            } catch is CancellationError {
-                Logger.log(severity: .info, tag: .upload, message: "Wait for check and retry uploads cancelled")
-            } catch {
-                Logger.log(tag: .upload, error: error, message: "Unexpected failure waiting to retry upload")
-            }
-        }
-    }
-    
-    func processFinishedUploads() async throws {
+    private func processFinishedUploads() async throws {
         // process the finished uploads - this is the last call and can take a while
         // TODO: syoung 08/23/2023 We need to revisit this for the case where there are *a lot*
         // of completion messages to send (since they are all set serially) so that this process
         // doesn't timeout and get killed by the OS.
-        let _ = try await nativeUploadManager.processFinishedUploads()
         guard !Task.isCancelled else {
             throw CancellationError()
         }
+        let _ = try await nativeUploadManager.processFinishedUploads()
     }
     
-    func retryUploadToS3() async throws {
+    private func retryUploadToS3() async throws {
         
         // get all the currently running upload tasks that can be handled by this manager
         async let allUrlSessionTasks = backgroundNetworkManager.getAllTasks()
         // get all the files that are currently pending
         async let allPendingUploads = nativeUploadManager.getPendingUploadFiles()
         
-        // check that the task is not cancelled
-        guard !Task.isCancelled else {
-            throw CancellationError()
-        }
-        
-        // Look through all the currect url session tasks and figure out which should be restarted
+        // look through all the currect url session tasks and figure out which should be restarted
         var uploadsToRetry = Set(await allPendingUploads)
         for urlSessionTask in await allUrlSessionTasks {
+            // check that the task is not cancelled
+            guard !Task.isCancelled else {
+                throw CancellationError()
+            }
+            // check that this is an upload task handled by this manager
             guard self.canHandle(task: urlSessionTask),
                   let uploadId = urlSessionTask.parsePendingUpload()
             else {
@@ -445,24 +303,14 @@ class UploadManager : NSObject, BridgeURLSessionHandler {
             guard !Task.isCancelled else {
                 throw CancellationError()
             }
-            let uploadSession = await nativeUploadManager.requestUploadSession(filePath: upload.filePath)
-            await handleS3UploadRequest(filePath: upload.filePath, uploadSession: uploadSession)
+            // request an upload session and if non-nil, then start it
+            if let uploadSession = await nativeUploadManager.requestUploadSession(filePath: upload.filePath) {
+                startS3Upload(uploadSession)
+            }
         }
     }
-    
-    @MainActor
-    private func handleS3UploadRequest(filePath: String, uploadSession: S3UploadSession?) {
-        if let uploadSession = uploadSession {
-            // If there is an upload session then start the upload.
-            startS3Upload(uploadSession)
-        }
-        else {
-            // If the callback is nil then services are offline. Try again later.
-            enqueueForRetry(filePath: filePath)
-        }
-    }
-    
-    func cleanupLostFiles() async throws {
+
+    private func cleanupLostFiles() async throws {
         // TODO: syoung 08/25/2023 Implement
     }
 }

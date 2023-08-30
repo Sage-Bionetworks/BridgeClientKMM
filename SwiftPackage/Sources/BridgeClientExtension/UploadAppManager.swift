@@ -325,7 +325,7 @@ open class UploadAppManager : ObservableObject {
         
         // Setup the upload manager
         Logger.log(severity: .info, message: "Setup the upload manager")
-        self.uploadManagerV2.setup(backgroundProcessId: backgroundProcessId)
+        self.uploadManagerV2.onLaunch(backgroundProcessId: backgroundProcessId)
     }
     
     /// **Required:** This method should be called by the app delegate in the implementation of

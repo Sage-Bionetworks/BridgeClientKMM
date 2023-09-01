@@ -214,14 +214,21 @@ class UploadManager : NSObject, BridgeURLSessionHandler, BackgroundProcessSyncDe
     }
 
     func bridgeUrlSession(_ session: any BridgeURLSession, didBecomeInvalidWithError error: Error?) {
-        // TODO: syoung 08/01/2023 Manage any cleanup needed to handle S3 session becoming invalid. Retry?
+        // If a url session becomes invalid, just queue up a delayed retry
+        Task {
+            await syncManager.enqueueForRetry()
+        }
     }
     
     // MARK: Private methods
     
+    func urlUploadTaskIdentifier(filePath: String, uploadSessionId: String) -> String {
+        "\(uploadSessionId)|\(filePath)"
+    }
+    
     private func startS3Upload(_ uploadSession: S3UploadSession) {
         let fileURL = sandboxFileManager.fileURL(of: uploadSession.filePath)
-        let taskIdentifier = "\(uploadSession.uploadSessionId)|\(uploadSession.filePath)"
+        let taskIdentifier = urlUploadTaskIdentifier(filePath: uploadSession.filePath, uploadSessionId: uploadSession.uploadSessionId)
         backgroundNetworkManager.uploadFile(fileURL,
                                             httpHeaders: uploadSession.requestHeaders,
                                             to: uploadSession.url,
@@ -234,7 +241,7 @@ class UploadManager : NSObject, BridgeURLSessionHandler, BackgroundProcessSyncDe
         sandboxFileManager.removeTempFile(filePath: filePath)
     }
     
-    func enqueueForRetry(filePath: String?, uploaded: Bool) async {
+    func enqueueForRetry(filePath: String, uploaded: Bool) async {
         // TODO: syoung 08/29/2023 Consider if we need to *only* retry the one file?
         await syncManager.enqueueForRetry()
     }

@@ -15,78 +15,78 @@ final class UploadManagerTests: XCTestCase {
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
-
-    @MainActor
-    func createUploadManager() -> (UploadManager, MockBackgroundNetworkManager, MockSandboxFileManager, MockNativeUploadManager) {
-        let bnm: MockBackgroundNetworkManager = .init()
-        let sfm: MockSandboxFileManager = .init()
-        let num: MockNativeUploadManager = .init()
-        let manager = UploadManager(
-            backgroundNetworkManager: bnm,
-            sandboxFileManager: sfm,
-            nativeUploadManager: num)
+    
+    let expectedTempFileDir = "/App Support/BridgeUploadsV2/STUDY_DATA/"
+    
+    func createUploadManager() -> (manager: TestUploadManager, mock: Mock) {
+        let mock = Mock()
+        let manager = TestUploadManager(
+            backgroundNetworkManager: mock.networkManager,
+            sandboxFileManager: mock.sandboxFileManager,
+            nativeUploadManager: mock.nativeManager)
         let fakePath = "\(fakeBaseDirectory)/App Support/\(manager.subdir)"
         manager.uploadDirURL = URL(fileURLWithPath: fakePath, isDirectory: true)
         
-        XCTAssertEqual(1, bnm.registeredHandlers.count)
-        XCTAssertEqual(manager, bnm.registeredHandlers.first as? UploadManager)
+        XCTAssertEqual(1, mock.networkManager.registeredHandlers.count)
+        XCTAssertEqual(manager, mock.networkManager.registeredHandlers.first as? UploadManager)
         
-        return (manager, bnm, sfm, num)
+        return (manager, mock)
     }
     
-    @MainActor
+    // MARK: Upload study data archive
+
     func testUploadArchive_Offline() async {
-        let (manager, mockNetworkManager, mockSandboxFileManager, mockNativeManager) = createUploadManager()
-        let (fileURL, schedule, startedOn) = mockSandboxFileManager.setupFakeArchive()
+        let (manager, mock) = createUploadManager()
+        let (fileURL, schedule, startedOn) = mock.sandboxFileManager.setupFakeArchive()
         
-        // Method under test
+        // -- Method under test
         let success = await manager.uploadEncryptedArchive(fileUrl: fileURL, schedule: schedule, startedOn: startedOn)
         XCTAssertTrue(success)
         
-        // Independent of network connectivity, the file should be copied and queued for upload
-        XCTAssertEqual(mockNativeManager.queuedUploadFiles.count, 1)
-        guard let uploadFile = mockNativeManager.queuedUploadFiles.first else {
+        // independent of network connectivity, the file should be copied and queued for upload
+        XCTAssertEqual(mock.nativeManager.queuedUploadFiles.count, 1)
+        guard let uploadFile = mock.nativeManager.queuedUploadFiles.first else {
             XCTFail("Unexpected NULL")
             return
         }
-        XCTAssertEqual(fileURL, mockSandboxFileManager.copyFileCalls[uploadFile.filePath])
+        XCTAssertEqual(fileURL, mock.sandboxFileManager.copyFileCalls[uploadFile.filePath])
         checkUploadFileExpectations(uploadFile)
         
-        // TODO: syoung 08/03/2023 Decide what to require before retrying the upload and test it.
-        
+        // and b/c the native upload manager failed to return an S3UploadSession, it should be
+        // queued to retry upload
+        XCTAssertEqual([uploadFile.filePath : false], manager.retryQueue)
     }
     
-    @MainActor
-    func testUploadArchive_Online_HappyPath() async throws {
-        let (manager, mockNetworkManager, mockSandboxFileManager, mockNativeManager) = createUploadManager()
-        let (fileURL, schedule, startedOn) = mockSandboxFileManager.setupFakeArchive()
+    func testUploadArchive_Online() async throws {
+        let (manager, mock) = createUploadManager()
+        let (fileURL, schedule, startedOn) = mock.sandboxFileManager.setupFakeArchive()
         let requestHeaders = ["foo" : "magoo"]
-        mockNativeManager.queuedS3UploadSession = .init(
+        mock.nativeManager.queuedS3UploadSession = .init(
             filePath: "ignored",
             contentType: "application/zip",
             uploadSessionId: "not-a-real-uploadSessionId-0",
             url: "https://not-a-real-org.org/not-a-real-url",
             requestHeaders: requestHeaders)
         
-        // Method under test
+        // -- Method under test
         let success = await manager.uploadEncryptedArchive(fileUrl: fileURL, schedule: schedule, startedOn: startedOn)
         XCTAssertTrue(success)
         
         // Independent of network connectivity, the file should be copied and queued for upload
-        XCTAssertEqual(mockNativeManager.queuedUploadFiles.count, 1)
-        guard let uploadFile = mockNativeManager.queuedUploadFiles.first else {
+        XCTAssertEqual(mock.nativeManager.queuedUploadFiles.count, 1)
+        guard let uploadFile = mock.nativeManager.queuedUploadFiles.first else {
             XCTFail("Unexpected NULL")
             return
         }
-        XCTAssertEqual(fileURL, mockSandboxFileManager.copyFileCalls[uploadFile.filePath])
+        XCTAssertEqual(fileURL, mock.sandboxFileManager.copyFileCalls[uploadFile.filePath])
         checkUploadFileExpectations(uploadFile)
-
+        
         // If successful in requesting an S3UploadSession then the upload manager should
         // call the network manager with that request.
-        XCTAssertEqual(mockNetworkManager.uploadRequests.count, 1)
-        XCTAssertEqual(1, mockSandboxFileManager.copyTempFiles.count)
-        guard let uploadTask = mockNetworkManager.uploadRequests.first,
-              let tempFile = mockSandboxFileManager.copyTempFiles.first
+        XCTAssertEqual(mock.networkManager.uploadRequests.count, 1)
+        XCTAssertEqual(1, mock.sandboxFileManager.copyTempFiles.count)
+        guard let uploadTask = mock.networkManager.uploadRequests.first,
+              let tempFile = mock.sandboxFileManager.copyTempFiles.first
         else {
             XCTFail("Unexpected NULL")
             return
@@ -100,19 +100,6 @@ final class UploadManagerTests: XCTestCase {
         
         // Check if the manager can handle the upload response
         XCTAssertTrue(manager.canHandle(task: uploadTask))
-        
-        // Once the S3 upload is complete, the shared network manager will call back to the upload manager.
-        // This should fire a call to the native upload manager (Kotlin) that will then attempt to mark the
-        // file as done.
-        uploadTask.setResponse(statusCode: 200)
-        try await manager.urlSession(task: uploadTask, didCompleteWithError: nil)
-        
-        // Check that the file was marked as uploaded
-        XCTAssertEqual([uploadFile.filePath], mockNativeManager.uploadFinished)
-        // Check for file deleted
-        XCTAssertEqual([uploadFile.filePath], mockSandboxFileManager.removeTempFiles)
-        
-        // TODO: syoung 08/23/2023 Check for processessing uploads requested
     }
     
     func checkUploadFileExpectations(_ uploadFile: UploadFile ) {
@@ -125,7 +112,88 @@ final class UploadManagerTests: XCTestCase {
         XCTAssertEqual("not-a-real-instanceGuid", uploadFile.metadata?.instanceGuid)
         XCTAssertEqual("not-a-real-eventTimestamp", uploadFile.metadata?.eventTimestamp)
         XCTAssertNotNil(uploadFile.metadata?.startedOn)
+        XCTAssertTrue(uploadFile.filePath.hasPrefix(expectedTempFileDir), "\(uploadFile.filePath) does not have expected prefix")
     }
+    
+    // MARK: Upload S3 responses
+    
+    func createS3UploadTask(_ manager: TestUploadManager, _ mock: Mock) -> (filePath: String, uploadId: String, uploadTask: MockBackgroundNetworkManager.UploadRequest) {
+        let filePath = "\(expectedTempFileDir)not-a-real-file"
+        let uploadId = "not-a-real-uploadSessionId-0"
+        let uploadTask = MockBackgroundNetworkManager.UploadRequest(
+            fileURL: mock.sandboxFileManager.fileURL(of: filePath),
+            httpHeaders: ["foo" : "magoo"],
+            urlString: "https://not-a-real-org.org/\(uploadId)/not-a-real-url",
+            taskDescription: manager.urlUploadTaskIdentifier(filePath: filePath, uploadSessionId: uploadId))
+        
+        // check test setup assumptions
+        XCTAssertTrue(manager.canHandle(task: uploadTask))
+        
+        return (filePath, uploadId, uploadTask)
+    }
+    
+    func testS3UploadResponse_HappyPath() async throws {
+        let (manager, mock) = createUploadManager()
+        let (filePath, _, uploadTask) = createS3UploadTask(manager, mock)
+        
+        // for the happy path, the S3 response code is 200
+        uploadTask.setResponse(statusCode: 200)
+        // and the native upload was successful
+        mock.nativeManager.uploadFinishedResponse[filePath] = true
+
+        // -- Method under test
+        
+        // Once the S3 upload is complete, the shared network manager will call back to the upload manager.
+        // This should fire a call to the native upload manager (Kotlin) that will then attempt to mark the
+        // file as done.
+        try await manager.urlSession(task: uploadTask, didCompleteWithError: nil)
+
+        // Check that the file was marked as uploaded
+        XCTAssertEqual([filePath], mock.nativeManager.uploadFinished)
+        // Check for file deleted
+        XCTAssertEqual([filePath], mock.sandboxFileManager.removeTempFiles)
+        // Check that the file was *not* queued for retry
+        XCTAssertEqual([:], manager.retryQueue)
+    }
+    
+    func checkRetryS3Failure(statusCode: Int) async throws {
+        let (manager, mock) = createUploadManager()
+        let (filePath, _, uploadTask) = createS3UploadTask(manager, mock)
+        
+        uploadTask.setResponse(statusCode: statusCode)
+
+        // -- Methods under test
+        
+        // Once the S3 upload is complete, the shared network manager will call back to the upload manager.
+        // This should fire a call to the native upload manager (Kotlin) that will then attempt to mark the
+        // file as done.
+        try await manager.urlSession(task: uploadTask, didCompleteWithError: nil)
+
+        // check that the file was not marked for upload
+        XCTAssertEqual([], mock.nativeManager.uploadFinished)
+        // and that the file was not removed
+        XCTAssertEqual([], mock.sandboxFileManager.removeTempFiles)
+        // but it is marked for retry
+        XCTAssertEqual([filePath:false], manager.retryQueue)
+    }
+    
+    func testS3UploadResponse_403() async throws {
+        try await checkRetryS3Failure(statusCode: 403)
+    }
+    
+    func testS3UploadResponse_409() async throws {
+        try await checkRetryS3Failure(statusCode: 409)
+    }
+    
+    func testS3UploadResponse_500() async throws {
+        try await checkRetryS3Failure(statusCode: 500)
+    }
+    
+    func testS3UploadResponse_503() async throws {
+        try await checkRetryS3Failure(statusCode: 503)
+    }
+    
+    // MARK: Sanity checks of Kotlin framework
     
     func testKotlinDataClassEquality() {
         // Check to make sure that data classes are properly handling equality and hash value.
@@ -138,6 +206,22 @@ final class UploadManagerTests: XCTestCase {
 }
 
 fileprivate let fakeBaseDirectory = "/Foo/48B0BAEB-94C4-4158-953C-74AB0935E5FA"
+
+class TestUploadManager : UploadManager {
+    var retryQueue: [String : Bool] = [:]
+    
+    override func enqueueForRetry(filePath: String, uploaded: Bool) async {
+        // Do not call through to the sync manager
+        retryQueue[filePath] = uploaded
+    }
+}
+
+/// Used to hold onto the mocks so they aren't prematurely released
+class Mock {
+    let networkManager: MockBackgroundNetworkManager = .init()
+    let sandboxFileManager: MockSandboxFileManager = .init()
+    let nativeManager: MockNativeUploadManager = .init()
+}
 
 class MockSandboxFileManager : SandboxFileManager {
     

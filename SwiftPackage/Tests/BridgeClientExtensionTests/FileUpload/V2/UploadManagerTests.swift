@@ -18,7 +18,7 @@ final class UploadManagerTests: XCTestCase {
     
     let expectedTempFileDir = "/App Support/BridgeUploadsV2/STUDY_DATA/"
     
-    func createUploadManager() -> (manager: TestUploadManager, mock: Mock) {
+    fileprivate func createUploadManager() -> (manager: TestUploadManager, mock: Mock) {
         let mock = Mock()
         let manager = TestUploadManager(
             backgroundNetworkManager: mock.networkManager,
@@ -117,7 +117,7 @@ final class UploadManagerTests: XCTestCase {
     
     // MARK: Upload S3 responses
     
-    func createS3UploadTask(_ manager: TestUploadManager, _ mock: Mock) -> (filePath: String, uploadId: String, uploadTask: MockBackgroundNetworkManager.UploadRequest) {
+    fileprivate func createS3UploadTask(_ manager: TestUploadManager, _ mock: Mock) -> (filePath: String, uploadId: String, uploadTask: MockBackgroundNetworkManager.UploadRequest) {
         let filePath = "\(expectedTempFileDir)not-a-real-file"
         let uploadId = "not-a-real-uploadSessionId-0"
         let uploadTask = MockBackgroundNetworkManager.UploadRequest(
@@ -217,7 +217,7 @@ class TestUploadManager : UploadManager {
 }
 
 /// Used to hold onto the mocks so they aren't prematurely released
-class Mock {
+fileprivate class Mock {
     let networkManager: MockBackgroundNetworkManager = .init()
     let sandboxFileManager: MockSandboxFileManager = .init()
     let nativeManager: MockNativeUploadManager = .init()

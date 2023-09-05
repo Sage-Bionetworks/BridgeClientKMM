@@ -320,6 +320,7 @@ open class UploadAppManager : ObservableObject {
         Logger.log(severity: .info, message: "Hook up upload observer")
         self.pendingUploadObserver = PendingUploadObserver() { count in
             self.isUploading = (count.intValue > 0)
+            Logger.log(severity: .info, tag: .upload, message: "Pending upload count changed: \(count.intValue)")
         }
         self.pendingUploadObserver.observePendingUploadCount()
         
@@ -420,6 +421,7 @@ open class UploadAppManager : ObservableObject {
                     // status was *not* connected.
                     strongSelf.uploadManagerV2.checkAndRetryUploads()
                 }
+                Logger.log(severity: .info, message: "Network status changed: \(newStatus.stringValue)")
                 strongSelf.networkStatus = newStatus
             }
         }

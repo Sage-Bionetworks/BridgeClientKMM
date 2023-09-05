@@ -26,12 +26,12 @@ final class ArchiveUploadProcessor {
     
     func encryptAndUpload(using builder: ArchiveBuilder) {
         Task.detached(priority: .userInitiated) {
-            await self._encryptAndUpload(using: builder)
+            await self.asyncEncryptAndUpload(using: builder)
         }
     }
     
     @MainActor
-    private func _encryptAndUpload(using builder: ArchiveBuilder) async {
+    func asyncEncryptAndUpload(using builder: ArchiveBuilder) async {
         uploadManager.isArchiving = true
 
         #if canImport(UIKit)

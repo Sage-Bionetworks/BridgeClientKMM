@@ -218,6 +218,7 @@ fileprivate let kBridgeV2InfoFilename = "info.json"
 
 public struct BridgeUploaderInfoV2 : Encodable {
     
+    let createdOn: String = ISO8601TimestampFormatter.string(from: Date())
     let files: [FileEntry]
     let dataFilename: String
     let format: FormatVersion

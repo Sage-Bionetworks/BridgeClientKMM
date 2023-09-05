@@ -96,7 +96,7 @@ class UploadManager : NSObject, BridgeURLSessionHandler, BackgroundProcessSyncDe
     func upload(fileUrl: URL, contentType: String, encrypted: Bool, metadata: UploadMetadata?, s3UploadType: S3UploadType) async -> Bool {
         
         // Both study data and participant data should first be copied to a temp file.
-        guard let uploadDirURL = self.uploadDirURL?.appendingPathComponent(s3UploadType.name),
+        guard let uploadDirURL = self.uploadDir(for: s3UploadType),
               let (_, tempUrl) = sandboxFileManager.tempFileFor(inFileURL: fileUrl, uploadDirURL: uploadDirURL),
               let contentLength = sandboxFileManager.fileContentLength(tempUrl)
         else {
@@ -139,6 +139,23 @@ class UploadManager : NSObject, BridgeURLSessionHandler, BackgroundProcessSyncDe
         }
 
         return true
+    }
+    
+    fileprivate func uploadDir(for s3UploadType: S3UploadType) -> URL? {
+        guard let baseURL = uploadDirURL else { return nil }
+        do {
+            let url: URL
+            if #available(iOS 16.0, *) {
+                url = baseURL.appending(component: s3UploadType.name, directoryHint: .isDirectory)
+            } else {
+                url = baseURL.appendingPathComponent(s3UploadType.name)
+            }
+            try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
+            return url
+        } catch {
+            Logger.log(tag: .upload, error: error, message: "Error trying to create the uploads directory for \(s3UploadType.name).")
+            return nil
+        }
     }
     
     // MARK: BackgroundProcessSyncDelegate

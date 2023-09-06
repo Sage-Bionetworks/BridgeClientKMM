@@ -223,6 +223,22 @@ class SandboxFileManager: NSObject {
     func fileExists(at url: URL) -> Bool {
         fileExists(atPath: url.absoluteString)
     }
+    
+    /// Append the base directory with a subdirectory and create if needed.
+    /// - Parameters:
+    ///   - baseURL: The base directory
+    ///   - subdir: The subdirectory to append
+    /// - Returns: The subdirectory or nil it fails.
+    func createSubdirectory(baseURL: URL, subdir: String) throws -> URL {
+        let url: URL
+        if #available(iOS 16.0, *) {
+            url = baseURL.appending(component: subdir, directoryHint: .isDirectory)
+        } else {
+            url = baseURL.appendingPathComponent(subdir)
+        }
+        try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
+        return url
+    }
 
 }
 

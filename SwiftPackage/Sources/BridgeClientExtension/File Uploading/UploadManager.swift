@@ -35,16 +35,9 @@ class UploadManager : NSObject, BridgeURLSessionHandler, BackgroundProcessSyncDe
     lazy var uploadDirURL: URL? = {
         do {
             let baseURL = try FileManager.default.sharedAppSupportDirectory()
-            let url: URL
-            if #available(iOS 16.0, *) {
-                url = baseURL.appending(component: subdir, directoryHint: .isDirectory)
-            } else {
-                url = baseURL.appendingPathComponent(subdir)
-            }
-            try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
-            return url
+            return try sandboxFileManager.createSubdirectory(baseURL: baseURL, subdir: subdir)
         } catch {
-            Logger.log(tag: .upload, error: error, message: "Error trying to create the uploads directory.")
+            Logger.log(tag: .upload, error: error, message: "Error trying to create the shared app support directory.")
             return nil
         }
     }()
@@ -144,14 +137,7 @@ class UploadManager : NSObject, BridgeURLSessionHandler, BackgroundProcessSyncDe
     fileprivate func uploadDir(for s3UploadType: S3UploadType) -> URL? {
         guard let baseURL = uploadDirURL else { return nil }
         do {
-            let url: URL
-            if #available(iOS 16.0, *) {
-                url = baseURL.appending(component: s3UploadType.name, directoryHint: .isDirectory)
-            } else {
-                url = baseURL.appendingPathComponent(s3UploadType.name)
-            }
-            try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
-            return url
+            return try sandboxFileManager.createSubdirectory(baseURL: baseURL, subdir: s3UploadType.name)
         } catch {
             Logger.log(tag: .upload, error: error, message: "Error trying to create the uploads directory for \(s3UploadType.name).")
             return nil

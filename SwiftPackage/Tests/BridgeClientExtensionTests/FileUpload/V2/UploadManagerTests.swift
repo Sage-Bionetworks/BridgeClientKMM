@@ -260,6 +260,10 @@ class MockSandboxFileManager : SandboxFileManager {
         md5Map[fileUrl] ?? copyFileCalls[sandboxRelativePath(of: fileUrl)].flatMap { md5Map[$0] }
     }
     
+    override func createSubdirectory(baseURL: URL, subdir: String) throws -> URL {
+        baseURL.appendingPathComponent(subdir, isDirectory: true)
+    }
+    
     func setupFakeArchive() -> (URL, AssessmentScheduleInfo, Date) {
         let now = Date()
         let schedule = AssessmentScheduleInfo(

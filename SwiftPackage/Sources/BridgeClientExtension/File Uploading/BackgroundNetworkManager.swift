@@ -346,7 +346,7 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate, BridgeUR
         let mainSession = backgroundSession()
         var tasks: [BridgeURLSessionTask] = await withCheckedContinuation { continuation in
             mainSession.getAllTasks {
-                continuation.resume(returning: $0)
+                continuation.resume(returning: $0 as [BridgeURLSessionTask])
             }
         }
         for pair in self.restoredSessions {
@@ -354,7 +354,7 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate, BridgeUR
             if session.identifier != mainSession.identifier {
                 tasks.append(contentsOf: await withCheckedContinuation { continuation in
                     session.getAllTasks {
-                        continuation.resume(returning: $0)
+                        continuation.resume(returning: $0 as [BridgeURLSessionTask])
                     }
                 })
             }

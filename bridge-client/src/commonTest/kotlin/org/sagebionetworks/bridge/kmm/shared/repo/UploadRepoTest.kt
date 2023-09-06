@@ -142,7 +142,7 @@ class UploadRepoTest : BaseTest() {
             assertEquals(1L, initialCount)
 
             // Pretend to upload the S3 file by marking it as finished
-            repo.markUploadFileFinished(UploadFileId(uploadFile.filePath))
+            repo.markUploadFileFinished(UploadFileId(uploadFile.filePath), sessionId)
 
             val afterUploadCount = database.getPendingUploadCount()
             assertEquals(1L, afterUploadCount)

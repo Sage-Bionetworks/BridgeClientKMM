@@ -374,19 +374,8 @@ extension BridgeURLSessionTask {
     }
 }
 
-extension NotificationCenter {
-    func addObserver(forName name: NSNotification.Name, callback: @escaping @MainActor () -> Void) -> NSObjectProtocol {
-        addObserver(forName: name, object: nil, queue: .main) { _ in
-            Task {
-                await callback()
-            }
-        }
-    }
-}
-
 // Use a protocol to wrap the background network manager - this is to allow using a mock for testing.
 protocol SharedBackgroundUploadManager : AnyObject {
-    @MainActor var isAppBackground: Bool { get }
     var sessionDelegateQueue: OperationQueue { get }
     func registerBackgroundTransferHandler(_ handler: BridgeURLSessionHandler)
     @discardableResult func uploadFile(_ fileURL: URL, httpHeaders: [String : String]?, to urlString: String, taskDescription: String) -> Bool
@@ -394,15 +383,6 @@ protocol SharedBackgroundUploadManager : AnyObject {
 }
 
 extension BackgroundNetworkManager : SharedBackgroundUploadManager {
-    
-    @MainActor
-    var isAppBackground: Bool {
-        #if canImport(UIKit)
-        return UIApplication.shared.applicationState == .background
-        #else
-        return false
-        #endif
-    }
 }
 
 // Use a protocol to wrap the native upload manager - this is to allow using a mock for testing.

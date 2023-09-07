@@ -11,6 +11,7 @@ import UIKit
 
 fileprivate let UnprocessedUploadsKey = "unprocessedUploads"
 
+/// This is a processor to use to handle archiving data and uploading in the background.
 final class ArchiveUploadProcessor {
     
     let pemPath: String?
@@ -35,6 +36,8 @@ final class ArchiveUploadProcessor {
         uploadManager.isArchiving = true
 
         #if canImport(UIKit)
+        // This allows the app to request about 30 seconds after the app has been
+        // backgrounded to prepare data for upload.
         let taskId = UIApplication.shared.beginBackgroundTask {
             Logger.log(tag: .upload,
                        error: BridgeUploadFailedError(category: .backgroundTaskTimeout, message: "Timed out when archiving and starting background upload.")
@@ -46,17 +49,21 @@ final class ArchiveUploadProcessor {
         do {
             let archive = try await builder.buildArchive()
             // Copy the startedOn date (if available) from the builder to the archive.
+            // This is a work-around for older code so that the adherence record can be
+            // marked for a requested archive.
             if let resultBuilder = builder as? ResultArchiveBuilder, archive.adherenceStartedOn == nil {
                 archive.adherenceStartedOn = resultBuilder.startedOn
             }
             await _copyTest(archive: archive)
-            let encrypted = await _encrypt(archive: archive)
-            await _upload(archive: archive, encrypted: encrypted)
+            try await _encrypt(archive: archive)
+            try await _upload(archive: archive)
         } catch {
             Logger.log(error: error, message: "Failed to archive and upload \(builder.identifier)")
         }
         
         #if canImport(UIKit)
+        // Let the OS know that the app is done with the processing that needs to happen
+        // before ending.
         UIApplication.shared.endBackgroundTask(taskId)
         #endif
         
@@ -71,24 +78,22 @@ final class ArchiveUploadProcessor {
         #endif
     }
     
-    private func _encrypt(archive: DataArchive) async -> Bool {
-        guard let path = self.pemPath else { return false }
-        do {
-            try archive.encryptArchive(using: path)
-            return true
-        } catch {
-            Logger.log(error: error, message: "Failed to encrypt \(archive.identifier)")
-            return false
+    private func _encrypt(archive: DataArchive) async throws {
+        guard let path = self.pemPath else {
+            // Throw an assert to alert the developer that the pem file is missing.
+            let message = "Cannot upload archive. Missing pemPath."
+            assertionFailure(message)
+            throw BridgeUnexpectedNullError(category: .missingFile, message: message)
         }
+        try archive.encryptArchive(using: path)
     }
     
     @MainActor
-    private func _upload(archive: DataArchive, encrypted: Bool) async {
+    private func _upload(archive: DataArchive) async throws {
         guard let url = archive.encryptedURL else {
             let message = "Cannot upload archive. Missing encryption."
             assertionFailure(message)   // Throw an assert to alert the developer that the pem file is missing.
-            Logger.log(error: BridgeUnexpectedNullError(category: .missingFile, message: message))
-            return
+            throw BridgeUnexpectedNullError(category: .missingFile, message: message)
         }
         await _uploadEncrypted(id: archive.identifier, url: url, schedule: archive.schedule, startedOn: archive.adherenceStartedOn)
     }
@@ -116,6 +121,7 @@ final class ArchiveUploadProcessor {
     
 }
 
+/// Use a protocol to allow for unit tests to mock the Upload Manager.
 protocol BridgeUploader : NSObjectProtocol {
     var isArchiving: Bool { get set }
     @MainActor func uploadEncryptedArchive(fileUrl: URL, schedule: AssessmentScheduleInfo?, startedOn: Date?) async -> Bool

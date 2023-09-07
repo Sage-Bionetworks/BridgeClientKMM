@@ -83,6 +83,7 @@ public struct AssessmentScheduleInfo : Identifiable, Hashable, Codable {
                                    label: assessment.assessmentInfo.label)
     }
     
+    /// Internal init that can be used for testing.
     init(instanceGuid: String, session: Session, assessmentInfo: Info) {
         self.instanceGuid = instanceGuid
         self.session = session

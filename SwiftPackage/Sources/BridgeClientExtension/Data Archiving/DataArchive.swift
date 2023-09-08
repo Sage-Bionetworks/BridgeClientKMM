@@ -216,8 +216,11 @@ open class DataArchive : NSObject, Identifiable {
 
 fileprivate let kBridgeV2InfoFilename = "info.json"
 
+/// The info.json file is required for Exporter V1/V2 and by the Bridge Study
+/// Manager in order to see an archive marked as "complete".
 public struct BridgeUploaderInfoV2 : Encodable {
     
+    let createdOn: String = ISO8601TimestampFormatter.string(from: Date())
     let files: [FileEntry]
     let dataFilename: String
     let format: FormatVersion

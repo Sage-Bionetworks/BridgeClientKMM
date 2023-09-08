@@ -62,6 +62,10 @@ internal fun UploadFileIdentifiable.getUploadSessionResourceId(): String {
     return "uploadSession--$filePath"
 }
 
+internal fun UploadFileIdentifiable.getUploadedFileRecordResourceId(): String {
+    return "uploadedFileRecord--$filePath"
+}
+
 internal class UploadFileId(override val filePath: String) : UploadFileIdentifiable
 
 enum class S3UploadType {

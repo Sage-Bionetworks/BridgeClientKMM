@@ -11,11 +11,6 @@ data class UploadMetadata(
     val eventTimestamp: String? = null,
     val startedOn: String? = null,
 ) {
-
-    fun getId(): String? {
-        return if (instanceGuid == null) null else "$instanceGuid|$eventTimestamp|$startedOn"
-    }
-
     internal fun toJsonMap(): Map<String, JsonElement> {
         val jsonCoder = Json {
             ignoreUnknownKeys = true
@@ -23,13 +18,5 @@ data class UploadMetadata(
             explicitNulls = false
         }
         return jsonCoder.encodeToJsonElement(UploadMetadata.serializer(),this).jsonObject.toMap()
-    }
-
-    /**
-     * Used on iOS to encode metadata.
-     * (`JsonElement` does not implement the Swift Codable protocol - syoung 07/10/2023)
-     */
-    fun toStringMap(): Map<String, String> {
-        return toJsonMap().mapValues { it.toString() }
     }
 }

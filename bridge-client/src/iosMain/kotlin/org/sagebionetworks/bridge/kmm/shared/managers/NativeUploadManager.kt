@@ -1,5 +1,10 @@
 package org.sagebionetworks.bridge.kmm.shared.managers
 
+import co.touchlab.kermit.Logger
+import co.touchlab.kermit.Severity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -8,6 +13,7 @@ import org.koin.core.component.inject
 import org.sagebionetworks.bridge.kmm.shared.models.S3UploadSession
 import org.sagebionetworks.bridge.kmm.shared.models.UploadFile
 import org.sagebionetworks.bridge.kmm.shared.models.UploadFileId
+import org.sagebionetworks.bridge.kmm.shared.models.getUploadFileResourceId
 import org.sagebionetworks.bridge.kmm.shared.repo.*
 
 class NativeUploadManager : KoinComponent {
@@ -15,7 +21,7 @@ class NativeUploadManager : KoinComponent {
     private val repo : UploadRepo by inject(mode = LazyThreadSafetyMode.NONE)
     private val adherenceRecordRepo : AdherenceRecordRepo by inject(mode = LazyThreadSafetyMode.NONE)
     private val authManager : AuthenticationRepository by inject(mode = LazyThreadSafetyMode.NONE)
-    private val scope = MainScope()
+    private val scope = CoroutineScope(Dispatchers.IO)  // TODO: syoung 08/24/2023 Decide if this should be main scope?
 
     fun queueAndRequestUploadSession(uploadFile: UploadFile, callBack: (S3UploadSession?) -> Unit) {
         scope.launch {
@@ -28,8 +34,15 @@ class NativeUploadManager : KoinComponent {
         }
     }
 
-    fun getUploadFiles(): List<String> {
-        return repo.getUploadFiles().map { it.filePath }
+    fun hasPendingUploads(): Boolean {
+        return repo.database.getPendingUploadCount() > 0
+    }
+
+    fun getPendingUploadFiles(callBack: (List<PendingUploadFile>) -> Unit) {
+        scope.launch {
+            val ret = repo.getPendingUploadFiles()
+            callBack(ret)
+        }
     }
 
     fun requestUploadSession(filePath: String, callBack: (S3UploadSession?) -> Unit) {
@@ -43,19 +56,26 @@ class NativeUploadManager : KoinComponent {
         }
     }
 
-    fun markUploadFileFinished(filePath: String, callBack: (Boolean) -> Unit) {
-        markAndProcessFinishedUploads(filePath, callBack)
+    fun markUploadUnrecoverableFailure(filePath: String) {
+        repo.removeUploadFile(UploadFileId(filePath))
+    }
+
+    fun markUploadFileFinished(filePath: String, uploadSessionId: String, callBack: (Boolean) -> Unit) {
+        val uploadFile = UploadFileId(filePath)
+        repo.markUploadFileFinished(uploadFile, uploadSessionId)
+        scope.launch {
+            try {
+                repo.completeUploadSession(uploadSessionId, uploadFile.getUploadFileResourceId())
+                callBack(true)
+            } catch (throwable: Throwable) {
+                Logger.i("Failed to send upload complete to server: $uploadSessionId", throwable)
+                callBack(false)
+            }
+        }
     }
 
     fun processFinishedUploads(callBack: (Boolean) -> Unit) {
-        markAndProcessFinishedUploads(null, callBack)
-    }
-
-    private fun markAndProcessFinishedUploads(filePath: String? = null, callBack: (Boolean) -> Unit) {
         scope.launch {
-            if (filePath != null) {
-                repo.markUploadFileFinished(UploadFileId(filePath))
-            }
             try {
                 repo.processFinishedUploads()
                 authManager.currentStudyId()?.let {
@@ -68,6 +88,9 @@ class NativeUploadManager : KoinComponent {
         }
     }
 
+    fun hasMarkedFileAsUploaded(filePath: String): Boolean {
+        return repo.getUploadedFileRecord(filePath) != null
+    }
 }
 
 class PendingUploadObserver(

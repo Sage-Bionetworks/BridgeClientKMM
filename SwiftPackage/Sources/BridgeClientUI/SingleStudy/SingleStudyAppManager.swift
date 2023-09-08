@@ -39,8 +39,8 @@ open class AbstractSingleStudyAppManager : BridgeClientAppManager {
     private var studyManager: NativeStudyManager?
     private var notificationManager: NativeScheduledNotificationManager?
 
-    public override init(platformConfig: IOSPlatformConfig, pemPath: String? = nil) {
-        super.init(platformConfig: platformConfig, pemPath: pemPath)
+    public override init(platformConfig: IOSPlatformConfig, pemPath: String, backgroundProcessId: String) {
+        super.init(platformConfig: platformConfig, pemPath: pemPath, backgroundProcessId: backgroundProcessId)
         let studyId = self.isPreview ? previewStudy.identifier : sharedUserDefaults.string(forKey: kStudyIdKey)
         self.study = studyId.map { .init(identifier: $0) }
         if self.isPreview {

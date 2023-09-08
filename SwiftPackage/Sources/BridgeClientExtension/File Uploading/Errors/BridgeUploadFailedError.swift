@@ -6,12 +6,19 @@ import Foundation
 struct BridgeUploadFailedError : Error, CustomNSError {
     static var errorDomain: String { "BridgeClient.UploadFailedError" }
     
-    let errorCode: Int
+    let category: Category
     let message: String
     
-    init(errorCode: Int = -1, message: String = "Bridge upload failed") {
-        self.errorCode = errorCode
-        self.message = message
+    var errorCode: Int {
+        category.rawValue
+    }
+    
+    enum Category : Int {
+        case unknown = -1
+        case backgroundTaskTimeout = -51
+        case wrongHandler = -52
+        case fileFailure = -53
+        case unexpectedBackgroundCall = -54
     }
     
     var errorUserInfo: [String : Any] {

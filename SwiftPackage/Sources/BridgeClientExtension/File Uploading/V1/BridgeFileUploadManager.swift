@@ -1085,6 +1085,7 @@ class BridgeFileUploadManager: SandboxFileManager, BridgeURLSessionDownloadDeleg
                 
                 // Update the app manager's isUploading status. This needs to be done on the main queue.
                 self.runOnQueue(OperationQueue.main, sync: false) {
+                    self.appManager.v1UploadsFinished = !uploading
                     self.appManager.isUploading = uploading
                 }
             }

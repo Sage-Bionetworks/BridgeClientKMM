@@ -10,6 +10,7 @@ import JsonModel
 public let kPreviewStudyId = "xcode_preview"
 public let kStudyIdKey = "studyId"
 fileprivate let kUserSessionIdKey = "userSessionId"
+fileprivate let kV1UploadsFinishedKey = "v1UploadsFinished"
 
 open class UploadAppManager : ObservableObject {
     
@@ -37,6 +38,16 @@ open class UploadAppManager : ObservableObject {
         set {
             sharedUserDefaults.set(newValue, forKey: kUserSessionIdKey)
             Logger.logWriter?.setUserId(newValue)
+        }
+    }
+    
+    /// Should the app manager check for V1 uploads? This will run the V1 manager at least once
+    /// on initial login to check for orphaned files, but after it finishes in-progress uploads
+    /// it will set the flag as `true` and will stop checking for v1 orphaned files.
+    var v1UploadsFinished: Bool {
+        get { sharedUserDefaults.bool(forKey: kV1UploadsFinishedKey) }
+        set {
+            sharedUserDefaults.set(newValue, forKey: kV1UploadsFinishedKey)
         }
     }
 
@@ -187,7 +198,9 @@ open class UploadAppManager : ObservableObject {
         // If we have a session token and it is different from the old one then check orphaned files.
         if let newToken = session?.sessionToken, !newToken.isEmpty, newToken != oldToken {
             Logger.log(severity: .info, message: "Session token updated: newToken='\(newToken)', oldToken='\(oldToken ?? "")'")
-            uploadManagerV1.onSessionTokenChanged()
+            if !v1UploadsFinished {
+                uploadManagerV1.onSessionTokenChanged()
+            }
         }
     }
     

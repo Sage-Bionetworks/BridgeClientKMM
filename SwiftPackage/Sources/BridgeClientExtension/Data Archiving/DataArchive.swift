@@ -97,8 +97,13 @@ open class DataArchive : NSObject, Identifiable {
     /// - Parameters:
     ///   - data: The data to encode to add as a file.
     ///   - fileInfo: The file info to include in the manifest.
-    public final func addFile(data: Data, fileInfo: FileInfo) throws {
+    public final func addFile(data: Data, fileInfo: FileInfo, localSchema: JsonSchema? = nil) throws {
         try _addFile(data: data, filepath: fileInfo.filename, createdOn: fileInfo.timestamp, contentType: fileInfo.contentType)
+        if let schema = localSchema,
+           let schemaPath = fileInfo.jsonSchema?.lastPathComponent, !schemaPath.isEmpty {
+            let schemaData = try schema.jsonEncodedData()
+            try _addFile(data: schemaData, filepath: schemaPath, createdOn: Date(), contentType: "application/json")
+        }
         self.manifest.append(fileInfo)
     }
 
@@ -116,7 +121,13 @@ open class DataArchive : NSObject, Identifiable {
             return
         }
         try archiver.addFile(data: data, filepath: filepath, createdOn: createdOn, contentType: contentType)
+        if isTest {
+            addedFiles[filepath] = data
+        }
     }
+    
+    var isTest: Bool = false
+    var addedFiles: [String : Data] = [:]
     
     /// Close the archive (but do not encrypt or delete).
     public final func completeArchive() throws {

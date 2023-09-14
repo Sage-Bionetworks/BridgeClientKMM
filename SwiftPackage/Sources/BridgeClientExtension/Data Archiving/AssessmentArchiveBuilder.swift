@@ -206,7 +206,7 @@ extension AnswerResult {
     func flatAnswer() -> (value: JsonSerializable?, jsonType: JsonType)? {
         // Exit early for types that are not supported
         guard let baseType = jsonAnswerType?.baseType ?? jsonValue?.jsonType,
-              baseType != .null, baseType != .object
+              baseType != .null
         else {
             return nil
         }
@@ -227,6 +227,8 @@ extension AnswerResult {
             return (value.jsonNumber(), baseType)
         case .array(let value):
             return (value.map { "\($0)" }.joined(separator: ","), .string)
+        case .object(let value):
+            return (value, baseType)    // objects are supported as a json blob only
         default:
             return nil
         }

@@ -106,11 +106,28 @@ open class AssessmentArchiveBuilder : ResultArchiveBuilder {
         // Iterate through all the results within this collection and add if they are `FileArchivable`.
         try addBranchResults(assessmentResult)
         
-        // For backwards compatibility and adherence, add an "answers.json" dictionary.
+        // For assessment results that include "answer" results, create an "answers.json" file.
         if !answers.isEmpty {
-            let data = try JSONSerialization.data(withJSONObject: answers, options: [.prettyPrinted, .withoutEscapingSlashes, .sortedKeys])
-            let manifestInfo = FileInfo(filename: "answers.json", timestamp: assessmentResult.endDate, contentType: "application/json")
-            try archive.addFile(data: data, fileInfo: manifestInfo)
+            do {
+                let data = try JSONSerialization.data(withJSONObject: answers, options: [.prettyPrinted, .withoutEscapingSlashes, .sortedKeys])
+                let schemaURL = URL(string: "answers_schema.json")!
+                let jsonSchema = JsonSchema(id: schemaURL,
+                                            description: assessmentResult.identifier,
+                                            isArray: false,
+                                            codingKeys: [],
+                                            interfaces: nil,
+                                            definitions: [],
+                                            properties: answersProperties,
+                                            required: nil,
+                                            examples: nil)
+                let manifestInfo = FileInfo(filename: "answers.json",
+                                            timestamp: assessmentResult.endDate,
+                                            contentType: "application/json",
+                                            jsonSchema: schemaURL)
+                try archive.addFile(data: data, fileInfo: manifestInfo, localSchema: jsonSchema)
+            } catch {
+                Logger.log(tag: .upload, error: error, message: "Failed to create answers file for \(assessmentResult.identifier)")
+            }
         }
         
         // Add the top-level assessment if desired.
@@ -124,7 +141,8 @@ open class AssessmentArchiveBuilder : ResultArchiveBuilder {
         return archive
     }
     
-    private var answers: [String : JsonSerializable] = [:]
+    var answers: [String : JsonSerializable] = [:]
+    var answersProperties: [String : JsonSchemaProperty] = [:]
     
     private func addBranchResults(_ branchResult: BranchNodeResult, _ stepPath: String? = nil) throws {
         try recursiveAddFiles(branchResult.stepHistory, stepPath)
@@ -155,8 +173,9 @@ open class AssessmentArchiveBuilder : ResultArchiveBuilder {
             try archive.addFile(data: data, fileInfo: manifestInfo)
         }
         else if let answer = result as? AnswerResult,
-                let value = answer.jsonValue {
-            answers[answer.identifier] = value.jsonObject()
+                let (value, jsonType) = answer.flatAnswer() {
+            answers[answer.identifier] = value
+            answersProperties[answer.identifier] = .primitive(.init(jsonType: jsonType, description: answer.questionText))
         }
     }
     
@@ -180,6 +199,37 @@ open class AssessmentArchiveBuilder : ResultArchiveBuilder {
                                 identifier: result.identifier,
                                 jsonSchema: result.jsonSchema)
         return (data, fileInfo)
+    }
+}
+
+extension AnswerResult {
+    func flatAnswer() -> (value: JsonSerializable?, jsonType: JsonType)? {
+        // Exit early for types that are not supported
+        guard let baseType = jsonAnswerType?.baseType ?? jsonValue?.jsonType,
+              baseType != .null, baseType != .object
+        else {
+            return nil
+        }
+
+        // If the value is null then exit early with a null value
+        guard let value = jsonValue else {
+            return (nil, baseType == .array ? .string : baseType)
+        }
+        
+        switch value {
+        case .boolean(let value):
+            return (value, baseType)
+        case .string(let value):
+            return (value, baseType)
+        case .integer(let value):
+            return (value, baseType)
+        case .number(let value):
+            return (value.jsonNumber(), baseType)
+        case .array(let value):
+            return (value.map { "\($0)" }.joined(separator: ","), .string)
+        default:
+            return nil
+        }
     }
 }
 

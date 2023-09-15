@@ -174,8 +174,9 @@ open class AssessmentArchiveBuilder : ResultArchiveBuilder {
         }
         else if let answer = result as? AnswerResult,
                 let (value, jsonType) = answer.flatAnswer() {
-            answers[answer.identifier] = value
-            answersProperties[answer.identifier] = .primitive(.init(jsonType: jsonType, description: answer.questionText))
+            let key = path.replacingOccurrences(of: "/", with: "_")
+            answers[key] = value
+            answersProperties[key] = .primitive(.init(jsonType: jsonType, description: answer.questionText))
         }
     }
     

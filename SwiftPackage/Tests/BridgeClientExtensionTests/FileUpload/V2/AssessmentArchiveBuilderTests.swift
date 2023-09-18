@@ -19,12 +19,14 @@ final class AssessmentArchiveBuilderTests: XCTestCase {
     func testSurveyAnswerBuilder() async throws {
         
         let assessmentResult = AssessmentResultObject(identifier: "example_survey")
-        let answerResult1 = AnswerResultObject(identifier: "step1", value: .boolean(true), questionText: "Do you like pizza?")
+        let answerResult1 = AnswerResultObject(identifier: "pizza", value: .boolean(true), questionText: "Do you like pizza?")
         let answerResult2 = AnswerResultObject(identifier: "step2", value: .integer(42), questionText: "What is the answer to the universe and everything?")
         let answerResult3 = AnswerResultObject(identifier: "step3", value: .number(52.25), questionText: "How old are you?")
         let answerResult4 = AnswerResultObject(identifier: "step4", value: .string("brown fox"), questionText: "Who jumped over the lazy dog?")
         let answerResult5 = AnswerResultObject(identifier: "step5", value: .array([1,11]), questionText: "What are your favorite numbers?")
-        assessmentResult.stepHistory = [answerResult1, answerResult2, answerResult3, answerResult4, answerResult5]
+        let answerResult6 = AnswerResultObject(identifier: "pizza", value: .boolean(false), questionText: "Do you like pizza now?")
+        let branchResult = BranchNodeResultObject(identifier: "branch", stepHistory: [answerResult6])
+        assessmentResult.stepHistory = [answerResult1, answerResult2, answerResult3, answerResult4, answerResult5, branchResult]
         
         guard let builder = AssessmentArchiveBuilder(assessmentResult) else {
             XCTFail("Unexpected NULL when creating the archiver")
@@ -34,7 +36,7 @@ final class AssessmentArchiveBuilderTests: XCTestCase {
         let _ = try await builder.buildArchive()
         
         // Check each answer type
-        XCTAssertEqual(builder.answers["step1"] as? Bool, true)
+        XCTAssertEqual(builder.answers["pizza"] as? Bool, true)
         XCTAssertEqual(builder.answers["step2"] as? Int, 42)
         XCTAssertEqual(builder.answers["step3"] as? Double, 52.25)
         XCTAssertEqual(builder.answers["step4"] as? String, "brown fox")
@@ -43,11 +45,12 @@ final class AssessmentArchiveBuilderTests: XCTestCase {
         // Check that the answers match the expected values
         let expectedAnswers = try JSONSerialization.jsonObject(with: """
         {
-            "step1" : true,
+            "pizza" : true,
             "step2" : 42,
             "step3" : 52.25,
             "step4" : "brown fox",
-            "step5" : "1,11"
+            "step5" : "1,11",
+            "branch_pizza" : false
         }
         """.data(using: .utf8)!) as! NSDictionary
         let answers = try builder.archive.addedFiles["answers.json"].map { try JSONSerialization.jsonObject(with: $0) } as? NSDictionary
@@ -62,7 +65,7 @@ final class AssessmentArchiveBuilderTests: XCTestCase {
             "title" : "answers_schema",
             "description" : "example_survey",
             "properties" : {
-                "step1" : {
+                "pizza" : {
                     "type" : "boolean",
                     "description" : "Do you like pizza?"
                 },
@@ -82,6 +85,10 @@ final class AssessmentArchiveBuilderTests: XCTestCase {
                     "type" : "string",
                     "description" : "What are your favorite numbers?"
                 },
+                "branch_pizza" : {
+                    "type" : "boolean",
+                    "description" : "Do you like pizza now?"
+                }
             }
         }
         """.data(using: .utf8)!) as! NSDictionary

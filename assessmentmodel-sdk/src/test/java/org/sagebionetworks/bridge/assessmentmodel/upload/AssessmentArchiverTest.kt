@@ -12,6 +12,9 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.plus
 import kotlinx.serialization.modules.polymorphic
@@ -27,6 +30,8 @@ import org.sagebionetworks.assessmentmodel.JsonArchivableFile
 import org.sagebionetworks.assessmentmodel.JsonFileArchivableResult
 import org.sagebionetworks.assessmentmodel.Result
 import org.sagebionetworks.assessmentmodel.serialization.*
+import org.sagebionetworks.assessmentmodel.survey.AnswerType
+import org.sagebionetworks.assessmentmodel.survey.BaseType
 import org.sagebionetworks.bridge.kmm.shared.BridgeConfig
 import org.sagebionetworks.bridge.kmm.shared.PlatformConfig
 import java.io.ByteArrayInputStream
@@ -97,7 +102,60 @@ class AssessmentArchiverTest {
         verifyArchive(assessmentResult, resultFileName, expectedFiles)
     }
 
-    private fun verifyArchive(assessmentResult: AssessmentResult, resultFileName: String, expectedFiles: Set<String>) {
+    fun testAssessmentArchiverSurveyAnswers() {
+
+        var assessmentResult = AssessmentResultObject("example_survey")
+        val answerResult1 = AnswerResultObject("pizza", AnswerType.BOOLEAN, JsonPrimitive(true), questionText = "Do you like pizza?")
+        val answerResult2 = AnswerResultObject("step2", AnswerType.INTEGER, JsonPrimitive(42), questionText = "What is the answer to the universe and everything?")
+        val answerResult3 = AnswerResultObject("step3", AnswerType.Decimal(), JsonPrimitive(52.25), questionText = "How old are you?")
+        val answerResult4 = AnswerResultObject("step4", AnswerType.STRING, JsonPrimitive("brown fox"), questionText = "Who jumped over the lazy dog?")
+        val answerResult5 = AnswerResultObject("step5", AnswerType.Array(BaseType.INTEGER), JsonArray(listOf(JsonPrimitive(1),JsonPrimitive(11))), questionText = "What are your favorite numbers?")
+        val answerResult6 = AnswerResultObject(  "pizza", AnswerType.BOOLEAN, JsonPrimitive(false), questionText = "Do you like pizza now?")
+        val branchResult = BranchNodeResultObject("branch", mutableListOf(answerResult6))
+        assessmentResult.pathHistoryResults.add(answerResult1)
+        assessmentResult.pathHistoryResults.add(answerResult2)
+        assessmentResult.pathHistoryResults.add(answerResult3)
+        assessmentResult.pathHistoryResults.add(answerResult4)
+        assessmentResult.pathHistoryResults.add(answerResult5)
+        assessmentResult.pathHistoryResults.add(branchResult)
+
+        val expectedAnswers = mapOf<String, JsonElement>(
+            "pizza" to JsonPrimitive(true),
+            "step2" to JsonPrimitive(42),
+            "step3" to JsonPrimitive(52.25),
+            "step4" to JsonPrimitive("brown fox"),
+            "step5" to JsonPrimitive("1,11"),
+            "branch_pizza" to JsonPrimitive(true),
+        )
+
+        val expectedAnswersSchema = SimpleJsonSchema(
+            "answers_schema.json",
+            "http://json-schema.org/draft-07/schema#",
+            "object",
+            "answers_schema",
+            "example_survey",
+            mutableMapOf(
+                "pizza" to JsonSchemaProperty(BaseType.BOOLEAN, "Do you like pizza?"),
+                "step2" to JsonSchemaProperty(BaseType.INTEGER, "What is the answer to the universe and everything?"),
+                "step3" to JsonSchemaProperty(BaseType.NUMBER, "How old are you?"),
+                "step4" to JsonSchemaProperty(BaseType.STRING,"Who jumped over the lazy dog?"),
+                "step5" to JsonSchemaProperty(BaseType.STRING,"What are your favorite numbers?"),
+                "branch_pizza" to JsonSchemaProperty(BaseType.BOOLEAN,"Do you like pizza now?")
+            )
+        )
+
+        val resultFileName = "assessmentResult.json"
+        val expectedFiles = setOf(resultFileName, "metadata.json", "info.json", "jsonTest.json", "answers.json", "answers_schema.json")
+        verifyArchive(assessmentResult, resultFileName, expectedFiles, expectedAnswers, expectedAnswersSchema)
+    }
+
+    private fun verifyArchive(
+        assessmentResult: AssessmentResult,
+        resultFileName: String,
+        expectedFiles: Set<String>,
+        expectedAnswers: Map<String, JsonElement>? = null,
+        expectedAnswersSchema: SimpleJsonSchema? = null
+    ) {
         val mutableExpectedFiles = expectedFiles.toMutableSet()
 
         val archiver = AssessmentArchiver(
@@ -126,6 +184,18 @@ class AssessmentArchiverTest {
                     assertEquals(assessmentResult.jsonSchema, archiveFileInfo?.jsonSchema)
                     foundMetadataFile = true
                     validateJson(metadataJsonString, "https://sage-bionetworks.github.io/mobile-client-json/schemas/v2/ArchiveMetadata.json")
+                }
+                if (entry.name == "answers.json" && expectedAnswers != null) {
+                    val data = zipInputStream.readBytes()
+                    val jsonString = data.toString(Charsets.UTF_8)
+                    val actual: Map<String, JsonElement> = Json.decodeFromString(jsonString)
+                    assertEquals(expectedAnswers, actual)
+                }
+                if (entry.name == "answers_schema.json" && expectedAnswersSchema != null) {
+                    val data = zipInputStream.readBytes()
+                    val jsonString = data.toString(Charsets.UTF_8)
+                    val actual: SimpleJsonSchema = Json.decodeFromString(jsonString)
+                    assertEquals(expectedAnswersSchema, actual)
                 }
             }
         } while (entry != null)

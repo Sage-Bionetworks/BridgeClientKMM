@@ -42,7 +42,7 @@ class AssessmentResultArchiveUploader(
                                     assessmentInstanceId: String,
                                     eventTimestamp: String,
                                     startedOn: Instant,
-                                    assessmentResultFilename: String = "assessmentResult.json",
+                                    assessmentResultFilename: String? = "assessmentResult.json",
                                     sessionWindowExpiration: kotlinx.datetime.Instant?) {
         if (sessionWindowExpiration != null) {
             Logger.w("`sessionWindowExpiration` is not supported.")
@@ -61,7 +61,7 @@ class AssessmentResultArchiveUploader(
                                     assessmentInstanceId: String,
                                     eventTimestamp: String,
                                     startedOn: Instant,
-                                    assessmentResultFilename: String = "assessmentResult.json") {
+                                    assessmentResultFilename: String? = "assessmentResult.json") {
 
         val archiver = AssessmentArchiver(
             assessmentResult = assessmentResult,

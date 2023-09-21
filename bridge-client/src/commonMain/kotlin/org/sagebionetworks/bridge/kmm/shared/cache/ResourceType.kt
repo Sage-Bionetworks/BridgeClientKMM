@@ -16,7 +16,8 @@ enum class ResourceType {
     ADHERENCE_RECORD,
     STUDY,
     STUDY_INFO,
-    PARTICIPANT_REPORT
+    PARTICIPANT_REPORT,
+    UPLOADED_FILE_RECORD,
 }
 
 enum class ResourceStatus {

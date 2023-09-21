@@ -42,7 +42,7 @@ val commonModule = module {
     single<ParticipantRepo> { ParticipantRepo(get(), get(), get(named("background")), get()) }
     single<ParticipantReportRepo> { ParticipantReportRepo(get(), get(), get(named("background"))) }
     single<LocalJsonDataCache> {LocalJsonDataCache(get())}
-
+    single<UploadRepo> { UploadRepo(get(), get(), get(named("background"))) }
 }
 
 expect val platformModule: Module

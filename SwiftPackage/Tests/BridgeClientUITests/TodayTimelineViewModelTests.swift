@@ -15,7 +15,7 @@ final class TodayTimelineViewModelTests: XCTestCase {
             return
         }
         
-        let bridgeManager = SingleStudyAppManager(appId: kPreviewStudyId)
+        let bridgeManager = SingleStudyAppManager(mockType: .preview)
         let todayManager = TodayTimelineViewModel()
         todayManager.onAppear(bridgeManager: bridgeManager, previewSchedules: previewSchedulesA)
         
@@ -42,7 +42,7 @@ final class TodayTimelineViewModelTests: XCTestCase {
             return
         }
         
-        let bridgeManager = SingleStudyAppManager(appId: kPreviewStudyId)
+        let bridgeManager = SingleStudyAppManager(mockType: .preview)
         let todayManager = TodayTimelineViewModel()
         todayManager.onAppear(bridgeManager: bridgeManager, previewSchedules: previewSchedulesA)
         
@@ -139,7 +139,7 @@ final class TodayTimelineViewModelTests: XCTestCase {
             return
         }
         
-        let bridgeManager = SingleStudyAppManager(appId: kPreviewStudyId)
+        let bridgeManager = SingleStudyAppManager(mockType: .preview)
         let todayManager = TodayTimelineViewModel()
         todayManager.onAppear(bridgeManager: bridgeManager, previewSchedules: previewSchedulesA)
         

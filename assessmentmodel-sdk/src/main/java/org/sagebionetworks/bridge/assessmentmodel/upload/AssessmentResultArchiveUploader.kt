@@ -7,14 +7,12 @@ import android.content.res.AssetManager
 import co.touchlab.kermit.Logger
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonPrimitive
 import okio.ByteString.Companion.toByteString
 import org.sagebionetworks.assessmentmodel.AssessmentResult
 import org.sagebionetworks.assessmentmodel.Result
-import org.sagebionetworks.bridge.data.AndroidStudyUploadEncryptor
 import org.sagebionetworks.bridge.data.Archive
-import org.sagebionetworks.bridge.kmm.shared.upload.UploadFile
+import org.sagebionetworks.bridge.kmm.shared.models.UploadMetadata
+import org.sagebionetworks.bridge.kmm.shared.models.UploadFile
 import org.sagebionetworks.bridge.kmm.shared.upload.UploadRequester
 import org.spongycastle.cms.CMSException
 import org.spongycastle.jcajce.provider.asymmetric.x509.CertificateFactory
@@ -38,6 +36,20 @@ class AssessmentResultArchiveUploader(
 
     val STUDY_PUBLIC_KEY = "study_public_key.pem"
 
+    @Deprecated("`sessionWindowExpiration` is not supported.")
+    fun archiveResultAndQueueUpload(assessmentResult: Result,
+                                    jsonCoder: Json,
+                                    assessmentInstanceId: String,
+                                    eventTimestamp: String,
+                                    startedOn: Instant,
+                                    assessmentResultFilename: String? = "assessmentResult.json",
+                                    sessionWindowExpiration: kotlinx.datetime.Instant?) {
+        if (sessionWindowExpiration != null) {
+            Logger.w("`sessionWindowExpiration` is not supported.")
+            return
+        }
+        archiveResultAndQueueUpload(assessmentResult, jsonCoder, assessmentInstanceId, eventTimestamp, startedOn, assessmentResultFilename)
+    }
 
     /**
      * Archive and queue the [assessmentResult] for upload using the specified [jsonCoder].
@@ -49,8 +61,7 @@ class AssessmentResultArchiveUploader(
                                     assessmentInstanceId: String,
                                     eventTimestamp: String,
                                     startedOn: Instant,
-                                    assessmentResultFilename: String? = "assessmentResult.json",
-                                    sessionWindowExpiration: kotlinx.datetime.Instant? = null) {
+                                    assessmentResultFilename: String? = "assessmentResult.json") {
 
         val archiver = AssessmentArchiver(
             assessmentResult = assessmentResult,
@@ -66,16 +77,10 @@ class AssessmentResultArchiveUploader(
             UUID.randomUUID().toString()
         }
 
-        val uploadMetadata: Map<String, JsonElement> = mapOf(
-            "instanceGuid" to JsonPrimitive(assessmentInstanceId),
-            "eventTimestamp" to JsonPrimitive(eventTimestamp),
-            "startedOn" to JsonPrimitive(startedOn.toString())
-        )
-
-
-        val uploadFile = persist(assessmentRunUUID, archiver.buildArchive(), uploadMetadata, sessionWindowExpiration)
+        val uploadMetadata = UploadMetadata(assessmentInstanceId, eventTimestamp, startedOn.toString())
+        val uploadFile = persist(assessmentRunUUID, archiver.buildArchive(), uploadMetadata)
         Logger.i("UploadFile $uploadFile")
-        uploadRequester.queueAndRequestUpload(context, uploadFile, assessmentInstanceId)
+        uploadRequester.queueAndRequestUpload(uploadFile)
     }
 
     @Throws(
@@ -83,7 +88,7 @@ class AssessmentResultArchiveUploader(
         CMSException::class,
         NoSuchAlgorithmException::class
     )
-    fun persist(filename: String, archive: Archive, uploadMetadata: Map<String, JsonElement>, sessionWindowExpiration: kotlinx.datetime.Instant?): UploadFile {
+    fun persist(filename: String, archive: Archive, uploadMetadata: UploadMetadata): UploadFile {
         val md5: MessageDigest = try {
             MessageDigest.getInstance("MD5")
         } catch (e: NoSuchAlgorithmException) {
@@ -114,7 +119,6 @@ class AssessmentResultArchiveUploader(
                 md5Hash = md5Hash,
                 encrypted = true,
                 metadata = uploadMetadata,
-                sessionExpires = sessionWindowExpiration
             )
 
         } catch (e: CMSException) {

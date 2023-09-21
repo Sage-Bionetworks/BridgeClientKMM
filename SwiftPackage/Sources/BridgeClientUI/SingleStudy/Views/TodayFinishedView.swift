@@ -125,6 +125,6 @@ fileprivate struct PreviewAllTodayFinished : View {
 struct TodayFinishedView_Previews: PreviewProvider {
     static var previews: some View {
         PreviewAllTodayFinished()
-            .environmentObject(SingleStudyAppManager(appId: kPreviewStudyId))
+            .environmentObject(SingleStudyAppManager(mockType: .preview))
     }
 }

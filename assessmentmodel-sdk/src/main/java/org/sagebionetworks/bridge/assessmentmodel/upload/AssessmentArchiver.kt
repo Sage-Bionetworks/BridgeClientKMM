@@ -1,16 +1,24 @@
 package org.sagebionetworks.bridge.assessmentmodel.upload
 
+import android.icu.text.CaseMap.Title
 import android.os.Build
 import co.touchlab.kermit.Logger
 import com.google.common.io.Files
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonPrimitive
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.sagebionetworks.assessmentmodel.*
+import org.sagebionetworks.assessmentmodel.survey.AnswerType
+import org.sagebionetworks.assessmentmodel.survey.BaseType
 import org.sagebionetworks.bridge.data.Archive
 import org.sagebionetworks.bridge.data.ByteSourceArchiveFile
 import org.sagebionetworks.bridge.data.JsonArchiveFile
@@ -32,6 +40,8 @@ class AssessmentArchiver(
 
     private val manifest: MutableSet<ArchiveFileInfo> = mutableSetOf()
     private val archiveBuilder: Archive.Builder
+    private var answers: MutableMap<String, JsonElement> = mutableMapOf()
+    private var answersSchema: SimpleJsonSchema
 
     init {
         val appVersion = "version ${bridgeConfig.appVersionName}, build ${bridgeConfig.appVersion}"
@@ -39,13 +49,14 @@ class AssessmentArchiver(
         archiveBuilder = Archive.Builder.forActivity(item)
             .withAppVersionName(appVersion)
             .withPhoneInfo(bridgeConfig.deviceName)
+        answersSchema = SimpleJsonSchema(description = assessmentResult.identifier)
     }
 
     fun buildArchive() : Archive {
         // Iterate through all the results within this collection and add if they are `JsonFileArchivableResult`.
         recursiveAdd(assessmentResult)
 
-        //Add assessment result file to archive
+        // Add assessment result file to archive
         if (assessmentResult is AssessmentResult && assessmentResultFilename != null) {
             Logger.d("Writing result for assessment ${assessmentResult.identifier}")
             archiveBuilder.addDataFile(
@@ -56,7 +67,7 @@ class AssessmentArchiver(
                 )
             )
 
-            //Add assessment result file info to manifest
+            // Add assessment result file info to manifest
             manifest.add(
                 ArchiveFileInfo(
                     filename = assessmentResultFilename,
@@ -69,7 +80,38 @@ class AssessmentArchiver(
             )
         }
 
-        //Add metadata file
+        // Add answers file and schema
+        if (answers.isNotEmpty()) {
+            val now = Clock.System.now()
+            val filename = "answers.json"
+            // Add the file to the archive
+            archiveBuilder.addDataFile(
+                JsonArchiveFile(
+                    filename,
+                    now.toJodaDateTime(),
+                    jsonCoder.encodeToString(answers)
+                )
+            )
+            // Add the schema to the archive
+            archiveBuilder.addDataFile(
+                JsonArchiveFile(
+                    answersSchema.id,
+                    now.toJodaDateTime(),
+                    jsonCoder.encodeToString(answersSchema)
+                )
+            )
+            // Add the linking between the answers and the schema to the metadata
+            manifest.add(
+                ArchiveFileInfo(
+                    filename = filename,
+                    timestamp = now.toString(),
+                    contentType = "application/json",
+                    jsonSchema = answersSchema.id
+                )
+            )
+        }
+
+        // Add metadata file
         val appVersion = "version ${bridgeConfig.appVersionName}, build ${bridgeConfig.appVersion}"
         val os = "${bridgeConfig.osName}/${bridgeConfig.osVersion}"
         val metadata =  ArchiveMetadata(
@@ -87,7 +129,7 @@ class AssessmentArchiver(
             )
         )
 
-        //Build and return the archive
+        // Build and return the archive
         return archiveBuilder.build()
     }
 
@@ -119,6 +161,9 @@ class AssessmentArchiver(
         }
         if (result is FileResult) {
             addFileResult(result, path)
+        }
+        if (result is AnswerResult) {
+            addAnswerResult(result, path)
         }
     }
 
@@ -179,6 +224,23 @@ class AssessmentArchiver(
         return true
     }
 
+    private fun addAnswerResult(result: AnswerResult, path: String) {
+        var baseType = result.answerType?.baseType ?: return
+        val key = path.replace("/", "_")
+        var jsonValue = result.jsonValue
+        if (baseType == BaseType.ARRAY) {
+            baseType = BaseType.STRING
+            jsonValue = jsonValue?.jsonArray?.let { array ->
+                val answers = array.map { it.toString() }
+                JsonPrimitive(answers.joinToString(","))
+            }
+        }
+        if (jsonValue != null) {
+            answers[key] = jsonValue
+        }
+        answersSchema.properties[key] = JsonSchemaProperty(baseType, result.questionText)
+    }
+
 }
 
 @Serializable
@@ -202,3 +264,21 @@ data class ArchiveFileInfo(
 
 fun Instant.toJodaDateTime(): DateTime = org.joda.time.Instant(this.toEpochMilliseconds())
     .toDateTime(DateTimeZone.UTC)
+
+@Serializable
+data class SimpleJsonSchema(
+    @SerialName("\$id")
+    val id: String = "answers_schema.json",
+    @SerialName("\$schema")
+    val schema: String = "http://json-schema.org/draft-07/schema#",
+    val type: String = "object",
+    val title: String = "answers_schema",
+    val description: String,
+    var properties: MutableMap<String, JsonSchemaProperty> = mutableMapOf()
+)
+
+@Serializable
+data class JsonSchemaProperty(
+    val type: BaseType,
+    val description: String?
+)

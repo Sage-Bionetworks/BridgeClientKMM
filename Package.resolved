@@ -3,20 +3,20 @@
     "pins": [
       {
         "package": "AssessmentModel",
-        "repositoryURL": "https://github.com/Sage-Bionetworks/AssessmentModelKMM.git",
+        "repositoryURL": "https://github.com/BridgeDigitalHealth/AssessmentModelKMM.git",
         "state": {
           "branch": null,
-          "revision": "3e9991bdbe297f8be13ce95d51dd83d099ad0699",
-          "version": "0.11.0"
+          "revision": "c69c70ccec06a41936a748057933922e94521d26",
+          "version": "1.0.3"
         }
       },
       {
         "package": "BridgeArchiver",
-        "repositoryURL": "https://github.com/Sage-Bionetworks/BridgeArchiver-Swift.git",
+        "repositoryURL": "https://github.com/BridgeDigitalHealth/BridgeArchiver-Swift.git",
         "state": {
           "branch": null,
-          "revision": "f1f0c4a9f177b13315bae618db186c12ecbc5bdb",
-          "version": "0.3.0"
+          "revision": "9fce5d2c7e1134c9c486b3eedfb2ba4dc337263a",
+          "version": "0.3.2"
         }
       },
       {
@@ -24,35 +24,26 @@
         "repositoryURL": "https://github.com/Sage-Bionetworks/CMSSupport.git",
         "state": {
           "branch": null,
-          "revision": "7390eb96b9edf53c3127d2aa2641a9475b36136e",
-          "version": "1.2.0"
+          "revision": "99ef4bcead679b83ee6b5414fd79992478f6c311",
+          "version": "1.2.3"
         }
       },
       {
         "package": "JsonModel",
-        "repositoryURL": "https://github.com/Sage-Bionetworks/JsonModel-Swift.git",
+        "repositoryURL": "https://github.com/BridgeDigitalHealth/JsonModel-Swift.git",
         "state": {
           "branch": null,
-          "revision": "cf13a8af6b09c25605f340150bb6392ea9d3c0f8",
-          "version": "2.0.0"
+          "revision": "5d9acc0f5c1779cca3a31ca1913d684406e74f1f",
+          "version": "2.3.1"
         }
       },
       {
         "package": "MobilePassiveData",
-        "repositoryURL": "https://github.com/Sage-Bionetworks/MobilePassiveData-SDK.git",
+        "repositoryURL": "https://github.com/BridgeDigitalHealth/MobilePassiveData-SDK.git",
         "state": {
           "branch": null,
-          "revision": "5c1b98eedde37fd6a898798c031f5e7d863404b3",
-          "version": "1.4.0"
-        }
-      },
-      {
-        "package": "SharedMobileUI",
-        "repositoryURL": "https://github.com/Sage-Bionetworks/SharedMobileUI-AppleOS.git",
-        "state": {
-          "branch": null,
-          "revision": "02192711c7f739df823bf187bd1b4cad9fe921c1",
-          "version": "0.19.0"
+          "revision": "74a1f99da8f8c017d0a5adbb3584be81bb1cd9a8",
+          "version": "1.6.2"
         }
       },
       {
@@ -60,8 +51,8 @@
         "repositoryURL": "https://github.com/weichsel/ZIPFoundation.git",
         "state": {
           "branch": null,
-          "revision": "cf10bbff6ac3b873e97b36b9784c79866a051a8e",
-          "version": "0.9.12"
+          "revision": "43ec568034b3731101dbf7670765d671c30f54f3",
+          "version": "0.9.16"
         }
       }
     ]

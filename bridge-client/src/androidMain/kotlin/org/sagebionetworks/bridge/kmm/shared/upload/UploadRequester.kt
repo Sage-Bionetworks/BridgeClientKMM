@@ -1,11 +1,11 @@
 package org.sagebionetworks.bridge.kmm.shared.upload
 
 import android.content.Context
-import android.util.Log
 import androidx.work.*
 import co.touchlab.kermit.Logger
 import app.cash.sqldelight.db.SqlDriver
 import io.ktor.client.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
@@ -16,6 +16,8 @@ import okio.*
 import okio.Path.Companion.toPath
 import org.sagebionetworks.bridge.kmm.shared.cache.*
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper.Companion.APP_WIDE_STUDY_ID
+import org.sagebionetworks.bridge.kmm.shared.models.UploadFile
+import org.sagebionetworks.bridge.kmm.shared.models.getUploadFileResourceId
 
 class UploadRequester(
     val database: ResourceDatabaseHelper,
@@ -30,35 +32,10 @@ class UploadRequester(
      * to create the UploadFile. Once this method returns, the UploadManager is now responsible
      * for deleting the specified UploadFile after a successful upload.
      */
-    fun queueAndRequestUpload(context: Context, uploadFile: UploadFile, assessmentInstanceId: String) {
-        val pendingUploads = database.getResourcesBySecondaryId(assessmentInstanceId, ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID)
-        if (pendingUploads.isNotEmpty()) {
-            for (uploadResource in pendingUploads) {
-                uploadResource.loadResource<UploadFile>()?.let { pendingUploadFile ->
-                    if (pendingUploadFile.sessionExpires != null) {
-                        //We already have pending upload for this assessmentInstanceID waiting for
-                        //the scheduled session to expire before uploading. It will be replaced
-                        //with the new one.
-                        FileSystem.SYSTEM.delete(pendingUploadFile.filePath.toPath())
-                        database.removeResource(pendingUploadFile.getUploadFileResourceId(), ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID)
-                    }
-                }
-            }
-        }
-
-        //Store uploadFile in local cache
-        val resource = Resource(
-            identifier = uploadFile.getUploadFileResourceId(),
-            type = ResourceType.FILE_UPLOAD,
-            secondaryId = assessmentInstanceId,
-            studyId = APP_WIDE_STUDY_ID,
-            json = Json.encodeToString(uploadFile),
-            lastUpdate = Clock.System.now().toEpochMilliseconds(),
-            status = ResourceStatus.SUCCESS,
-            needSave = false
-        )
-        database.insertUpdateResource(resource)
-
+    fun queueAndRequestUpload(uploadFile: UploadFile) {
+        // Store uploadFile in local cache
+        database.storeUploadFile(uploadFile)
+        // Queue the upload worker - this will kick off the upload process
         queueUploadWorker()
     }
 
@@ -91,7 +68,9 @@ class UploadRequester(
         return database.getResourcesAsFlow(ResourceType.FILE_UPLOAD, APP_WIDE_STUDY_ID)
     }
 
-
+    fun getPendingUploadCount() : Flow<Long> {
+        return database.getPendingUploadCountAsFlow()
+    }
 
     private fun getFile(filename: String): Path {
         val pathString = context.filesDir.absolutePath + Path.DIRECTORY_SEPARATOR + filename
@@ -104,7 +83,8 @@ internal class CoroutineUploadWorker(
     context: Context,
     params: WorkerParameters,
     private val httpClient: HttpClient,
-    private val sqlDriver: SqlDriver
+    private val databaseHelper: ResourceDatabaseHelper,
+    private val backgroundScope: CoroutineScope,
 ) : CoroutineWorker(context, params) {
     private val TAG = "CoroutineUploadWorker"
     
@@ -112,7 +92,7 @@ internal class CoroutineUploadWorker(
         return withContext(Dispatchers.IO) {
             Logger.d { "Upload worker started" }
             val uploadManager = UploadManager(
-                httpClient, sqlDriver
+                httpClient, databaseHelper, backgroundScope
             )
             return@withContext try {
                 if (uploadManager.processUploads()) {

@@ -97,8 +97,13 @@ open class DataArchive : NSObject, Identifiable {
     /// - Parameters:
     ///   - data: The data to encode to add as a file.
     ///   - fileInfo: The file info to include in the manifest.
-    public final func addFile(data: Data, fileInfo: FileInfo) throws {
+    public final func addFile(data: Data, fileInfo: FileInfo, localSchema: JsonSchema? = nil) throws {
         try _addFile(data: data, filepath: fileInfo.filename, createdOn: fileInfo.timestamp, contentType: fileInfo.contentType)
+        if let schema = localSchema,
+           let schemaPath = fileInfo.jsonSchema?.lastPathComponent, !schemaPath.isEmpty {
+            let schemaData = try schema.jsonEncodedData()
+            try _addFile(data: schemaData, filepath: schemaPath, createdOn: Date(), contentType: "application/json")
+        }
         self.manifest.append(fileInfo)
     }
 
@@ -116,13 +121,22 @@ open class DataArchive : NSObject, Identifiable {
             return
         }
         try archiver.addFile(data: data, filepath: filepath, createdOn: createdOn, contentType: contentType)
+        if isTest {
+            addedFiles[filepath] = data
+        }
     }
+    
+    var isTest: Bool = false
+    var addedFiles: [String : Data] = [:]
     
     /// Close the archive (but do not encrypt or delete).
     public final func completeArchive() throws {
+        guard !isCompleted else { return }
         let metadata = ArchiveMetadata(files: manifest)
         let metadataDictionary = try metadata.jsonEncodedDictionary()
         try addMetadata(metadataDictionary)
+        // TODO: syoung 08/03/2023 Remove work-around. Add info.json file b/c otherwise the upload is marked as failed. 
+        try addBridgeV2Info()
         isCompleted = true
     }
     
@@ -191,6 +205,45 @@ open class DataArchive : NSObject, Identifiable {
         }
     }
     #endif
+    
+    func addBridgeV2Info(dataFilename: String = "answers.json",
+                         format: BridgeUploaderInfoV2.FormatVersion = .v2_generic,
+                         schemaIdentifier: String? = nil,
+                         schemaRevision: Int? = nil) throws {
+        let platformConfig = PlatformConfigImpl()
+        let info = BridgeUploaderInfoV2(files: files,
+                                        dataFilename: dataFilename,
+                                        format: format,
+                                        item: schemaIdentifier ?? identifier,
+                                        schemaRevision: schemaRevision,
+                                        appName: platformConfig.appName,
+                                        appVersion: platformConfig.appVersionName,
+                                        phoneInfo: platformConfig.deviceInfo)
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(info)
+        try _addFile(data: data, filepath: kBridgeV2InfoFilename, createdOn: Date(), contentType: "application/json")
+    }
+}
+
+fileprivate let kBridgeV2InfoFilename = "info.json"
+
+/// The info.json file is required for Exporter V1/V2 and by the Bridge Study
+/// Manager in order to see an archive marked as "complete".
+public struct BridgeUploaderInfoV2 : Encodable {
+    
+    let createdOn: String = ISO8601TimestampFormatter.string(from: Date())
+    let files: [FileEntry]
+    let dataFilename: String
+    let format: FormatVersion
+    let item: String
+    let schemaRevision: Int?
+    let appName: String
+    let appVersion: String
+    let phoneInfo: String
+    
+    public enum FormatVersion : String, Codable {
+        case v1_legacy, v2_generic
+    }
 }
 
 struct BridgeArchiveError : Error, CustomNSError {

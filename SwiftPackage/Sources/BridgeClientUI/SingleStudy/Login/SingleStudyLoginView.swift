@@ -183,7 +183,7 @@ struct LoginView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             SingleStudyLoginView()
-                .environmentObject(SingleStudyAppManager(appId: kPreviewStudyId))
+                .environmentObject(SingleStudyAppManager(mockType: .preview))
         }
     }
 }

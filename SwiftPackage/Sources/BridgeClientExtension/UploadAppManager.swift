@@ -6,11 +6,11 @@
 import Foundation
 import BridgeClient
 import JsonModel
-import Network
 
 public let kPreviewStudyId = "xcode_preview"
 public let kStudyIdKey = "studyId"
 fileprivate let kUserSessionIdKey = "userSessionId"
+fileprivate let kV1UploadsFinishedKey = "v1UploadsFinished"
 
 open class UploadAppManager : ObservableObject {
     
@@ -40,13 +40,22 @@ open class UploadAppManager : ObservableObject {
             Logger.logWriter?.setUserId(newValue)
         }
     }
+    
+    /// Should the app manager check for V1 uploads? This will run the V1 manager at least once
+    /// on initial login to check for orphaned files, but after it finishes in-progress uploads
+    /// it will set the flag as `true` and will stop checking for v1 orphaned files.
+    var v1UploadsFinished: Bool {
+        get { sharedUserDefaults.bool(forKey: kV1UploadsFinishedKey) }
+        set {
+            sharedUserDefaults.set(newValue, forKey: kV1UploadsFinishedKey)
+        }
+    }
 
     /// The path to the pem file that is used to encrypt data being uploaded to Bridge.
     ///
     /// - Note: Data should be encrypted so that it is not stored insecurely on the phone (while waiting
     ///         for an upload connection).
-    public var pemPath: String? { uploadProcessor.pemPath }
-    private let uploadProcessor: ArchiveUploadProcessor
+    public var pemPath: String? { self.uploadProcessor.pemPath }
         
     /// The title of the app to display. By default, this is the localized display name of the app that is shown
     /// to the participant in their phone home screen.
@@ -189,14 +198,22 @@ open class UploadAppManager : ObservableObject {
         // If we have a session token and it is different from the old one then check orphaned files.
         if let newToken = session?.sessionToken, !newToken.isEmpty, newToken != oldToken {
             Logger.log(severity: .info, message: "Session token updated: newToken='\(newToken)', oldToken='\(oldToken ?? "")'")
-            BridgeFileUploadManager.shared.onSessionTokenChanged()
+            if !v1UploadsFinished {
+                uploadManagerV1.onSessionTokenChanged()
+            }
         }
     }
     
+    private let uploadProcessor: ArchiveUploadProcessor
+    private let backgroundProcessId: String?
     private var appConfigManager: NativeAppConfigManager!
     public private(set) var authManager: NativeAuthenticationManager!
+    private var pendingUploadObserver: PendingUploadObserver!
+    let backgroundNetworkManager: BackgroundNetworkManager = .init()
+    lazy private(set) var uploadManagerV1: BridgeFileUploadManager = .init(netManager: backgroundNetworkManager, appManager: self)
+    lazy private(set) var uploadManagerV2: UploadManager = .init(backgroundNetworkManager: backgroundNetworkManager)
     
-    /// Convenience initializer for intializing a bridge manager with just an app id and pem file.
+    /// Convenience initializer for intializing a bridge manager with just required properties.
     ///
     /// Both the APP ID and the CMS Public Key (ie. pem file) are accessible through the [Bridge Study Manager](https://research.sagebridge.org).
     /// Once logged into an "app" (which can host multiple "studies"), select "Server Config -> Settings" from the menu.
@@ -206,8 +223,34 @@ open class UploadAppManager : ObservableObject {
     ///   - pemPath: The path to the pem file (as an embedded resource) to use for encrypting uploads. The pem file can be downloaded
     ///     from the [Bridge Study Manager](https://research.sagebridge.org) by going "Server Settings -> Settings"
     ///     and tapping on the button labeled "Download CMS Public Key..." and saving the file to a secure location.
+    ///   - backgroundProcessId: The background process ID registered in the "info.plist" used to allow processing pending uploads
+    ///     in the background.
+    ///   - appGroupId: The app group ID to use when setting up files that are shared with an app extension.
+    ///   - defaultConsentGuid: The default consent guid for this app (where the app includes in-app consent).
+    public convenience init(appId: String, pemPath: String, backgroundProcessId: String, appGroupId: String? = nil, defaultConsentGuid: String? = nil) {
+        self.init(platformConfig: PlatformConfigImpl(appId: appId, appGroupIdentifier: appGroupId, defaultConsentGuid: defaultConsentGuid), pemPath: pemPath, backgroundProcessId: backgroundProcessId)
+    }
+    
+    public enum MockType {
+        case unitTest, preview
+    }
+    
+    /// A special manager that is used in unit testing and SwiftUI preview.
+    /// - Parameter mockType: The type of mock manager to initialize.
+    public convenience init(mockType: MockType) {
+        let appId = mockType == .preview ? kPreviewStudyId : "not-a-real-appid"
+        self.init(appId: appId, pemPath: "", backgroundProcessId: "")
+    }
+    
+    @available(*, deprecated, message: "Use initializer with non-nil pem path and background process Id")
     public convenience init(appId: String, appGroupId: String? = nil, pemPath: String? = nil, defaultConsentGuid: String? = nil) {
         self.init(platformConfig: PlatformConfigImpl(appId: appId, appGroupIdentifier: appGroupId, defaultConsentGuid: defaultConsentGuid), pemPath: pemPath)
+    }
+    
+    @available(*, deprecated, message: "Use initializer with non-nil pem path and background process Id")
+    public convenience init(platformConfig: IOSPlatformConfig, pemPath: String? = nil) {
+        let pemPath = pemPath ?? Bundle.main.path(forResource: platformConfig.appId, ofType: "pem") ?? ""
+        self.init(platformConfig: platformConfig, pemPath: pemPath, backgroundProcessId: "")
     }
     
     /// Initialize the bridge manager with a custom platform config.
@@ -215,9 +258,8 @@ open class UploadAppManager : ObservableObject {
     /// - Parameters:
     ///   - platformConfig: The platform config to use to set up the connection to Bridge.
     ///   - pemPath: The path to the location of the pem file to use when encrypting uploads.
-    public init(platformConfig: IOSPlatformConfig, pemPath: String? = nil) {
-        let pemPath = pemPath ?? Bundle.main.path(forResource: platformConfig.appId, ofType: "pem")
-        self.uploadProcessor = .init(pemPath: pemPath)
+    ///   - backgroundProcessId: The background process ID registered in the "info.plist" used to allow processing pending uploads in the background.
+    public init(platformConfig: IOSPlatformConfig, pemPath: String, backgroundProcessId: String) {
         self.title = platformConfig.localizedAppName
         self.platformConfig = platformConfig
         
@@ -230,22 +272,12 @@ open class UploadAppManager : ObservableObject {
             self.sharedUserDefaults = UserDefaults.standard
         }
         
+        // Create the archive upload processor
+        self.uploadProcessor = .init(pemPath: pemPath, sharedUserDefaults: self.sharedUserDefaults)
+        self.backgroundProcessId = backgroundProcessId.isEmpty ? nil : backgroundProcessId
+        
         // Is this a new login (in which case we need to get the adherence records)
         self.isNewLogin = (self.userSessionId == nil)
-        
-        // Set up the background manager
-        setupBackgroundManager()
-    }
-    
-    private func setupBackgroundManager() {
-
-        // Hookup the background network manager singleton and make us its app manager
-        let bnm = BackgroundNetworkManager.shared
-        bnm.appManager = self
-        
-        // Register the file upload APIs so that retries can happen
-        let _ = ParticipantFileUploadAPI.shared
-        let _ = StudyDataUploadAPI.shared
     }
     
     /// **Required:** This method should be called by the app delegate when the app is launching in either `willLaunch` or `didLaunch`.
@@ -263,6 +295,10 @@ open class UploadAppManager : ObservableObject {
             let enableNetworkLogs = false
         #endif
         KoinKt.doInitKoin(enableNetworkLogs: enableNetworkLogs)
+        
+        // Setup upload processor
+        Logger.log(severity: .info, message: "Hook up upload processor")
+        self.uploadProcessor.uploadManager = uploadManagerV2
         
         // Hook up app config
         Logger.log(severity: .info, message: "Hook up app config")
@@ -292,6 +328,18 @@ open class UploadAppManager : ObservableObject {
             self.updateUserSessionStatus(session, updateType: .launch)
         }
         self.authManager.observeUserSessionInfo()
+        
+        // Hook up upload observer
+        Logger.log(severity: .info, message: "Hook up upload observer")
+        self.pendingUploadObserver = PendingUploadObserver() { count in
+            self.isUploading = (count.intValue > 0)
+            Logger.log(severity: .info, tag: .upload, message: "Pending upload count changed: \(count.intValue)")
+        }
+        self.pendingUploadObserver.observePendingUploadCount()
+        
+        // Setup the upload manager
+        Logger.log(severity: .info, message: "Setup the upload manager")
+        self.uploadManagerV2.onLaunch(backgroundProcessId: backgroundProcessId)
     }
     
     /// **Required:** This method should be called by the app delegate in the implementation of
@@ -299,7 +347,7 @@ open class UploadAppManager : ObservableObject {
     /// restore a background upload session.
     @MainActor
     public final func handleEvents(for backgroundSession: String, completionHandler: @escaping () -> Void) {
-        BackgroundNetworkManager.shared.restore(backgroundSession: backgroundSession, completionHandler: completionHandler)
+        backgroundNetworkManager.restore(backgroundSession: backgroundSession, completionHandler: completionHandler)
     }
     
     /// Wrapper used to allow `BridgeClientAppManager` to call through to a single sign-in handler.
@@ -376,46 +424,30 @@ open class UploadAppManager : ObservableObject {
         // Do nothing. Allows subclass override setup and app state changes.
     }
     
-    private let networkMonitoringQueue = DispatchQueue(label: "org.sagebase.NetworkConnectivityMonitor.\(UUID())")
-    private var networkMonitor: NWPathMonitor?
+    lazy private var networkMonitor: NetworkMonitor = .init() { [weak self] newStatus in
+        guard let strongSelf = self else { return }
+        Task {
+            await MainActor.run {
+                let oldStatus = strongSelf.networkStatus
+                if newStatus == .connected, oldStatus != .unknown {
+                    // only check for uploads if the new status is connected and the previous
+                    // status was *not* connected.
+                    strongSelf.uploadManagerV2.checkAndRetryUploads()
+                }
+                Logger.log(severity: .info, message: "Network status changed: \(newStatus.stringValue)")
+                strongSelf.networkStatus = newStatus
+            }
+        }
+    }
     
     private func updateNetworkMonitoring() {
         // This is not thread protected so it should always be called from the main thread
         if isUploading || !userSessionInfo.isAuthenticated {
-            startMonitoringNetwork()
+            networkMonitor.startIfNeeded()
         }
         else {
-            stopMonitoringNetwork()
+            networkMonitor.cancel()
         }
-    }
-    
-    private func stopMonitoringNetwork() {
-        networkMonitor?.cancel()
-        networkMonitor = nil
-    }
-
-    private func startMonitoringNetwork() {
-        guard networkMonitor == nil else { return }
-        let networkMonitor = NWPathMonitor()
-        self.networkMonitor = networkMonitor
-        networkMonitor.pathUpdateHandler = { [weak self] path in
-            guard let strongSelf = self else { return }
-            DispatchQueue.main.async {
-                switch path.status {
-                case .unsatisfied:
-                    if #available(iOS 14.2, *), path.unsatisfiedReason == .cellularDenied {
-                        strongSelf.networkStatus = .cellularDenied
-                    } else {
-                        strongSelf.networkStatus = .notConnected
-                    }
-                case .satisfied:
-                    strongSelf.networkStatus = .connected
-                default:
-                    strongSelf.networkStatus = .unknown
-                }
-            }
-        }
-        networkMonitor.start(queue: networkMonitoringQueue)
     }
     
     /// Encrypt and upload an archive created with the given builder.
@@ -426,14 +458,6 @@ open class UploadAppManager : ObservableObject {
             self.isUploading = true
         }
         uploadProcessor.encryptAndUpload(using: builder)
-    }
-    
-    @available(*, deprecated, message: "Encrypt and upload with an `ArchiveBuilder` instead. Batch upload of multiple archives is no longer supported and will be deleted in a future version.")
-    public final func encryptAndUpload(_ archives: [DataArchive]) {
-        OperationQueue.main.addOperation {
-            self.isUploading = true
-        }
-        uploadProcessor.encryptAndUpload(archives)
     }
     
     func notifyUIOfBridgeError(_ value: Int32, description: String) {
@@ -459,123 +483,6 @@ open class UploadAppManager : ObservableObject {
                 completion(error == nil)
             }
         }
-    }
-}
-
-final class ArchiveUploadProcessor {
-    
-    let pemPath: String?
-    var isTestUser: Bool = false
-    
-    init(pemPath: String?) {
-        self.pemPath = pemPath
-    }
-    
-    func encryptAndUpload(using builder: ArchiveBuilder) {
-        Task.detached(priority: .medium) {
-            await self._encryptAndUpload(using: builder)
-        }
-    }
-    
-    @MainActor
-    private func _encryptAndUpload(using builder: ArchiveBuilder) async {
-        do {
-            let archive = try await builder.buildArchive()
-            // Copy the startedOn date (if available) from the builder to the archive.
-            if let resultBuilder = builder as? ResultArchiveBuilder, archive.adherenceStartedOn == nil {
-                archive.adherenceStartedOn = resultBuilder.startedOn
-            }
-            await _copyTest(archive: archive)
-            let encrypted = await _encrypt(archive: archive)
-            await _upload(archive: archive, encrypted: encrypted)
-        } catch {
-            Logger.log(error: error, message: "Failed to archive and upload \(builder.identifier)")
-        }
-    }
-    
-    @available(*, deprecated)
-    func encryptAndUpload(_ archives: [DataArchive]) {
-        Task.detached(priority: .medium) {
-            await self._encryptAndUpload(archives)
-        }
-    }
-
-    @MainActor
-    @available(*, deprecated)
-    private func _encryptAndUpload(_ archives: [DataArchive]) async {
-        await withTaskGroup(of: Void.self) { group in
-            archives.forEach { archive in
-                group.addTask {
-                    await self._copyTest(archive: archive)
-                    let encrypted = await self._encrypt(archive: archive)
-                    await self._upload(archive: archive, encrypted: encrypted)
-                }
-            }
-        }
-    }
-    
-    private func _copyTest(archive: DataArchive) async {
-        #if DEBUG
-        if isTestUser {
-            archive.copyTestArchive()
-        }
-        #endif
-    }
-    
-    private func _encrypt(archive: DataArchive) async -> Bool {
-        guard let path = self.pemPath else { return false }
-        do {
-            try archive.encryptArchive(using: path)
-            return true
-        } catch {
-            Logger.log(error: error, message: "Failed to encrypt \(archive.identifier)")
-            return false
-        }
-    }
-    
-    @MainActor
-    private func _upload(archive: DataArchive, encrypted: Bool) async {
-        guard let url = archive.encryptedURL else {
-            let message = "Cannot upload archive. Missing encryption."
-            assertionFailure(message)   // Throw an assert to alert the developer that the pem file is missing.
-            Logger.log(error: BridgeUnexpectedNullError(category: .missingFile, message: message))
-            return
-        }
-        _uploadEncrypted(id: archive.identifier, url: url, schedule: archive.schedule, startedOn: archive.adherenceStartedOn)
-    }
-    
-    @MainActor
-    private func _uploadEncrypted(id: String, url: URL, schedule: AssessmentScheduleInfo?, startedOn: Date?) {
-        let uploadMetadata = UploadMetadata(schedule: schedule, startedOn: startedOn)
-        let dictionary: [String : JsonSerializable] = {
-            do {
-                return try uploadMetadata.jsonEncodedDictionary()
-            } catch {
-                Logger.log(tag: .upload, error: error)
-                return [:]
-            }
-        }()
-        let exporterV3Metadata: JsonElement? = dictionary.count > 0 ? .object(dictionary) : nil
-        let extras = StudyDataUploadExtras(encrypted: true, metadata: exporterV3Metadata, zipped: true)
-        Logger.log(severity: .info, message: "Uploading file: \(id)", metadata: dictionary)
-        StudyDataUploadAPI.shared.upload(fileId: id, fileUrl: url, contentType: "application/zip", extras: extras)
-        do {
-            try FileManager.default.removeItem(at: url)
-        } catch let err {
-            Logger.log(error: err, message: "Failed to delete encrypted archive \(id) at \(url)")
-        }
-    }
-}
-
-public struct UploadMetadata : Codable {
-    public let instanceGuid: String?
-    public let eventTimestamp: String?
-    public let startedOn: String?
-    
-    init(schedule: AssessmentScheduleInfo?, startedOn: Date?) {
-        self.instanceGuid = schedule?.instanceGuid
-        self.eventTimestamp = schedule?.session.eventTimestamp
-        self.startedOn = startedOn?.jsonObject() as? String
     }
 }
 

@@ -30,43 +30,29 @@ enum HTTPMethod : String {
     case GET, POST, PUT, DELETE
 }
 
-class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
-
-    /// A singleton instance of the manager.
-    static let shared = BackgroundNetworkManager()
+class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate, BridgeURLSessionBackgroundDelegate {
 
     /// The identifier (base) for the background URLSession. App extensions will append a unique string to this to distinguish
     /// their background sessions.
-    static let backgroundSessionIdentifier = "org.sagebase.backgroundnetworkmanager.session"
-    
-    /// BackgroundNetworkManager needs access to app configuration and user session info. The app manager should create the singleton
-    /// instance and immediately set this value to itself.
-    var appManager: UploadAppManager!
-
-    /// We use this custom HTTP request header as a hack to keep track of how many times we've retried a request.
-    let retryCountHeader = "X-SageBridge-Retry"
-    
-    /// This sets the maximum number of times we will retry a request before giving up.
-    let maxRetries = 5
-    
-    /// If set, URLSession(Data/Download)Delegate method calls received by the BackgroundNetworkManager
-    /// will be passed through to this object for further handling.
-    var backgroundTransferDelegate: URLSessionBackgroundDelegate?
+    let backgroundSessionIdentifier = "org.sagebase.backgroundnetworkmanager.session"
     
     /// The queue used for calling background session delegate methods.
     ///  Also used for creating the singleton background session itself in a thread-safe way.
     ///  Created lazily.
-    static let sessionDelegateQueue: OperationQueue = {
+    let sessionDelegateQueue: OperationQueue = {
         let delegateQueue = OperationQueue()
         delegateQueue.maxConcurrentOperationCount = 1
         return delegateQueue
     }()
             
-    /// The singleton background URLSession.
-    static var _backgroundSession: URLSession? = nil
+    /// The primary background URLSession.
+    var primaryBackgroundSession: (any BridgeURLSession)? = nil
     
-    /// A singleton map of pending background URLSession completion handlers that have been passed in from the app delegate and not yet called.
+    /// A map of pending background URLSession completion handlers that have been passed in from the app delegate and not yet called.
     var backgroundSessionCompletionHandlers = [String : () -> Void]()
+    
+    /// A map of the restored background sessions.
+    var restoredSessions = [String : any BridgeURLSession]()
     
     func isRunningInAppExtension() -> Bool {
         // "An app extension target’s Info.plist file identifies the extension point and may specify some details
@@ -81,11 +67,6 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
         return (packageType != "APPL") && infoDict["NSExtension"] != nil
     }
     
-    /// Private initializer so only the singleton can ever get created.
-    private override init() {
-        super.init()
-    }
-    
     /// For encoding objects to be passed to Bridge.
     let jsonEncoder = SerializationFactory.defaultFactory.createJSONEncoder()
     
@@ -94,16 +75,16 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
     
     /// Access (and if necessary, create) the singleton background URLSession used by the singleton BackgroundNetworkManager.
     /// Make sure it only gets created once, regardless of threading.
-    func backgroundSession() -> URLSession {
-        if BackgroundNetworkManager._backgroundSession == nil {
+    func backgroundSession() -> any BridgeURLSession {
+        if primaryBackgroundSession == nil {
             // If it doesn't yet exist, queue up a block of code to create it.
             let createSessionOperation = BlockOperation {
                 // Once it's our turn in the operation queue, check if someone else created it
                 // in the meantime so we don't clobber it.
-                guard BackgroundNetworkManager._backgroundSession == nil else { return }
+                guard self.primaryBackgroundSession == nil else { return }
                 
                 // OK, create it.
-                var sessionIdentifier = BackgroundNetworkManager.backgroundSessionIdentifier
+                var sessionIdentifier = self.backgroundSessionIdentifier
                 if self.isRunningInAppExtension() {
                     // Uniquify it from the containing app's BridgeClient background session and those of any other
                     // app extensions or instances thereof with the same containing app that use BridgeClient. Note
@@ -115,21 +96,39 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
                     sessionIdentifier.append(UUID().uuidString)
                 }
                 
-                self.createBackgroundSession(with: sessionIdentifier)
+                self.primaryBackgroundSession = self.createBackgroundSession(with: sessionIdentifier)
             }
-            BackgroundNetworkManager.sessionDelegateQueue.addOperations([createSessionOperation], waitUntilFinished: true)
+            sessionDelegateQueue.addOperations([createSessionOperation], waitUntilFinished: true)
         }
-        return BackgroundNetworkManager._backgroundSession!
+        return primaryBackgroundSession!
     }
     
     // internal-use-only method, must always be called on the session delegate queue
-    fileprivate func createBackgroundSession(with sessionIdentifier: String) {
+    fileprivate func createBackgroundSession(with sessionIdentifier: String) -> any BridgeURLSession {
         let config = URLSessionConfiguration.background(withIdentifier: sessionIdentifier)
         if let appGroupIdentifier = IOSBridgeConfig().appGroupIdentifier, !appGroupIdentifier.isEmpty {
             config.sharedContainerIdentifier = appGroupIdentifier
         }
-        
-        BackgroundNetworkManager._backgroundSession = URLSession(configuration: config, delegate: self, delegateQueue: BackgroundNetworkManager.sessionDelegateQueue)
+        return URLSession(configuration: config, delegate: self, delegateQueue: sessionDelegateQueue)
+    }
+    
+    
+    /// If registered, URLSession(Data/Download)Delegate method calls received by the BackgroundNetworkManager
+    /// will be passed through to these objects for further handling.
+    var backgroundTransferHandlers: [BridgeURLSessionHandler] = []
+    
+    func registerBackgroundTransferHandler(_ handler: BridgeURLSessionHandler) {
+        backgroundTransferHandlers.append(handler)
+    }
+    
+    func backgroundTransferHandler(for task: BridgeURLSessionTask) -> BridgeURLSessionHandler? {
+        guard let handler = backgroundTransferHandlers.first(where: { $0.canHandle(task: task) })
+        else {
+            let error = BridgeUnexpectedNullError(category: .notFound, message: "Could not find a handler for URLSessionTask \(task.description).")
+            Logger.log(tag: .upload, error: error)
+            return nil
+        }
+        return handler
     }
     
     func bridgeBaseURL() -> URL {
@@ -166,7 +165,7 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
         }.joined(separator: "&")
     }
     
-    func request(method: HTTPMethod, URLString: String, headers: [String : String]?) -> URLRequest {
+    func downloadRequest(method: HTTPMethod, URLString: String, headers: [String : String]?) -> URLRequest {
         var request = URLRequest(url: bridgeURL(for: URLString))
         request.httpMethod = method.rawValue
         request.httpShouldHandleCookies = false
@@ -176,7 +175,7 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
         return request
     }
     
-    func request<T>(method: HTTPMethod, URLString: String, headers: [String : String]?, parameters: T) -> URLRequest where T: Encodable {
+    func downloadRequest<T>(method: HTTPMethod, URLString: String, headers: [String : String]?, parameters: T) -> URLRequest where T: Encodable {
         var URLString = URLString
         let isGet = (method == .GET)
         
@@ -190,7 +189,7 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
             }
         }
 
-        var request = self.request(method: method, URLString: URLString, headers: headers)
+        var request = self.downloadRequest(method: method, URLString: URLString, headers: headers)
         
         // for non-GET requests, the parameters (if any) go in the request body
         let contentTypeHeader = "Content-Type"
@@ -213,30 +212,30 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
     }
     
     @discardableResult
-    func downloadFile(from URLString: String, method: HTTPMethod, httpHeaders: [String : String]?, taskDescription: String) -> URLSessionDownloadTask {
-        let request = self.request(method: method, URLString: URLString, headers: httpHeaders)
+    func downloadFile(from URLString: String, method: HTTPMethod, httpHeaders: [String : String]?, taskDescription: String) -> Bool {
+        let request = self.downloadRequest(method: method, URLString: URLString, headers: httpHeaders)
         return self.downloadFile(with: request, taskDescription: taskDescription)
     }
     
     @discardableResult
-    func downloadFile<T>(from URLString: String, method: HTTPMethod, httpHeaders: [String : String]?, parameters: T?, taskDescription: String) -> URLSessionDownloadTask where T: Encodable {
-        let request =  self.request(method: method, URLString: URLString, headers: httpHeaders, parameters: parameters)
+    func downloadFile<T>(from URLString: String, method: HTTPMethod, httpHeaders: [String : String]?, parameters: T?, taskDescription: String) -> Bool where T: Encodable {
+        let request =  self.downloadRequest(method: method, URLString: URLString, headers: httpHeaders, parameters: parameters)
         return self.downloadFile(with: request, taskDescription: taskDescription)
     }
     
-    private func downloadFile(with request: URLRequest, taskDescription: String) -> URLSessionDownloadTask {
+    private func downloadFile(with request: URLRequest, taskDescription: String) -> Bool {
         let task = self.backgroundSession().downloadTask(with: request)
         task.taskDescription = taskDescription
         task.resume()
-        return task
+        return true
     }
     
     @discardableResult
-    func uploadFile(_ fileURL: URL, httpHeaders: [String : String]?, to urlString: String, taskDescription: String) -> URLSessionUploadTask? {
+    func uploadFile(_ fileURL: URL, httpHeaders: [String : String]?, to urlString: String, taskDescription: String) -> Bool {
         guard let url = URL(string: urlString) else {
             let message = "Error: Could not create URL from string '\(urlString)"
             Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .invalidURL, message: message))
-            return nil
+            return false
         }
         var request = URLRequest(url: url)
         request.allHTTPHeaderFields = httpHeaders
@@ -244,160 +243,209 @@ class BackgroundNetworkManager: NSObject, URLSessionBackgroundDelegate {
         let task = backgroundSession().uploadTask(with: request, fromFile: fileURL)
         task.taskDescription = taskDescription
         task.resume()
-        return task
-    }
-    
-    func restore(backgroundSession: String, completionHandler: @escaping () -> Void) {
-        guard backgroundSession.starts(with: BackgroundNetworkManager.backgroundSessionIdentifier) else { return }
-        self.backgroundSessionCompletionHandlers[backgroundSession] = completionHandler
-        BackgroundNetworkManager.sessionDelegateQueue.addOperation {
-            if BackgroundNetworkManager._backgroundSession == nil {
-                self.createBackgroundSession(with: backgroundSession)
-            }
-        }
-    }
-    
-    // MARK: Helpers
-    func isTemporaryError(errorCode: Int) -> Bool {
-        return (errorCode == NSURLErrorTimedOut || errorCode == NSURLErrorCannotFindHost || errorCode == NSURLErrorCannotConnectToHost || errorCode == NSURLErrorNotConnectedToInternet || errorCode == NSURLErrorSecureConnectionFailed)
-    }
-    
-    // Make sure to only ever call this from the main thread--the session token
-    // lives in Kotlin Native code which only allows access from the thread on which
-    // the object was originally created. ~emm 2021-09-17
-    @discardableResult
-    func retry(task: URLSessionDownloadTask) -> Bool {
-        guard var request = task.originalRequest else {
-            let message = "Unable to retry upload task, as originalRequest is nil:\n\(task)"
-            Logger.log(tag: .upload, error: BridgeUnexpectedNullError(category: .corruptData, message: message))
-            return false
-        }
-        
-        // Try, try again, until we run out of retries.
-        var retry = Int(request.value(forHTTPHeaderField: retryCountHeader) ?? "") ?? 0
-        guard retry < maxRetries else {
-            Logger.log(severity: .info, message: "Retry attempts (\(retry)) exceeds max retry count (\(maxRetries)).")
-            return false
-        }
-        
-        guard let sessionToken = appManager.sessionToken else {
-            Logger.log(severity: .warn, tag: .upload, message: "Unable to retry task--not signed in (auth manager's UserSessionInfo is nil)")
-            return false
-        }
-
-        retry += 1
-        request.setValue("\(retry)", forHTTPHeaderField: retryCountHeader)
-        request.setValue(sessionToken, forHTTPHeaderField: "Bridge-Session")
-
-        let newTask = self.backgroundSession().downloadTask(with: request)
-        newTask.taskDescription = task.taskDescription
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + pow(2.0, Double(retry))) {
-            newTask.resume()
-        }
-        
         return true
     }
     
-    func handleError(_ error: NSError, session: URLSession, task: URLSessionDownloadTask) -> Bool {
-        if isTemporaryError(errorCode: error.code) {
-            // Retry, and let the caller know we're retrying.
-            return retry(task: task)
-        }
-        
-        return false
-    }
-    
-    func handleUnsupportedAppVersion() {
-        self.appManager.notifyUIOfBridgeError(410, description: "Unsupported app version")
-    }
-    
-    func handleServerPreconditionNotMet() {
-        self.appManager.notifyUIOfBridgeError(412, description: "User not consented")
-    }
-    
-    func handleHTTPErrorResponse(_ response: HTTPURLResponse, session: URLSession, task: URLSessionDownloadTask) -> Bool {
-        switch response.statusCode {
-        case 401:
-            self.appManager.reauthenticate { success in
-                if success {
-                    Logger.log(severity: .info, tag: .upload, message: "Session token auto-refresh succeeded, retrying original request")
-                    self.retry(task: task)
+    func restore(backgroundSession: String, completionHandler: @escaping () -> Void) {
+        guard backgroundSession.starts(with: self.backgroundSessionIdentifier) else { return }
+        self.backgroundSessionCompletionHandlers[backgroundSession] = completionHandler
+        self.sessionDelegateQueue.addOperation {
+            if self.restoredSessions[backgroundSession] == nil {
+                let session = self.createBackgroundSession(with: backgroundSession)
+                self.restoredSessions[backgroundSession] = session
+                if backgroundSession == self.backgroundSessionIdentifier {
+                    self.primaryBackgroundSession = session
                 }
             }
-            return true
-                
-        case 410:
-            handleUnsupportedAppVersion()
-            
-        case 412:
-            handleServerPreconditionNotMet()
-            
-        default:
-            // Let the backgroundTransferDelegate deal with it
-            break
         }
-        
-        return false
     }
     
     // MARK: URLSessionDownloadDelegate
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
-        self.backgroundTransferDelegate?.urlSession(session, downloadTask: downloadTask, didFinishDownloadingTo: location)
+        let httpResponseCode = (downloadTask.response as? HTTPURLResponse)?.statusCode ?? 0
+        let url = downloadTask.originalRequest?.url?.absoluteString ?? "null"
+        Logger.log(severity: .info, tag: .upload, message: """
+            \(type(of: downloadTask)) didFinishDownloading
+            status=\(httpResponseCode)
+            url='\(url)'
+        """)
+        self.bridgeUrlSession(session, downloadTask: downloadTask, didFinishDownloadingTo: location)
+    }
+    func bridgeUrlSession(_ session: any BridgeURLSession, downloadTask: BridgeURLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+        (self.backgroundTransferHandler(for: downloadTask) as? BridgeURLSessionDownloadDelegate)?
+            .bridgeUrlSession(session, downloadTask: downloadTask, didFinishDownloadingTo: location)
     }
     
     // MARK: URLSessionTaskDelegate
-    fileprivate func retryFailedDownload(_ task: URLSessionDownloadTask, for session: URLSession, resumeData: Data) {
-        let resumeTask = session.downloadTask(withResumeData: resumeData)
-        resumeTask.taskDescription = task.taskDescription
-        resumeTask.resume()
-    }
-    
-    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        if let nsError = error as NSError?,
-           let downloadTask = task as? URLSessionDownloadTask,
-           let resumeData = nsError.userInfo[NSURLSessionDownloadTaskResumeData] as? Data {
-            // if there's resume data from a download task, use it to retry
-            self.retryFailedDownload(downloadTask, for: session, resumeData: resumeData)
-            return
-        }
 
-        var retrying = false
-        if let downloadTask = task as? URLSessionDownloadTask {
-            let httpResponse = task.response as? HTTPURLResponse
-            let httpError = (httpResponse?.statusCode ?? 0) >= 400
-            if let nsError = error as NSError? {
-                retrying = self.handleError(nsError, session: session, task: downloadTask)
-            }
-            else if httpError {
-                retrying = self.handleHTTPErrorResponse(httpResponse!, session: session, task: downloadTask)
-            }
-        }
-        
-        if !retrying {
-            self.backgroundTransferDelegate?.urlSession?(session, task: task, didCompleteWithError: error)
-        }
+    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        let httpResponseCode = (task.response as? HTTPURLResponse)?.statusCode ?? 0
+        let url = task.originalRequest?.url?.absoluteString.split(separator: "?").first ?? "null"
+        Logger.log(severity: .info, tag: .upload, message: """
+            \(type(of: task)) didCompleteWithError: \(String(describing: error))
+            status=\(httpResponseCode)
+            url='\(url)'
+        """)
+        self.bridgeUrlSession(session, task: task, didCompleteWithError: error)
+    }
+    func bridgeUrlSession(_ session: any BridgeURLSession, task: BridgeURLSessionTask, didCompleteWithError error: Error?) {
+        self.backgroundTransferHandler(for: task)?.bridgeUrlSession(session, task: task, didCompleteWithError: error)
     }
     
     // MARK: URLSessionDelegate
     func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
-        if let identifier = session.configuration.identifier,
-            let completion = self.backgroundSessionCompletionHandlers[identifier] {
+        Logger.log(severity: .info, tag: .upload, message: "URLSession \(String(describing: session.configuration.identifier)) didFinishEvents")
+        self.bridgeUrlSessionDidFinishEvents(forBackgroundURLSession: session)
+    }
+    func bridgeUrlSessionDidFinishEvents(forBackgroundURLSession session: any BridgeURLSession) {
+        guard let identifier = session.identifier else { return }
+        if let completion = self.backgroundSessionCompletionHandlers[identifier] {
             OperationQueue.main.addOperation {
                 completion()
             }
             self.backgroundSessionCompletionHandlers.removeValue(forKey: identifier)
         }
-        self.backgroundTransferDelegate?.urlSessionDidFinishEvents?(forBackgroundURLSession: session)
+        self.sessionDelegateQueue.addOperation {
+            // If this is not the primary url session then release it.
+            if identifier != self.backgroundSessionIdentifier {
+                self.restoredSessions[identifier] = nil
+            }
+        }
     }
     
     func urlSession(_ session: URLSession, didBecomeInvalidWithError error: Error?) {
+        Logger.log(severity: .warn, tag: .upload, message: "URLSession \(String(describing: session.configuration.identifier)) didBecomeInvalidWithError: \(String(describing: error))")
+        self.bridgeUrlSession(session, didBecomeInvalidWithError: error)
+    }
+    func bridgeUrlSession(_ session: any BridgeURLSession, didBecomeInvalidWithError error: Error?) {
         if error != nil,
-           let identifier = session.configuration.identifier {
+           let identifier = session.identifier {
             // if it became invalid unintentionally (i.e. due to an error), re-create the session:
-            BackgroundNetworkManager.sessionDelegateQueue.addOperation {
-                self.createBackgroundSession(with: identifier)
+            self.sessionDelegateQueue.addOperation {
+                let hasRestoredSession = self.restoredSessions[identifier] != nil
+                let isPrimary = self.primaryBackgroundSession?.identifier == identifier
+                if hasRestoredSession || isPrimary {
+                    let session = self.createBackgroundSession(with: identifier)
+                    if hasRestoredSession {
+                        self.restoredSessions[identifier] = session
+                    }
+                    if isPrimary {
+                        self.primaryBackgroundSession = session
+                    }
+                }
             }
         }
-        self.backgroundTransferDelegate?.urlSession?(session, didBecomeInvalidWithError: error)
+        self.backgroundTransferHandlers.forEach {
+            $0.bridgeUrlSession(session, didBecomeInvalidWithError: error)
+        }
     }
+    
+    // MARK: Async task handling
+    
+    func getAllTasks() async -> [BridgeURLSessionTask] {
+        let mainSession = backgroundSession()
+        var tasks: [BridgeURLSessionTask] = await withCheckedContinuation { continuation in
+            mainSession.getAllTasks {
+                continuation.resume(returning: $0 as [BridgeURLSessionTask])
+            }
+        }
+        for pair in self.restoredSessions {
+            let session = pair.value as any BridgeURLSession
+            if session.identifier != mainSession.identifier {
+                tasks.append(contentsOf: await withCheckedContinuation { continuation in
+                    session.getAllTasks {
+                        continuation.resume(returning: $0 as [BridgeURLSessionTask])
+                    }
+                })
+            }
+        }
+        return tasks
+    }
+}
+
+// MARK: URLSession Mocking
+
+enum BridgeURLSessionTaskType : String {
+    case upload, download, unknown
+}
+
+protocol BridgeURLSession : NSObjectProtocol {
+    associatedtype UploadTask : BridgeURLSessionUploadTask
+    associatedtype DownloadTask : BridgeURLSessionDownloadTask
+    associatedtype SessionTask : BridgeURLSessionTask
+    
+    var identifier: String? { get }
+    var bridgeDelegate: BridgeURLSessionBackgroundDelegate? { get }
+    var delegateQueue: OperationQueue { get }
+    
+    func uploadTask(with request: URLRequest, fromFile fileURL: URL) -> UploadTask
+    func downloadTask(with request: URLRequest) -> DownloadTask
+    func downloadTask(withResumeData data: Data) -> DownloadTask
+    func getAllTasks(completionHandler: @escaping @Sendable ([SessionTask]) -> Void)
+}
+
+protocol BridgeURLSessionTask : NSObjectProtocol {
+    var taskDescription: String? { get set }
+    var state: URLSessionTask.State { get }
+    var taskType: BridgeURLSessionTaskType { get }
+    var originalRequest: URLRequest? { get }
+    var response: URLResponse? { get }
+    func resume()
+    func cancel()
+}
+
+protocol BridgeURLSessionDownloadTask : BridgeURLSessionTask {
+}
+
+protocol BridgeURLSessionUploadTask : BridgeURLSessionTask {
+}
+
+protocol BridgeURLSessionHandler : BridgeURLSessionUploadDelegate {
+    func canHandle(task: BridgeURLSessionTask) -> Bool
+}
+
+protocol BridgeURLSessionUploadDelegate : NSObjectProtocol {
+    func bridgeUrlSession(_ session: any BridgeURLSession, task: BridgeURLSessionTask, didCompleteWithError error: Error?)
+    func bridgeUrlSession(_ session: any BridgeURLSession, didBecomeInvalidWithError error: Error?)
+}
+
+protocol BridgeURLSessionDownloadDelegate : BridgeURLSessionUploadDelegate {
+    func bridgeUrlSession(_ session: any BridgeURLSession, downloadTask: BridgeURLSessionDownloadTask, didFinishDownloadingTo location: URL)
+}
+
+protocol BridgeURLSessionBackgroundDelegate : BridgeURLSessionDownloadDelegate {
+    func bridgeUrlSessionDidFinishEvents(forBackgroundURLSession session: any BridgeURLSession)
+}
+
+extension URLSession : BridgeURLSession {
+    typealias UploadTask = URLSessionUploadTask
+    typealias DownloadTask = URLSessionDownloadTask
+    typealias SessionTask = URLSessionTask
+
+    var identifier: String? {
+        configuration.identifier
+    }
+    
+    var bridgeDelegate: BridgeURLSessionBackgroundDelegate? {
+        delegate as? BridgeURLSessionBackgroundDelegate
+    }
+}
+
+extension URLSessionTask : BridgeURLSessionTask {
+    var taskType: BridgeURLSessionTaskType {
+        switch (self) {
+        case is URLSessionDownloadTask:
+            return .download
+        case is URLSessionUploadTask:
+            return .upload
+        default:
+            return .unknown
+        }
+    }
+}
+
+extension URLSessionDownloadTask : BridgeURLSessionDownloadTask {
+}
+
+extension URLSessionUploadTask : BridgeURLSessionUploadTask {
 }

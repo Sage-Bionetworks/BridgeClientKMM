@@ -166,7 +166,7 @@ extension AnyTransition {
 
 // Used to allow previewing the `TodayView`
 fileprivate struct PreviewTodayView : View {
-    @StateObject var bridgeManager = SingleStudyAppManager(appId: kPreviewStudyId)
+    @StateObject var bridgeManager = SingleStudyAppManager(mockType: .preview)
     @StateObject var viewModel = TodayTimelineViewModel()
     
     var body: some View {

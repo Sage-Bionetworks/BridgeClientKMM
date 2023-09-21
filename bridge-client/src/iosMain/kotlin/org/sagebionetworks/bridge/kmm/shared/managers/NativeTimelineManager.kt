@@ -1,13 +1,9 @@
-package org.sagebionetworks.bridge.kmm.shared
+package org.sagebionetworks.bridge.kmm.shared.managers
 
-import co.touchlab.sqliter.DatabaseConfiguration
-import co.touchlab.sqliter.createDatabaseManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.datetime.*
 import kotlinx.serialization.json.JsonElement
@@ -17,6 +13,7 @@ import org.koin.core.component.inject
 import org.sagebionetworks.bridge.kmm.shared.cache.*
 import org.sagebionetworks.bridge.kmm.shared.models.*
 import org.sagebionetworks.bridge.kmm.shared.repo.*
+import org.sagebionetworks.bridge.kmm.shared.toNSData
 import platform.Foundation.*
 
 class NativeTimelineStudyBurstManager(
@@ -28,19 +25,31 @@ class NativeTimelineStudyBurstManager(
 
     var scheduleJob: Job? = null
 
+    @Deprecated("`userJoinedDate` is ignored",
+        ReplaceWith("refreshStudyBurstSchedule()")
+    )
     fun refreshStudyBurstSchedule(userJoinedDate: Instant) {
-        runCatching { scheduleJob?.cancel() }
-        scheduleJob = null
-        observeStudyBurstSchedule(false, userJoinedDate)
+        refreshStudyBurstSchedule()
     }
 
+    fun refreshStudyBurstSchedule() {
+        runCatching { scheduleJob?.cancel() }
+        scheduleJob = null
+        observeStudyBurstSchedule()
+    }
+
+    @Deprecated("`isNewLogin` and `userJoinedDate` are ignored",
+        ReplaceWith("observeStudyBurstSchedule()")
+    )
     fun observeStudyBurstSchedule(isNewLogin: Boolean,
                                   userJoinedDate: Instant) {
+        observeStudyBurstSchedule()
+    }
+
+    fun observeStudyBurstSchedule() {
         scheduleJob = scope.launch {
-            if (isNewLogin) {
-                if (!adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)) {
-                    updateFailed?.invoke()
-                }
+            if (!adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)) {
+                updateFailed?.invoke()
             }
             repo.getStudyBurstSchedule(studyId).collect { timelineResource ->
                 (timelineResource as? ResourceResult.Success)?.data?.let { schedule ->
@@ -78,7 +87,14 @@ class NativeTimelineManager(
 
     var todayJob: Job? = null
 
+    @Deprecated("`isNewLogin` is ignored",
+        ReplaceWith("observeTodaySchedule()")
+    )
     fun observeTodaySchedule(isNewLogin: Boolean) {
+        observeTodaySchedule()
+    }
+
+    fun observeTodaySchedule() {
         todayJob = scope.launch {
             // Always load remote adherence records
             adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)
@@ -94,7 +110,7 @@ class NativeTimelineManager(
     fun refreshTodaySchedule() {
         runCatching { todayJob?.cancel() }
         todayJob = null
-        observeTodaySchedule(false)
+        observeTodaySchedule()
     }
 }
 

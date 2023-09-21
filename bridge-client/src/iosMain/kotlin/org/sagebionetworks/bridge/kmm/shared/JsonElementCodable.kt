@@ -1,8 +1,9 @@
 package org.sagebionetworks.bridge.kmm.shared
 
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import org.sagebionetworks.bridge.kmm.shared.managers.NativeAdherenceRecord
+import org.sagebionetworks.bridge.kmm.shared.managers.NativeParticipantDataRecord
 import org.sagebionetworks.bridge.kmm.shared.models.AdherenceRecord
 import org.sagebionetworks.bridge.kmm.shared.models.AppConfig
 import org.sagebionetworks.bridge.kmm.shared.models.Study

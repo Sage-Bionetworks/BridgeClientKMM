@@ -1,4 +1,4 @@
-package org.sagebionetworks.bridge.kmm.shared
+package org.sagebionetworks.bridge.kmm.shared.managers
 
 import co.touchlab.kermit.Logger
 import io.ktor.http.*
@@ -7,10 +7,10 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.Instant
 import kotlinx.datetime.minus
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.sagebionetworks.bridge.kmm.shared.IOSBridgeConfig
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus
 import org.sagebionetworks.bridge.kmm.shared.models.SharingScope

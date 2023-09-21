@@ -55,7 +55,7 @@ struct StudyDataUploadObject: Codable, BridgeUploadTrackingData {
     }
 }
 
-public struct StudyDataUploadExtras: Codable {
+struct StudyDataUploadExtras: Codable {
     var encrypted: Bool?
     var metadata: JsonElement?
     var zipped: Bool?
@@ -63,73 +63,50 @@ public struct StudyDataUploadExtras: Codable {
 
 extension Notification.Name {
     /// Notification name posted by the `BridgeFileUploadManager` when a study file upload completes.
-    public static let SBBStudyFileUploaded = Notification.Name(rawValue: "SBBStudyFileUploaded")
+    static let SBBStudyFileUploaded = Notification.Name(rawValue: "SBBStudyFileUploaded")
     
     /// Notification name posted by the `BridgeFileUploadManager` when a study file upload request to Bridge fails.
-    public static let SBBStudyFileUploadRequestFailed = Notification.Name(rawValue: "SBBStudyFileUploadRequestFailed")
+    static let SBBStudyFileUploadRequestFailed = Notification.Name(rawValue: "SBBStudyFileUploadRequestFailed")
     
     /// Notification name posted by the `BridgeFileUploadManager` when a study file upload attempt to S3 fails unrecoverably.
-    public static let SBBStudyFileUploadToS3Failed = Notification.Name(rawValue: "SBBStudyFileUploadToS3Failed")
+    static let SBBStudyFileUploadToS3Failed = Notification.Name(rawValue: "SBBStudyFileUploadToS3Failed")
     
     /// Notification name posted by the `BridgeFileUploadManager` when attempting to notify Bridge
     /// of a successful upload fails unrecoverably.
-    public static let SBBStudyFileUploadBridgeNotificationFailed = Notification.Name(rawValue: "SBBStudyFileUploadBridgeNotificationFailed")
+    static let SBBStudyFileUploadBridgeNotificationFailed = Notification.Name(rawValue: "SBBStudyFileUploadBridgeNotificationFailed")
 }
 
-public class StudyDataUploadAPI: BridgeFileUploadAPITyped {
+class StudyDataUploadAPI: BridgeFileUploadAPITyped {
     typealias TrackingType = StudyDataUploadObject
     typealias UploadRequestType = UploadRequest
     typealias UploadRequestResponseType = UploadSession
 
-    /// A singleton instance of the API.
-    public static let shared = StudyDataUploadAPI()
-
     /// The Notification.userInfo key for the uploaded file's fileId.
     let fileNameKey = "FileName"
     
-    public private(set) var apiString: String = "v3/uploads"
+    private(set) var apiString: String = "v3/uploads"
     
-    public private(set) var tempUploadDirURL: URL
+    private(set) var tempUploadDirURL: URL
     
-    public private(set) var notifiesBridgeWhenUploaded: Bool = true
+    private(set) var notifiesBridgeWhenUploaded: Bool = true
     
-    public private(set) var uploadManager: BridgeFileUploadManager
+    weak private(set) var uploadManager: BridgeFileUploadManager!
     
-    /// Private initializer so only the singleton can ever get created.
-    private init() {
-        self.uploadManager = BridgeFileUploadManager.shared
-        
+    static var uploadSubdirectory: String = "StudyDataUploads"
+    
+    init(uploadManager: BridgeFileUploadManager) {
+
         // Set up a directory to keep temp copies of files being uploaded
         do {
-            let appSupportDir = try FileManager.default.sharedUploadDirectory()
-            self.tempUploadDirURL = appSupportDir.appendingPathComponent("StudyDataUploads")
+            let appSupportDir = try FileManager.default.sharedAppSupportDirectory()
+            self.tempUploadDirURL = appSupportDir.appendingPathComponent(Self.uploadSubdirectory)
             try FileManager.default.createDirectory(at: self.tempUploadDirURL, withIntermediateDirectories: true, attributes: nil)
         }
         catch {
             fatalError("StudyDataUploadAPI unable to create temp upload directory: \(error)")
         }
         
-        // Register this upload API with the file upload manager
-        self.uploadManager.bridgeFileUploadApis[self.apiString] = self
-    }
-    
-    // adapted from https://stackoverflow.com/a/32166735
-    func md5base64(data: Data) -> String {
-        let length = Int(CC_MD5_DIGEST_LENGTH)
-        var digestData = Data(count: length)
-        _ = digestData.withUnsafeMutableBytes { digestBytes -> UInt8 in
-            data.withUnsafeBytes { messageBytes -> UInt8 in
-                if let messageBytesBaseAddress = messageBytes.baseAddress, let digestBytesBlindMemory = digestBytes.bindMemory(to: UInt8.self).baseAddress {
-                    let messageLength = CC_LONG(data.count)
-                    // Ignore the deprecation warning. The form of pre-signed S3 URLs used
-                    // by Bridge for these uploads requires that we give the base64encoded
-                    // MD5 hash in the HTTP headers.
-                    CC_MD5(messageBytesBaseAddress, messageLength, digestBytesBlindMemory)
-                }
-                return 0
-            }
-        }
-        return digestData.base64EncodedString()
+        self.uploadManager = uploadManager
     }
         
     func uploadMetadata(for fileId: String, fileUrl: URL, mimeType: String, extras: Codable? = nil) -> BridgeFileUploadMetadataBlob? {
@@ -149,7 +126,7 @@ public class StudyDataUploadAPI: BridgeFileUploadAPITyped {
         var contentMD5String: String
         do {
             let fileData = try Data(contentsOf: fileUrl, options: [.alwaysMapped, .uncached])
-            contentMD5String = self.md5base64(data: fileData)
+            contentMD5String = fileData.md5base64()
         } catch let err {
             Logger.log(tag: .upload, error: err, message: "Error trying to get memory-mapped data of participant file at \(fileUrl) in order to calculate its base64encoded MD5 hash.")
             return nil

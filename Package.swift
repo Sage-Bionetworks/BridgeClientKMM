@@ -29,18 +29,12 @@ let package = Package(
     dependencies: [
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
-        .package(name: "SharedMobileUI",
-                 url: "https://github.com/Sage-Bionetworks/SharedMobileUI-AppleOS.git",
-                 from: "0.19.0"),
-        .package(name: "BridgeArchiver",
-                 url: "https://github.com/Sage-Bionetworks/BridgeArchiver-Swift.git",
+        .package(url: "https://github.com/BridgeDigitalHealth/BridgeArchiver-Swift.git",
                  from: "0.3.0"),
-        .package(name: "JsonModel",
-                 url: "https://github.com/Sage-Bionetworks/JsonModel-Swift.git",
-                 "1.6.0"..<"3.0.0"),
-        .package(name: "AssessmentModel",
-                 url: "https://github.com/Sage-Bionetworks/AssessmentModelKMM.git",
-                 from: "0.11.0"),
+        .package(url: "https://github.com/BridgeDigitalHealth/JsonModel-Swift.git",
+                 from: "2.0.0"),
+        .package(url: "https://github.com/BridgeDigitalHealth/AssessmentModelKMM.git",
+                 from: "1.0.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -51,8 +45,8 @@ let package = Package(
         .target(name: "BridgeClientExtension",
                 dependencies: [
                     "BridgeClient",
-                    "BridgeArchiver",
-                    "JsonModel",
+                    .product(name: "BridgeArchiver", package: "BridgeArchiver-Swift"),
+                    .product(name: "JsonModel", package: "JsonModel-Swift"),
                 ],
                 path: "SwiftPackage/Sources/BridgeClientExtension"),
         .testTarget(name: "BridgeClientExtensionTests",
@@ -67,10 +61,9 @@ let package = Package(
                 dependencies: [
                     "BridgeClient",
                     "BridgeClientExtension",
-                    "SharedMobileUI",
-                    "JsonModel",
-                    .product(name: "AssessmentModel", package: "AssessmentModel"),
-                    .product(name: "AssessmentModelUI", package: "AssessmentModel"),
+                    .product(name: "JsonModel", package: "JsonModel-Swift"),
+                    .product(name: "AssessmentModel", package: "AssessmentModelKMM"),
+                    .product(name: "AssessmentModelUI", package: "AssessmentModelKMM"),
                 ],
                 path: "SwiftPackage/Sources/BridgeClientUI",
                 resources: [.process("Resources")]),

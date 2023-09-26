@@ -183,6 +183,18 @@ extension UIDevice {
     
     /// A human-readable mapped name for a given device type.
     fileprivate var machineName: String {
+        if #available(iOS 16.0, *) {
+            // With iOS 16, the name is *not* the name given to the device by the user.
+            // Instead, it is the "friendly" machine name for the device.
+            // https://developer.apple.com/documentation/uikit/uidevice/1620015-name
+            return self.name
+        } else {
+            return _pre16MachineName()
+        }
+    }
+    
+    private func _pre16MachineName() -> String {
+        
         let id = deviceTypeIdentifier
         switch id {
         case "iPod5,1":                                     return "iPod Touch 5"
@@ -211,6 +223,16 @@ extension UIDevice {
         case "iPhone12,1":                                  return "iPhone 11"
         case "iPhone12,3":                                  return "iPhone 11 Pro"
         case "iPhone12,5":                                  return "iPhone 11 Pro Max"
+        case "iPhone12,8":                                  return "iPhone SE 2nd Gen"
+        case "iPhone13,1":                                  return "iPhone 12 Mini"
+        case "iPhone13,2":                                  return "iPhone 12"
+        case "iPhone13,3":                                  return "iPhone 12 Pro"
+        case "iPhone13,4":                                  return "iPhone 12 Pro Max"
+        case "iPhone14,2":                                  return "iPhone 13 Pro"
+        case "iPhone14,3":                                  return "iPhone 13 Pro Max"
+        case "iPhone14,4":                                  return "iPhone 13 Mini"
+        case "iPhone14,5":                                  return "iPhone 13"
+        case "iPhone14,6":                                  return "iPhone SE 3rd Gen"
             
         case "iPad2,1", "iPad2,2", "iPad2,3", "iPad2,4":    return "iPad 2"
         case "iPad3,1", "iPad3,2", "iPad3,3":               return "iPad 3"
@@ -232,13 +254,18 @@ extension UIDevice {
         case "iPad8,5","iPad8,6","iPad8,7","iPad8,8":       return "iPad Pro 3 12.9 Inch"
         case "iPad11,1","iPad11,2":                         return "iPad Mini 5"
         case "iPad11,3","iPad11,4":                         return "iPad Air 3"
+        case "iPad11,6","iPad11,7":                         return "iPad 8th Gen"
+        case "iPad12,1","iPad12,2":                         return "iPad 9th Gen"
+        case "iPad14,1","iPad14,2":                         return "iPad mini 6th Gen"
+        case "iPad13,1","iPad13,2":                         return "iPad Air 4th Gen"
+        case "iPad13,4","iPad13,5","iPad13,6","iPad13,7":   return "iPad Pro 11 inch 5th Gen"
+        case "iPad13,8","iPad13,9","iPad13,10","iPad13,11": return "iPad Pro 12.9 inch 5th Gen"
+        case "iPad13,16","iPad13,17":                       return "iPad Air 5th Gen"
+        case "iPad13,18","iPad13,19":                       return "iPad 10th Gen"
+        case "iPad14,3","iPad14,4":                         return "iPad Pro 11 inch 4th Gen"
+        case "iPad14,5","iPad14,6":                         return "iPad Pro 12.9 inch 6th Gen"
             
-        case "AppleTV5,3":                                  return "Apple TV"
-        case "AppleTV6,2":                                  return "Apple TV 4K"
-            
-        case "AudioAccessory1,1":                           return "HomePod"
-            
-        case "i386", "x86_64":                              return "Simulator"
+        case "i386", "x86_64", "arm64":                     return "Simulator"
             
         default:                                            return id
         }

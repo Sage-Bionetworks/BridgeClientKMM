@@ -37,7 +37,7 @@ class AssessmentConfigRepoTest: BaseTest() {
             )
 
 
-            val resultJson = repo.getAssessmentConfig(assessmentConfigId).filterNot { ResourceResult.InProgress == it }.first()
+            val resultJson = repo.getAssessmentConfigAsFlow(assessmentConfigId).filterNot { ResourceResult.InProgress == it }.first()
             assertNotNull(resultJson)
 
             val db = repo.database

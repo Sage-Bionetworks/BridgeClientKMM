@@ -14,7 +14,7 @@ buildscript {
 }
 
 plugins {
-    id("org.jetbrains.dokka") version "1.6.0"
+    id("org.jetbrains.dokka") version "1.9.0"
     id("maven-publish")
 //    id("org.jetbrains.kotlinx.kover") version "0.6.1"
 }

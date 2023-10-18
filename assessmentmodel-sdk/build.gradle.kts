@@ -9,6 +9,7 @@ plugins {
 
 android {
     compileSdk = libs.versions.compileSdk.get().toInt()
+    android.buildFeatures.buildConfig = true
     defaultConfig {
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
@@ -33,6 +34,7 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    namespace = "org.sagebionetworks.bridge.assessmentmodel"
 }
 
 

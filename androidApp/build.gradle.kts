@@ -23,6 +23,7 @@ dependencies {
 }
 android {
     compileSdk = libs.versions.compileSdk.get().toInt()
+    android.buildFeatures.buildConfig = true
     defaultConfig {
         applicationId = "org.sagebionetworks.bridge.kmm.androidApp"
         minSdk = libs.versions.minSdk.get().toInt()
@@ -42,4 +43,5 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    namespace = "org.sagebionetworks.bridge.kmm.androidApp"
 }

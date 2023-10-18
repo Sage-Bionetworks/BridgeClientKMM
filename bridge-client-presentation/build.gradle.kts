@@ -27,6 +27,7 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    namespace = "org.sagebionetworks.bridge.kmm.presentation"
 }
 
 

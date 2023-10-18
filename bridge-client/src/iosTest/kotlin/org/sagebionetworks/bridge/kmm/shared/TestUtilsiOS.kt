@@ -13,12 +13,14 @@ internal actual fun testDatabaseDriver(): SqlDriver {
         return NativeSqliteDriver(
             DatabaseConfiguration(
                 name = tableName,
-                version = schema.version,
+                version = schema.version.toInt(),
                 create = { connection ->
                     wrapConnection(connection) { schema.create(it) }
                 },
                 upgrade = { connection, oldVersion, newVersion ->
-                    wrapConnection(connection) { schema.migrate(it, oldVersion, newVersion) }
+                    wrapConnection(connection) { schema.migrate(it, oldVersion.toLong(),
+                        newVersion.toLong()
+                    ) }
                 },
                 inMemory = true
             )

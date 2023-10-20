@@ -183,17 +183,11 @@ extension UIDevice {
     
     /// A human-readable mapped name for a given device type.
     fileprivate var machineName: String {
-        if #available(iOS 16.0, *) {
-            // With iOS 16, the name is *not* the name given to the device by the user.
-            // Instead, it is the "friendly" machine name for the device.
-            // https://developer.apple.com/documentation/uikit/uidevice/1620015-name
-            return self.name
-        } else {
-            return _pre16MachineName()
-        }
+        // Use the hardcoded machine name b/c each os version seems to change this
+        _hardcodedMachineName()
     }
     
-    private func _pre16MachineName() -> String {
+    private func _hardcodedMachineName() -> String {
         
         let id = deviceTypeIdentifier
         switch id {
@@ -233,6 +227,14 @@ extension UIDevice {
         case "iPhone14,4":                                  return "iPhone 13 Mini"
         case "iPhone14,5":                                  return "iPhone 13"
         case "iPhone14,6":                                  return "iPhone SE 3rd Gen"
+        case "iPhone14,7":                                  return "iPhone 14"
+        case "iPhone14,8":                                  return "iPhone 14 Plus"
+        case "iPhone15,2":                                  return "iPhone 14 Pro"
+        case "iPhone15,3":                                  return "iPhone 14 Pro Max"
+        case "iPhone15,4":                                  return "iPhone 15"
+        case "iPhone15,5":                                  return "iPhone 15 Plus"
+        case "iPhone16,1":                                  return "iPhone 15 Pro"
+        case "iPhone16,2":                                  return "iPhone 15 Pro Max"
             
         case "iPad2,1", "iPad2,2", "iPad2,3", "iPad2,4":    return "iPad 2"
         case "iPad3,1", "iPad3,2", "iPad3,3":               return "iPad 3"
@@ -267,7 +269,17 @@ extension UIDevice {
             
         case "i386", "x86_64", "arm64":                     return "Simulator"
             
-        default:                                            return id
+        default:
+            if #available(iOS 16.0, *) {
+                // With iOS 16, the name is *not* the name given to the device by the user.
+                // Instead, it is the "friendly" machine name for the device.
+                // https://developer.apple.com/documentation/uikit/uidevice/1620015-name
+                // That said, it appears that in some cases, only the "iPhone" and not the
+                // model is being returned so also check for that. syoung 10/20/2023
+                return self.name != "iPhone" ? self.name : id
+            } else {
+                return id
+            }
         }
     }
 }

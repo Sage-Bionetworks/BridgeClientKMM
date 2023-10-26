@@ -155,7 +155,8 @@ abstract class AbstractNativeTimelineManager(
 
     fun fetchAssessmentConfig(instanceGuid: String, assessmentInfo: AssessmentInfo, callBack: (NativeAssessmentConfig) -> Unit) {
         scope.launch {
-            assessmentConfigRepo.getAssessmentConfig(assessmentInfo).collectLatest { resource ->
+            try {
+                val resource = assessmentConfigRepo.getAssessmentConfig(assessmentInfo)
                 val restoredResultData = localCache.loadData(instanceGuid, "AssessmentResult")
                 val restoredJson = (restoredResultData?.json as? JsonObject)?.toString()?.toNSData()
                 callBack(
@@ -165,6 +166,10 @@ abstract class AbstractNativeTimelineManager(
                         config = (resource as? ResourceResult.Success)?.data?.config.toString().toNSData(),
                         restoredResult = restoredJson
                     )
+                )
+            } catch (_: Throwable) {
+                callBack(
+                    NativeAssessmentConfig(instanceGuid, assessmentInfo.identifier, null, null)
                 )
             }
         }

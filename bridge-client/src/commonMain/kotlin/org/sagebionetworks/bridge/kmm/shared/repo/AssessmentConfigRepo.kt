@@ -46,8 +46,22 @@ class AssessmentConfigRepo(httpClient: HttpClient, databaseHelper: ResourceDatab
      * Load [AssessmentConfig] using [AssessmentInfo]. This will trigger a remote call to load from
      * Bridge server when necessary.
      */
-    fun getAssessmentConfig(assessmentInfo: AssessmentInfo): Flow<ResourceResult<AssessmentConfig>> {
+    fun getAssessmentConfigAsFlow(assessmentInfo: AssessmentInfo): Flow<ResourceResult<AssessmentConfig>> {
         return getResourceByIdAsFlow(
+            identifier = assessmentInfo.guid,
+            secondaryId = assessmentInfo.identifier,
+            resourceType = ResourceType.ASSESSMENT_CONFIG,
+            remoteLoad = { loadRemoteAssessmentConfig(assessmentInfo) },
+            studyId = APP_WIDE_STUDY_ID
+        )
+    }
+
+    /**
+     * Load [AssessmentConfig] using [AssessmentInfo]. This will trigger a remote call to load from
+     * Bridge server when necessary.
+     */
+    suspend fun getAssessmentConfig(assessmentInfo: AssessmentInfo): ResourceResult<AssessmentConfig> {
+        return getResourceById(
             identifier = assessmentInfo.guid,
             secondaryId = assessmentInfo.identifier,
             resourceType = ResourceType.ASSESSMENT_CONFIG,

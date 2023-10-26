@@ -6,7 +6,7 @@
 #import <Foundation/NSString.h>
 #import <Foundation/NSValue.h>
 
-@class BridgeClientPlatformConfigBridgeEnvironment, BridgeClientIOSBridgeConfig, BridgeClientIOSLogger, NSData, BridgeClientAdherenceRecord, BridgeClientAppConfig, BridgeClientKotlinx_serialization_jsonJsonElement, BridgeClientStudy, BridgeClientUserSessionInfo, BridgeClientKotlinEnumCompanion, BridgeClientKotlinEnum<E>, BridgeClientLogSeverity, BridgeClientKotlinArray<T>, NSError, BridgeClientAccountStatusCompanion, BridgeClientAccountStatus, BridgeClientAddressCompanion, BridgeClientAddress, BridgeClientKotlinx_datetimeInstant, BridgeClientAdherenceRecordCompanion, BridgeClientAdherenceRecordTypeCompanion, BridgeClientAdherenceRecordType, BridgeClientAdherenceRecordUpdatesCompanion, BridgeClientAdherenceRecordUpdates, BridgeClientSortOrder, BridgeClientAdherenceRecordsSearchCompanion, BridgeClientAdherenceRecordsSearch, BridgeClientCriteria, BridgeClientSurveyReference, BridgeClientSchemaReference, BridgeClientConfigReference, BridgeClientFileReference, BridgeClientAppConfigCompanion, BridgeClientAssessmentConfigCompanion, BridgeClientAssessmentConfig, BridgeClientColorScheme, BridgeClientImageResource, BridgeClientAssessmentInfoCompanion, BridgeClientAssessmentInfo, BridgeClientClientInfoCompanion, BridgeClientClientInfo, BridgeClientColorSchemeCompanion, BridgeClientConfigReferenceCompanion, BridgeClientConsentStatusCompanion, BridgeClientConsentStatus, BridgeClientContactRole, BridgeClientPhone, BridgeClientContactCompanion, BridgeClientContact, BridgeClientContactRoleCompanion, BridgeClientCriteriaCompanion, BridgeClientDateRangeCompanion, BridgeClientDateRange, BridgeClientEnrollmentInfoCompanion, BridgeClientEnrollmentInfo, BridgeClientEnvironmentCompanion, BridgeClientEnvironment, BridgeClientFileReferenceCompanion, BridgeClientIdentifierCompanion, BridgeClientIdentifier, BridgeClientLabel, BridgeClientImageResourceCompanion, BridgeClientIrbDecisionTypeCompanion, BridgeClientIrbDecisionType, BridgeClientLabelCompanion, BridgeClientNotificationType, BridgeClientNotificationMessage, BridgeClientNotificationInfoCompanion, BridgeClientNotificationInfo, BridgeClientNotificationMessageCompanion, BridgeClientNotificationTypeCompanion, BridgeClientParticipantDataCompanion, BridgeClientParticipantData, BridgeClientScheduledSession, BridgeClientSessionInfo, BridgeClientStudyBurstInfo, BridgeClientParticipantScheduleCompanion, BridgeClientParticipantSchedule, BridgeClientPerformanceOrderCompanion, BridgeClientPerformanceOrder, BridgeClientPhoneCompanion, BridgeClientPhoneSignInRequestCompanion, BridgeClientPhoneSignInRequest, BridgeClientPhoneSigninCompanion, BridgeClientPhoneSignin, BridgeClientReminderTypeCompanion, BridgeClientReminderType, BridgeClientRoleCompanion, BridgeClientRole, BridgeClientS3UploadSession, BridgeClientS3UploadType, BridgeClientScheduledAssessmentCompanion, BridgeClientScheduledAssessment, BridgeClientKotlinx_datetimeLocalTime, BridgeClientKotlinx_datetimeDateTimePeriod, BridgeClientKotlinx_datetimeLocalDate, BridgeClientScheduledSessionCompanion, BridgeClientKotlinx_datetimeLocalDateTime, BridgeClientSchemaReferenceCompanion, BridgeClientSessionInfoCompanion, BridgeClientSharingScopeCompanion, BridgeClientSharingScope, BridgeClientSignInTypeCompanion, BridgeClientSignInType, BridgeClientSortOrderCompanion, BridgeClientStudyPhase, BridgeClientStudyCompanion, BridgeClientStudyActivityEventCompanion, BridgeClientStudyActivityEvent, BridgeClientStudyActivityEventListCompanion, BridgeClientStudyActivityEventList, BridgeClientStudyActivityEventRequestCompanion, BridgeClientStudyBurstInfoCompanion, BridgeClientStudyInfoCompanion, BridgeClientStudyInfo, BridgeClientUserConsentHistory, BridgeClientStudyParticipantCompanion, BridgeClientStudyParticipant, BridgeClientStudyPhaseCompanion, BridgeClientSurveyReferenceCompanion, BridgeClientTimelineCompanion, BridgeClientTimeline, BridgeClientUploadMetadata, BridgeClientUploadFileCompanion, BridgeClientUploadFile, BridgeClientUploadMetadataCompanion, BridgeClientUploadSessionCompanion, BridgeClientUploadSession, BridgeClientUploadedFileRecordCompanion, BridgeClientUploadedFileRecord, BridgeClientUserConsentHistoryCompanion, BridgeClientUserSessionInfoCompanion, BridgeClientKoin_coreKoin, BridgeClientNativeAssessmentConfig, NSDate, BridgeClientNativeAdherenceRecord, BridgeClientResourceStatus, BridgeClientAppStatus, BridgeClientParticipantRepoUpdateParticipantRecord, BridgeClientKtor_httpHttpStatusCode, BridgeClientKotlinError, BridgeClientUserSessionState, BridgeClientAssessmentHistoryRecord, BridgeClientNativeParticipantDataRecord, BridgeClientNativeScheduledAssessment, NSDateComponents, BridgeClientNativeScheduledNotification, NSTimeZone, BridgeClientNativeScheduledSessionWindow, BridgeClientNativeScheduledSessionTimelineSlice, BridgeClientNativeStudyBurst, BridgeClientNativeStudyBurstSchedule, BridgeClientAbstractNativeTimelineManager, BridgeClientPendingUploadFile, BridgeClientEtagFeatureFeature, BridgeClientEtagFeature, BridgeClientKtor_client_coreHttpClient, BridgeClientKtor_utilsAttributeKey<T>, BridgeClientEtagFeatureConfig, BridgeClientAdherenceRecords, BridgeClientAllAssessmentAdherence, BridgeClientBridgeResourceDatabaseQueries, BridgeClientLocalDataCacheQueries, BridgeClientParticipantScheduleQueries, BridgeClientBridgeResourceDatabaseCompanion, BridgeClientAdherenceRecordsAdapter, BridgeClientJsonDataAdapter, BridgeClientResourceAdapter, BridgeClientKotlinUnit, BridgeClientRuntimeTransacterTransaction, BridgeClientKotlinThrowable, BridgeClientRuntimeBaseTransacterImpl, BridgeClientRuntimeTransacterImpl, BridgeClientRuntimeQuery<__covariant RowType>, BridgeClientResourceType, BridgeClientResource, BridgeClientEtagCache, BridgeClientCompletedAssessmentAdherence, BridgeClientFullScheduledSessions, BridgeClientGroupedFuturePendingNotifications, BridgeClientKotlinx_datetimeTimeZone, BridgeClientJsonData, BridgeClientResourceDatabaseHelper, BridgeClientScheduledNotification, BridgeClientParticipantScheduleDatabaseExpandedScheduledSession, BridgeClientParticipantScheduleDatabaseScheduledAssessment, BridgeClientParticipantScheduleDatabaseScheduledSessionHolder, BridgeClientScheduledNotifications, BridgeClientScheduledAssessmentAdherence, BridgeClientScheduleMetadata, BridgeClientStudyBurstSessions, BridgeClientResourceDatabaseHelperCompanion, BridgeClientResourceResult<__covariant T>, BridgeClientResourceResultFailed, BridgeClientKotlinNothing, BridgeClientResourceResultInProgress, BridgeClientResourceResultSuccess<__covariant T>, BridgeClientScheduledAssessments, BridgeClientScheduledSessions, BridgeClientSqliteDriverFactory, BridgeClientNative_driverNativeSqliteDriver, BridgeClientAbstractResourceRepo, BridgeClientScheduleTimelineRepo, BridgeClientAuthenticationRepository, BridgeClientParticipantRepoUpdateParticipantRecordCompanion, BridgeClientReport, BridgeClientAdherenceRecordRepo, BridgeClientAssessmentConfigRepo, BridgeClientScheduledAssessmentReference, BridgeClientScheduledNotificationCompanion, BridgeClientScheduledSessionWindow, BridgeClientScheduledSessionTimelineSlice, BridgeClientStudyBurst, BridgeClientStudyBurstSchedule, BridgeClientKoin_coreModule, BridgeClientKoin_coreKoinApplication, BridgeClientKotlinx_serialization_jsonJsonElementCompanion, BridgeClientKotlinx_datetimeInstantCompanion, BridgeClientKotlinx_datetimeLocalTimeCompanion, BridgeClientKotlinx_datetimeDateTimePeriodCompanion, BridgeClientKotlinx_datetimeMonth, BridgeClientKotlinx_datetimeLocalDateCompanion, BridgeClientKotlinx_datetimeDayOfWeek, BridgeClientKotlinx_datetimeLocalDateTimeCompanion, BridgeClientKoin_coreScope, BridgeClientKoin_coreParametersHolder, BridgeClientKotlinLazyThreadSafetyMode, BridgeClientKoin_coreLogger, BridgeClientKoin_coreInstanceRegistry, BridgeClientKoin_corePropertyRegistry, BridgeClientKoin_coreScopeRegistry, BridgeClientKtor_httpHttpStatusCodeCompanion, BridgeClientKotlinCancellationException, BridgeClientKtor_client_coreHttpClientEngineConfig, BridgeClientKtor_client_coreHttpClientConfig<T>, BridgeClientKtor_eventsEvents, BridgeClientKtor_client_coreHttpReceivePipeline, BridgeClientKtor_client_coreHttpRequestPipeline, BridgeClientKtor_client_coreHttpResponsePipeline, BridgeClientKtor_client_coreHttpSendPipeline, BridgeClientRuntimeExecutableQuery<__covariant RowType>, BridgeClientKotlinx_datetimeTimeZoneCompanion, BridgeClientNative_driverConnectionWrapper, BridgeClientSqliter_driverDatabaseConfiguration, BridgeClientKotlinException, BridgeClientKotlinRuntimeException, BridgeClientKotlinIllegalStateException, BridgeClientKoin_coreInstanceFactory<T>, BridgeClientKotlinPair<__covariant A, __covariant B>, BridgeClientKoin_coreScopeDSL, BridgeClientKoin_coreSingleInstanceFactory<T>, BridgeClientKoin_coreKoinApplicationCompanion, BridgeClientKoin_coreLevel, BridgeClientKotlinx_serialization_coreSerializersModule, BridgeClientKotlinx_serialization_coreSerialKind, BridgeClientKoin_coreParametersHolderCompanion, BridgeClientKoin_coreScopeRegistryCompanion, BridgeClientKtor_client_coreHttpRequestData, BridgeClientKtor_client_coreHttpResponseData, BridgeClientKotlinx_coroutines_coreCoroutineDispatcher, BridgeClientKtor_client_coreProxyConfig, BridgeClientKtor_eventsEventDefinition<T>, BridgeClientKtor_utilsPipelinePhase, BridgeClientKtor_utilsPipeline<TSubject, TContext>, BridgeClientKtor_client_coreHttpReceivePipelinePhases, BridgeClientKtor_client_coreHttpResponse, BridgeClientKtor_client_coreHttpRequestPipelinePhases, BridgeClientKtor_client_coreHttpRequestBuilder, BridgeClientKtor_client_coreHttpResponsePipelinePhases, BridgeClientKtor_client_coreHttpResponseContainer, BridgeClientKtor_client_coreHttpClientCall, BridgeClientKtor_client_coreHttpSendPipelinePhases, BridgeClientKotlinByteArray, BridgeClientKotlinx_datetimeFixedOffsetTimeZone, BridgeClientSqliter_driverJournalMode, BridgeClientSqliter_driverDatabaseConfigurationExtended, BridgeClientSqliter_driverDatabaseConfigurationLogging, BridgeClientSqliter_driverDatabaseConfigurationLifecycle, BridgeClientSqliter_driverDatabaseConfigurationEncryption, BridgeClientKoin_coreBeanDefinition<T>, BridgeClientKoin_coreInstanceFactoryCompanion, BridgeClientKoin_coreInstanceContext, BridgeClientKtor_httpUrl, BridgeClientKtor_httpHttpMethod, BridgeClientKtor_httpOutgoingContent, BridgeClientKtor_utilsGMTDate, BridgeClientKtor_httpHttpProtocolVersion, BridgeClientKotlinAbstractCoroutineContextElement, BridgeClientKotlinx_coroutines_coreCoroutineDispatcherKey, BridgeClientKtor_httpHeadersBuilder, BridgeClientKtor_client_coreHttpRequestBuilderCompanion, BridgeClientKtor_httpURLBuilder, BridgeClientKtor_utilsTypeInfo, BridgeClientKtor_client_coreHttpClientCallCompanion, BridgeClientKotlinByteIterator, BridgeClientKotlinx_datetimeUtcOffset, BridgeClientKotlinx_datetimeFixedOffsetTimeZoneCompanion, BridgeClientSqliter_driverJournalModeCompanion, BridgeClientSqliter_driverSynchronousFlag, BridgeClientKoin_coreKind, BridgeClientKoin_coreCallbacks<T>, BridgeClientKtor_httpUrlCompanion, BridgeClientKtor_httpURLProtocol, BridgeClientKtor_httpHttpMethodCompanion, BridgeClientKtor_httpContentType, BridgeClientKtor_utilsGMTDateCompanion, BridgeClientKtor_utilsWeekDay, BridgeClientKtor_utilsMonth, BridgeClientKtor_httpHttpProtocolVersionCompanion, BridgeClientKotlinAbstractCoroutineContextKey<B, E>, BridgeClientKtor_ioMemory, BridgeClientKtor_ioChunkBuffer, BridgeClientKtor_ioBuffer, BridgeClientKtor_ioByteReadPacket, BridgeClientKtor_utilsStringValuesBuilderImpl, BridgeClientKtor_httpURLBuilderCompanion, BridgeClientKotlinx_datetimeUtcOffsetCompanion, BridgeClientKtor_httpURLProtocolCompanion, BridgeClientKtor_httpHeaderValueParam, BridgeClientKtor_httpHeaderValueWithParametersCompanion, BridgeClientKtor_httpHeaderValueWithParameters, BridgeClientKtor_httpContentTypeCompanion, BridgeClientKtor_utilsWeekDayCompanion, BridgeClientKtor_utilsMonthCompanion, BridgeClientKtor_ioMemoryCompanion, BridgeClientKtor_ioBufferCompanion, BridgeClientKtor_ioChunkBufferCompanion, BridgeClientKtor_ioInputCompanion, BridgeClientKtor_ioInput, BridgeClientKtor_ioByteReadPacketCompanion, BridgeClientKotlinKTypeProjection, BridgeClientSqliter_driverFieldType, BridgeClientKotlinKVariance, BridgeClientKotlinKTypeProjectionCompanion, BridgeClientSqliter_driverFieldTypeCompanion;
+@class BridgeClientPlatformConfigBridgeEnvironment, BridgeClientIOSBridgeConfig, BridgeClientIOSLogger, NSData, BridgeClientAdherenceRecord, BridgeClientAppConfig, BridgeClientKotlinx_serialization_jsonJsonElement, BridgeClientStudy, BridgeClientUserSessionInfo, BridgeClientKotlinEnumCompanion, BridgeClientKotlinEnum<E>, BridgeClientLogSeverity, BridgeClientKotlinArray<T>, NSError, BridgeClientAccountStatusCompanion, BridgeClientAccountStatus, BridgeClientAddressCompanion, BridgeClientAddress, BridgeClientKotlinx_datetimeInstant, BridgeClientAdherenceRecordCompanion, BridgeClientAdherenceRecordTypeCompanion, BridgeClientAdherenceRecordType, BridgeClientAdherenceRecordUpdatesCompanion, BridgeClientAdherenceRecordUpdates, BridgeClientSortOrder, BridgeClientAdherenceRecordsSearchCompanion, BridgeClientAdherenceRecordsSearch, BridgeClientCriteria, BridgeClientSurveyReference, BridgeClientSchemaReference, BridgeClientConfigReference, BridgeClientFileReference, BridgeClientAppConfigCompanion, BridgeClientAssessmentConfigCompanion, BridgeClientAssessmentConfig, BridgeClientColorScheme, BridgeClientImageResource, BridgeClientAssessmentInfoCompanion, BridgeClientAssessmentInfo, BridgeClientClientInfoCompanion, BridgeClientClientInfo, BridgeClientColorSchemeCompanion, BridgeClientConfigReferenceCompanion, BridgeClientConsentStatusCompanion, BridgeClientConsentStatus, BridgeClientContactRole, BridgeClientPhone, BridgeClientContactCompanion, BridgeClientContact, BridgeClientContactRoleCompanion, BridgeClientCriteriaCompanion, BridgeClientDateRangeCompanion, BridgeClientDateRange, BridgeClientEnrollmentInfoCompanion, BridgeClientEnrollmentInfo, BridgeClientEnvironmentCompanion, BridgeClientEnvironment, BridgeClientFileReferenceCompanion, BridgeClientIdentifierCompanion, BridgeClientIdentifier, BridgeClientLabel, BridgeClientImageResourceCompanion, BridgeClientIrbDecisionTypeCompanion, BridgeClientIrbDecisionType, BridgeClientLabelCompanion, BridgeClientNotificationType, BridgeClientNotificationMessage, BridgeClientNotificationInfoCompanion, BridgeClientNotificationInfo, BridgeClientNotificationMessageCompanion, BridgeClientNotificationTypeCompanion, BridgeClientParticipantDataCompanion, BridgeClientParticipantData, BridgeClientScheduledSession, BridgeClientSessionInfo, BridgeClientStudyBurstInfo, BridgeClientParticipantScheduleCompanion, BridgeClientParticipantSchedule, BridgeClientPerformanceOrderCompanion, BridgeClientPerformanceOrder, BridgeClientPhoneCompanion, BridgeClientPhoneSignInRequestCompanion, BridgeClientPhoneSignInRequest, BridgeClientPhoneSigninCompanion, BridgeClientPhoneSignin, BridgeClientReminderTypeCompanion, BridgeClientReminderType, BridgeClientRoleCompanion, BridgeClientRole, BridgeClientS3UploadSession, BridgeClientS3UploadType, BridgeClientScheduledAssessmentCompanion, BridgeClientScheduledAssessment, BridgeClientKotlinx_datetimeLocalTime, BridgeClientKotlinx_datetimeDateTimePeriod, BridgeClientKotlinx_datetimeLocalDate, BridgeClientScheduledSessionCompanion, BridgeClientKotlinx_datetimeLocalDateTime, BridgeClientSchemaReferenceCompanion, BridgeClientSessionInfoCompanion, BridgeClientSharingScopeCompanion, BridgeClientSharingScope, BridgeClientSignInTypeCompanion, BridgeClientSignInType, BridgeClientSortOrderCompanion, BridgeClientStudyPhase, BridgeClientStudyCompanion, BridgeClientStudyActivityEventCompanion, BridgeClientStudyActivityEvent, BridgeClientStudyActivityEventListCompanion, BridgeClientStudyActivityEventList, BridgeClientStudyActivityEventRequestCompanion, BridgeClientStudyBurstInfoCompanion, BridgeClientStudyInfoCompanion, BridgeClientStudyInfo, BridgeClientUserConsentHistory, BridgeClientStudyParticipantCompanion, BridgeClientStudyParticipant, BridgeClientStudyPhaseCompanion, BridgeClientSurveyReferenceCompanion, BridgeClientTimelineCompanion, BridgeClientTimeline, BridgeClientUploadMetadata, BridgeClientUploadFileCompanion, BridgeClientUploadFile, BridgeClientUploadMetadataCompanion, BridgeClientUploadSessionCompanion, BridgeClientUploadSession, BridgeClientUploadedFileRecordCompanion, BridgeClientUploadedFileRecord, BridgeClientUserConsentHistoryCompanion, BridgeClientUserSessionInfoCompanion, BridgeClientKoin_coreKoin, BridgeClientNativeAssessmentConfig, NSDate, BridgeClientNativeAdherenceRecord, BridgeClientResourceStatus, BridgeClientAppStatus, BridgeClientParticipantRepoUpdateParticipantRecord, BridgeClientKtor_httpHttpStatusCode, BridgeClientKotlinError, BridgeClientUserSessionState, BridgeClientAssessmentHistoryRecord, BridgeClientNativeParticipantDataRecord, BridgeClientNativeScheduledAssessment, NSDateComponents, BridgeClientNativeScheduledNotification, NSTimeZone, BridgeClientNativeScheduledSessionWindow, BridgeClientNativeScheduledSessionTimelineSlice, BridgeClientNativeStudyBurst, BridgeClientNativeStudyBurstSchedule, BridgeClientAbstractNativeTimelineManager, BridgeClientPendingUploadFile, BridgeClientEtagFeatureFeature, BridgeClientEtagFeature, BridgeClientKtor_client_coreHttpClient, BridgeClientKtor_utilsAttributeKey<T>, BridgeClientEtagFeatureConfig, BridgeClientAdherenceRecords, BridgeClientAllAssessmentAdherence, BridgeClientBridgeResourceDatabaseQueries, BridgeClientLocalDataCacheQueries, BridgeClientParticipantScheduleQueries, BridgeClientBridgeResourceDatabaseCompanion, BridgeClientAdherenceRecordsAdapter, BridgeClientJsonDataAdapter, BridgeClientResourceAdapter, BridgeClientKotlinUnit, BridgeClientRuntimeTransacterTransaction, BridgeClientKotlinThrowable, BridgeClientRuntimeBaseTransacterImpl, BridgeClientRuntimeTransacterImpl, BridgeClientRuntimeQuery<__covariant RowType>, BridgeClientResourceType, BridgeClientResource, BridgeClientEtagCache, BridgeClientCompletedAssessmentAdherence, BridgeClientFullScheduledSessions, BridgeClientGroupedFuturePendingNotifications, BridgeClientKotlinx_datetimeTimeZone, BridgeClientJsonData, BridgeClientResourceDatabaseHelper, BridgeClientScheduledNotification, BridgeClientParticipantScheduleDatabaseExpandedScheduledSession, BridgeClientParticipantScheduleDatabaseScheduledAssessment, BridgeClientParticipantScheduleDatabaseScheduledSessionHolder, BridgeClientScheduledNotifications, BridgeClientScheduledAssessmentAdherence, BridgeClientScheduleMetadata, BridgeClientStudyBurstSessions, BridgeClientResourceDatabaseHelperCompanion, BridgeClientResourceResult<__covariant T>, BridgeClientResourceResultFailed, BridgeClientKotlinNothing, BridgeClientResourceResultInProgress, BridgeClientResourceResultSuccess<__covariant T>, BridgeClientScheduledAssessments, BridgeClientScheduledSessions, BridgeClientSqliteDriverFactory, BridgeClientNative_driverNativeSqliteDriver, BridgeClientAbstractResourceRepo, BridgeClientScheduleTimelineRepo, BridgeClientAuthenticationRepository, BridgeClientParticipantRepoUpdateParticipantRecordCompanion, BridgeClientReport, BridgeClientAdherenceRecordRepo, BridgeClientAssessmentConfigRepo, BridgeClientScheduledAssessmentReference, BridgeClientScheduledNotificationCompanion, BridgeClientScheduledSessionWindow, BridgeClientScheduledSessionTimelineSlice, BridgeClientStudyBurst, BridgeClientStudyBurstSchedule, BridgeClientKoin_coreModule, BridgeClientKoin_coreKoinApplication, BridgeClientKotlinx_serialization_jsonJsonElementCompanion, BridgeClientKotlinx_datetimeInstantCompanion, BridgeClientKotlinx_datetimeLocalTimeCompanion, BridgeClientKotlinx_datetimeDateTimePeriodCompanion, BridgeClientKotlinx_datetimeMonth, BridgeClientKotlinx_datetimeLocalDateCompanion, BridgeClientKotlinx_datetimeDayOfWeek, BridgeClientKotlinx_datetimeLocalDateTimeCompanion, BridgeClientKoin_coreScope, BridgeClientKoin_coreParametersHolder, BridgeClientKotlinLazyThreadSafetyMode, BridgeClientKoin_coreLogger, BridgeClientKoin_coreInstanceRegistry, BridgeClientKoin_corePropertyRegistry, BridgeClientKoin_coreScopeRegistry, BridgeClientKtor_httpHttpStatusCodeCompanion, BridgeClientKotlinCancellationException, BridgeClientKtor_client_coreHttpClientEngineConfig, BridgeClientKtor_client_coreHttpClientConfig<T>, BridgeClientKtor_eventsEvents, BridgeClientKtor_client_coreHttpReceivePipeline, BridgeClientKtor_client_coreHttpRequestPipeline, BridgeClientKtor_client_coreHttpResponsePipeline, BridgeClientKtor_client_coreHttpSendPipeline, BridgeClientRuntimeAfterVersion, BridgeClientRuntimeExecutableQuery<__covariant RowType>, BridgeClientKotlinx_datetimeTimeZoneCompanion, BridgeClientNative_driverConnectionWrapper, BridgeClientSqliter_driverDatabaseConfiguration, BridgeClientKotlinException, BridgeClientKotlinRuntimeException, BridgeClientKotlinIllegalStateException, BridgeClientKoin_coreInstanceFactory<T>, BridgeClientKotlinPair<__covariant A, __covariant B>, BridgeClientKoin_coreScopeDSL, BridgeClientKoin_coreSingleInstanceFactory<T>, BridgeClientKoin_coreKoinApplicationCompanion, BridgeClientKoin_coreLevel, BridgeClientKotlinx_serialization_coreSerializersModule, BridgeClientKotlinx_serialization_coreSerialKind, BridgeClientKoin_coreParametersHolderCompanion, BridgeClientKoin_coreScopeRegistryCompanion, BridgeClientKtor_client_coreHttpRequestData, BridgeClientKtor_client_coreHttpResponseData, BridgeClientKotlinx_coroutines_coreCoroutineDispatcher, BridgeClientKtor_client_coreProxyConfig, BridgeClientKtor_eventsEventDefinition<T>, BridgeClientKtor_utilsPipelinePhase, BridgeClientKtor_utilsPipeline<TSubject, TContext>, BridgeClientKtor_client_coreHttpReceivePipelinePhases, BridgeClientKtor_client_coreHttpResponse, BridgeClientKtor_client_coreHttpRequestPipelinePhases, BridgeClientKtor_client_coreHttpRequestBuilder, BridgeClientKtor_client_coreHttpResponsePipelinePhases, BridgeClientKtor_client_coreHttpResponseContainer, BridgeClientKtor_client_coreHttpClientCall, BridgeClientKtor_client_coreHttpSendPipelinePhases, BridgeClientKotlinByteArray, BridgeClientKotlinx_datetimeFixedOffsetTimeZone, BridgeClientSqliter_driverJournalMode, BridgeClientSqliter_driverDatabaseConfigurationExtended, BridgeClientSqliter_driverDatabaseConfigurationLogging, BridgeClientSqliter_driverDatabaseConfigurationLifecycle, BridgeClientSqliter_driverDatabaseConfigurationEncryption, BridgeClientKoin_coreBeanDefinition<T>, BridgeClientKoin_coreInstanceFactoryCompanion, BridgeClientKoin_coreInstanceContext, BridgeClientKtor_httpUrl, BridgeClientKtor_httpHttpMethod, BridgeClientKtor_httpOutgoingContent, BridgeClientKtor_utilsGMTDate, BridgeClientKtor_httpHttpProtocolVersion, BridgeClientKotlinAbstractCoroutineContextElement, BridgeClientKotlinx_coroutines_coreCoroutineDispatcherKey, BridgeClientKtor_httpHeadersBuilder, BridgeClientKtor_client_coreHttpRequestBuilderCompanion, BridgeClientKtor_httpURLBuilder, BridgeClientKtor_utilsTypeInfo, BridgeClientKtor_client_coreHttpClientCallCompanion, BridgeClientKotlinByteIterator, BridgeClientKotlinx_datetimeUtcOffset, BridgeClientKotlinx_datetimeFixedOffsetTimeZoneCompanion, BridgeClientSqliter_driverJournalModeCompanion, BridgeClientSqliter_driverSynchronousFlag, BridgeClientKoin_coreKind, BridgeClientKoin_coreCallbacks<T>, BridgeClientKtor_httpUrlCompanion, BridgeClientKtor_httpURLProtocol, BridgeClientKtor_httpHttpMethodCompanion, BridgeClientKtor_httpContentType, BridgeClientKtor_utilsGMTDateCompanion, BridgeClientKtor_utilsWeekDay, BridgeClientKtor_utilsMonth, BridgeClientKtor_httpHttpProtocolVersionCompanion, BridgeClientKotlinAbstractCoroutineContextKey<B, E>, BridgeClientKtor_ioMemory, BridgeClientKtor_ioChunkBuffer, BridgeClientKtor_ioBuffer, BridgeClientKtor_ioByteReadPacket, BridgeClientKtor_utilsStringValuesBuilderImpl, BridgeClientKtor_httpURLBuilderCompanion, BridgeClientKotlinx_datetimeUtcOffsetCompanion, BridgeClientKtor_httpURLProtocolCompanion, BridgeClientKtor_httpHeaderValueParam, BridgeClientKtor_httpHeaderValueWithParametersCompanion, BridgeClientKtor_httpHeaderValueWithParameters, BridgeClientKtor_httpContentTypeCompanion, BridgeClientKtor_utilsWeekDayCompanion, BridgeClientKtor_utilsMonthCompanion, BridgeClientKtor_ioMemoryCompanion, BridgeClientKtor_ioBufferCompanion, BridgeClientKtor_ioChunkBufferCompanion, BridgeClientKtor_ioInputCompanion, BridgeClientKtor_ioInput, BridgeClientKtor_ioByteReadPacketCompanion, BridgeClientKotlinKTypeProjection, BridgeClientSqliter_driverFieldType, BridgeClientKotlinKVariance, BridgeClientKotlinKTypeProjectionCompanion, BridgeClientSqliter_driverFieldTypeCompanion;
 
 @protocol BridgeClientPlatformConfig, BridgeClientBridgeConfig, BridgeClientIOSPlatformConfig, BridgeClientNativeLogWriter, BridgeClientKotlinComparable, BridgeClientKotlinx_serialization_coreKSerializer, BridgeClientUploadFileIdentifiable, BridgeClientKoin_coreKoinComponent, BridgeClientParticipantScheduleMutator, BridgeClientKotlinx_coroutines_coreJob, BridgeClientEtagStorageCache, BridgeClientKtor_client_coreHttpClientPlugin, BridgeClientHttpUtil, BridgeClientRuntimeColumnAdapter, BridgeClientRuntimeTransactionWithoutReturn, BridgeClientRuntimeTransactionWithReturn, BridgeClientRuntimeTransacterBase, BridgeClientRuntimeTransacter, BridgeClientBridgeResourceDatabase, BridgeClientRuntimeSqlDriver, BridgeClientRuntimeSqlSchema, BridgeClientDbDriverFactory, BridgeClientKotlinx_coroutines_coreFlow, BridgeClientKotlinx_coroutines_coreCoroutineScope, BridgeClientBridgeErrorStatusNotifier, BridgeClientAuthenticationProvider, BridgeClientKotlinx_coroutines_coreStateFlow, BridgeClientKotlinIterator, BridgeClientKotlinx_serialization_coreEncoder, BridgeClientKotlinx_serialization_coreSerialDescriptor, BridgeClientKotlinx_serialization_coreSerializationStrategy, BridgeClientKotlinx_serialization_coreDecoder, BridgeClientKotlinx_serialization_coreDeserializationStrategy, BridgeClientKoin_coreKoinScopeComponent, BridgeClientKoin_coreQualifier, BridgeClientKotlinKClass, BridgeClientKotlinLazy, BridgeClientKotlinx_coroutines_coreChildHandle, BridgeClientKotlinx_coroutines_coreChildJob, BridgeClientKotlinx_coroutines_coreDisposableHandle, BridgeClientKotlinSequence, BridgeClientKotlinx_coroutines_coreSelectClause0, BridgeClientKotlinCoroutineContextKey, BridgeClientKotlinCoroutineContextElement, BridgeClientKotlinCoroutineContext, BridgeClientKtor_ioCloseable, BridgeClientKtor_client_coreHttpClientEngine, BridgeClientKtor_client_coreHttpClientEngineCapability, BridgeClientKtor_utilsAttributes, BridgeClientRuntimeTransactionCallbacks, BridgeClientRuntimeQueryListener, BridgeClientRuntimeQueryResult, BridgeClientRuntimeSqlPreparedStatement, BridgeClientRuntimeSqlCursor, BridgeClientRuntimeCloseable, BridgeClientKotlinx_coroutines_coreFlowCollector, BridgeClientSqliter_driverDatabaseManager, BridgeClientKotlinx_coroutines_coreSharedFlow, BridgeClientKotlinx_serialization_coreCompositeEncoder, BridgeClientKotlinAnnotation, BridgeClientKotlinx_serialization_coreCompositeDecoder, BridgeClientKoin_coreScopeCallback, BridgeClientKotlinKDeclarationContainer, BridgeClientKotlinKAnnotatedElement, BridgeClientKotlinKClassifier, BridgeClientKotlinx_coroutines_coreParentJob, BridgeClientKotlinx_coroutines_coreSelectInstance, BridgeClientKotlinx_coroutines_coreSelectClause, BridgeClientKotlinSuspendFunction2, BridgeClientSqliter_driverDatabaseConnection, BridgeClientKotlinx_serialization_coreSerializersModuleCollector, BridgeClientKtor_httpHeaders, BridgeClientKotlinContinuation, BridgeClientKotlinContinuationInterceptor, BridgeClientKotlinx_coroutines_coreRunnable, BridgeClientKotlinFunction, BridgeClientKtor_httpHttpMessage, BridgeClientKtor_ioByteReadChannel, BridgeClientKtor_httpHttpMessageBuilder, BridgeClientKtor_client_coreHttpRequest, BridgeClientSqliter_driverStatement, BridgeClientSqliter_driverLogger, BridgeClientKtor_httpParameters, BridgeClientKotlinMapEntry, BridgeClientKtor_utilsStringValues, BridgeClientKtor_ioReadSession, BridgeClientKotlinSuspendFunction1, BridgeClientKotlinAppendable, BridgeClientKtor_utilsStringValuesBuilder, BridgeClientKtor_httpParametersBuilder, BridgeClientKotlinKType, BridgeClientSqliter_driverCursor, BridgeClientKtor_ioObjectPool;
 
@@ -275,6 +275,7 @@ __attribute__((swift_name("LogSeverity")))
 @property (class, readonly) BridgeClientLogSeverity *error __attribute__((swift_name("error")));
 @property (class, readonly) BridgeClientLogSeverity *assert __attribute__((swift_name("assert")));
 + (BridgeClientKotlinArray<BridgeClientLogSeverity *> *)values __attribute__((swift_name("values()")));
+@property (class, readonly) NSArray<BridgeClientLogSeverity *> *entries __attribute__((swift_name("entries")));
 @end
 
 __attribute__((swift_name("NativeLogWriter")))
@@ -294,6 +295,7 @@ __attribute__((swift_name("PlatformConfigBridgeEnvironment")))
 @property (class, readonly) BridgeClientPlatformConfigBridgeEnvironment *development __attribute__((swift_name("development")));
 @property (class, readonly) BridgeClientPlatformConfigBridgeEnvironment *custom __attribute__((swift_name("custom")));
 + (BridgeClientKotlinArray<BridgeClientPlatformConfigBridgeEnvironment *> *)values __attribute__((swift_name("values()")));
+@property (class, readonly) NSArray<BridgeClientPlatformConfigBridgeEnvironment *> *entries __attribute__((swift_name("entries")));
 - (NSString *)basePath __attribute__((swift_name("basePath()")));
 - (NSString *)domainSuffix __attribute__((swift_name("domainSuffix()")));
 @end
@@ -314,6 +316,7 @@ __attribute__((swift_name("AccountStatus")))
 @property (class, readonly) BridgeClientAccountStatus *disabled __attribute__((swift_name("disabled")));
 @property (class, readonly) BridgeClientAccountStatus *unverified __attribute__((swift_name("unverified")));
 + (BridgeClientKotlinArray<BridgeClientAccountStatus *> *)values __attribute__((swift_name("values()")));
+@property (class, readonly) NSArray<BridgeClientAccountStatus *> *entries __attribute__((swift_name("entries")));
 @property (readonly) NSString * _Nullable serialName __attribute__((swift_name("serialName")));
 @end
 
@@ -342,13 +345,53 @@ __attribute__((swift_name("Address")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="city")
+*/
 @property (readonly) NSString * _Nullable city __attribute__((swift_name("city")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="country")
+*/
 @property (readonly) NSString * _Nullable country __attribute__((swift_name("country")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="division")
+*/
 @property (readonly) NSString * _Nullable division __attribute__((swift_name("division")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="mailRouting")
+*/
 @property (readonly) NSString * _Nullable mailRouting __attribute__((swift_name("mailRouting")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="placeName")
+*/
 @property (readonly) NSString * _Nullable placeName __attribute__((swift_name("placeName")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="postalCode")
+*/
 @property (readonly) NSString * _Nullable postalCode __attribute__((swift_name("postalCode")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="street")
+*/
 @property (readonly) NSString * _Nullable street __attribute__((swift_name("street")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
 @end
 
@@ -376,14 +419,59 @@ __attribute__((swift_name("AdherenceRecord")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="clientData")
+*/
 @property (readonly) BridgeClientKotlinx_serialization_jsonJsonElement * _Nullable clientData __attribute__((swift_name("clientData")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="clientTimeZone")
+*/
 @property (readonly) NSString * _Nullable clientTimeZone __attribute__((swift_name("clientTimeZone")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="declined")
+*/
 @property (readonly) BOOL declined __attribute__((swift_name("declined")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="eventTimestamp")
+*/
 @property (readonly) NSString *eventTimestamp __attribute__((swift_name("eventTimestamp")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="finishedOn")
+*/
 @property (readonly) BridgeClientKotlinx_datetimeInstant * _Nullable finishedOn __attribute__((swift_name("finishedOn")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="instanceGuid")
+*/
 @property (readonly) NSString *instanceGuid __attribute__((swift_name("instanceGuid")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="startedOn")
+*/
 @property (readonly) BridgeClientKotlinx_datetimeInstant * _Nullable startedOn __attribute__((swift_name("startedOn")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString *type __attribute__((swift_name("type")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="uploadedOn")
+*/
 @property (readonly) NSString * _Nullable uploadedOn __attribute__((swift_name("uploadedOn")));
 @end
 
@@ -412,6 +500,7 @@ __attribute__((swift_name("AdherenceRecordType")))
 @property (class, readonly) BridgeClientAdherenceRecordType *assessment __attribute__((swift_name("assessment")));
 @property (class, readonly) BridgeClientAdherenceRecordType *session __attribute__((swift_name("session")));
 + (BridgeClientKotlinArray<BridgeClientAdherenceRecordType *> *)values __attribute__((swift_name("values()")));
+@property (class, readonly) NSArray<BridgeClientAdherenceRecordType *> *entries __attribute__((swift_name("entries")));
 @property (readonly) NSString * _Nullable serialName __attribute__((swift_name("serialName")));
 @end
 
@@ -440,7 +529,17 @@ __attribute__((swift_name("AdherenceRecordUpdates")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="records")
+*/
 @property (readonly) NSArray<BridgeClientAdherenceRecord *> *records __attribute__((swift_name("records")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString *type __attribute__((swift_name("type")));
 @end
 
@@ -468,19 +567,89 @@ __attribute__((swift_name("AdherenceRecordsSearch")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="adherenceRecordType")
+*/
 @property (readonly) BridgeClientAdherenceRecordType * _Nullable adherenceRecordType __attribute__((swift_name("adherenceRecordType")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="assessmentIds")
+*/
 @property (readonly) NSArray<NSString *> * _Nullable assessmentIds __attribute__((swift_name("assessmentIds")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="currentTimestampsOnly")
+*/
 @property (readonly) BridgeClientBoolean * _Nullable currentTimestampsOnly __attribute__((swift_name("currentTimestampsOnly")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="endTime")
+*/
 @property (readonly) NSString * _Nullable endTime __attribute__((swift_name("endTime")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="eventTimestamps")
+*/
 @property (readonly) NSDictionary<NSString *, NSString *> * _Nullable eventTimestamps __attribute__((swift_name("eventTimestamps")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="includeRepeats")
+*/
 @property (readonly) BridgeClientBoolean * _Nullable includeRepeats __attribute__((swift_name("includeRepeats")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="instanceGuids")
+*/
 @property (readonly) NSArray<NSString *> * _Nullable instanceGuids __attribute__((swift_name("instanceGuids")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="offsetBy")
+*/
 @property (readonly) BridgeClientInt * _Nullable offsetBy __attribute__((swift_name("offsetBy")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="pageSize")
+*/
 @property (readonly) BridgeClientInt * _Nullable pageSize __attribute__((swift_name("pageSize")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="sessionGuids")
+*/
 @property (readonly) NSArray<NSString *> * _Nullable sessionGuids __attribute__((swift_name("sessionGuids")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="sortOrder")
+*/
 @property (readonly) BridgeClientSortOrder * _Nullable sortOrder __attribute__((swift_name("sortOrder")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="startTime")
+*/
 @property (readonly) NSString * _Nullable startTime __attribute__((swift_name("startTime")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="timeWindowGuids")
+*/
 @property (readonly) NSArray<NSString *> * _Nullable timeWindowGuids __attribute__((swift_name("timeWindowGuids")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
 @end
 
@@ -508,19 +677,89 @@ __attribute__((swift_name("AppConfig")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="clientData")
+*/
 @property (readonly) BridgeClientKotlinx_serialization_jsonJsonElement * _Nullable clientData __attribute__((swift_name("clientData")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="configElements")
+*/
 @property (readonly) NSDictionary<NSString *, BridgeClientKotlinx_serialization_jsonJsonElement *> * _Nullable configElements __attribute__((swift_name("configElements")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="configReferences")
+*/
 @property (readonly) NSArray<BridgeClientConfigReference *> * _Nullable configReferences __attribute__((swift_name("configReferences")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="createdOn")
+*/
 @property (readonly) NSString * _Nullable createdOn __attribute__((swift_name("createdOn")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="criteria")
+*/
 @property (readonly) BridgeClientCriteria * _Nullable criteria __attribute__((swift_name("criteria")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="deleted")
+*/
 @property (readonly) BridgeClientBoolean * _Nullable deleted __attribute__((swift_name("deleted")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="fileReferences")
+*/
 @property (readonly) NSArray<BridgeClientFileReference *> * _Nullable fileReferences __attribute__((swift_name("fileReferences")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="guid")
+*/
 @property (readonly) NSString * _Nullable guid __attribute__((swift_name("guid")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="label")
+*/
 @property (readonly) NSString *label __attribute__((swift_name("label")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="modifiedOn")
+*/
 @property (readonly) NSString * _Nullable modifiedOn __attribute__((swift_name("modifiedOn")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="schemaReferences")
+*/
 @property (readonly) NSArray<BridgeClientSchemaReference *> * _Nullable schemaReferences __attribute__((swift_name("schemaReferences")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="surveyReferences")
+*/
 @property (readonly) NSArray<BridgeClientSurveyReference *> * _Nullable surveyReferences __attribute__((swift_name("surveyReferences")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="version")
+*/
 @property (readonly) BridgeClientLong * _Nullable version __attribute__((swift_name("version")));
 @end
 
@@ -548,10 +787,35 @@ __attribute__((swift_name("AssessmentConfig")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="config")
+*/
 @property (readonly) BridgeClientKotlinx_serialization_jsonJsonElement *config __attribute__((swift_name("config")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="createdOn")
+*/
 @property (readonly) NSString * _Nullable createdOn __attribute__((swift_name("createdOn")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="modifiedOn")
+*/
 @property (readonly) NSString * _Nullable modifiedOn __attribute__((swift_name("modifiedOn")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="version")
+*/
 @property (readonly) BridgeClientLong * _Nullable version __attribute__((swift_name("version")));
 @end
 
@@ -579,17 +843,77 @@ __attribute__((swift_name("AssessmentInfo")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="appId")
+*/
 @property (readonly) NSString *appId __attribute__((swift_name("appId")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="colorScheme")
+*/
 @property (readonly) BridgeClientColorScheme * _Nullable colorScheme __attribute__((swift_name("colorScheme")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Transient
+*/
 @property (readonly) NSString *configPath __attribute__((swift_name("configPath")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="configUrl")
+*/
 @property (readonly) NSString *configUrl __attribute__((swift_name("configUrl")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="guid")
+*/
 @property (readonly) NSString *guid __attribute__((swift_name("guid")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="identifier")
+*/
 @property (readonly) NSString *identifier __attribute__((swift_name("identifier")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="imageResource")
+*/
 @property (readonly) BridgeClientImageResource * _Nullable imageResource __attribute__((swift_name("imageResource")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="key")
+*/
 @property (readonly) NSString *key __attribute__((swift_name("key")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="label")
+*/
 @property (readonly) NSString *label __attribute__((swift_name("label")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="minutesToComplete")
+*/
 @property (readonly) BridgeClientInt * _Nullable minutesToComplete __attribute__((swift_name("minutesToComplete")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="revision")
+*/
 @property (readonly) BridgeClientInt * _Nullable revision __attribute__((swift_name("revision")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
 @end
 
@@ -617,13 +941,53 @@ __attribute__((swift_name("ClientInfo")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="appName")
+*/
 @property (readonly) NSString * _Nullable appName __attribute__((swift_name("appName")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="appVersion")
+*/
 @property (readonly) BridgeClientInt * _Nullable appVersion __attribute__((swift_name("appVersion")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="deviceName")
+*/
 @property (readonly) NSString * _Nullable deviceName __attribute__((swift_name("deviceName")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="osName")
+*/
 @property (readonly) NSString * _Nullable osName __attribute__((swift_name("osName")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="osVersion")
+*/
 @property (readonly) NSString * _Nullable osVersion __attribute__((swift_name("osVersion")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="sdkName")
+*/
 @property (readonly) NSString * _Nullable sdkName __attribute__((swift_name("sdkName")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="sdkVersion")
+*/
 @property (readonly) BridgeClientInt * _Nullable sdkVersion __attribute__((swift_name("sdkVersion")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
 @end
 
@@ -651,10 +1015,35 @@ __attribute__((swift_name("ColorScheme")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="activated")
+*/
 @property (readonly) NSString * _Nullable activated __attribute__((swift_name("activated")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="background")
+*/
 @property (readonly) NSString * _Nullable background __attribute__((swift_name("background")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="foreground")
+*/
 @property (readonly) NSString * _Nullable foreground __attribute__((swift_name("foreground")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="inactivated")
+*/
 @property (readonly) NSString * _Nullable inactivated __attribute__((swift_name("inactivated")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
 @end
 
@@ -682,8 +1071,23 @@ __attribute__((swift_name("ConfigReference")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="id")
+*/
 @property (readonly) NSString *id __attribute__((swift_name("id")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="revision")
+*/
 @property (readonly) int64_t revision __attribute__((swift_name("revision")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
 @end
 
@@ -711,12 +1115,47 @@ __attribute__((swift_name("ConsentStatus")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="consented")
+*/
 @property (readonly) BridgeClientBoolean * _Nullable consented __attribute__((swift_name("consented")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="name")
+*/
 @property (readonly) NSString * _Nullable name __attribute__((swift_name("name")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="required")
+*/
 @property (readonly) BridgeClientBoolean * _Nullable required __attribute__((swift_name("required")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="signedMostRecentConsent")
+*/
 @property (readonly) BridgeClientBoolean * _Nullable signedMostRecentConsent __attribute__((swift_name("signedMostRecentConsent")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="signedOn")
+*/
 @property (readonly) NSString * _Nullable signedOn __attribute__((swift_name("signedOn")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="subpopulationGuid")
+*/
 @property (readonly) NSString * _Nullable subpopulationGuid __attribute__((swift_name("subpopulationGuid")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
 @end
 
@@ -744,14 +1183,59 @@ __attribute__((swift_name("Contact")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="address")
+*/
 @property (readonly) BridgeClientAddress * _Nullable address __attribute__((swift_name("address")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="affiliation")
+*/
 @property (readonly) NSString * _Nullable affiliation __attribute__((swift_name("affiliation")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="email")
+*/
 @property (readonly) NSString * _Nullable email __attribute__((swift_name("email")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="jurisdiction")
+*/
 @property (readonly) NSString * _Nullable jurisdiction __attribute__((swift_name("jurisdiction")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="name")
+*/
 @property (readonly) NSString *name __attribute__((swift_name("name")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="phone")
+*/
 @property (readonly) BridgeClientPhone * _Nullable phone __attribute__((swift_name("phone")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="position")
+*/
 @property (readonly) NSString * _Nullable position __attribute__((swift_name("position")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="role")
+*/
 @property (readonly) BridgeClientContactRole *role __attribute__((swift_name("role")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
 @end
 
@@ -784,6 +1268,7 @@ __attribute__((swift_name("ContactRole")))
 @property (class, readonly) BridgeClientContactRole *studySupport __attribute__((swift_name("studySupport")));
 @property (class, readonly) BridgeClientContactRole *technicalSupport __attribute__((swift_name("technicalSupport")));
 + (BridgeClientKotlinArray<BridgeClientContactRole *> *)values __attribute__((swift_name("values()")));
+@property (class, readonly) NSArray<BridgeClientContactRole *> *entries __attribute__((swift_name("entries")));
 @property (readonly) NSString * _Nullable serialName __attribute__((swift_name("serialName")));
 @end
 
@@ -812,13 +1297,53 @@ __attribute__((swift_name("Criteria")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="allOfGroups")
+*/
 @property (readonly) NSArray<NSString *> * _Nullable allOfGroups __attribute__((swift_name("allOfGroups")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="allOfSubstudyIds")
+*/
 @property (readonly) NSArray<NSString *> * _Nullable allOfSubstudyIds __attribute__((swift_name("allOfSubstudyIds")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="language")
+*/
 @property (readonly) NSString * _Nullable language __attribute__((swift_name("language")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="maxAppVersions")
+*/
 @property (readonly) NSDictionary<NSString *, BridgeClientInt *> * _Nullable maxAppVersions __attribute__((swift_name("maxAppVersions")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="minAppVersions")
+*/
 @property (readonly) NSDictionary<NSString *, BridgeClientInt *> * _Nullable minAppVersions __attribute__((swift_name("minAppVersions")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="noneOfGroups")
+*/
 @property (readonly) NSArray<NSString *> * _Nullable noneOfGroups __attribute__((swift_name("noneOfGroups")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="noneOfSubstudyIds")
+*/
 @property (readonly) NSArray<NSString *> * _Nullable noneOfSubstudyIds __attribute__((swift_name("noneOfSubstudyIds")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
 @end
 
@@ -846,7 +1371,17 @@ __attribute__((swift_name("DateRange")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="endDate")
+*/
 @property (readonly) NSString * _Nullable endDate __attribute__((swift_name("endDate")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="startDate")
+*/
 @property (readonly) NSString * _Nullable startDate __attribute__((swift_name("startDate")));
 @end
 
@@ -874,12 +1409,47 @@ __attribute__((swift_name("EnrollmentInfo")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="consentRequired")
+*/
 @property (readonly) BridgeClientBoolean * _Nullable consentRequired __attribute__((swift_name("consentRequired")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="enrolledBySelf")
+*/
 @property (readonly) BridgeClientBoolean * _Nullable enrolledBySelf __attribute__((swift_name("enrolledBySelf")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="enrolledOn")
+*/
 @property (readonly) NSString * _Nullable enrolledOn __attribute__((swift_name("enrolledOn")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="externalId")
+*/
 @property (readonly) NSString * _Nullable externalId __attribute__((swift_name("externalId")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="withdrawnBySelf")
+*/
 @property (readonly) BridgeClientBoolean * _Nullable withdrawnBySelf __attribute__((swift_name("withdrawnBySelf")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="withdrawnOn")
+*/
 @property (readonly) NSString * _Nullable withdrawnOn __attribute__((swift_name("withdrawnOn")));
 @end
 
@@ -910,6 +1480,7 @@ __attribute__((swift_name("Environment")))
 @property (class, readonly) BridgeClientEnvironment *staging __attribute__((swift_name("staging")));
 @property (class, readonly) BridgeClientEnvironment *production __attribute__((swift_name("production")));
 + (BridgeClientKotlinArray<BridgeClientEnvironment *> *)values __attribute__((swift_name("values()")));
+@property (class, readonly) NSArray<BridgeClientEnvironment *> *entries __attribute__((swift_name("entries")));
 @property (readonly) NSString * _Nullable serialName __attribute__((swift_name("serialName")));
 @end
 
@@ -938,9 +1509,29 @@ __attribute__((swift_name("FileReference")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="createdOn")
+*/
 @property (readonly) NSString *createdOn __attribute__((swift_name("createdOn")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="guid")
+*/
 @property (readonly) NSString *guid __attribute__((swift_name("guid")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="href")
+*/
 @property (readonly) NSString * _Nullable href __attribute__((swift_name("href")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
 @end
 
@@ -968,9 +1559,29 @@ __attribute__((swift_name("Identifier")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="appId")
+*/
 @property (readonly) NSString *appId __attribute__((swift_name("appId")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="email")
+*/
 @property (readonly) NSString * _Nullable email __attribute__((swift_name("email")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="phone")
+*/
 @property (readonly) BridgeClientPhone * _Nullable phone __attribute__((swift_name("phone")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
 @end
 
@@ -998,9 +1609,29 @@ __attribute__((swift_name("ImageResource")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="labels")
+*/
 @property (readonly) NSArray<BridgeClientLabel *> * _Nullable labels __attribute__((swift_name("labels")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="module")
+*/
 @property (readonly) NSString * _Nullable module __attribute__((swift_name("module")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="name")
+*/
 @property (readonly) NSString *name __attribute__((swift_name("name")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString *type __attribute__((swift_name("type")));
 @end
 
@@ -1029,6 +1660,7 @@ __attribute__((swift_name("IrbDecisionType")))
 @property (class, readonly) BridgeClientIrbDecisionType *exempt __attribute__((swift_name("exempt")));
 @property (class, readonly) BridgeClientIrbDecisionType *approved __attribute__((swift_name("approved")));
 + (BridgeClientKotlinArray<BridgeClientIrbDecisionType *> *)values __attribute__((swift_name("values()")));
+@property (class, readonly) NSArray<BridgeClientIrbDecisionType *> *entries __attribute__((swift_name("entries")));
 @property (readonly) NSString * _Nullable serialName __attribute__((swift_name("serialName")));
 @end
 
@@ -1057,8 +1689,23 @@ __attribute__((swift_name("Label")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="lang")
+*/
 @property (readonly) NSString * _Nullable lang __attribute__((swift_name("lang")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="value")
+*/
 @property (readonly) NSString * _Nullable value __attribute__((swift_name("value")));
 @end
 
@@ -1092,11 +1739,41 @@ __attribute__((swift_name("NotificationInfo")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="allowSnooze")
+*/
 @property (readonly) BridgeClientBoolean * _Nullable allowSnooze __attribute__((swift_name("allowSnooze")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="interval")
+*/
 @property (readonly) NSString * _Nullable interval __attribute__((swift_name("interval")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="message")
+*/
 @property (readonly) BridgeClientNotificationMessage * _Nullable message __attribute__((swift_name("message")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="notifyAt")
+*/
 @property (readonly) BridgeClientNotificationType *notifyAt __attribute__((swift_name("notifyAt")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="offset")
+*/
 @property (readonly) NSString * _Nullable offset __attribute__((swift_name("offset")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
 @end
 
@@ -1124,9 +1801,29 @@ __attribute__((swift_name("NotificationMessage")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="lang")
+*/
 @property (readonly) NSString * _Nullable lang __attribute__((swift_name("lang")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="message")
+*/
 @property (readonly) NSString *message __attribute__((swift_name("message")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="subject")
+*/
 @property (readonly) NSString *subject __attribute__((swift_name("subject")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
 @end
 
@@ -1155,6 +1852,7 @@ __attribute__((swift_name("NotificationType")))
 @property (class, readonly) BridgeClientNotificationType *afterWindowStart __attribute__((swift_name("afterWindowStart")));
 @property (class, readonly) BridgeClientNotificationType *beforeWindowEnd __attribute__((swift_name("beforeWindowEnd")));
 + (BridgeClientKotlinArray<BridgeClientNotificationType *> *)values __attribute__((swift_name("values()")));
+@property (class, readonly) NSArray<BridgeClientNotificationType *> *entries __attribute__((swift_name("entries")));
 @property (readonly) NSString * _Nullable serialName __attribute__((swift_name("serialName")));
 @end
 
@@ -1183,8 +1881,23 @@ __attribute__((swift_name("ParticipantData")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="data")
+*/
 @property (readonly) NSDictionary<NSString *, BridgeClientKotlinx_serialization_jsonJsonElement *> *data __attribute__((swift_name("data")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="identifier")
+*/
 @property (readonly) NSString * _Nullable identifier __attribute__((swift_name("identifier")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
 @end
 
@@ -1212,13 +1925,53 @@ __attribute__((swift_name("ParticipantSchedule")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="assessments")
+*/
 @property (readonly) NSArray<BridgeClientAssessmentInfo *> * _Nullable assessments __attribute__((swift_name("assessments")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="createdOn")
+*/
 @property (readonly) NSString *createdOn __attribute__((swift_name("createdOn")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="dateRange")
+*/
 @property (readonly) BridgeClientDateRange * _Nullable dateRange __attribute__((swift_name("dateRange")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="eventTimestamps")
+*/
 @property (readonly) NSDictionary<NSString *, BridgeClientKotlinx_datetimeInstant *> * _Nullable eventTimestamps __attribute__((swift_name("eventTimestamps")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="schedule")
+*/
 @property (readonly) NSArray<BridgeClientScheduledSession *> * _Nullable schedule __attribute__((swift_name("schedule")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="sessions")
+*/
 @property (readonly) NSArray<BridgeClientSessionInfo *> * _Nullable sessions __attribute__((swift_name("sessions")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="studyBursts")
+*/
 @property (readonly) NSArray<BridgeClientStudyBurstInfo *> * _Nullable studyBursts __attribute__((swift_name("studyBursts")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
 @end
 
@@ -1248,6 +2001,7 @@ __attribute__((swift_name("PerformanceOrder")))
 @property (class, readonly) BridgeClientPerformanceOrder *sequential __attribute__((swift_name("sequential")));
 @property (class, readonly) BridgeClientPerformanceOrder *randomized __attribute__((swift_name("randomized")));
 + (BridgeClientKotlinArray<BridgeClientPerformanceOrder *> *)values __attribute__((swift_name("values()")));
+@property (class, readonly) NSArray<BridgeClientPerformanceOrder *> *entries __attribute__((swift_name("entries")));
 @property (readonly) NSString * _Nullable serialName __attribute__((swift_name("serialName")));
 @end
 
@@ -1276,9 +2030,29 @@ __attribute__((swift_name("Phone")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="nationalFormat")
+*/
 @property (readonly) NSString * _Nullable nationalFormat __attribute__((swift_name("nationalFormat")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="number")
+*/
 @property (readonly) NSString *number __attribute__((swift_name("number")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="regionCode")
+*/
 @property (readonly) NSString *regionCode __attribute__((swift_name("regionCode")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
 @end
 
@@ -1306,8 +2080,23 @@ __attribute__((swift_name("PhoneSignInRequest")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="appId")
+*/
 @property (readonly) NSString *appId __attribute__((swift_name("appId")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="phone")
+*/
 @property (readonly) BridgeClientPhone *phone __attribute__((swift_name("phone")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
 @end
 
@@ -1335,9 +2124,29 @@ __attribute__((swift_name("PhoneSignin")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="appId")
+*/
 @property (readonly) NSString *appId __attribute__((swift_name("appId")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="phone")
+*/
 @property (readonly) BridgeClientPhone *phone __attribute__((swift_name("phone")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="token")
+*/
 @property (readonly) NSString *token __attribute__((swift_name("token")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
 @end
 
@@ -1366,6 +2175,7 @@ __attribute__((swift_name("ReminderType")))
 @property (class, readonly) BridgeClientReminderType *afterWindowStart __attribute__((swift_name("afterWindowStart")));
 @property (class, readonly) BridgeClientReminderType *beforeWindowEnd __attribute__((swift_name("beforeWindowEnd")));
 + (BridgeClientKotlinArray<BridgeClientReminderType *> *)values __attribute__((swift_name("values()")));
+@property (class, readonly) NSArray<BridgeClientReminderType *> *entries __attribute__((swift_name("entries")));
 @property (readonly) NSString * _Nullable serialName __attribute__((swift_name("serialName")));
 @end
 
@@ -1397,6 +2207,7 @@ __attribute__((swift_name("Role")))
 @property (class, readonly) BridgeClientRole *admin __attribute__((swift_name("admin")));
 @property (class, readonly) BridgeClientRole *worker __attribute__((swift_name("worker")));
 + (BridgeClientKotlinArray<BridgeClientRole *> *)values __attribute__((swift_name("values()")));
+@property (class, readonly) NSArray<BridgeClientRole *> *entries __attribute__((swift_name("entries")));
 @property (readonly) NSString * _Nullable serialName __attribute__((swift_name("serialName")));
 @end
 
@@ -1441,6 +2252,7 @@ __attribute__((swift_name("S3UploadType")))
 @property (class, readonly) BridgeClientS3UploadType *studyData __attribute__((swift_name("studyData")));
 @property (class, readonly) BridgeClientS3UploadType *participantData __attribute__((swift_name("participantData")));
 + (BridgeClientKotlinArray<BridgeClientS3UploadType *> *)values __attribute__((swift_name("values()")));
+@property (class, readonly) NSArray<BridgeClientS3UploadType *> *entries __attribute__((swift_name("entries")));
 @end
 
 
@@ -1457,8 +2269,23 @@ __attribute__((swift_name("ScheduledAssessment")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="instanceGuid")
+*/
 @property (readonly) NSString *instanceGuid __attribute__((swift_name("instanceGuid")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="refKey")
+*/
 @property (readonly) NSString *refKey __attribute__((swift_name("refKey")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
 @end
 
@@ -1486,20 +2313,95 @@ __attribute__((swift_name("ScheduledSession")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="assessments")
+*/
 @property (readonly) NSArray<BridgeClientScheduledAssessment *> *assessments __attribute__((swift_name("assessments")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="delayTime")
+*/
 @property (readonly) NSString * _Nullable delayTime __attribute__((swift_name("delayTime")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="endDate")
+*/
 @property (readonly) BridgeClientKotlinx_datetimeLocalDate *endDate __attribute__((swift_name("endDate")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="expiration")
+*/
 @property (readonly) BridgeClientKotlinx_datetimeDateTimePeriod *expiration __attribute__((swift_name("expiration")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="instanceGuid")
+*/
 @property (readonly) NSString *instanceGuid __attribute__((swift_name("instanceGuid")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="persistent")
+*/
 @property (readonly) BOOL persistent __attribute__((swift_name("persistent")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="refGuid")
+*/
 @property (readonly) NSString *refGuid __attribute__((swift_name("refGuid")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="startDate")
+*/
 @property (readonly) BridgeClientKotlinx_datetimeLocalDate *startDate __attribute__((swift_name("startDate")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Transient
+*/
 @property (readonly) BridgeClientKotlinx_datetimeLocalDateTime *startDateTime __attribute__((swift_name("startDateTime")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="startEventId")
+*/
 @property (readonly) NSString * _Nullable startEventId __attribute__((swift_name("startEventId")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="startTime")
+*/
 @property BridgeClientKotlinx_datetimeLocalTime *startTime __attribute__((swift_name("startTime")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="studyBurstId")
+*/
 @property (readonly) NSString * _Nullable studyBurstId __attribute__((swift_name("studyBurstId")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="studyBurstNum")
+*/
 @property (readonly) BridgeClientInt * _Nullable studyBurstNum __attribute__((swift_name("studyBurstNum")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="timeWindowGuid")
+*/
 @property (readonly) NSString * _Nullable timeWindowGuid __attribute__((swift_name("timeWindowGuid")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
 @end
 
@@ -1527,8 +2429,23 @@ __attribute__((swift_name("SchemaReference")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="id")
+*/
 @property (readonly) NSString *id __attribute__((swift_name("id")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="revision")
+*/
 @property (readonly) BridgeClientLong * _Nullable revision __attribute__((swift_name("revision")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
 @end
 
@@ -1556,13 +2473,53 @@ __attribute__((swift_name("SessionInfo")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="guid")
+*/
 @property (readonly) NSString *guid __attribute__((swift_name("guid")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="label")
+*/
 @property (readonly) NSString *label __attribute__((swift_name("label")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="minutesToComplete")
+*/
 @property (readonly) BridgeClientInt * _Nullable minutesToComplete __attribute__((swift_name("minutesToComplete")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="notifications")
+*/
 @property (readonly) NSArray<BridgeClientNotificationInfo *> * _Nullable notifications __attribute__((swift_name("notifications")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="performanceOrder")
+*/
 @property (readonly) BridgeClientPerformanceOrder *performanceOrder __attribute__((swift_name("performanceOrder")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="symbol")
+*/
 @property (readonly) NSString * _Nullable symbol __attribute__((swift_name("symbol")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="timeWindowGuids")
+*/
 @property (readonly) NSArray<NSString *> * _Nullable timeWindowGuids __attribute__((swift_name("timeWindowGuids")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
 @end
 
@@ -1592,6 +2549,7 @@ __attribute__((swift_name("SharingScope")))
 @property (class, readonly) BridgeClientSharingScope *sponsorsAndPartners __attribute__((swift_name("sponsorsAndPartners")));
 @property (class, readonly) BridgeClientSharingScope *allQualifiedResearchers __attribute__((swift_name("allQualifiedResearchers")));
 + (BridgeClientKotlinArray<BridgeClientSharingScope *> *)values __attribute__((swift_name("values()")));
+@property (class, readonly) NSArray<BridgeClientSharingScope *> *entries __attribute__((swift_name("entries")));
 @property (readonly) NSString * _Nullable serialName __attribute__((swift_name("serialName")));
 @end
 
@@ -1624,6 +2582,7 @@ __attribute__((swift_name("SignInType")))
 @property (class, readonly) BridgeClientSignInType *emailMessage __attribute__((swift_name("emailMessage")));
 @property (class, readonly) BridgeClientSignInType *phoneMessage __attribute__((swift_name("phoneMessage")));
 + (BridgeClientKotlinArray<BridgeClientSignInType *> *)values __attribute__((swift_name("values()")));
+@property (class, readonly) NSArray<BridgeClientSignInType *> *entries __attribute__((swift_name("entries")));
 @property (readonly) NSString * _Nullable serialName __attribute__((swift_name("serialName")));
 @end
 
@@ -1653,6 +2612,7 @@ __attribute__((swift_name("SortOrder")))
 @property (class, readonly) BridgeClientSortOrder *asc __attribute__((swift_name("asc")));
 @property (class, readonly) BridgeClientSortOrder *desc __attribute__((swift_name("desc")));
 + (BridgeClientKotlinArray<BridgeClientSortOrder *> *)values __attribute__((swift_name("values()")));
+@property (class, readonly) NSArray<BridgeClientSortOrder *> *entries __attribute__((swift_name("entries")));
 @property (readonly) NSString * _Nullable serialName __attribute__((swift_name("serialName")));
 @end
 
@@ -1681,30 +2641,155 @@ __attribute__((swift_name("Study")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="clientData")
+*/
 @property (readonly) BridgeClientKotlinx_serialization_jsonJsonElement * _Nullable clientData __attribute__((swift_name("clientData")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="colorScheme")
+*/
 @property (readonly) BridgeClientColorScheme * _Nullable colorScheme __attribute__((swift_name("colorScheme")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="contacts")
+*/
 @property (readonly) NSArray<BridgeClientContact *> * _Nullable contacts __attribute__((swift_name("contacts")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="createdOn")
+*/
 @property (readonly) NSString * _Nullable createdOn __attribute__((swift_name("createdOn")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="deleted")
+*/
 @property (readonly) BridgeClientBoolean * _Nullable deleted __attribute__((swift_name("deleted")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="details")
+*/
 @property (readonly) NSString * _Nullable details __attribute__((swift_name("details")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="diseases")
+*/
 @property (readonly) NSArray<NSString *> * _Nullable diseases __attribute__((swift_name("diseases")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="identifier")
+*/
 @property (readonly) NSString *identifier __attribute__((swift_name("identifier")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="institutionId")
+*/
 @property (readonly) NSString * _Nullable institutionId __attribute__((swift_name("institutionId")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="irbDecisionOn")
+*/
 @property (readonly) NSString * _Nullable irbDecisionOn __attribute__((swift_name("irbDecisionOn")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="irbDecisionType")
+*/
 @property (readonly) BridgeClientIrbDecisionType * _Nullable irbDecisionType __attribute__((swift_name("irbDecisionType")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="irbExpiresOn")
+*/
 @property (readonly) NSString * _Nullable irbExpiresOn __attribute__((swift_name("irbExpiresOn")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="irbName")
+*/
 @property (readonly) NSString * _Nullable irbName __attribute__((swift_name("irbName")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="irbProtocolId")
+*/
 @property (readonly) NSString * _Nullable irbProtocolId __attribute__((swift_name("irbProtocolId")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="irbProtocolName")
+*/
 @property (readonly) NSString * _Nullable irbProtocolName __attribute__((swift_name("irbProtocolName")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="keywords")
+*/
 @property (readonly) NSString * _Nullable keywords __attribute__((swift_name("keywords")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="modifiedOn")
+*/
 @property (readonly) NSString * _Nullable modifiedOn __attribute__((swift_name("modifiedOn")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="name")
+*/
 @property (readonly) NSString *name __attribute__((swift_name("name")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="phase")
+*/
 @property (readonly) BridgeClientStudyPhase *phase __attribute__((swift_name("phase")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="scheduleGuid")
+*/
 @property (readonly) NSString * _Nullable scheduleGuid __attribute__((swift_name("scheduleGuid")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="signInTypes")
+*/
 @property (readonly) NSArray<BridgeClientSignInType *> * _Nullable signInTypes __attribute__((swift_name("signInTypes")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="studyDesignTypes")
+*/
 @property (readonly) NSArray<NSString *> * _Nullable studyDesignTypes __attribute__((swift_name("studyDesignTypes")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="studyLogoUrl")
+*/
 @property (readonly) NSString * _Nullable studyLogoUrl __attribute__((swift_name("studyLogoUrl")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="version")
+*/
 @property (readonly) int64_t version __attribute__((swift_name("version")));
 @end
 
@@ -1732,12 +2817,47 @@ __attribute__((swift_name("StudyActivityEvent")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="answerValue")
+*/
 @property (readonly) NSString * _Nullable answerValue __attribute__((swift_name("answerValue")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="clientTimeZone")
+*/
 @property (readonly) NSString * _Nullable clientTimeZone __attribute__((swift_name("clientTimeZone")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="createdOn")
+*/
 @property (readonly) NSString * _Nullable createdOn __attribute__((swift_name("createdOn")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="eventId")
+*/
 @property (readonly) NSString *eventId __attribute__((swift_name("eventId")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="recordCount")
+*/
 @property (readonly) BridgeClientInt * _Nullable recordCount __attribute__((swift_name("recordCount")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="timestamp")
+*/
 @property (readonly) BridgeClientKotlinx_datetimeInstant *timestamp __attribute__((swift_name("timestamp")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
 @end
 
@@ -1765,7 +2885,17 @@ __attribute__((swift_name("StudyActivityEventList")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="items")
+*/
 @property (readonly) NSArray<BridgeClientStudyActivityEvent *> * _Nullable items __attribute__((swift_name("items")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
 @end
 
@@ -1789,10 +2919,35 @@ __attribute__((swift_name("StudyActivityEventRequest")))
 @interface BridgeClientStudyActivityEventRequest : BridgeClientBase
 - (instancetype)initWithEventId:(NSString *)eventId timestamp:(BridgeClientKotlinx_datetimeInstant *)timestamp answerValue:(NSString * _Nullable)answerValue clientTimeZone:(NSString * _Nullable)clientTimeZone type:(NSString * _Nullable)type __attribute__((swift_name("init(eventId:timestamp:answerValue:clientTimeZone:type:)"))) __attribute__((objc_designated_initializer));
 @property (class, readonly, getter=companion) BridgeClientStudyActivityEventRequestCompanion *companion __attribute__((swift_name("companion")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="answerValue")
+*/
 @property (readonly) NSString * _Nullable answerValue __attribute__((swift_name("answerValue")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="clientTimeZone")
+*/
 @property (readonly) NSString * _Nullable clientTimeZone __attribute__((swift_name("clientTimeZone")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="eventId")
+*/
 @property (readonly) NSString *eventId __attribute__((swift_name("eventId")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="timestamp")
+*/
 @property (readonly) BridgeClientKotlinx_datetimeInstant *timestamp __attribute__((swift_name("timestamp")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
 @end
 
@@ -1820,11 +2975,41 @@ __attribute__((swift_name("StudyBurstInfo")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="delay")
+*/
 @property (readonly) BridgeClientKotlinx_datetimeDateTimePeriod *delay __attribute__((swift_name("delay")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="identifier")
+*/
 @property (readonly) NSString *identifier __attribute__((swift_name("identifier")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="interval")
+*/
 @property (readonly) BridgeClientKotlinx_datetimeDateTimePeriod *interval __attribute__((swift_name("interval")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="occurrences")
+*/
 @property (readonly) int32_t occurrences __attribute__((swift_name("occurrences")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="originEventId")
+*/
 @property (readonly) NSString *originEventId __attribute__((swift_name("originEventId")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
 @end
 
@@ -1852,13 +3037,53 @@ __attribute__((swift_name("StudyInfo")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="colorScheme")
+*/
 @property (readonly) BridgeClientColorScheme * _Nullable colorScheme __attribute__((swift_name("colorScheme")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="details")
+*/
 @property (readonly) NSString * _Nullable details __attribute__((swift_name("details")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="identifier")
+*/
 @property (readonly) NSString * _Nullable identifier __attribute__((swift_name("identifier")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="name")
+*/
 @property (readonly) NSString * _Nullable name __attribute__((swift_name("name")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="phase")
+*/
 @property (readonly) BridgeClientStudyPhase * _Nullable phase __attribute__((swift_name("phase")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="signInTypes")
+*/
 @property (readonly) NSArray<BridgeClientSignInType *> * _Nullable signInTypes __attribute__((swift_name("signInTypes")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="studyLogoUrl")
+*/
 @property (readonly) NSString * _Nullable studyLogoUrl __attribute__((swift_name("studyLogoUrl")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
 @end
 
@@ -1886,32 +3111,192 @@ __attribute__((swift_name("StudyParticipant")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="attributes")
+ *   kotlinx.serialization.EncodeDefault(mode=Mode.NEVER)
+*/
 @property (readonly) NSDictionary<NSString *, NSString *> * _Nullable attributes __attribute__((swift_name("attributes")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="clientData")
+*/
 @property (readonly) BridgeClientKotlinx_serialization_jsonJsonElement * _Nullable clientData __attribute__((swift_name("clientData")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="clientTimeZone")
+ *   kotlinx.serialization.EncodeDefault(mode=Mode.NEVER)
+*/
 @property (readonly) NSString * _Nullable clientTimeZone __attribute__((swift_name("clientTimeZone")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="consentHistories")
+ *   kotlinx.serialization.EncodeDefault(mode=Mode.NEVER)
+*/
 @property (readonly) NSDictionary<NSString *, NSArray<BridgeClientUserConsentHistory *> *> * _Nullable consentHistories __attribute__((swift_name("consentHistories")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="consented")
+ *   kotlinx.serialization.EncodeDefault(mode=Mode.NEVER)
+*/
 @property (readonly) BridgeClientBoolean * _Nullable consented __attribute__((swift_name("consented")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="createdOn")
+ *   kotlinx.serialization.EncodeDefault(mode=Mode.NEVER)
+*/
 @property (readonly) NSString * _Nullable createdOn __attribute__((swift_name("createdOn")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="dataGroups")
+ *   kotlinx.serialization.EncodeDefault(mode=Mode.NEVER)
+*/
 @property (readonly) NSArray<NSString *> * _Nullable dataGroups __attribute__((swift_name("dataGroups")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="email")
+ *   kotlinx.serialization.EncodeDefault(mode=Mode.NEVER)
+*/
 @property (readonly) NSString * _Nullable email __attribute__((swift_name("email")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="emailVerified")
+ *   kotlinx.serialization.EncodeDefault(mode=Mode.NEVER)
+*/
 @property (readonly) BridgeClientBoolean * _Nullable emailVerified __attribute__((swift_name("emailVerified")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="enrollments")
+ *   kotlinx.serialization.EncodeDefault(mode=Mode.NEVER)
+*/
 @property (readonly) NSDictionary<NSString *, BridgeClientEnrollmentInfo *> * _Nullable enrollments __attribute__((swift_name("enrollments")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="externalIds")
+ *   kotlinx.serialization.EncodeDefault(mode=Mode.NEVER)
+*/
 @property (readonly) NSDictionary<NSString *, NSString *> * _Nullable externalIds __attribute__((swift_name("externalIds")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="firstName")
+ *   kotlinx.serialization.EncodeDefault(mode=Mode.NEVER)
+*/
 @property (readonly) NSString * _Nullable firstName __attribute__((swift_name("firstName")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="healthCode")
+ *   kotlinx.serialization.EncodeDefault(mode=Mode.NEVER)
+*/
 @property (readonly) NSString * _Nullable healthCode __attribute__((swift_name("healthCode")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="id")
+ *   kotlinx.serialization.EncodeDefault(mode=Mode.NEVER)
+*/
 @property (readonly) NSString * _Nullable id __attribute__((swift_name("id")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="languages")
+ *   kotlinx.serialization.EncodeDefault(mode=Mode.NEVER)
+*/
 @property (readonly) NSArray<NSString *> * _Nullable languages __attribute__((swift_name("languages")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="lastName")
+ *   kotlinx.serialization.EncodeDefault(mode=Mode.NEVER)
+*/
 @property (readonly) NSString * _Nullable lastName __attribute__((swift_name("lastName")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="notifyByEmail")
+ *   kotlinx.serialization.EncodeDefault(mode=Mode.NEVER)
+*/
 @property (readonly) BOOL notifyByEmail __attribute__((swift_name("notifyByEmail")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="orgMembership")
+ *   kotlinx.serialization.EncodeDefault(mode=Mode.NEVER)
+*/
 @property (readonly) NSString * _Nullable orgMembership __attribute__((swift_name("orgMembership")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="phone")
+ *   kotlinx.serialization.EncodeDefault(mode=Mode.NEVER)
+*/
 @property (readonly) BridgeClientPhone * _Nullable phone __attribute__((swift_name("phone")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="phoneVerified")
+ *   kotlinx.serialization.EncodeDefault(mode=Mode.NEVER)
+*/
 @property (readonly) BridgeClientBoolean * _Nullable phoneVerified __attribute__((swift_name("phoneVerified")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="roles")
+ *   kotlinx.serialization.EncodeDefault(mode=Mode.NEVER)
+*/
 @property (readonly) NSArray<BridgeClientRole *> * _Nullable roles __attribute__((swift_name("roles")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="sharingScope")
+ *   kotlinx.serialization.EncodeDefault(mode=Mode.NEVER)
+*/
 @property (readonly) BridgeClientSharingScope * _Nullable sharingScope __attribute__((swift_name("sharingScope")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="status")
+ *   kotlinx.serialization.EncodeDefault(mode=Mode.NEVER)
+*/
 @property (readonly) BridgeClientAccountStatus * _Nullable status __attribute__((swift_name("status")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="studyIds")
+ *   kotlinx.serialization.EncodeDefault(mode=Mode.NEVER)
+*/
 @property (readonly) NSArray<NSString *> * _Nullable studyIds __attribute__((swift_name("studyIds")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="synapseUserId")
+ *   kotlinx.serialization.EncodeDefault(mode=Mode.NEVER)
+*/
 @property (readonly) NSString * _Nullable synapseUserId __attribute__((swift_name("synapseUserId")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="timeZone")
+ *   kotlinx.serialization.EncodeDefault(mode=Mode.NEVER)
+*/
 @property (readonly) NSString * _Nullable timeZone __attribute__((swift_name("timeZone")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
 @end
 
@@ -1945,6 +3330,7 @@ __attribute__((swift_name("StudyPhase")))
 @property (class, readonly) BridgeClientStudyPhase *completed __attribute__((swift_name("completed")));
 @property (class, readonly) BridgeClientStudyPhase *withdrawn __attribute__((swift_name("withdrawn")));
 + (BridgeClientKotlinArray<BridgeClientStudyPhase *> *)values __attribute__((swift_name("values()")));
+@property (class, readonly) NSArray<BridgeClientStudyPhase *> *entries __attribute__((swift_name("entries")));
 @property (readonly) NSString * _Nullable serialName __attribute__((swift_name("serialName")));
 @end
 
@@ -1973,10 +3359,35 @@ __attribute__((swift_name("SurveyReference")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="createdOn")
+*/
 @property (readonly) NSString * _Nullable createdOn __attribute__((swift_name("createdOn")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="guid")
+*/
 @property (readonly) NSString *guid __attribute__((swift_name("guid")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="href")
+*/
 @property (readonly) NSString * _Nullable href __attribute__((swift_name("href")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="identifier")
+*/
 @property (readonly) NSString * _Nullable identifier __attribute__((swift_name("identifier")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
 @end
 
@@ -2004,13 +3415,53 @@ __attribute__((swift_name("Timeline")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="assessments")
+*/
 @property (readonly) NSArray<BridgeClientAssessmentInfo *> * _Nullable assessments __attribute__((swift_name("assessments")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="duration")
+*/
 @property (readonly) BridgeClientKotlinx_datetimeDateTimePeriod *duration __attribute__((swift_name("duration")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="schedule")
+*/
 @property (readonly) NSArray<BridgeClientScheduledSession *> * _Nullable schedule __attribute__((swift_name("schedule")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="sessions")
+*/
 @property (readonly) NSArray<BridgeClientSessionInfo *> * _Nullable sessions __attribute__((swift_name("sessions")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="studyBursts")
+*/
 @property (readonly) NSArray<BridgeClientStudyBurstInfo *> * _Nullable studyBursts __attribute__((swift_name("studyBursts")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="totalMinutes")
+*/
 @property (readonly) BridgeClientInt * _Nullable totalMinutes __attribute__((swift_name("totalMinutes")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="totalNotifications")
+*/
 @property (readonly) BridgeClientInt * _Nullable totalNotifications __attribute__((swift_name("totalNotifications")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
 @end
 
@@ -2100,9 +3551,29 @@ __attribute__((swift_name("UploadSession")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="expires")
+*/
 @property (readonly) NSString * _Nullable expires __attribute__((swift_name("expires")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="id")
+*/
 @property (readonly) NSString * _Nullable id __attribute__((swift_name("id")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="url")
+*/
 @property (readonly) NSString *url __attribute__((swift_name("url")));
 @end
 
@@ -2160,15 +3631,65 @@ __attribute__((swift_name("UserConsentHistory")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="birthdate")
+*/
 @property (readonly) NSString * _Nullable birthdate __attribute__((swift_name("birthdate")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="consentCreatedOn")
+*/
 @property (readonly) NSString * _Nullable consentCreatedOn __attribute__((swift_name("consentCreatedOn")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="hasSignedActiveConsent")
+*/
 @property (readonly) BridgeClientBoolean * _Nullable hasSignedActiveConsent __attribute__((swift_name("hasSignedActiveConsent")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="imageData")
+*/
 @property (readonly) NSString * _Nullable imageData __attribute__((swift_name("imageData")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="imageMimeType")
+*/
 @property (readonly) NSString * _Nullable imageMimeType __attribute__((swift_name("imageMimeType")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="name")
+*/
 @property (readonly) NSString * _Nullable name __attribute__((swift_name("name")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="signedOn")
+*/
 @property (readonly) NSString * _Nullable signedOn __attribute__((swift_name("signedOn")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="subpopulationGuid")
+*/
 @property (readonly) NSString * _Nullable subpopulationGuid __attribute__((swift_name("subpopulationGuid")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="withdrewOn")
+*/
 @property (readonly) NSString * _Nullable withdrewOn __attribute__((swift_name("withdrewOn")));
 @end
 
@@ -2196,36 +3717,191 @@ __attribute__((swift_name("UserSessionInfo")))
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="attributes")
+*/
 @property (readonly) NSDictionary<NSString *, NSString *> * _Nullable attributes __attribute__((swift_name("attributes")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="authenticated")
+*/
 @property (readonly) BOOL authenticated __attribute__((swift_name("authenticated")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="clientData")
+*/
 @property (readonly) BridgeClientKotlinx_serialization_jsonJsonElement * _Nullable clientData __attribute__((swift_name("clientData")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="consentStatuses")
+*/
 @property (readonly) NSDictionary<NSString *, BridgeClientConsentStatus *> * _Nullable consentStatuses __attribute__((swift_name("consentStatuses")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="consented")
+*/
 @property (readonly) BOOL consented __attribute__((swift_name("consented")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="createdOn")
+*/
 @property (readonly) NSString * _Nullable createdOn __attribute__((swift_name("createdOn")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="dataGroups")
+*/
 @property (readonly) NSArray<NSString *> * _Nullable dataGroups __attribute__((swift_name("dataGroups")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="dataSharing")
+*/
 @property (readonly) BridgeClientBoolean * _Nullable dataSharing __attribute__((swift_name("dataSharing")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="email")
+*/
 @property (readonly) NSString * _Nullable email __attribute__((swift_name("email")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="emailVerified")
+*/
 @property (readonly) BridgeClientBoolean * _Nullable emailVerified __attribute__((swift_name("emailVerified")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="enrollments")
+*/
 @property (readonly) NSDictionary<NSString *, BridgeClientEnrollmentInfo *> * _Nullable enrollments __attribute__((swift_name("enrollments")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="environment")
+*/
 @property (readonly) BridgeClientEnvironment * _Nullable environment __attribute__((swift_name("environment")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="externalId")
+*/
 @property (readonly) NSString * _Nullable externalId __attribute__((swift_name("externalId")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="externalIds")
+*/
 @property (readonly) NSDictionary<NSString *, NSString *> * _Nullable externalIds __attribute__((swift_name("externalIds")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="firstName")
+*/
 @property (readonly) NSString * _Nullable firstName __attribute__((swift_name("firstName")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="id")
+*/
 @property (readonly) NSString *id __attribute__((swift_name("id")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="languages")
+*/
 @property (readonly) NSArray<NSString *> * _Nullable languages __attribute__((swift_name("languages")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="lastName")
+*/
 @property (readonly) NSString * _Nullable lastName __attribute__((swift_name("lastName")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="notifyByEmail")
+*/
 @property (readonly) BridgeClientBoolean * _Nullable notifyByEmail __attribute__((swift_name("notifyByEmail")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="orgMembership")
+*/
 @property (readonly) NSString * _Nullable orgMembership __attribute__((swift_name("orgMembership")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="phone")
+*/
 @property (readonly) BridgeClientPhone * _Nullable phone __attribute__((swift_name("phone")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="phoneVerified")
+*/
 @property (readonly) BridgeClientBoolean * _Nullable phoneVerified __attribute__((swift_name("phoneVerified")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="reauthToken")
+*/
 @property (readonly) NSString * _Nullable reauthToken __attribute__((swift_name("reauthToken")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="roles")
+*/
 @property (readonly) NSArray<BridgeClientRole *> * _Nullable roles __attribute__((swift_name("roles")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="sessionToken")
+*/
 @property (readonly) NSString *sessionToken __attribute__((swift_name("sessionToken")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="sharingScope")
+*/
 @property (readonly) BridgeClientSharingScope * _Nullable sharingScope __attribute__((swift_name("sharingScope")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="signedMostRecentConsent")
+*/
 @property (readonly) BridgeClientBoolean * _Nullable signedMostRecentConsent __attribute__((swift_name("signedMostRecentConsent")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="status")
+*/
 @property (readonly) BridgeClientAccountStatus * _Nullable status __attribute__((swift_name("status")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="studyIds")
+*/
 @property (readonly) NSArray<NSString *> *studyIds __attribute__((swift_name("studyIds")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="synapseUserId")
+*/
 @property (readonly) NSString * _Nullable synapseUserId __attribute__((swift_name("synapseUserId")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="type")
+*/
 @property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
 @end
 
@@ -3106,6 +4782,7 @@ __attribute__((swift_name("ResourceStatus")))
 @property (class, readonly) BridgeClientResourceStatus *retry __attribute__((swift_name("retry")));
 @property (class, readonly) BridgeClientResourceStatus *failed __attribute__((swift_name("failed")));
 + (BridgeClientKotlinArray<BridgeClientResourceStatus *> *)values __attribute__((swift_name("values()")));
+@property (class, readonly) NSArray<BridgeClientResourceStatus *> *entries __attribute__((swift_name("entries")));
 @end
 
 __attribute__((objc_subclassing_restricted))
@@ -3128,6 +4805,7 @@ __attribute__((swift_name("ResourceType")))
 @property (class, readonly) BridgeClientResourceType *participantReport __attribute__((swift_name("participantReport")));
 @property (class, readonly) BridgeClientResourceType *uploadedFileRecord __attribute__((swift_name("uploadedFileRecord")));
 + (BridgeClientKotlinArray<BridgeClientResourceType *> *)values __attribute__((swift_name("values()")));
+@property (class, readonly) NSArray<BridgeClientResourceType *> *entries __attribute__((swift_name("entries")));
 @end
 
 __attribute__((objc_subclassing_restricted))
@@ -3328,6 +5006,7 @@ __attribute__((swift_name("AppStatus")))
 @property (class, readonly) BridgeClientAppStatus *supported __attribute__((swift_name("supported")));
 @property (class, readonly) BridgeClientAppStatus *unsupported __attribute__((swift_name("unsupported")));
 + (BridgeClientKotlinArray<BridgeClientAppStatus *> *)values __attribute__((swift_name("values()")));
+@property (class, readonly) NSArray<BridgeClientAppStatus *> *entries __attribute__((swift_name("entries")));
 @end
 
 __attribute__((objc_subclassing_restricted))
@@ -3335,7 +5014,13 @@ __attribute__((swift_name("AssessmentConfigRepo")))
 @interface BridgeClientAssessmentConfigRepo : BridgeClientAbstractResourceRepo
 - (instancetype)initWithHttpClient:(BridgeClientKtor_client_coreHttpClient *)httpClient databaseHelper:(BridgeClientResourceDatabaseHelper *)databaseHelper backgroundScope:(id<BridgeClientKotlinx_coroutines_coreCoroutineScope>)backgroundScope __attribute__((swift_name("init(httpClient:databaseHelper:backgroundScope:)"))) __attribute__((objc_designated_initializer));
 - (instancetype)initWithDatabase:(BridgeClientResourceDatabaseHelper *)database backgroundScope:(id<BridgeClientKotlinx_coroutines_coreCoroutineScope>)backgroundScope __attribute__((swift_name("init(database:backgroundScope:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
-- (id<BridgeClientKotlinx_coroutines_coreFlow>)getAssessmentConfigAssessmentInfo:(BridgeClientAssessmentInfo *)assessmentInfo __attribute__((swift_name("getAssessmentConfig(assessmentInfo:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)getAssessmentConfigAssessmentInfo:(BridgeClientAssessmentInfo *)assessmentInfo completionHandler:(void (^)(BridgeClientResourceResult<BridgeClientAssessmentConfig *> * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("getAssessmentConfig(assessmentInfo:completionHandler:)")));
+- (id<BridgeClientKotlinx_coroutines_coreFlow>)getAssessmentConfigAsFlowAssessmentInfo:(BridgeClientAssessmentInfo *)assessmentInfo __attribute__((swift_name("getAssessmentConfigAsFlow(assessmentInfo:)")));
 - (BridgeClientAssessmentConfig * _Nullable)getCachedAssessmentConfigByGuidGuid:(NSString *)guid __attribute__((swift_name("getCachedAssessmentConfigByGuid(guid:)")));
 - (id<BridgeClientKotlinx_coroutines_coreFlow>)getCachedAssessmentConfigByGuidAsFlowGuid:(NSString *)guid __attribute__((swift_name("getCachedAssessmentConfigByGuidAsFlow(guid:)")));
 - (BOOL)hasCachedAssessmentConfigByGuidGuid:(NSString *)guid __attribute__((swift_name("hasCachedAssessmentConfigByGuid(guid:)")));
@@ -3757,6 +5442,11 @@ __attribute__((swift_name("KotlinThrowable")))
 - (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
 + (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
 - (instancetype)initWithMessage:(NSString * _Nullable)message cause:(BridgeClientKotlinThrowable * _Nullable)cause __attribute__((swift_name("init(message:cause:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * @note annotations
+ *   kotlin.experimental.ExperimentalNativeApi
+*/
 - (BridgeClientKotlinArray<NSString *> *)getStackTrace __attribute__((swift_name("getStackTrace()")));
 - (void)printStackTrace __attribute__((swift_name("printStackTrace()")));
 - (NSString *)description __attribute__((swift_name("description()")));
@@ -4121,21 +5811,21 @@ __attribute__((swift_name("RuntimeCloseable")))
 __attribute__((swift_name("RuntimeSqlDriver")))
 @protocol BridgeClientRuntimeSqlDriver <BridgeClientRuntimeCloseable>
 @required
-- (void)addListenerListener:(id<BridgeClientRuntimeQueryListener>)listener queryKeys:(BridgeClientKotlinArray<NSString *> *)queryKeys __attribute__((swift_name("addListener(listener:queryKeys:)")));
+- (void)addListenerQueryKeys:(BridgeClientKotlinArray<NSString *> *)queryKeys listener:(id<BridgeClientRuntimeQueryListener>)listener __attribute__((swift_name("addListener(queryKeys:listener:)")));
 - (BridgeClientRuntimeTransacterTransaction * _Nullable)currentTransaction __attribute__((swift_name("currentTransaction()")));
 - (id<BridgeClientRuntimeQueryResult>)executeIdentifier:(BridgeClientInt * _Nullable)identifier sql:(NSString *)sql parameters:(int32_t)parameters binders:(void (^ _Nullable)(id<BridgeClientRuntimeSqlPreparedStatement>))binders __attribute__((swift_name("execute(identifier:sql:parameters:binders:)")));
-- (id<BridgeClientRuntimeQueryResult>)executeQueryIdentifier:(BridgeClientInt * _Nullable)identifier sql:(NSString *)sql mapper:(id _Nullable (^)(id<BridgeClientRuntimeSqlCursor>))mapper parameters:(int32_t)parameters binders:(void (^ _Nullable)(id<BridgeClientRuntimeSqlPreparedStatement>))binders __attribute__((swift_name("executeQuery(identifier:sql:mapper:parameters:binders:)")));
+- (id<BridgeClientRuntimeQueryResult>)executeQueryIdentifier:(BridgeClientInt * _Nullable)identifier sql:(NSString *)sql mapper:(id<BridgeClientRuntimeQueryResult> (^)(id<BridgeClientRuntimeSqlCursor>))mapper parameters:(int32_t)parameters binders:(void (^ _Nullable)(id<BridgeClientRuntimeSqlPreparedStatement>))binders __attribute__((swift_name("executeQuery(identifier:sql:mapper:parameters:binders:)")));
 - (id<BridgeClientRuntimeQueryResult>)doNewTransaction __attribute__((swift_name("doNewTransaction()")));
 - (void)notifyListenersQueryKeys:(BridgeClientKotlinArray<NSString *> *)queryKeys __attribute__((swift_name("notifyListeners(queryKeys:)")));
-- (void)removeListenerListener:(id<BridgeClientRuntimeQueryListener>)listener queryKeys:(BridgeClientKotlinArray<NSString *> *)queryKeys __attribute__((swift_name("removeListener(listener:queryKeys:)")));
+- (void)removeListenerQueryKeys:(BridgeClientKotlinArray<NSString *> *)queryKeys listener:(id<BridgeClientRuntimeQueryListener>)listener __attribute__((swift_name("removeListener(queryKeys:listener:)")));
 @end
 
 __attribute__((swift_name("RuntimeSqlSchema")))
 @protocol BridgeClientRuntimeSqlSchema
 @required
 - (id<BridgeClientRuntimeQueryResult>)createDriver:(id<BridgeClientRuntimeSqlDriver>)driver __attribute__((swift_name("create(driver:)")));
-- (id<BridgeClientRuntimeQueryResult>)migrateDriver:(id<BridgeClientRuntimeSqlDriver>)driver oldVersion:(int32_t)oldVersion newVersion:(int32_t)newVersion __attribute__((swift_name("migrate(driver:oldVersion:newVersion:)")));
-@property (readonly) int32_t version __attribute__((swift_name("version")));
+- (id<BridgeClientRuntimeQueryResult>)migrateDriver:(id<BridgeClientRuntimeSqlDriver>)driver oldVersion:(int64_t)oldVersion newVersion:(int64_t)newVersion callbacks:(BridgeClientKotlinArray<BridgeClientRuntimeAfterVersion *> *)callbacks __attribute__((swift_name("migrate(driver:oldVersion:newVersion:callbacks:)")));
+@property (readonly) int64_t version __attribute__((swift_name("version")));
 @end
 
 __attribute__((objc_subclassing_restricted))
@@ -4169,7 +5859,7 @@ __attribute__((swift_name("RuntimeTransacterTransaction")))
 __attribute__((swift_name("RuntimeExecutableQuery")))
 @interface BridgeClientRuntimeExecutableQuery<__covariant RowType> : BridgeClientBase
 - (instancetype)initWithMapper:(RowType (^)(id<BridgeClientRuntimeSqlCursor>))mapper __attribute__((swift_name("init(mapper:)"))) __attribute__((objc_designated_initializer));
-- (id<BridgeClientRuntimeQueryResult>)executeMapper:(id _Nullable (^)(id<BridgeClientRuntimeSqlCursor>))mapper __attribute__((swift_name("execute(mapper:)")));
+- (id<BridgeClientRuntimeQueryResult>)executeMapper:(id<BridgeClientRuntimeQueryResult> (^)(id<BridgeClientRuntimeSqlCursor>))mapper __attribute__((swift_name("execute(mapper:)")));
 - (NSArray<RowType> *)executeAsList __attribute__((swift_name("executeAsList()")));
 - (RowType)executeAsOne __attribute__((swift_name("executeAsOne()")));
 - (RowType _Nullable)executeAsOneOrNull __attribute__((swift_name("executeAsOneOrNull()")));
@@ -4218,21 +5908,21 @@ __attribute__((swift_name("KotlinNothing")))
 __attribute__((swift_name("Native_driverConnectionWrapper")))
 @interface BridgeClientNative_driverConnectionWrapper : BridgeClientBase <BridgeClientRuntimeSqlDriver>
 - (id<BridgeClientRuntimeQueryResult>)executeIdentifier:(BridgeClientInt * _Nullable)identifier sql:(NSString *)sql parameters:(int32_t)parameters binders:(void (^ _Nullable)(id<BridgeClientRuntimeSqlPreparedStatement>))binders __attribute__((swift_name("execute(identifier:sql:parameters:binders:)")));
-- (id<BridgeClientRuntimeQueryResult>)executeQueryIdentifier:(BridgeClientInt * _Nullable)identifier sql:(NSString *)sql mapper:(id _Nullable (^)(id<BridgeClientRuntimeSqlCursor>))mapper parameters:(int32_t)parameters binders:(void (^ _Nullable)(id<BridgeClientRuntimeSqlPreparedStatement>))binders __attribute__((swift_name("executeQuery(identifier:sql:mapper:parameters:binders:)")));
+- (id<BridgeClientRuntimeQueryResult>)executeQueryIdentifier:(BridgeClientInt * _Nullable)identifier sql:(NSString *)sql mapper:(id<BridgeClientRuntimeQueryResult> (^)(id<BridgeClientRuntimeSqlCursor>))mapper parameters:(int32_t)parameters binders:(void (^ _Nullable)(id<BridgeClientRuntimeSqlPreparedStatement>))binders __attribute__((swift_name("executeQuery(identifier:sql:mapper:parameters:binders:)")));
 @end
 
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("Native_driverNativeSqliteDriver")))
 @interface BridgeClientNative_driverNativeSqliteDriver : BridgeClientNative_driverConnectionWrapper <BridgeClientRuntimeSqlDriver>
 - (instancetype)initWithConfiguration:(BridgeClientSqliter_driverDatabaseConfiguration *)configuration maxReaderConnections:(int32_t)maxReaderConnections __attribute__((swift_name("init(configuration:maxReaderConnections:)"))) __attribute__((objc_designated_initializer));
-- (instancetype)initWithSchema:(id<BridgeClientRuntimeSqlSchema>)schema name:(NSString *)name maxReaderConnections:(int32_t)maxReaderConnections onConfiguration:(BridgeClientSqliter_driverDatabaseConfiguration *(^)(BridgeClientSqliter_driverDatabaseConfiguration *))onConfiguration __attribute__((swift_name("init(schema:name:maxReaderConnections:onConfiguration:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithSchema:(id<BridgeClientRuntimeSqlSchema>)schema name:(NSString *)name maxReaderConnections:(int32_t)maxReaderConnections onConfiguration:(BridgeClientSqliter_driverDatabaseConfiguration *(^)(BridgeClientSqliter_driverDatabaseConfiguration *))onConfiguration callbacks:(BridgeClientKotlinArray<BridgeClientRuntimeAfterVersion *> *)callbacks __attribute__((swift_name("init(schema:name:maxReaderConnections:onConfiguration:callbacks:)"))) __attribute__((objc_designated_initializer));
 - (instancetype)initWithDatabaseManager:(id<BridgeClientSqliter_driverDatabaseManager>)databaseManager maxReaderConnections:(int32_t)maxReaderConnections __attribute__((swift_name("init(databaseManager:maxReaderConnections:)"))) __attribute__((objc_designated_initializer));
-- (void)addListenerListener:(id<BridgeClientRuntimeQueryListener>)listener queryKeys:(BridgeClientKotlinArray<NSString *> *)queryKeys __attribute__((swift_name("addListener(listener:queryKeys:)")));
+- (void)addListenerQueryKeys:(BridgeClientKotlinArray<NSString *> *)queryKeys listener:(id<BridgeClientRuntimeQueryListener>)listener __attribute__((swift_name("addListener(queryKeys:listener:)")));
 - (void)close __attribute__((swift_name("close()")));
 - (BridgeClientRuntimeTransacterTransaction * _Nullable)currentTransaction __attribute__((swift_name("currentTransaction()")));
 - (id<BridgeClientRuntimeQueryResult>)doNewTransaction __attribute__((swift_name("doNewTransaction()")));
 - (void)notifyListenersQueryKeys:(BridgeClientKotlinArray<NSString *> *)queryKeys __attribute__((swift_name("notifyListeners(queryKeys:)")));
-- (void)removeListenerListener:(id<BridgeClientRuntimeQueryListener>)listener queryKeys:(BridgeClientKotlinArray<NSString *> *)queryKeys __attribute__((swift_name("removeListener(listener:queryKeys:)")));
+- (void)removeListenerQueryKeys:(BridgeClientKotlinArray<NSString *> *)queryKeys listener:(id<BridgeClientRuntimeQueryListener>)listener __attribute__((swift_name("removeListener(queryKeys:listener:)")));
 @end
 
 __attribute__((swift_name("KotlinException")))
@@ -4706,6 +6396,7 @@ __attribute__((swift_name("KotlinLazyThreadSafetyMode")))
 @property (class, readonly) BridgeClientKotlinLazyThreadSafetyMode *publication __attribute__((swift_name("publication")));
 @property (class, readonly) BridgeClientKotlinLazyThreadSafetyMode *none __attribute__((swift_name("none")));
 + (BridgeClientKotlinArray<BridgeClientKotlinLazyThreadSafetyMode *> *)values __attribute__((swift_name("values()")));
+@property (class, readonly) NSArray<BridgeClientKotlinLazyThreadSafetyMode *> *entries __attribute__((swift_name("entries")));
 @end
 
 __attribute__((swift_name("Koin_coreLogger")))
@@ -5029,7 +6720,15 @@ __attribute__((swift_name("RuntimeSqlCursor")))
 - (BridgeClientDouble * _Nullable)getDoubleIndex:(int32_t)index __attribute__((swift_name("getDouble(index:)")));
 - (BridgeClientLong * _Nullable)getLongIndex:(int32_t)index __attribute__((swift_name("getLong(index:)")));
 - (NSString * _Nullable)getStringIndex:(int32_t)index __attribute__((swift_name("getString(index:)")));
-- (BOOL)next_ __attribute__((swift_name("next_()")));
+- (id<BridgeClientRuntimeQueryResult>)next __attribute__((swift_name("next()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("RuntimeAfterVersion")))
+@interface BridgeClientRuntimeAfterVersion : BridgeClientBase
+- (instancetype)initWithAfterVersion:(int64_t)afterVersion block:(void (^)(id<BridgeClientRuntimeSqlDriver>))block __attribute__((swift_name("init(afterVersion:block:)"))) __attribute__((objc_designated_initializer));
+@property (readonly) int64_t afterVersion __attribute__((swift_name("afterVersion")));
+@property (readonly) void (^block)(id<BridgeClientRuntimeSqlDriver>) __attribute__((swift_name("block")));
 @end
 
 __attribute__((objc_subclassing_restricted))
@@ -6483,7 +8182,7 @@ __attribute__((swift_name("Ktor_ioChunkBuffer")))
 - (BridgeClientKtor_ioChunkBuffer *)duplicate __attribute__((swift_name("duplicate()")));
 - (void)releasePool:(id<BridgeClientKtor_ioObjectPool>)pool __attribute__((swift_name("release(pool:)")));
 - (void)reset __attribute__((swift_name("reset()")));
-@property (getter=next__) BridgeClientKtor_ioChunkBuffer * _Nullable next __attribute__((swift_name("next")));
+@property (getter=next_) BridgeClientKtor_ioChunkBuffer * _Nullable next __attribute__((swift_name("next")));
 @property (readonly) BridgeClientKtor_ioChunkBuffer * _Nullable origin __attribute__((swift_name("origin")));
 @property (readonly) int32_t referenceCount __attribute__((swift_name("referenceCount")));
 @end
@@ -6638,7 +8337,7 @@ __attribute__((swift_name("Sqliter_driverCursor")))
 - (NSString *)getStringIndex:(int32_t)index __attribute__((swift_name("getString(index:)")));
 - (BridgeClientSqliter_driverFieldType *)getTypeIndex:(int32_t)index __attribute__((swift_name("getType(index:)")));
 - (BOOL)isNullIndex:(int32_t)index __attribute__((swift_name("isNull(index:)")));
-- (BOOL)next_ __attribute__((swift_name("next_()")));
+- (BOOL)next__ __attribute__((swift_name("next_()")));
 @property (readonly) int32_t columnCount __attribute__((swift_name("columnCount")));
 @property (readonly) NSDictionary<NSString *, BridgeClientInt *> *columnNames __attribute__((swift_name("columnNames")));
 @property (readonly) id<BridgeClientSqliter_driverStatement> statement __attribute__((swift_name("statement")));
@@ -6827,6 +8526,7 @@ __attribute__((swift_name("KotlinKVariance")))
 @property (class, readonly) BridgeClientKotlinKVariance *in __attribute__((swift_name("in")));
 @property (class, readonly) BridgeClientKotlinKVariance *out __attribute__((swift_name("out")));
 + (BridgeClientKotlinArray<BridgeClientKotlinKVariance *> *)values __attribute__((swift_name("values()")));
+@property (class, readonly) NSArray<BridgeClientKotlinKVariance *> *entries __attribute__((swift_name("entries")));
 @end
 
 __attribute__((objc_subclassing_restricted))

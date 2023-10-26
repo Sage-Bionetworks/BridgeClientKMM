@@ -57,7 +57,7 @@ class IntegrationSmokeTest: AbstractBaseIntegrationTest() {
 
             // Load an AssessmentConfig
             val assessmentInfo = session.assessments[0].assessmentInfo
-            val assessmentResult = assessmentConfigRepo.getAssessmentConfig(assessmentInfo).filter { it is ResourceResult.Success }.first()
+            val assessmentResult = assessmentConfigRepo.getAssessmentConfigAsFlow(assessmentInfo).filter { it is ResourceResult.Success }.first()
             val assessmentConfig = (assessmentResult as ResourceResult.Success).data
             assertEquals("AssessmentConfig", assessmentConfig.type)
 

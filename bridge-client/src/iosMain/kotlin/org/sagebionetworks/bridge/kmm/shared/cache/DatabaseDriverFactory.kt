@@ -1,11 +1,13 @@
 package org.sagebionetworks.bridge.kmm.shared.cache
 
+import app.cash.sqldelight.db.QueryResult
 import co.touchlab.kermit.Logger
 import co.touchlab.sqliter.DatabaseConfiguration
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.db.SqlSchema
 import app.cash.sqldelight.driver.native.NativeSqliteDriver
 import app.cash.sqldelight.driver.native.wrapConnection
+import kotlinx.cinterop.ExperimentalForeignApi
 import org.sagebionetworks.bridge.kmm.shared.IOSBridgeConfig
 import platform.Foundation.*
 
@@ -14,7 +16,8 @@ actual class DatabaseDriverFactory: DbDriverFactory {
 }
 
 object SqliteDriverFactory {
-    fun createDriver(schema: SqlSchema, name: String): NativeSqliteDriver {
+    @OptIn(ExperimentalForeignApi::class)
+    fun createDriver(schema: SqlSchema<QueryResult.Value<Unit>>, name: String): NativeSqliteDriver {
 
         val path = IOSBridgeConfig.appGroupIdentifier?.let { groupId ->
             NSFileManager.defaultManager.containerURLForSecurityApplicationGroupIdentifier(groupId)?.let { baseURL ->
@@ -39,7 +42,7 @@ object SqliteDriverFactory {
                 // constructor should be revisited.
                 val configuration = DatabaseConfiguration(
                     name = name,
-                    version = schema.version,
+                    version = schema.version.toInt(),
                     extendedConfig = DatabaseConfiguration.Extended(
                         basePath = path.absoluteString
                     ),
@@ -47,7 +50,9 @@ object SqliteDriverFactory {
                         wrapConnection(connection) { schema.create(it) }
                     },
                     upgrade = { connection, oldVersion, newVersion ->
-                        wrapConnection(connection) { schema.migrate(it, oldVersion, newVersion) }
+                        wrapConnection(connection) { schema.migrate(it,
+                            oldVersion.toLong(), newVersion.toLong()
+                        ) }
                     }
                 )
                 return NativeSqliteDriver(configuration)

@@ -14,10 +14,10 @@ jobs:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
-    - name: set up JDK 11
+    - name: set up JDK 17
       uses: actions/setup-java@v1
       with:
-        java-version: 11
+        java-version: 17
     - name: Check BridgeClient
       env:
         testExternalId01: ${{ secrets.TEST_EXTERNAL_ID_01 }}

@@ -1,9 +1,7 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
-import com.android.zipflinger.Sources.dir
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 import org.jetbrains.kotlin.gradle.plugin.mpp.BitcodeEmbeddingMode
-import org.gradle.internal.classpath.Instrumented.systemProperty
 
 plugins {
     id("com.android.library")
@@ -21,17 +19,25 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 }
 
 sqldelight {
-    database("BridgeResourceDatabase") {
-        packageName = "org.sagebionetworks.bridge.kmm.shared.cache"
+    databases {
+        create("BridgeResourceDatabase") {
+            packageName.set("org.sagebionetworks.bridge.kmm.shared.cache")
 //        schemaOutputDirectory = file("src/schema")
+        }
     }
 }
 
 val iosFrameworkName = "BridgeClient"
 
 kotlin {
-    android {
+    androidTarget {
         publishAllLibraryVariants()
+        compilations.all {
+            kotlinOptions {
+                jvmTarget = "1.8"
+            }
+        }
+        android.buildFeatures.buildConfig = true
         tasks.withType<Test> {
             systemProperty(
                 "testExternalId01",
@@ -110,7 +116,7 @@ kotlin {
                 implementation(libs.koin.android.workmanager)
             }
         }
-        val androidTest by getting {
+        val androidUnitTest by getting {
             dependencies {
                 implementation(kotlin("test-junit"))
                 implementation(libs.junit)
@@ -160,6 +166,7 @@ android {
     testOptions {
         unitTests.isReturnDefaultValues = true
     }
+    namespace = "org.sagebionetworks.bridge.kmm.android"
 }
 
 publishing {

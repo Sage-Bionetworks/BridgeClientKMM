@@ -1,5 +1,6 @@
 package org.sagebionetworks.bridge.kmm.shared
 
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -8,6 +9,7 @@ import platform.CoreFoundation.CFRunLoopGetCurrent
 import platform.CoreFoundation.CFRunLoopRun
 import platform.CoreFoundation.CFRunLoopStop
 
+@OptIn(ExperimentalForeignApi::class)
 actual abstract class BaseTest {
 
     actual fun <T> runTest(block: suspend CoroutineScope.() -> T) {

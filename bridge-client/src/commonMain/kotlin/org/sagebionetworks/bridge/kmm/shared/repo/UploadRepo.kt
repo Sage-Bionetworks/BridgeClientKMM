@@ -76,7 +76,7 @@ internal open class UploadRepo(
 
     /**
      * Get all the completed [UploadSession] records from the local cache. This will include files
-     * marks as upload completed.
+     * marked as upload completed.
      */
     fun getCompletedUploadSessions(): List<UploadSession> {
         val resources = database.getResourcesNeedSave(

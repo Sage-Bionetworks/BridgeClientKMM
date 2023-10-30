@@ -39,9 +39,8 @@ android {
 
 
 dependencies {
-        val assessmentVersion = "0.12.0"
         api(project(":bridge-client"))
-        api("org.sagebionetworks.assessmentmodel:assessmentModel:$assessmentVersion")
+        api(libs.assessmentModel)
 
         api(libs.koin.android)
         // Kermit

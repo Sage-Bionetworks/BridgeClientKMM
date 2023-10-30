@@ -11,6 +11,7 @@ import okio.ByteString.Companion.toByteString
 import org.sagebionetworks.assessmentmodel.AssessmentResult
 import org.sagebionetworks.assessmentmodel.Result
 import org.sagebionetworks.bridge.data.Archive
+import org.sagebionetworks.bridge.kmm.shared.models.AdherenceRecord
 import org.sagebionetworks.bridge.kmm.shared.models.UploadMetadata
 import org.sagebionetworks.bridge.kmm.shared.models.UploadFile
 import org.sagebionetworks.bridge.kmm.shared.upload.UploadRequester
@@ -36,31 +37,14 @@ class AssessmentResultArchiveUploader(
 
     val STUDY_PUBLIC_KEY = "study_public_key.pem"
 
-    @Deprecated("`sessionWindowExpiration` is not supported.")
-    fun archiveResultAndQueueUpload(assessmentResult: Result,
-                                    jsonCoder: Json,
-                                    assessmentInstanceId: String,
-                                    eventTimestamp: String,
-                                    startedOn: Instant,
-                                    assessmentResultFilename: String? = "assessmentResult.json",
-                                    sessionWindowExpiration: kotlinx.datetime.Instant?) {
-        if (sessionWindowExpiration != null) {
-            Logger.w("`sessionWindowExpiration` is not supported.")
-            return
-        }
-        archiveResultAndQueueUpload(assessmentResult, jsonCoder, assessmentInstanceId, eventTimestamp, startedOn, assessmentResultFilename)
-    }
 
     /**
      * Archive and queue the [assessmentResult] for upload using the specified [jsonCoder].
-     * Specifying a [sessionWindowExpiration] will delay the upload until after that point in time.
-     * Subsequent calls to this method with the same [assessmentInstanceId] will replace any delayed uploads.
      */
     fun archiveResultAndQueueUpload(assessmentResult: Result,
                                     jsonCoder: Json,
                                     assessmentInstanceId: String,
-                                    eventTimestamp: String,
-                                    startedOn: Instant,
+                                    adherenceRecord: AdherenceRecord,
                                     assessmentResultFilename: String? = "assessmentResult.json") {
 
         val archiver = AssessmentArchiver(
@@ -77,7 +61,14 @@ class AssessmentResultArchiveUploader(
             UUID.randomUUID().toString()
         }
 
-        val uploadMetadata = UploadMetadata(assessmentInstanceId, eventTimestamp, startedOn.toString())
+        val uploadMetadata = UploadMetadata(
+            instanceGuid = assessmentInstanceId,
+            eventTimestamp = adherenceRecord.eventTimestamp,
+            startedOn = adherenceRecord.startedOn?.toString(),
+            finishedOn = adherenceRecord.finishedOn?.toString(),
+            declined = adherenceRecord.declined,
+            clientData = adherenceRecord.clientData
+        )
         val uploadFile = persist(assessmentRunUUID, archiver.buildArchive(), uploadMetadata)
         Logger.i("UploadFile $uploadFile")
         uploadRequester.queueAndRequestUpload(uploadFile)

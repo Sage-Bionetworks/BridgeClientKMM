@@ -15,6 +15,7 @@ import kotlinx.datetime.plus
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import org.sagebionetworks.bridge.kmm.shared.BaseTest
 import org.sagebionetworks.bridge.kmm.shared.cache.Resource
@@ -381,12 +382,24 @@ class UploadRepoTest : BaseTest() {
 
     @Test
     fun testUploadMetadata_toJsonMap() {
-        val metadata = UploadMetadata("foo", "goo", "maloo")
+        val clientData = JsonObject(mapOf(
+            "data" to JsonPrimitive("foo")))
+        val metadata = UploadMetadata(
+            instanceGuid = "foo",
+            eventTimestamp = "goo",
+            startedOn = "maloo",
+            finishedOn = "achoo",
+            declined = false,
+            clientData = clientData
+        )
         val json = metadata.toJsonMap()
         val expectedJson: Map <String, JsonElement> = mapOf(
             "instanceGuid" to JsonPrimitive("foo"),
             "eventTimestamp" to JsonPrimitive("goo"),
             "startedOn" to JsonPrimitive("maloo"),
+            "finishedOn" to JsonPrimitive("achoo"),
+            "declined" to JsonPrimitive(false),
+            "clientData" to clientData
         )
         assertEquals(expectedJson, json)
     }

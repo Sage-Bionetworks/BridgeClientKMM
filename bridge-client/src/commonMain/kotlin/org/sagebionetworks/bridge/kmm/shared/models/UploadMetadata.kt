@@ -10,6 +10,9 @@ data class UploadMetadata(
     val instanceGuid: String? = null,
     val eventTimestamp: String? = null,
     val startedOn: String? = null,
+    val finishedOn: String? = null,
+    val declined: Boolean? = null,
+    val clientData: JsonElement? = null
 ) {
     internal fun toJsonMap(): Map<String, JsonElement> {
         val jsonCoder = Json {

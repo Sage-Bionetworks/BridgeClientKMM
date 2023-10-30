@@ -1,259 +1,322 @@
-<html>
-  <head>
+<!doctype html>
+<html class="no-js">
+<head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>org.sagebionetworks.bridge.kmm.shared</title>
-</head><body><link href="../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../";</script>
-    <script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async></script><link href="../../styles/style.css" rel="Stylesheet"><link href="../../styles/jetbrains-mono.css" rel="Stylesheet"><link href="../../styles/main.css" rel="Stylesheet"><link href="../../styles/prism.css" rel="Stylesheet"><link href="../../styles/logo-styles.css" rel="Stylesheet"><script type="text/javascript" src="../../scripts/clipboard.js" async></script><script type="text/javascript" src="../../scripts/navigation-loader.js" async></script><script type="text/javascript" src="../../scripts/platform-content-handler.js" async></script><script type="text/javascript" src="../../scripts/main.js" async></script><script type="text/javascript" src="../../scripts/prism.js" async></script><script>const storage = localStorage.getItem("dokka-dark-mode")
-const savedDarkMode = storage ? JSON.parse(storage) : false
-if(savedDarkMode === true){
-    document.getElementsByTagName("html")[0].classList.add("theme-dark")
-}</script>
-
-  
-    <div class="navigation-wrapper" id="navigation-wrapper">
-      <div id="leftToggler"><span class="icon-toggler"></span></div>
-      <div class="library-name"><a href="../../index.html"><span>BridgeClientKMM</span></a></div>
-      <div>0.19.1</div>
-      <div class="pull-right d-flex">
-        <div class="filter-section" id="filter-section"><button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":bridge-client:dokkaHtmlPartial/androidMain">android</button><button class="platform-tag platform-selector common-like" data-active="" data-filter=":bridge-client:dokkaHtmlPartial/commonMain">common</button><button class="platform-tag platform-selector common-like" data-active="" data-filter=":bridge-client:dokkaHtmlPartial/iosMain">ios</button></div>
-<button id="theme-toggle-button"><span id="theme-toggle"></span></button>
-        <div id="searchBar"></div>
-      </div>
+<link href="../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../styles/style.css" rel="Stylesheet">
+<link href="../../styles/main.css" rel="Stylesheet">
+<link href="../../styles/prism.css" rel="Stylesheet">
+<link href="../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<script type="text/javascript" src="../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+<a class="library-name--link" href="../../index.html">
+                            BridgeClientKMM
+                    </a>            </div>
+            <div class="library-version">0.20.0
+            </div>
+        </div>
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":bridge-client:dokkaHtmlPartial/androidMain">android</button>
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":bridge-client:dokkaHtmlPartial/commonMain">common</button>
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":bridge-client:dokkaHtmlPartial/iosMain">ios</button>
+        </div>
     </div>
-    <div id="container">
-      <div id="leftColumn">
-        <div id="sideMenu"></div>
-      </div>
-      <div id="main"><script type="text/javascript" src="../../scripts/main.js"></script>
-        <div class="main-content" id="content" pageids="bridge-client::org.sagebionetworks.bridge.kmm.shared////PointingToDeclaration//-449849504">
-          <div class="breadcrumbs"><a href="../index.html">bridge-client</a>/<a href="index.html">org.sagebionetworks.bridge.kmm.shared</a></div>
-          <div class="cover ">
-            <h1 class="cover"><span><span>Package</span></span> <span>org.</span><wbr><span>sagebionetworks.</span><wbr><span>bridge.</span><wbr><span>kmm.</span><wbr><span>shared</span></h1>
-          </div>
-          <div class="tabbedcontent">
-            <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Types">Types</button><button class="section-tab" data-togglable="Functions">Functions</button></div>
-            <div class="tabs-section-body">
-              <h2 class="">Types</h2>
-              <div class="table" data-togglable="Types"><a data-name="-1087710160%2FClasslikes%2F420152228" anchor-label="AndroidBridgeConfig" id="-1087710160%2FClasslikes%2F420152228" data-filterable-set=":bridge-client:dokkaHtmlPartial/androidMain"></a>
-                <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/androidMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/androidMain">
-                  <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="-android-bridge-config/index.html"><span>Android</span><wbr><span>Bridge</span><wbr><span><span>Config</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1087710160%2FClasslikes%2F420152228"></span>
-                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                        </span></span></div>
-                    <div>
-                      <div class="title">
-                        <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark jvm-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/androidMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/androidMain">android</button></div>
-<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-android-bridge-config/index.html">AndroidBridgeConfig</a><span class="token punctuation">(</span>context<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/content/Context.html">Context</a><span class="token punctuation">)</span> : <a href="../../bridge-client/org.sagebionetworks.bridge.kmm.shared/-bridge-config/index.html">BridgeConfig</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-<a data-name="2003854733%2FClasslikes%2F-202008714" anchor-label="BridgeConfig" id="2003854733%2FClasslikes%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a>
-                <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain">
-                  <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="-bridge-config/index.html"><span>Bridge</span><wbr><span><span>Config</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2003854733%2FClasslikes%2F-202008714"></span>
-                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                        </span></span></div>
-                    <div>
-                      <div class="title">
-                        <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/commonMain">common</button></div>
-<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-bridge-config/index.html">BridgeConfig</a> : <a href="-platform-config/index.html">PlatformConfig</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-<a data-name="-351293998%2FClasslikes%2F1906099806" anchor-label="IOSBridgeConfig" id="-351293998%2FClasslikes%2F1906099806" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain"></a>
-                <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain">
-                  <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="-i-o-s-bridge-config/index.html"><span>IOSBridge</span><wbr><span><span>Config</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-351293998%2FClasslikes%2F1906099806"></span>
-                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                        </span></span></div>
-                    <div>
-                      <div class="title">
-                        <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/iosMain">ios</button></div>
-<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-i-o-s-bridge-config/index.html">IOSBridgeConfig</a> : <a href="../../bridge-client/org.sagebionetworks.bridge.kmm.shared/-bridge-config/index.html">BridgeConfig</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-<a data-name="1758932237%2FClasslikes%2F1906099806" anchor-label="IOSLogger" id="1758932237%2FClasslikes%2F1906099806" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain"></a>
-                <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain">
-                  <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="-i-o-s-logger/index.html"><span><span>IOSLogger</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1758932237%2FClasslikes%2F1906099806"></span>
-                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                        </span></span></div>
-                    <div>
-                      <div class="title">
-                        <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/iosMain">ios</button></div>
-<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-i-o-s-logger/index.html">IOSLogger</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-<a data-name="1005723816%2FClasslikes%2F1906099806" anchor-label="IOSPlatformConfig" id="1005723816%2FClasslikes%2F1906099806" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain"></a>
-                <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain">
-                  <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="-i-o-s-platform-config/index.html"><span>IOSPlatform</span><wbr><span><span>Config</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1005723816%2FClasslikes%2F1906099806"></span>
-                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                        </span></span></div>
-                    <div>
-                      <div class="title">
-                        <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/iosMain">ios</button></div>
-<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-i-o-s-platform-config/index.html">IOSPlatformConfig</a> : <a href="../../bridge-client/org.sagebionetworks.bridge.kmm.shared/-platform-config/index.html">PlatformConfig</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-<a data-name="-2035569298%2FClasslikes%2F1906099806" anchor-label="JsonDecoder" id="-2035569298%2FClasslikes%2F1906099806" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain"></a>
-                <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain">
-                  <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="-json-decoder/index.html"><span>Json</span><wbr><span><span>Decoder</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2035569298%2FClasslikes%2F1906099806"></span>
-                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                        </span></span></div>
-                    <div>
-                      <div class="title">
-                        <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/iosMain">ios</button></div>
-<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-json-decoder/index.html">JsonDecoder</a><span class="token punctuation">(</span>jsonData<span class="token operator">: </span><span data-unresolved-link="/<ERROR CLASS>///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-<a data-name="-853061784%2FClasslikes%2F1906099806" anchor-label="JsonElementDecoder" id="-853061784%2FClasslikes%2F1906099806" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain"></a>
-                <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain">
-                  <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="-json-element-decoder/index.html"><span>Json</span><wbr><span>Element</span><wbr><span><span>Decoder</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-853061784%2FClasslikes%2F1906099806"></span>
-                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                        </span></span></div>
-                    <div>
-                      <div class="title">
-                        <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/iosMain">ios</button></div>
-<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-json-element-decoder/index.html">JsonElementDecoder</a><span class="token punctuation">(</span>jsonData<span class="token operator">: </span><span data-unresolved-link="/<ERROR CLASS>///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-<a data-name="818224361%2FClasslikes%2F1906099806" anchor-label="LogSeverity" id="818224361%2FClasslikes%2F1906099806" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain"></a>
-                <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain">
-                  <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="-log-severity/index.html"><span>Log</span><wbr><span><span>Severity</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="818224361%2FClasslikes%2F1906099806"></span>
-                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                        </span></span></div>
-                    <div>
-                      <div class="title">
-                        <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/iosMain">ios</button></div>
-<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">enum </span><a href="-log-severity/index.html">LogSeverity</a> : <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-enum/index.html">Enum</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="-log-severity/index.html">LogSeverity</a><span class="token operator">&gt; </span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-<a data-name="-187501270%2FClasslikes%2F1906099806" anchor-label="NativeLogWriter" id="-187501270%2FClasslikes%2F1906099806" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain"></a>
-                <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain">
-                  <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="-native-log-writer/index.html"><span>Native</span><wbr><span>Log</span><wbr><span><span>Writer</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-187501270%2FClasslikes%2F1906099806"></span>
-                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                        </span></span></div>
-                    <div>
-                      <div class="title">
-                        <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/iosMain">ios</button></div>
-<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-native-log-writer/index.html">NativeLogWriter</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-<a data-name="855889315%2FClasslikes%2F-202008714" anchor-label="PlatformConfig" id="855889315%2FClasslikes%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a>
-                <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain">
-                  <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="-platform-config/index.html"><span>Platform</span><wbr><span><span>Config</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="855889315%2FClasslikes%2F-202008714"></span>
-                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                        </span></span></div>
-                    <div>
-                      <div class="title">
-                        <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/commonMain">common</button></div>
-<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-platform-config/index.html">PlatformConfig</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>                        </div>
-                      </div>
-                    </div>
-                  </div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
+    </div>
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="package" id="content" pageids="bridge-client::org.sagebionetworks.bridge.kmm.shared////PointingToDeclaration//-449849504">
+  <div class="breadcrumbs"><a href="../index.html">bridge-client</a><span class="delimiter">/</span><span class="current">org.sagebionetworks.bridge.kmm.shared</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button><button class="section-tab" data-togglable="FUNCTION,EXTENSION_FUNCTION">Functions</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="">Types</h2>
+        <div class="table"><a data-name="-1087710160%2FClasslikes%2F420152228" anchor-label="AndroidBridgeConfig" id="-1087710160%2FClasslikes%2F420152228" data-filterable-set=":bridge-client:dokkaHtmlPartial/androidMain"></a>
+          <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/androidMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-android-bridge-config/index.html"><span>Android</span><wbr><span>Bridge</span><wbr><span><span>Config</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1087710160%2FClasslikes%2F420152228"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":bridge-client:dokkaHtmlPartial/androidMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-android-bridge-config/index.html">AndroidBridgeConfig</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">context<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/content/Context.html">Context</a></span></span><span class="token punctuation">)</span> : <a href="-bridge-config/index.html">BridgeConfig</a></div></div>                  </div>
                 </div>
               </div>
-              <h2 class="">Functions</h2>
-              <div class="table" data-togglable="Functions"><a data-name="305404332%2FFunctions%2F-202008714" anchor-label="buildClientData" id="305404332%2FFunctions%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a>
-                <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain">
-                  <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="build-client-data.html"><span>build</span><wbr><span>Client</span><wbr><span><span>Data</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="305404332%2FFunctions%2F-202008714"></span>
-                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                        </span></span></div>
-                    <div>
-                      <div class="title">
-                        <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/commonMain">common</button></div>
-<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="-platform-config/index.html">PlatformConfig</a><span class="token punctuation">.</span><a href="build-client-data.html"><span class="token function">buildClientData</span></a><span class="token punctuation">(</span>input<span class="token operator">: </span><span data-unresolved-link="/<ERROR CLASS>///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span>uploadId<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<ERROR CLASS>///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>                        </div>
-                      </div>
-                    </div>
-                  </div>
+            </div>
+          </div>
+<a data-name="2003854733%2FClasslikes%2F-202008714" anchor-label="BridgeConfig" id="2003854733%2FClasslikes%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-bridge-config/index.html"><span>Bridge</span><wbr><span><span>Config</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2003854733%2FClasslikes%2F-202008714"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-bridge-config/index.html">BridgeConfig</a> : <a href="-platform-config/index.html">PlatformConfig</a></div></div></div>
                 </div>
-<a data-name="1740236104%2FFunctions%2F1906099806" anchor-label="clientDataJson" id="1740236104%2FFunctions%2F1906099806" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain"></a>
-                <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain">
-                  <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="client-data-json.html"><span>client</span><wbr><span>Data</span><wbr><span><span>Json</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1740236104%2FFunctions%2F1906099806"></span>
-                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                        </span></span></div>
-                    <div>
-                      <div class="title">
-                        <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/iosMain">ios</button></div>
-<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="../org.sagebionetworks.bridge.kmm.shared.managers/-native-adherence-record/index.html">NativeAdherenceRecord</a><span class="token punctuation">.</span><a href="client-data-json.html"><span class="token function">clientDataJson</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<ERROR CLASS>///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token operator">?</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="../org.sagebionetworks.bridge.kmm.shared.managers/-native-participant-data-record/index.html">NativeParticipantDataRecord</a><span class="token punctuation">.</span><a href="client-data-json.html"><span class="token function">clientDataJson</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<ERROR CLASS>///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token operator">?</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="../org.sagebionetworks.bridge.kmm.shared.models/-adherence-record/index.html#1898637872%2FExtensions%2F1906099806">AdherenceRecord</a><span class="token punctuation">.</span><a href="client-data-json.html"><span class="token function">clientDataJson</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<ERROR CLASS>///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token operator">?</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="../org.sagebionetworks.bridge.kmm.shared.models/-app-config/index.html#153508187%2FExtensions%2F1906099806">AppConfig</a><span class="token punctuation">.</span><a href="client-data-json.html"><span class="token function">clientDataJson</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<ERROR CLASS>///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token operator">?</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="../org.sagebionetworks.bridge.kmm.shared.models/-study/index.html#-1962034795%2FExtensions%2F1906099806">Study</a><span class="token punctuation">.</span><a href="client-data-json.html"><span class="token function">clientDataJson</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<ERROR CLASS>///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token operator">?</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="../org.sagebionetworks.bridge.kmm.shared.models/-user-session-info/index.html#-1537333883%2FExtensions%2F1906099806">UserSessionInfo</a><span class="token punctuation">.</span><a href="client-data-json.html"><span class="token function">clientDataJson</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<ERROR CLASS>///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token operator">?</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="../org.sagebionetworks.bridge.kmm.shared.repo/-assessment-history-record/index.html#637134579%2FExtensions%2F1906099806">AssessmentHistoryRecord</a><span class="token punctuation">.</span><a href="client-data-json.html"><span class="token function">clientDataJson</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<ERROR CLASS>///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token operator">?</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="../org.sagebionetworks.bridge.kmm.shared.repo/-report/index.html#1866112792%2FExtensions%2F1906099806">Report</a><span class="token punctuation">.</span><a href="client-data-json.html"><span class="token function">clientDataJson</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<ERROR CLASS>///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token operator">?</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>                        </div>
-                      </div>
-                    </div>
-                  </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-351293998%2FClasslikes%2F1906099806" anchor-label="IOSBridgeConfig" id="-351293998%2FClasslikes%2F1906099806" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain"></a>
+          <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-i-o-s-bridge-config/index.html"><span>IOSBridge</span><wbr><span><span>Config</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-351293998%2FClasslikes%2F1906099806"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-i-o-s-bridge-config/index.html">IOSBridgeConfig</a> : <a href="-bridge-config/index.html">BridgeConfig</a></div></div>                  </div>
                 </div>
-<a data-name="1295300796%2FFunctions%2F1906099806" anchor-label="configElementJson" id="1295300796%2FFunctions%2F1906099806" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain"></a>
-                <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain">
-                  <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="config-element-json.html"><span>config</span><wbr><span>Element</span><wbr><span><span>Json</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1295300796%2FFunctions%2F1906099806"></span>
-                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                        </span></span></div>
-                    <div>
-                      <div class="title">
-                        <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/iosMain">ios</button></div>
-<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="../org.sagebionetworks.bridge.kmm.shared.models/-app-config/index.html#153508187%2FExtensions%2F1906099806">AppConfig</a><span class="token punctuation">.</span><a href="config-element-json.html"><span class="token function">configElementJson</span></a><span class="token punctuation">(</span>identifier<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<ERROR CLASS>///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token operator">?</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>                        </div>
-                      </div>
-                    </div>
-                  </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1758932237%2FClasslikes%2F1906099806" anchor-label="IOSLogger" id="1758932237%2FClasslikes%2F1906099806" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain"></a>
+          <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-i-o-s-logger/index.html"><span><span>IOSLogger</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1758932237%2FClasslikes%2F1906099806"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-i-o-s-logger/index.html">IOSLogger</a></div></div>                  </div>
                 </div>
-<a data-name="555594613%2FFunctions%2F1906099806" anchor-label="mapConfigElements" id="555594613%2FFunctions%2F1906099806" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain"></a>
-                <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain">
-                  <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="map-config-elements.html"><span>map</span><wbr><span>Config</span><wbr><span><span>Elements</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="555594613%2FFunctions%2F1906099806"></span>
-                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                        </span></span></div>
-                    <div>
-                      <div class="title">
-                        <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/iosMain">ios</button></div>
-<div class="content sourceset-depenent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="../org.sagebionetworks.bridge.kmm.shared.models/-app-config/index.html#153508187%2FExtensions%2F1906099806">AppConfig</a><span class="token punctuation">.</span><a href="map-config-elements.html"><span class="token function">mapConfigElements</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span><span class="token keyword"></span><span data-unresolved-link="/<ERROR CLASS>///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token operator">&gt;</span><span class="token operator">?</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div>                        </div>
-                      </div>
-                    </div>
-                  </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1005723816%2FClasslikes%2F1906099806" anchor-label="IOSPlatformConfig" id="1005723816%2FClasslikes%2F1906099806" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain"></a>
+          <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-i-o-s-platform-config/index.html"><span>IOSPlatform</span><wbr><span><span>Config</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1005723816%2FClasslikes%2F1906099806"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-i-o-s-platform-config/index.html">IOSPlatformConfig</a> : <a href="-platform-config/index.html">PlatformConfig</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2035569298%2FClasslikes%2F1906099806" anchor-label="JsonDecoder" id="-2035569298%2FClasslikes%2F1906099806" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain"></a>
+          <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-json-decoder/index.html"><span>Json</span><wbr><span><span>Decoder</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2035569298%2FClasslikes%2F1906099806"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-json-decoder/index.html">JsonDecoder</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">jsonData<span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-853061784%2FClasslikes%2F1906099806" anchor-label="JsonElementDecoder" id="-853061784%2FClasslikes%2F1906099806" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain"></a>
+          <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-json-element-decoder/index.html"><span>Json</span><wbr><span>Element</span><wbr><span><span>Decoder</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-853061784%2FClasslikes%2F1906099806"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-json-element-decoder/index.html">JsonElementDecoder</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">jsonData<span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="818224361%2FClasslikes%2F1906099806" anchor-label="LogSeverity" id="818224361%2FClasslikes%2F1906099806" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain"></a>
+          <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-log-severity/index.html"><span>Log</span><wbr><span><span>Severity</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="818224361%2FClasslikes%2F1906099806"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">enum </span><a href="-log-severity/index.html">LogSeverity</a> : <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-enum/index.html">Enum</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="-log-severity/index.html">LogSeverity</a><span class="token operator">&gt; </span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-187501270%2FClasslikes%2F1906099806" anchor-label="NativeLogWriter" id="-187501270%2FClasslikes%2F1906099806" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain"></a>
+          <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-native-log-writer/index.html"><span>Native</span><wbr><span>Log</span><wbr><span><span>Writer</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-187501270%2FClasslikes%2F1906099806"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-native-log-writer/index.html">NativeLogWriter</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="855889315%2FClasslikes%2F-202008714" anchor-label="PlatformConfig" id="855889315%2FClasslikes%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-platform-config/index.html"><span>Platform</span><wbr><span><span>Config</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="855889315%2FClasslikes%2F-202008714"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-platform-config/index.html">PlatformConfig</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <div class="footer"><span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2023 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
+      </div>
+      <div data-togglable="EXTENSION_FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="1476760501%2FFunctions%2F-202008714" anchor-label="buildClientData" id="1476760501%2FFunctions%2F-202008714" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":bridge-client:dokkaHtmlPartial/commonMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="build-client-data.html"><span>build</span><wbr><span>Client</span><wbr><span><span>Data</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1476760501%2FFunctions%2F-202008714"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="-platform-config/index.html">PlatformConfig</a><span class="token punctuation">.</span><a href="build-client-data.html"><span class="token function">buildClientData</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">input<span class="token operator">: </span><span data-unresolved-link="kotlinx.serialization.json/JsonElement///PointingToDeclaration/">JsonElement</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">uploadId<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlinx.serialization.json/JsonElement///PointingToDeclaration/">JsonElement</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1740236104%2FFunctions%2F1906099806" anchor-label="clientDataJson" id="1740236104%2FFunctions%2F1906099806" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="client-data-json.html"><span>client</span><wbr><span>Data</span><wbr><span><span>Json</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1740236104%2FFunctions%2F1906099806"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="../org.sagebionetworks.bridge.kmm.shared.managers/-native-adherence-record/index.html">NativeAdherenceRecord</a><span class="token punctuation">.</span><a href="client-data-json.html"><span class="token function">clientDataJson</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">?</span></div><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="../org.sagebionetworks.bridge.kmm.shared.managers/-native-participant-data-record/index.html">NativeParticipantDataRecord</a><span class="token punctuation">.</span><a href="client-data-json.html"><span class="token function">clientDataJson</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">?</span></div><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="../org.sagebionetworks.bridge.kmm.shared.models/-adherence-record/index.html">AdherenceRecord</a><span class="token punctuation">.</span><a href="client-data-json.html"><span class="token function">clientDataJson</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">?</span></div><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="../org.sagebionetworks.bridge.kmm.shared.models/-app-config/index.html">AppConfig</a><span class="token punctuation">.</span><a href="client-data-json.html"><span class="token function">clientDataJson</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">?</span></div><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="../org.sagebionetworks.bridge.kmm.shared.models/-study/index.html">Study</a><span class="token punctuation">.</span><a href="client-data-json.html"><span class="token function">clientDataJson</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">?</span></div><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="../org.sagebionetworks.bridge.kmm.shared.models/-user-session-info/index.html">UserSessionInfo</a><span class="token punctuation">.</span><a href="client-data-json.html"><span class="token function">clientDataJson</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">?</span></div><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="../org.sagebionetworks.bridge.kmm.shared.repo/-assessment-history-record/index.html">AssessmentHistoryRecord</a><span class="token punctuation">.</span><a href="client-data-json.html"><span class="token function">clientDataJson</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">?</span></div><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="../org.sagebionetworks.bridge.kmm.shared.repo/-report/index.html">Report</a><span class="token punctuation">.</span><a href="client-data-json.html"><span class="token function">clientDataJson</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">?</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1295300796%2FFunctions%2F1906099806" anchor-label="configElementJson" id="1295300796%2FFunctions%2F1906099806" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="config-element-json.html"><span>config</span><wbr><span>Element</span><wbr><span><span>Json</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1295300796%2FFunctions%2F1906099806"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="../org.sagebionetworks.bridge.kmm.shared.models/-app-config/index.html">AppConfig</a><span class="token punctuation">.</span><a href="config-element-json.html"><span class="token function">configElementJson</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">identifier<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">?</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="555594613%2FFunctions%2F1906099806" anchor-label="mapConfigElements" id="555594613%2FFunctions%2F1906099806" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="map-config-elements.html"><span>map</span><wbr><span>Config</span><wbr><span><span>Elements</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="555594613%2FFunctions%2F1906099806"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":bridge-client:dokkaHtmlPartial/iosMain" data-filterable-set=":bridge-client:dokkaHtmlPartial/iosMain" data-active="" data-toggle=":bridge-client:dokkaHtmlPartial/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":bridge-client:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="../org.sagebionetworks.bridge.kmm.shared.models/-app-config/index.html">AppConfig</a><span class="token punctuation">.</span><a href="map-config-elements.html"><span class="token function">mapConfigElements</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span><span class="token keyword"></span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">&gt;</span><span class="token operator">?</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  
-</body></html>
-
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2023 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
 

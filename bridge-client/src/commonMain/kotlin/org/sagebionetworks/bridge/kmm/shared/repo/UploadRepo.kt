@@ -75,6 +75,18 @@ internal open class UploadRepo(
     }
 
     /**
+     * Get all the completed [UploadSession] records from the local cache. This will include files
+     * marked as upload completed.
+     */
+    fun getCompletedUploadSessions(): List<UploadSession> {
+        val resources = database.getResourcesNeedSave(
+            ResourceType.UPLOAD_SESSION,
+            ResourceDatabaseHelper.APP_WIDE_STUDY_ID
+        )
+        return resources.mapNotNull { it.loadResource() }
+    }
+
+    /**
      * Get a tuple of the filepath and upload session for all pending uploads.
      */
     fun getPendingUploadFiles(): List<PendingUploadFile> {
@@ -268,7 +280,9 @@ internal open class UploadRepo(
 
     suspend fun completeUploadSession(uploadSessionId: String?, resourceId: String) {
         uploadSessionId?.let {
+            Logger.i("Processing finished upload: $uploadSessionId")
             uploadsApi.completeUploadSession(it)
+            Logger.i("Upload $uploadSessionId marked as completed. Removing resource with identifier: $resourceId.")
             database.removeResource(
                 resourceId,
                 ResourceType.UPLOAD_SESSION,

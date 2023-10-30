@@ -4202,6 +4202,7 @@ __attribute__((swift_name("NativeUploadManager")))
 @interface BridgeClientNativeUploadManager : BridgeClientBase <BridgeClientKoin_coreKoinComponent>
 - (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
 + (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+- (void)debugLogPendingUploads __attribute__((swift_name("debugLogPendingUploads()")));
 - (void)getPendingUploadFilesCallBack:(void (^)(NSArray<BridgeClientPendingUploadFile *> *))callBack __attribute__((swift_name("getPendingUploadFiles(callBack:)")));
 - (BOOL)hasMarkedFileAsUploadedFilePath:(NSString *)filePath __attribute__((swift_name("hasMarkedFileAsUploaded(filePath:)")));
 - (BOOL)hasPendingUploads __attribute__((swift_name("hasPendingUploads()")));

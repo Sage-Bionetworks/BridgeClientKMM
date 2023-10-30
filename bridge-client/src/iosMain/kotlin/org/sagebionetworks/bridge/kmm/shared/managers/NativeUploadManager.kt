@@ -14,6 +14,7 @@ import org.sagebionetworks.bridge.kmm.shared.models.S3UploadSession
 import org.sagebionetworks.bridge.kmm.shared.models.UploadFile
 import org.sagebionetworks.bridge.kmm.shared.models.UploadFileId
 import org.sagebionetworks.bridge.kmm.shared.models.getUploadFileResourceId
+import org.sagebionetworks.bridge.kmm.shared.models.getUploadSessionResourceId
 import org.sagebionetworks.bridge.kmm.shared.repo.*
 
 class NativeUploadManager : KoinComponent {
@@ -65,7 +66,7 @@ class NativeUploadManager : KoinComponent {
         repo.markUploadFileFinished(uploadFile, uploadSessionId)
         scope.launch {
             try {
-                repo.completeUploadSession(uploadSessionId, uploadFile.getUploadFileResourceId())
+                repo.completeUploadSession(uploadSessionId, uploadFile.getUploadSessionResourceId())
                 callBack(true)
             } catch (throwable: Throwable) {
                 Logger.i("Failed to send upload complete to server: $uploadSessionId", throwable)
@@ -90,6 +91,13 @@ class NativeUploadManager : KoinComponent {
 
     fun hasMarkedFileAsUploaded(filePath: String): Boolean {
         return repo.getUploadedFileRecord(filePath) != null
+    }
+
+    fun debugLogPendingUploads() {
+        val files = repo.getUploadFiles().map { it.filePath }
+        val sessions = repo.getCompletedUploadSessions().map { it.id!! }
+        Logger.i("All pending uploads: $files")
+        Logger.i("All completed uploads: $sessions")
     }
 }
 

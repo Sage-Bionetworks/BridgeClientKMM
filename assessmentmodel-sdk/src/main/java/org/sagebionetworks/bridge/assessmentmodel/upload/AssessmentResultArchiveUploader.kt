@@ -64,10 +64,7 @@ class AssessmentResultArchiveUploader(
         val uploadMetadata = UploadMetadata(
             instanceGuid = assessmentInstanceId,
             eventTimestamp = adherenceRecord.eventTimestamp,
-            startedOn = adherenceRecord.startedOn?.toString(),
-            finishedOn = adherenceRecord.finishedOn?.toString(),
-            declined = adherenceRecord.declined,
-            clientData = adherenceRecord.clientData
+            startedOn = adherenceRecord.startedOn?.toString()
         )
         val uploadFile = persist(assessmentRunUUID, archiver.buildArchive(), uploadMetadata)
         Logger.i("UploadFile $uploadFile")

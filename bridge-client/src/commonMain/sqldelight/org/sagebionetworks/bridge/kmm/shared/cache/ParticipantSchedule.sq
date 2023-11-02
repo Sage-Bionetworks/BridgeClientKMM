@@ -143,6 +143,11 @@ SELECT *
 FROM AdherenceRecords
 WHERE studyId = ?;
 
+getAdherence:
+SELECT *
+FROM AdherenceRecords
+WHERE instanceGuid = ? AND startedOn = ?;
+
 -- Get all finished assessment adherence records that aren't declined, can group by assessmentInstanceID in code
 completedAssessmentAdherence:
 SELECT *

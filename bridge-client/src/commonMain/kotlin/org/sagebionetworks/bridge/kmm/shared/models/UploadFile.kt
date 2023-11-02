@@ -1,7 +1,7 @@
 package org.sagebionetworks.bridge.kmm.shared.models
 
-import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
+import org.sagebionetworks.bridge.kmm.shared.repo.AdherenceRecordRepo
 
 @Serializable
 data class UploadFile (
@@ -23,14 +23,21 @@ data class UploadFile (
         return filePath.subSequence(filePath.lastIndexOf("/")+1, filePath.length).toString()
     }
 
-    internal fun getUploadRequest(): UploadRequest {
+    internal fun getUploadRequest(adherenceRepo: AdherenceRecordRepo?): UploadRequest {
+        val adherenceRecord = if (metadata?.instanceGuid != null && metadata?.startedOn != null) {
+            adherenceRepo?.getCachedAdherenceRecord(metadata.instanceGuid, metadata.startedOn)
+        } else {
+            null
+        }
+        val requestMetadata = adherenceRecord?.let { UploadRequestMetadata(adherenceRecord).toJsonMap() } ?: metadata?.toJsonMap()
+
         return UploadRequest(
             name = filename(),
             contentLength = fileLength,
             contentMd5 = md5Hash?.trim() ?: "", //Old md5 algorithm was sometimes including newline character at end, trim() is to fix old stuck uploads -nbrown 1/20/23
             contentType = contentType,
             encrypted = encrypted,
-            metadata = metadata?.toJsonMap(),
+            metadata = requestMetadata,
             type = "UploadRequest"
         )
     }

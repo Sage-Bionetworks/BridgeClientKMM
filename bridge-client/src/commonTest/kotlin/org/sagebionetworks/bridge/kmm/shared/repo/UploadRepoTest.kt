@@ -75,7 +75,7 @@ class UploadRepoTest : BaseTest() {
             }
             val testClient = getTestClient(mockEngine)
             val testDatabaseHelper = ResourceDatabaseHelper(testDatabaseDriver())
-            val repo = UploadRepo(testClient, testDatabaseHelper, MainScope())
+            val repo = UploadRepo(testClient, testDatabaseHelper, MainScope(), null)
             val database = repo.database
 
             val uploadFile1 = mockUploadFile()
@@ -118,7 +118,7 @@ class UploadRepoTest : BaseTest() {
             }
             val testClient = getTestClient(mockEngine)
             val testDatabaseHelper = ResourceDatabaseHelper(testDatabaseDriver())
-            val repo = UploadRepo(testClient, testDatabaseHelper, MainScope())
+            val repo = UploadRepo(testClient, testDatabaseHelper, MainScope(), null)
             val database = repo.database
 
             val uploadFile = mockUploadFile()
@@ -174,7 +174,7 @@ class UploadRepoTest : BaseTest() {
             }
             val testClient = getTestClient(mockEngine)
             val testDatabaseHelper = ResourceDatabaseHelper(testDatabaseDriver())
-            val repo = UploadRepo(testClient, testDatabaseHelper, MainScope())
+            val repo = UploadRepo(testClient, testDatabaseHelper, MainScope(), null)
 
             val uploadFile = mockUploadFile()
             val response = repo.queueAndRequestUploadSession(uploadFile)
@@ -208,7 +208,7 @@ class UploadRepoTest : BaseTest() {
             }
             val testClient = getTestClient(mockEngine)
             val testDatabaseHelper = ResourceDatabaseHelper(testDatabaseDriver())
-            val repo = UploadRepo(testClient, testDatabaseHelper, MainScope())
+            val repo = UploadRepo(testClient, testDatabaseHelper, MainScope(), null)
             val database = repo.database
 
             // Save the upload file and the old (expired) upload session
@@ -284,7 +284,7 @@ class UploadRepoTest : BaseTest() {
             }
             val testClient = getTestClient(mockEngine)
             val testDatabaseHelper = ResourceDatabaseHelper(testDatabaseDriver())
-            val repo = UploadRepo(testClient, testDatabaseHelper, MainScope())
+            val repo = UploadRepo(testClient, testDatabaseHelper, MainScope(), null)
             val database = repo.database
 
             // Save the upload file and the old (expired) upload session
@@ -349,7 +349,7 @@ class UploadRepoTest : BaseTest() {
             }
             val testClient = getTestClient(mockEngine)
             val testDatabaseHelper = ResourceDatabaseHelper(testDatabaseDriver())
-            val repo = UploadRepo(testClient, testDatabaseHelper, MainScope())
+            val repo = UploadRepo(testClient, testDatabaseHelper, MainScope(), null)
             val database = repo.database
 
             val resource = Resource(
@@ -382,24 +382,16 @@ class UploadRepoTest : BaseTest() {
 
     @Test
     fun testUploadMetadata_toJsonMap() {
-        val clientData = JsonObject(mapOf(
-            "data" to JsonPrimitive("foo")))
         val metadata = UploadMetadata(
             instanceGuid = "foo",
             eventTimestamp = "goo",
             startedOn = "maloo",
-            finishedOn = "achoo",
-            declined = false,
-            clientData = clientData
         )
         val json = metadata.toJsonMap()
         val expectedJson: Map <String, JsonElement> = mapOf(
             "instanceGuid" to JsonPrimitive("foo"),
             "eventTimestamp" to JsonPrimitive("goo"),
             "startedOn" to JsonPrimitive("maloo"),
-            "finishedOn" to JsonPrimitive("achoo"),
-            "declined" to JsonPrimitive(false),
-            "clientData" to clientData
         )
         assertEquals(expectedJson, json)
     }

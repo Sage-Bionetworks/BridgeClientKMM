@@ -75,6 +75,13 @@ class AdherenceRecordRepo(httpClient: HttpClient,
         }
     }
 
+    fun getCachedAdherenceRecord(instanceId: String, startedOn: String) : AdherenceRecord? {
+        return dbQuery.getAdherence(instanceId, startedOn).executeAsOneOrNull()?.let {
+                Json.decodeFromString<AdherenceRecord>(it.adherenceJson)
+        }
+    }
+
+
     // TODO: Remove once this method is not longer being used by ScheduleTimelineRep -nbrown 10/17/22
     /**
      * Get the locally cached [AdherenceRecord]s for the specified [instanceIds].

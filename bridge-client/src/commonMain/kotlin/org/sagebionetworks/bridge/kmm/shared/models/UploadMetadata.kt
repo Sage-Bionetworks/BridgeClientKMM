@@ -28,6 +28,7 @@ data class UploadRequestMetadata(
     val startedOn: String? = null,
     val finishedOn: String? = null,
     val declined: Boolean? = null,
+    val clientTimeZone: String? = null,
     val clientData: JsonElement? = null
 ) {
 
@@ -37,6 +38,7 @@ data class UploadRequestMetadata(
         startedOn = adherenceRecord.startedOn?.toString(),
         finishedOn = adherenceRecord.finishedOn?.toString(),
         declined = adherenceRecord.declined,
+        clientTimeZone = adherenceRecord.clientTimeZone,
         clientData = adherenceRecord.clientData
     )
 

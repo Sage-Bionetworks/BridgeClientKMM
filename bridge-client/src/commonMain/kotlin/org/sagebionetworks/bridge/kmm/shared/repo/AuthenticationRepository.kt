@@ -112,6 +112,7 @@ class AuthenticationRepository(
         }
         // Always clear database when signOut is called
         database.clearDatabase()
+        clearCredentials()
     }
 
     /**

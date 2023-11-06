@@ -16,6 +16,8 @@ import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
 import org.sagebionetworks.bridge.kmm.shared.testDatabaseDriver
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class AuthenticationRepoTest : BaseTest() {
@@ -83,6 +85,8 @@ class AuthenticationRepoTest : BaseTest() {
                 addHandler (
                     getJsonReponseHandler(Json.encodeToString(userSessionInfo))
                 )
+                // 4 - Sign-out call
+                addHandler { respondOk() }
                 reuseHandlers = false
             }
             // AuthProvider needs to be null so RefreshTokenFeature doesn't get installed
@@ -90,18 +94,22 @@ class AuthenticationRepoTest : BaseTest() {
             (testConfig.bridgeConfig as TestBridgeConfig).cacheCredentials = true
             val testClient = getTestClient(mockEngine, testConfig)
 
+            val encryptedSharedSettings = TestEncryptedSharedSettings()
             val authRepo = AuthenticationRepository(
                 testClient,
                 testConfig.bridgeConfig,
                 testConfig.db,
                 MainScope(),
-                TestEncryptedSharedSettings()
+                encryptedSharedSettings
             )
 
             val result = authRepo.signInExternalId("participant:testStudyId", "participant:testStudyId")
             assertTrue(result is ResourceResult.Success)
             assertTrue(authRepo.reAuth())
             assertTrue(authRepo.isAuthenticated())
+            assertNotNull(encryptedSharedSettings.pwd)
+            authRepo.signOut()
+            assertNull(encryptedSharedSettings.pwd)
 
         }
 

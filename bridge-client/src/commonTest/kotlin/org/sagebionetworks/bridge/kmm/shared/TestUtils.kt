@@ -15,6 +15,7 @@ import kotlinx.serialization.json.Json
 import org.sagebionetworks.bridge.kmm.shared.apis.RefreshTokenFeature
 import org.sagebionetworks.bridge.kmm.shared.apis.SessionTokenFeature
 import org.sagebionetworks.bridge.kmm.shared.apis.HttpUtil
+import org.sagebionetworks.bridge.kmm.shared.cache.EncryptedSharedSettings
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
 import org.sagebionetworks.bridge.kmm.shared.di.appendAuthConfig
 import org.sagebionetworks.bridge.kmm.shared.di.appendDefaultConfig
@@ -97,4 +98,10 @@ fun getJsonReponseHandler(json: String, responseCode: HttpStatusCode = HttpStatu
     return {request ->
         respond(json, responseCode, headersOf("Content-Type" to listOf(ContentType.Application.Json.toString())))
     }
+}
+
+class TestEncryptedSharedSettings : EncryptedSharedSettings {
+
+    override var pwd: String? = null
+
 }

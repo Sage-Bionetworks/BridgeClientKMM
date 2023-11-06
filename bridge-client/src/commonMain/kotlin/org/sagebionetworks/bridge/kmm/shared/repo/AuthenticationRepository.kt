@@ -31,7 +31,8 @@ class AuthenticationRepository(
     authHttpClient: HttpClient,
     val bridgeConfig: BridgeConfig,
     val database: ResourceDatabaseHelper,
-    private val backgroundScope: CoroutineScope
+    private val backgroundScope: CoroutineScope,
+    private val encryptedSharedSettings: EncryptedSharedSettings
 ) : KoinComponent, AuthenticationProvider {
 
     internal companion object {
@@ -192,6 +193,21 @@ class AuthenticationRepository(
         return signIn(signIn)
     }
 
+    private fun storeCredentials(password: String) {
+        if (bridgeConfig.cacheCredentials) {
+            encryptedSharedSettings.pwd = password
+        }
+    }
+
+    private fun clearCredentials() {
+        encryptedSharedSettings.pwd = null
+    }
+
+    private fun getCredentials() : String? {
+        return encryptedSharedSettings.pwd
+    }
+
+
     suspend fun reauthWithCredentials(password: String) : ResourceResult<UserSessionInfo> {
         val sessionInfo = session() ?: return ResourceResult.Failed(ResourceStatus.FAILED)
         val signIn = SignIn(
@@ -207,6 +223,7 @@ class AuthenticationRepository(
         } catch (err: Throwable) {
             Logger.e("Error requesting reAuth with stored password: $err")
             if (err is ResponseException && err.response.status == HttpStatusCode.NotFound) {
+                clearCredentials()
                 ResourceResult.Failed(ResourceStatus.FAILED)
             } else {
                 ResourceResult.Failed(ResourceStatus.RETRY)
@@ -217,6 +234,9 @@ class AuthenticationRepository(
     private suspend fun signIn(signIn: SignIn) : ResourceResult<UserSessionInfo> {
         try {
             val userSession = authenticationApi.signIn(signIn)
+            if (signIn.password != null && bridgeConfig.cacheCredentials) {
+                storeCredentials(signIn.password)
+            }
             updateCachedSession(null, userSession)
             return ResourceResult.Success(userSession, ResourceStatus.SUCCESS)
         } catch (err: Throwable) {
@@ -290,6 +310,13 @@ class AuthenticationRepository(
                         sessionToken = ""
                     )
                     updateCachedSession(null, newSession)
+                    val pwd = getCredentials()
+                    if (bridgeConfig.cacheCredentials && pwd != null) {
+                        val result = reauthWithCredentials(pwd)
+                        if (result is ResourceResult.Success) {
+                            success = true
+                        }
+                    }
                 } else {
                     // Some sort of network error leave the session alone so we can try again
                     Logger.i("User reauth failed. Ignoring. $err")

@@ -15,6 +15,7 @@ sqlDelight = "2.0.0"
 koin = "3.1.5"
 okio = "3.0.0"
 kermit = "1.0.0"
+multiplatformSettings = "1.1.0"
 androidWorkManager = "2.7.1"
 androidxLifecycle = "2.2.0"
 #TODO: syoung 02/15/2022 Figure out why this fails to build on my machine
@@ -62,6 +63,7 @@ ktor-client-serialization = { module = "io.ktor:ktor-serialization-kotlinx-json"
 ktor-client-contentNegotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
 
+multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatformSettings" }
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 
 sqlDelight-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqlDelight" }
@@ -75,6 +77,7 @@ touchlab-kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 touchlab-stately = { module = "co.touchlab:stately-common", version = "1.1.1" }
 
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+androidx-security-crypto-ktx = { group = "androidx.security", name = "security-crypto", version = "1.1.0-alpha06" }
 
 [plugins]
 gradleDependencyUpdate = "com.github.ben-manes.versions:0.42.0"

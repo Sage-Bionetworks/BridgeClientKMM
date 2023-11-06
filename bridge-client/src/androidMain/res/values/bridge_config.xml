@@ -2,5 +2,6 @@
 <resources>
     <string name="osb_app_id" translatable="false">bridge-client-kmm-integration</string>
     <string name="osb_app_name">Bridge Client KMM Integration</string>
+    <bool name="cache_credentials">false</bool>
 
 </resources>

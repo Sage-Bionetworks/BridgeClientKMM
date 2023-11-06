@@ -42,6 +42,8 @@ interface PlatformConfig {
     val deviceName: String
 
     val osName: String
+
+    val cacheCredentials: Boolean
 }
 
 fun PlatformConfig.buildClientData(input: JsonElement? = null, uploadId: String? = null): JsonElement {

@@ -18,6 +18,7 @@ import org.sagebionetworks.bridge.kmm.shared.cache.*
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper.Companion.APP_WIDE_STUDY_ID
 import org.sagebionetworks.bridge.kmm.shared.models.UploadFile
 import org.sagebionetworks.bridge.kmm.shared.models.getUploadFileResourceId
+import org.sagebionetworks.bridge.kmm.shared.repo.AdherenceRecordRepo
 
 class UploadRequester(
     val database: ResourceDatabaseHelper,
@@ -85,6 +86,7 @@ internal class CoroutineUploadWorker(
     private val httpClient: HttpClient,
     private val databaseHelper: ResourceDatabaseHelper,
     private val backgroundScope: CoroutineScope,
+    private val adherenceRecordRepo: AdherenceRecordRepo,
 ) : CoroutineWorker(context, params) {
     private val TAG = "CoroutineUploadWorker"
     
@@ -92,7 +94,7 @@ internal class CoroutineUploadWorker(
         return withContext(Dispatchers.IO) {
             Logger.d { "Upload worker started" }
             val uploadManager = UploadManager(
-                httpClient, databaseHelper, backgroundScope
+                httpClient, databaseHelper, backgroundScope, adherenceRecordRepo
             )
             return@withContext try {
                 if (uploadManager.processUploads()) {

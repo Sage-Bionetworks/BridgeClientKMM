@@ -33,6 +33,7 @@ internal open class UploadRepo(
     httpClient: HttpClient,
     databaseHelper: ResourceDatabaseHelper,
     backgroundScope: CoroutineScope,
+    val adherenceRecordRepo: AdherenceRecordRepo?
 ) : AbstractResourceRepo(databaseHelper, backgroundScope) {
 
     companion object {
@@ -264,7 +265,7 @@ internal open class UploadRepo(
             resourceType = ResourceType.UPLOAD_SESSION,
             studyId = ResourceDatabaseHelper.APP_WIDE_STUDY_ID,
             curResource = null,
-            remoteLoad = {loadRemoteUploadSession(uploadFile.getUploadRequest())}
+            remoteLoad = {loadRemoteUploadSession(uploadFile.getUploadRequest(adherenceRecordRepo))}
         ).loadResource()
         //TODO: Need to think through error handling if we are unable to get an UploadSession -nbrown 12/16/20
     }

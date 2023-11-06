@@ -12,13 +12,15 @@ import org.sagebionetworks.bridge.kmm.shared.cache.loadResource
 import org.sagebionetworks.bridge.kmm.shared.models.UploadFile
 import org.sagebionetworks.bridge.kmm.shared.models.UploadSession
 import org.sagebionetworks.bridge.kmm.shared.models.getUploadSessionResourceId
+import org.sagebionetworks.bridge.kmm.shared.repo.AdherenceRecordRepo
 import org.sagebionetworks.bridge.kmm.shared.repo.UploadRepo
 
 internal class UploadManager(
     httpClient: HttpClient,
     databaseHelper: ResourceDatabaseHelper,
     backgroundScope: CoroutineScope,
-) : UploadRepo(httpClient, databaseHelper, backgroundScope) {
+    adherenceRecordRepo: AdherenceRecordRepo?,
+) : UploadRepo(httpClient, databaseHelper, backgroundScope, adherenceRecordRepo) {
 
     private val s3UploadApi = S3UploadApi(httpClient = httpClient)
 

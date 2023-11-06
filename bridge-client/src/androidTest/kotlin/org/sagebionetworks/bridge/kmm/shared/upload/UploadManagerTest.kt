@@ -61,7 +61,7 @@ class UploadManagerTest {
         )
 
         val testDatabaseHelper = ResourceDatabaseHelper(testDatabaseDriver())
-        val uploadManager = UploadManager(testHttpClient, testDatabaseHelper, TestScope())
+        val uploadManager = UploadManager(testHttpClient, testDatabaseHelper, TestScope(), null)
         uploadManager.database.storeUploadFile(uploadFile)
         return uploadManager
     }

@@ -225,7 +225,7 @@ class AssessmentArchiver(
     }
 
     private fun addAnswerResult(result: AnswerResult, path: String) {
-        var baseType = result.answerType?.baseType ?: return
+        var baseType = result.answerType?.jsonType ?: return
         val key = path.replace("/", "_")
         var jsonValue = result.jsonValue
         if (baseType == BaseType.ARRAY) {

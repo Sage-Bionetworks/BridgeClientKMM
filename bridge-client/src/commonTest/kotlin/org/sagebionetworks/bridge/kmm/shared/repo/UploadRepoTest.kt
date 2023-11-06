@@ -15,6 +15,7 @@ import kotlinx.datetime.plus
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import org.sagebionetworks.bridge.kmm.shared.BaseTest
 import org.sagebionetworks.bridge.kmm.shared.cache.Resource
@@ -74,7 +75,7 @@ class UploadRepoTest : BaseTest() {
             }
             val testClient = getTestClient(mockEngine)
             val testDatabaseHelper = ResourceDatabaseHelper(testDatabaseDriver())
-            val repo = UploadRepo(testClient, testDatabaseHelper, MainScope())
+            val repo = UploadRepo(testClient, testDatabaseHelper, MainScope(), null)
             val database = repo.database
 
             val uploadFile1 = mockUploadFile()
@@ -117,7 +118,7 @@ class UploadRepoTest : BaseTest() {
             }
             val testClient = getTestClient(mockEngine)
             val testDatabaseHelper = ResourceDatabaseHelper(testDatabaseDriver())
-            val repo = UploadRepo(testClient, testDatabaseHelper, MainScope())
+            val repo = UploadRepo(testClient, testDatabaseHelper, MainScope(), null)
             val database = repo.database
 
             val uploadFile = mockUploadFile()
@@ -173,7 +174,7 @@ class UploadRepoTest : BaseTest() {
             }
             val testClient = getTestClient(mockEngine)
             val testDatabaseHelper = ResourceDatabaseHelper(testDatabaseDriver())
-            val repo = UploadRepo(testClient, testDatabaseHelper, MainScope())
+            val repo = UploadRepo(testClient, testDatabaseHelper, MainScope(), null)
 
             val uploadFile = mockUploadFile()
             val response = repo.queueAndRequestUploadSession(uploadFile)
@@ -207,7 +208,7 @@ class UploadRepoTest : BaseTest() {
             }
             val testClient = getTestClient(mockEngine)
             val testDatabaseHelper = ResourceDatabaseHelper(testDatabaseDriver())
-            val repo = UploadRepo(testClient, testDatabaseHelper, MainScope())
+            val repo = UploadRepo(testClient, testDatabaseHelper, MainScope(), null)
             val database = repo.database
 
             // Save the upload file and the old (expired) upload session
@@ -283,7 +284,7 @@ class UploadRepoTest : BaseTest() {
             }
             val testClient = getTestClient(mockEngine)
             val testDatabaseHelper = ResourceDatabaseHelper(testDatabaseDriver())
-            val repo = UploadRepo(testClient, testDatabaseHelper, MainScope())
+            val repo = UploadRepo(testClient, testDatabaseHelper, MainScope(), null)
             val database = repo.database
 
             // Save the upload file and the old (expired) upload session
@@ -348,7 +349,7 @@ class UploadRepoTest : BaseTest() {
             }
             val testClient = getTestClient(mockEngine)
             val testDatabaseHelper = ResourceDatabaseHelper(testDatabaseDriver())
-            val repo = UploadRepo(testClient, testDatabaseHelper, MainScope())
+            val repo = UploadRepo(testClient, testDatabaseHelper, MainScope(), null)
             val database = repo.database
 
             val resource = Resource(
@@ -381,7 +382,11 @@ class UploadRepoTest : BaseTest() {
 
     @Test
     fun testUploadMetadata_toJsonMap() {
-        val metadata = UploadMetadata("foo", "goo", "maloo")
+        val metadata = UploadMetadata(
+            instanceGuid = "foo",
+            eventTimestamp = "goo",
+            startedOn = "maloo",
+        )
         val json = metadata.toJsonMap()
         val expectedJson: Map <String, JsonElement> = mapOf(
             "instanceGuid" to JsonPrimitive("foo"),

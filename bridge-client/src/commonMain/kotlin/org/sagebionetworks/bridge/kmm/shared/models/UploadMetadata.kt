@@ -20,3 +20,34 @@ data class UploadMetadata(
         return jsonCoder.encodeToJsonElement(UploadMetadata.serializer(),this).jsonObject.toMap()
     }
 }
+
+@Serializable
+data class UploadRequestMetadata(
+    val instanceGuid: String? = null,
+    val eventTimestamp: String? = null,
+    val startedOn: String? = null,
+    val finishedOn: String? = null,
+    val declined: Boolean? = null,
+    val clientTimeZone: String? = null,
+    val clientData: JsonElement? = null
+) {
+
+    constructor(adherenceRecord: AdherenceRecord) : this(
+        instanceGuid = adherenceRecord.instanceGuid,
+        eventTimestamp = adherenceRecord.eventTimestamp,
+        startedOn = adherenceRecord.startedOn?.toString(),
+        finishedOn = adherenceRecord.finishedOn?.toString(),
+        declined = adherenceRecord.declined,
+        clientTimeZone = adherenceRecord.clientTimeZone,
+        clientData = adherenceRecord.clientData
+    )
+
+    internal fun toJsonMap(): Map<String, JsonElement> {
+        val jsonCoder = Json {
+            ignoreUnknownKeys = true
+            encodeDefaults = true
+            explicitNulls = false
+        }
+        return jsonCoder.encodeToJsonElement(UploadRequestMetadata.serializer(),this).jsonObject.toMap()
+    }
+}

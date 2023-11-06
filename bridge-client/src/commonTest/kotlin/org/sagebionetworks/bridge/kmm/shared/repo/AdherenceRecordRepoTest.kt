@@ -1,6 +1,7 @@
 package org.sagebionetworks.bridge.kmm.shared.repo
 
 import kotlinx.coroutines.MainScope
+import kotlinx.datetime.TimeZone
 import kotlinx.serialization.json.jsonPrimitive
 import org.sagebionetworks.bridge.kmm.shared.BaseTest
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
@@ -27,6 +28,7 @@ class AdherenceRecordRepoTest: BaseTest() {
             "         \"startedOn\":\""+ startedOn + "\",\n" +
             "         \"finishedOn\":\""+ finishedOn + "\",\n" +
             "         \"eventTimestamp\":\""+ eventTimestamp +"\",\n" +
+            "         \"clientTimeZone\":\""+ TimeZone.currentSystemDefault().id +"\",\n" +
             "         \"type\":\"AdherenceRecord\"\n" +
             "      }\n" +
             "   ],\n" +
@@ -94,6 +96,7 @@ class AdherenceRecordRepoTest: BaseTest() {
             assertEquals(startedOn, uploadRequestMetadata?.get("startedOn")?.jsonPrimitive?.content)
             assertEquals(finishedOn, uploadRequestMetadata?.get("finishedOn")?.jsonPrimitive?.content)
             assertEquals(eventTimestamp, uploadRequestMetadata?.get("eventTimestamp")?.jsonPrimitive?.content)
+            assertEquals(TimeZone.currentSystemDefault().id, uploadRequestMetadata?.get("clientTimeZone")?.jsonPrimitive?.content)
             assertEquals("false", uploadRequestMetadata?.get("declined").toString())
 
         }

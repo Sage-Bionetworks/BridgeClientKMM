@@ -17,12 +17,14 @@ public class PlatformConfigImpl : IOSPlatformConfig {
     public let osName: String
     public let osVersion: String
     public let defaultConsentGuid: String?
+    public let cacheCredentials: Bool
+    
     
     public var deviceInfo: String {
         "\(deviceName); \(osName)/\(osVersion)"
     }
     
-    public init(appId: String? = nil, appGroupIdentifier: String? = nil, bridgeEnvironment: PlatformConfigBridgeEnvironment = .production, defaultConsentGuid: String? = nil) {
+    public init(appId: String? = nil, appGroupIdentifier: String? = nil, bridgeEnvironment: PlatformConfigBridgeEnvironment = .production, defaultConsentGuid: String? = nil, cacheCredentials: Bool = false) {
         
         self.appId = appId ?? Bundle.main.bridgeAppId
         self.appGroupIdentifier = appGroupIdentifier
@@ -31,6 +33,7 @@ public class PlatformConfigImpl : IOSPlatformConfig {
         self.appVersion = Int32(Bundle.main.buildNumber)
         self.bridgeEnvironment = bridgeEnvironment
         self.defaultConsentGuid = defaultConsentGuid
+        self.cacheCredentials = cacheCredentials
         
         #if os(watchOS)
         let device = WKInterfaceDevice.current()

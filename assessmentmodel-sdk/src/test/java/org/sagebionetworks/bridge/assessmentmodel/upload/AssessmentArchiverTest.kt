@@ -262,6 +262,8 @@ class TestBridgeConfig: BridgeConfig {
         get() = PlatformConfig.BridgeEnvironment.PRODUCTION
     override val osName: String
         get() = "AssessmentModel-SDK Test"
+    override val cacheCredentials: Boolean
+        get() = false
     override val osVersion: String
         get() = "AssessmentModel-SDK Test"
     override val deviceName: String

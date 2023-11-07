@@ -5,6 +5,8 @@ import org.koin.core.module.Module
 import org.koin.core.qualifier.named
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
+import org.sagebionetworks.bridge.kmm.shared.cache.EncryptedSharedSettings
+import org.sagebionetworks.bridge.kmm.shared.cache.EncryptedSharedSettingsImpl
 import org.sagebionetworks.bridge.kmm.shared.cache.LocalJsonDataCache
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
 import org.sagebionetworks.bridge.kmm.shared.repo.*
@@ -25,6 +27,8 @@ fun bridgeClientkoinModules(enableNetworkLogs: Boolean): List<Module> {
 val commonModule = module {
     single {ResourceDatabaseHelper(get())}
 
+    single<EncryptedSharedSettings> {EncryptedSharedSettingsImpl(get(named(EncryptedSharedSettingsImpl.encryptedSettingsName)))}
+
     single<AssessmentConfigRepo> {AssessmentConfigRepo(get(), get(), get(named("background"))) }
     single<ScheduleTimelineRepo> {ScheduleTimelineRepo(get(), get(), get(), get(), get(named("background")), null) }
     single<ActivityEventsRepo> { ActivityEventsRepo(get(), get(), get(named("background")), get()) }
@@ -34,7 +38,8 @@ val commonModule = module {
             authHttpClient = get(named("authHttpClient")),
             bridgeConfig = get(),
             database = get(),
-            backgroundScope =  get(named("background"))
+            backgroundScope =  get(named("background")),
+            encryptedSharedSettings = get()
         )
     }
     single<AppConfigRepo> { AppConfigRepo(get(), get(), get(named("background")), get()) }

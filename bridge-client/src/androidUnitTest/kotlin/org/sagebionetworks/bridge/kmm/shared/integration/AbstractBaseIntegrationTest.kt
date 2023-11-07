@@ -1,14 +1,18 @@
 package org.sagebionetworks.bridge.kmm.shared.integration
 
 import org.koin.core.context.startKoin
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.sagebionetworks.bridge.kmm.shared.BaseTest
 import org.sagebionetworks.bridge.kmm.shared.BridgeConfig
 import org.sagebionetworks.bridge.kmm.shared.PlatformConfig
+import org.sagebionetworks.bridge.kmm.shared.TestEncryptedSharedSettings
 import org.sagebionetworks.bridge.kmm.shared.apis.HttpUtil
+import org.sagebionetworks.bridge.kmm.shared.cache.EncryptedSharedSettings
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
 import org.sagebionetworks.bridge.kmm.shared.di.bridgeClientkoinModules
+import org.sagebionetworks.bridge.kmm.shared.repo.AuthenticationRepository
 import org.sagebionetworks.bridge.kmm.shared.testDatabaseDriver
 import kotlin.test.*
 
@@ -26,6 +30,16 @@ abstract class AbstractBaseIntegrationTest: BaseTest(), KoinTest {
                     return "en-US,en"
                 }
             } }
+            //Need to override for tests since encryptedSharedSettings requires a Context
+            single<AuthenticationRepository> {
+                AuthenticationRepository(
+                    authHttpClient = get(named("authHttpClient")),
+                    bridgeConfig = get(),
+                    database = get(),
+                    backgroundScope =  get(named("background")),
+                    encryptedSharedSettings = TestEncryptedSharedSettings()
+                )
+            }
 
         }
         init {
@@ -58,6 +72,8 @@ abstract class AbstractBaseIntegrationTest: BaseTest(), KoinTest {
             get() = PlatformConfig.BridgeEnvironment.PRODUCTION
         override val osName: String
             get() = "Android Integration Test"
+        override val cacheCredentials: Boolean
+            get() = true
         override val osVersion: String
             get() = "Android Integration Test"
         override val deviceName: String

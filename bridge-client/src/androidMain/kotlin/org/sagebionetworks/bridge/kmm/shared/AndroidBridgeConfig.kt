@@ -47,6 +47,8 @@ class AndroidBridgeConfig(context: Context) : BridgeConfig {
     // TODO: emm 2021-08-18 Where should this value come from?
     override val bridgeEnvironment: PlatformConfig.BridgeEnvironment = PlatformConfig.BridgeEnvironment.PRODUCTION
 
+    override val cacheCredentials: Boolean = applicationContext.resources.getBoolean(R.bool.cache_credentials)
+
     override val osName: String = "Android"
 
     override val osVersion: String = VERSION.RELEASE

@@ -2,9 +2,13 @@ package org.sagebionetworks.bridge.kmm.shared.integration
 
 import org.koin.core.component.inject
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceResult
-import org.sagebionetworks.bridge.kmm.shared.repo.AuthenticationRepository
 import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
-import kotlin.test.*
+import org.sagebionetworks.bridge.kmm.shared.repo.AuthenticationRepository
+import kotlin.test.Test
+import kotlin.test.assertFalse
+import kotlin.test.assertNotEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class AuthenticationIntegrationTest: AbstractBaseIntegrationTest() {
 
@@ -31,6 +35,12 @@ class AuthenticationIntegrationTest: AbstractBaseIntegrationTest() {
             val updatedSession = authRepo.session()
             assertNotNull(updatedSession)
             assertNotEquals(updatedSession.reauthToken, sessionInfo.reauthToken)
+            // Clear session token and reauth token
+            authRepo.updateCachedSession(null, updatedSession.copy(reauthToken = "invalid-token", sessionToken = "", authenticated = false))
+            //Test reauth using cached credentials
+            assertTrue(authRepo.reAuth())
+            assertTrue(authRepo.isAuthenticated())
+
             //Test signout
             authRepo.signOut()
             assertFalse(authRepo.isAuthenticated())

@@ -44,7 +44,7 @@ class ParticipantRepoTest : BaseTest() {
             db.insertUpdateResource(resource)
             val bridgeConfig = TestBridgeConfig()
             val testConfig = TestHttpClientConfig(bridgeConfig = bridgeConfig, db = db)
-            val authRepo = AuthenticationRepository(getTestClient("", config = testConfig.copy(authProvider = null)), bridgeConfig,  db, MainScope())
+            val authRepo = AuthenticationRepository(getTestClient("", config = testConfig.copy(authProvider = null)), bridgeConfig,  db, MainScope(), TestEncryptedSharedSettings())
             val participantRepo = ParticipantRepo(getTestClient("", config = testConfig), db, MainScope(), authRepo)
             val session = authRepo.session()
             assertNotNull(session)
@@ -81,5 +81,7 @@ class TestBridgeConfig: BridgeConfig {
         get() = "Test"
     override val deviceName: String
         get() = "Test"
+    override var cacheCredentials: Boolean = false
+
 
 }

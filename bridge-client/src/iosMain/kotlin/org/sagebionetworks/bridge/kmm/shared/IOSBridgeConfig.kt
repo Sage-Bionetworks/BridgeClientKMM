@@ -47,6 +47,9 @@ object IOSBridgeConfig  : BridgeConfig {
         get() = platformConfig.osVersion
     override val deviceName: String
         get() = platformConfig.deviceName
+
+    override val cacheCredentials: Boolean
+        get() = platformConfig.cacheCredentials
 }
 
 internal data class PlatformConfigImpl(
@@ -60,5 +63,6 @@ internal data class PlatformConfigImpl(
     override val deviceName: String = "Unknown",
     override val osName: String = "iOS",
     override val defaultConsentGuid: String? = null,
+    override val cacheCredentials: Boolean = false
 ) : IOSPlatformConfig
 

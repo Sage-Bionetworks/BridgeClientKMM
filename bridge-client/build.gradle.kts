@@ -95,6 +95,7 @@ kotlin {
                 api(libs.koin.core)
                 // Kermit
                 implementation(libs.touchlab.kermit)
+                implementation(libs.multiplatform.settings)
             }
         }
 
@@ -114,6 +115,7 @@ kotlin {
                 implementation(libs.androidx.work.runtimeKts)
                 implementation(libs.koin.android)
                 implementation(libs.koin.android.workmanager)
+                implementation(libs.androidx.security.crypto.ktx)
             }
         }
         val androidUnitTest by getting {

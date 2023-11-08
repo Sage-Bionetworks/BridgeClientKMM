@@ -60,11 +60,11 @@ class AssessmentResultArchiveUploader(
             UUID.randomUUID().toString()
         }
 
-        val uploadMetadata = UploadMetadata(
-            instanceGuid = adherenceRecord?.instanceGuid,
-            eventTimestamp = adherenceRecord?.eventTimestamp,
-            startedOn = adherenceRecord?.startedOn?.toString()
-        )
+        val uploadMetadata = adherenceRecord?.let { UploadMetadata(
+            instanceGuid = it.instanceGuid,
+            eventTimestamp = it.eventTimestamp,
+            startedOn = it.startedOn?.toString()
+        )}
         val uploadFile = persist(assessmentRunUUID, archiver.buildArchive(), uploadMetadata)
         Logger.i("UploadFile $uploadFile")
         uploadRequester.queueAndRequestUpload(uploadFile)
@@ -75,7 +75,7 @@ class AssessmentResultArchiveUploader(
         CMSException::class,
         NoSuchAlgorithmException::class
     )
-    fun persist(filename: String, archive: Archive, uploadMetadata: UploadMetadata): UploadFile {
+    fun persist(filename: String, archive: Archive, uploadMetadata: UploadMetadata?): UploadFile {
         val md5: MessageDigest = try {
             MessageDigest.getInstance("MD5")
         } catch (e: NoSuchAlgorithmException) {

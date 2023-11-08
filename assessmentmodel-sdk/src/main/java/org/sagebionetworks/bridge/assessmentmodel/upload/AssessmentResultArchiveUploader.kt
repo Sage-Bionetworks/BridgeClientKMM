@@ -43,8 +43,7 @@ class AssessmentResultArchiveUploader(
      */
     fun archiveResultAndQueueUpload(assessmentResult: Result,
                                     jsonCoder: Json,
-                                    assessmentInstanceId: String,
-                                    adherenceRecord: AdherenceRecord,
+                                    adherenceRecord: AdherenceRecord?,
                                     assessmentResultFilename: String? = "assessmentResult.json") {
 
         val archiver = AssessmentArchiver(
@@ -62,9 +61,9 @@ class AssessmentResultArchiveUploader(
         }
 
         val uploadMetadata = UploadMetadata(
-            instanceGuid = assessmentInstanceId,
-            eventTimestamp = adherenceRecord.eventTimestamp,
-            startedOn = adherenceRecord.startedOn?.toString()
+            instanceGuid = adherenceRecord?.instanceGuid,
+            eventTimestamp = adherenceRecord?.eventTimestamp,
+            startedOn = adherenceRecord?.startedOn?.toString()
         )
         val uploadFile = persist(assessmentRunUUID, archiver.buildArchive(), uploadMetadata)
         Logger.i("UploadFile $uploadFile")

@@ -161,8 +161,7 @@ class AssessmentArchiverTest {
         val archiver = AssessmentArchiver(
             assessmentResult = assessmentResult,
             jsonCoder = jsonCoder,
-            bridgeConfig = TestBridgeConfig(),
-            assessmentResultFilename = resultFileName
+            bridgeConfig = TestBridgeConfig()
         )
 
         val archive = archiver.buildArchive()

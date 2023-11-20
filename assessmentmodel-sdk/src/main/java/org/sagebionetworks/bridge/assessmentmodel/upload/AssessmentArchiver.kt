@@ -34,8 +34,6 @@ class AssessmentArchiver(
     private val assessmentResult: Result,
     private val jsonCoder: Json,
     private val bridgeConfig: BridgeConfig,
-    // To serialize assessmentResult as part of archive, include a filename for the result.
-    private val assessmentResultFilename: String? = null // Used when result is of type AssessmentResult
 ) {
 
     private val manifest: MutableSet<ArchiveFileInfo> = mutableSetOf()
@@ -55,9 +53,9 @@ class AssessmentArchiver(
     fun buildArchive() : Archive {
         // Iterate through all the results within this collection and add if they are `JsonFileArchivableResult`.
         recursiveAdd(assessmentResult)
-
         // Add assessment result file to archive
-        if (assessmentResult is AssessmentResult && assessmentResult !is JsonFileArchivableResult && assessmentResultFilename != null) {
+        if (assessmentResult is AssessmentResult && assessmentResult !is JsonFileArchivableResult) {
+            val assessmentResultFilename = "assessmentResult.json"
             Logger.d("Writing result for assessment ${assessmentResult.identifier}")
             archiveBuilder.addDataFile(
                 JsonArchiveFile(

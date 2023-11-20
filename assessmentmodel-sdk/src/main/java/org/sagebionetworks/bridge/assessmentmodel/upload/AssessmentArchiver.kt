@@ -57,7 +57,7 @@ class AssessmentArchiver(
         recursiveAdd(assessmentResult)
 
         // Add assessment result file to archive
-        if (assessmentResult is AssessmentResult && assessmentResultFilename != null) {
+        if (assessmentResult is AssessmentResult && assessmentResult !is JsonFileArchivableResult && assessmentResultFilename != null) {
             Logger.d("Writing result for assessment ${assessmentResult.identifier}")
             archiveBuilder.addDataFile(
                 JsonArchiveFile(

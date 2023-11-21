@@ -42,6 +42,9 @@ class AssessmentArchiver(
     private var answersSchema: SimpleJsonSchema
 
     init {
+        if (assessmentResult !is AssessmentResult && assessmentResult !is JsonFileArchivableResult) {
+            throw IllegalArgumentException("Result must implement either AssessmentResult or JsonFileArchivableResult")
+        }
         val appVersion = "version ${bridgeConfig.appVersionName}, build ${bridgeConfig.appVersion}"
         val item = assessmentResult.identifier
         archiveBuilder = Archive.Builder.forActivity(item)
@@ -54,7 +57,7 @@ class AssessmentArchiver(
         // Iterate through all the results within this collection and add if they are `JsonFileArchivableResult`.
         recursiveAdd(assessmentResult)
         // Add assessment result file to archive
-        if (assessmentResult is AssessmentResult && assessmentResult !is JsonFileArchivableResult) {
+        if (assessmentResult is AssessmentResult) {
             val assessmentResultFilename = "assessmentResult.json"
             Logger.d("Writing result for assessment ${assessmentResult.identifier}")
             archiveBuilder.addDataFile(

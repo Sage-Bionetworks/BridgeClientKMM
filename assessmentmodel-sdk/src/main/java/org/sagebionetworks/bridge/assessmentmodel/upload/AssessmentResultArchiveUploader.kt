@@ -43,14 +43,12 @@ class AssessmentResultArchiveUploader(
      */
     fun archiveResultAndQueueUpload(assessmentResult: Result,
                                     jsonCoder: Json,
-                                    adherenceRecord: AdherenceRecord?,
-                                    assessmentResultFilename: String? = "assessmentResult.json") {
+                                    adherenceRecord: AdherenceRecord?) {
 
         val archiver = AssessmentArchiver(
             assessmentResult = assessmentResult,
             jsonCoder = jsonCoder,
-            bridgeConfig = bridgeConfig,
-            assessmentResultFilename = assessmentResultFilename
+            bridgeConfig = bridgeConfig
         )
 
         val assessmentRunUUID =  if (assessmentResult is AssessmentResult && assessmentResult.runUUIDString.isNotEmpty()) {

@@ -11,18 +11,9 @@
 */
 package org.sagebionetworks.bridge.kmm.shared.models
 
-import org.sagebionetworks.bridge.kmm.shared.models.ColorScheme
-import org.sagebionetworks.bridge.kmm.shared.models.ImageResource
-import org.sagebionetworks.bridge.kmm.shared.models.Label
-import org.sagebionetworks.bridge.kmm.shared.models.PropertyInfo
-import kotlinx.serialization.Serializable
-
-
-
-
-
 
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 
 /**
@@ -68,8 +59,8 @@ data class Assessment (
     /* The ID of the organization that owns this assessment. Only members of that organization will be able to edit the assessment, either in an app context or in the shared assessment library.  */
     @SerialName("ownerId")
     val ownerId: kotlin.String,
+
     /* A name for the assessment that is shown to study designers, but not to study participants if there are labels that can be shown instead. */
-    
     @SerialName("title")
     val title: kotlin.String,
 
@@ -80,12 +71,12 @@ data class Assessment (
     /* One of an enumerated list of states an assessment can be in. */
     @SerialName("phase")
     val phase: Assessment.Phase,
+
     /* Each assessment revision is assigned a unique GUID which can be used to retrieve it through the API. Assessments will also have a unique combination of an identifier and a revision, and can be retrieved as a set of revisions under a given identifier.  */
-    
     @SerialName("guid")
     val guid: kotlin.String? = null,
+
     /* A collection of labels for this assessment. Only one label can be included for each language, and if the user’s language cannot be selected, English will be selected as a default. If an English label does not exist, then the assessment title can be used instead. */
-    
     @SerialName("labels")
     val labels: kotlin.collections.List<Label>? = null,
     
@@ -94,8 +85,8 @@ data class Assessment (
     
     @SerialName("summary")
     val summary: kotlin.String? = null,
+
     /* If this assessment was copied from a shared assessment, this will be the GUID of the shared assessment revision that was used to make this copy. Certain aspects of the assessment (notably, the assessment's configuration) are guaranteed to be identical to this origin assessment.  */
-    
     @SerialName("originGuid")
     val originGuid: kotlin.String? = null,
     
@@ -104,63 +95,63 @@ data class Assessment (
     
     @SerialName("normingStatus")
     val normingStatus: kotlin.String? = null,
+
     /* The number of minutes it takes for a participant to complete this assessment. */
-    
     @SerialName("minutesToComplete")
     val minutesToComplete: kotlin.Int? = null,
+
     /* A set of tags that apply to this assessment. Tags should be namespaced with a prefix followed by a period (e.g. \"category.neurodegenerative\"), as the tag API will give you these tags in a map keyed from the prefix to a list of the values under that prefix. */
-    
     @SerialName("tags")
     val tags: kotlin.collections.List<kotlin.String>? = null,
+
     /* A map of AssessmentNode GUIDs to a set of field identifiers in that node that can be customized by developers without invalidating an assessment (the assessment will maintain its link to the shared assessment it was derived from, if any, and the authors of the assessment are confident that these changes to the configuration will not invalidate the scientific validity of the assessment). This specification guides validation of submissions to update an AssessmentNode through a specific customization API.  */
-    
     @SerialName("customizationFields")
     val customizationFields: kotlin.collections.Map<kotlin.String, kotlin.collections.List<PropertyInfo>>? = null,
+
     /* The date and time the assessment was created. */
-    
     @SerialName("createdOn")
     val createdOn: kotlin.String? = null,
+
     /* The date and time the assessment was last modified. */
-    
     @SerialName("modifiedOn")
     val modifiedOn: kotlin.String? = null,
+
     /* Has this assessment been logically deleted (an admin can restore it)?  */
-    
     @SerialName("deleted")
     val deleted: kotlin.Boolean? = null,
+
     /* The optimistic locking version of the assessment. This value must be submitted as part of the next update of the model. If it does not match the value on the server, a 409 error (Conflict) will prevent the update from occurring. It can also serve as a key to determine if a local cache of `Assessment` needs to be updated.  */
-    
     @SerialName("version")
     val version: kotlin.Long? = null,
     
     @SerialName("imageResource")
     val imageResource: ImageResource? = null,
+
     /* The framework this assessment belongs to. */
-    
     @SerialName("frameworkIdentifier")
     val frameworkIdentifier: kotlin.String? = null,
+
     /* A URL for a resource specifying a JSON schema for the archived results. */
-    
     @SerialName("jsonSchemaUrl")
     val jsonSchemaUrl: kotlin.String? = null,
+
     /* The category of assessment. */
-    
     @SerialName("category")
     val category: kotlin.String? = null,
+
     /* The minimum age for which this assessment has been validated. */
-    
     @SerialName("minAge")
     val minAge: kotlin.Int? = null,
     /* The maximum age for which this assessment has been validated. */
     
     @SerialName("maxAge")
     val maxAge: kotlin.Int? = null,
+
     /* Additional metadata fields, expressed as a key-value map. */
-    
     @SerialName("additionalMetadata")
     val additionalMetadata: kotlinx.serialization.json.JsonObject? = null,
-    /* Assessment */
     
+    /* Assessment */
     @SerialName("type")
     val type: kotlin.String? = null
 

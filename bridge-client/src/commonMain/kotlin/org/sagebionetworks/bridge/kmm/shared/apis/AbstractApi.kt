@@ -6,7 +6,7 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 
-internal abstract class AbstractApi(protected val basePath: String, protected val httpClient: HttpClient) {
+abstract class AbstractApi(val basePath: String, val httpClient: HttpClient) {
 
     companion object {
         const val BASE_PATH = "https://webservices.sagebridge.org"
@@ -17,7 +17,7 @@ internal abstract class AbstractApi(protected val basePath: String, protected va
         return postDataResponse(model, path).body()
     }
 
-    internal suspend inline fun <reified T> postDataResponse(model: T, path: String) : HttpResponse {
+    suspend inline fun <reified T> postDataResponse(model: T, path: String) : HttpResponse {
         val builder = HttpRequestBuilder()
 
         builder.method = HttpMethod.Post
@@ -51,7 +51,7 @@ internal abstract class AbstractApi(protected val basePath: String, protected va
         return getDataResponse(path, modifiedDateTimeString, queryParams).body()
     }
 
-    internal suspend fun getDataResponse(
+    suspend fun getDataResponse(
         path: String,
         modifiedDateTimeString: String? = null,
         queryParams: Map<String, String>? = null,

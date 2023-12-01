@@ -31,11 +31,23 @@ enum class Role(val serialName: String? = null) {
     @SerialName("researcher")
     RESEARCHER,
 
+    @SerialName("study_coordinator")
+    STUDY_COORDINATOR,
+
+    @SerialName("study_designer")
+    STUDY_DESIGNER,
+
+    @SerialName("org_admin")
+    ORG_ADMIN,
+
     @SerialName("admin")
     ADMIN,
 
     @SerialName("worker")
-    WORKER;
+    WORKER,
+
+    @SerialName("superadmin")
+    SUPERADMIN;
 
 }
 

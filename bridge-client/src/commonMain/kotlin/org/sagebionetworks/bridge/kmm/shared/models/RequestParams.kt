@@ -56,7 +56,7 @@ import kotlinx.serialization.SerialName
  * @param type RequestParams
  */
 @Serializable
-internal data class RequestParams (
+data class RequestParams (
     @SerialName("allOfGroups")
     val allOfGroups: List<String>? = null,
     @SerialName("assessmentIds")

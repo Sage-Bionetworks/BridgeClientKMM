@@ -1,6 +1,9 @@
 package org.sagebionetworks.bridge.kmm.shared.repo
 
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.first
 import org.sagebionetworks.bridge.kmm.shared.BaseTest
@@ -30,10 +33,11 @@ class AssessmentConfigRepoTest: BaseTest() {
                 label = "foo",
                 configUrl = "http://www.google.com/testpath"
             )
+            val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
             val repo = AssessmentConfigRepo(
                 getTestClient(assessmentJson),
                 ResourceDatabaseHelper(testDatabaseDriver()),
-                MainScope()
+                scope
             )
 
 

@@ -1,6 +1,9 @@
 package org.sagebionetworks.bridge.kmm.shared.repo
 
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.datetime.*
@@ -443,7 +446,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
     }
 
     private fun getTestScheduleTimelineRepo(adherenceRecordJson: String = "", timeStamp: Instant, timelineJson: String = getScheduleJson(timeStamp) ) : ScheduleTimelineRepo {
-        val adherenceRecordRepo = AdherenceRecordRepo(getTestClient(adherenceRecordJson), null, databaseHelper, MainScope())
+        val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+        val adherenceRecordRepo = AdherenceRecordRepo(getTestClient(adherenceRecordJson), null, databaseHelper, scope)
         val configJson = "{\n" +
                 "  \"config\": {},\n" +
                 "  \"createdOn\": \"2020-08-28T14:28:13.386Z\",\n" +
@@ -451,8 +455,8 @@ class ScheduleTimelineRepoTest: BaseTest() {
                 "  \"version\": 0,\n" +
                 "  \"type\": \"AssessmentConfig\"\n" +
                 "}"
-        val assessmentConfigRepo = AssessmentConfigRepo(getTestClient(configJson), databaseHelper, MainScope())
-        return ScheduleTimelineRepo(adherenceRecordRepo, assessmentConfigRepo, getTestClient(timelineJson), databaseHelper, MainScope())
+        val assessmentConfigRepo = AssessmentConfigRepo(getTestClient(configJson), databaseHelper, scope)
+        return ScheduleTimelineRepo(adherenceRecordRepo, assessmentConfigRepo, getTestClient(timelineJson), databaseHelper, scope)
     }
 
     @BeforeTest

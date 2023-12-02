@@ -1,16 +1,25 @@
 package org.sagebionetworks.bridge.kmm.shared.repo
 
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.datetime.Clock
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
-import org.sagebionetworks.bridge.kmm.shared.*
+import org.sagebionetworks.bridge.kmm.shared.BaseTest
+import org.sagebionetworks.bridge.kmm.shared.BridgeConfig
+import org.sagebionetworks.bridge.kmm.shared.PlatformConfig
+import org.sagebionetworks.bridge.kmm.shared.TestEncryptedSharedSettings
+import org.sagebionetworks.bridge.kmm.shared.TestHttpClientConfig
 import org.sagebionetworks.bridge.kmm.shared.cache.Resource
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceDatabaseHelper
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceStatus
 import org.sagebionetworks.bridge.kmm.shared.cache.ResourceType
+import org.sagebionetworks.bridge.kmm.shared.getTestClient
 import org.sagebionetworks.bridge.kmm.shared.models.UserSessionInfo
+import org.sagebionetworks.bridge.kmm.shared.testDatabaseDriver
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -44,8 +53,9 @@ class ParticipantRepoTest : BaseTest() {
             db.insertUpdateResource(resource)
             val bridgeConfig = TestBridgeConfig()
             val testConfig = TestHttpClientConfig(bridgeConfig = bridgeConfig, db = db)
-            val authRepo = AuthenticationRepository(getTestClient("", config = testConfig.copy(authProvider = null)), bridgeConfig,  db, MainScope(), TestEncryptedSharedSettings())
-            val participantRepo = ParticipantRepo(getTestClient("", config = testConfig), db, MainScope(), authRepo)
+            val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+            val authRepo = AuthenticationRepository(getTestClient("", config = testConfig.copy(authProvider = null)), bridgeConfig,  db, scope, TestEncryptedSharedSettings())
+            val participantRepo = ParticipantRepo(getTestClient("", config = testConfig), db, scope, authRepo)
             val session = authRepo.session()
             assertNotNull(session)
             assertNull(session.clientData)

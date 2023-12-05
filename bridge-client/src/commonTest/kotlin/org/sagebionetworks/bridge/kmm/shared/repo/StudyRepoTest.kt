@@ -3,7 +3,10 @@ package org.sagebionetworks.bridge.kmm.shared.repo
 import io.ktor.client.engine.*
 import io.ktor.client.engine.mock.*
 import io.ktor.http.*
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.SupervisorJob
 import org.sagebionetworks.bridge.kmm.shared.*
 import org.sagebionetworks.bridge.kmm.shared.cache.*
 import org.sagebionetworks.bridge.kmm.shared.models.StudyInfo
@@ -15,11 +18,12 @@ class StudyRepoTest : BaseTest() {
     fun testGetStudyInfo_404_NotFound() {
         runTest {
             val json = "{\"statusCode\":404,\"entityClass\":\"Study\",\"message\":\"Study not found.\",\"type\":\"EntityNotFoundException\"}"
+            val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
             val repo = StudyRepo(
                 bridgeConfig = TestBridgeConfig(),
                 httpClient = getTestClient(json, HttpStatusCode.NotFound),
                 databaseHelper = ResourceDatabaseHelper(testDatabaseDriver()),
-                backgroundScope = MainScope()
+                backgroundScope = scope
             )
 
             val studyInfo = repo.getStudyInfo("missing")
@@ -43,12 +47,12 @@ class StudyRepoTest : BaseTest() {
                 }
                 reuseHandlers = false
             }
-
+            val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
             val repo = StudyRepo(
                 bridgeConfig = TestBridgeConfig(),
                 httpClient = getTestClient(mockEngine),
                 databaseHelper = ResourceDatabaseHelper(testDatabaseDriver()),
-                backgroundScope = MainScope()
+                backgroundScope = scope
             )
 
             val studyInfo = repo.getStudyInfo("test_study")

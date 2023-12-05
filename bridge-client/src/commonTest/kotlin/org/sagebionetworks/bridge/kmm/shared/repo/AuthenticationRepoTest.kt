@@ -5,7 +5,10 @@ import io.ktor.client.engine.mock.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.sagebionetworks.bridge.kmm.shared.*
@@ -28,12 +31,12 @@ class AuthenticationRepoTest : BaseTest() {
 
             val json = "{\"statusCode\":404,\"entityClass\":\"Account\",\"message\":\"Study not found.\",\"type\":\"EntityNotFoundException\"}"
             val testConfig = TestHttpClientConfig(authProvider = null)
-
+            val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
             val authRepo = AuthenticationRepository(
                 getTestClient(json, HttpStatusCode.NotFound, testConfig),
                 testConfig.bridgeConfig,
                 testConfig.db,
-                MainScope(),
+                scope,
                 TestEncryptedSharedSettings())
 
             val response = authRepo.signInExternalId("typo:test_study", "typo:test_study")
@@ -48,12 +51,12 @@ class AuthenticationRepoTest : BaseTest() {
 
             val json = "{\"statusCode\":410}"
             val testConfig = TestHttpClientConfig()
-
+            val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
             val authRepo = AuthenticationRepository(
                 getTestClient(json, HttpStatusCode.Gone, testConfig),
                 testConfig.bridgeConfig,
                 testConfig.db,
-                MainScope(),
+                scope,
                 TestEncryptedSharedSettings())
 
             val response = authRepo.signInExternalId("typo:test_study", "typo:test_study")
@@ -93,13 +96,13 @@ class AuthenticationRepoTest : BaseTest() {
             val testConfig = TestHttpClientConfig(authProvider = null)
             (testConfig.bridgeConfig as TestBridgeConfig).cacheCredentials = true
             val testClient = getTestClient(mockEngine, testConfig)
-
+            val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
             val encryptedSharedSettings = TestEncryptedSharedSettings()
             val authRepo = AuthenticationRepository(
                 testClient,
                 testConfig.bridgeConfig,
                 testConfig.db,
-                MainScope(),
+                scope,
                 encryptedSharedSettings
             )
 

@@ -30,6 +30,7 @@ sqldelight {
 val iosFrameworkName = "BridgeClient"
 
 kotlin {
+    targetHierarchy.default()
     androidTarget {
         publishAllLibraryVariants()
         compilations.all {
@@ -45,6 +46,14 @@ kotlin {
                     .getProperty("testExternalId01")
                     ?: System.getenv("testExternalId01")
             )
+        }
+    }
+
+    jvm() {
+        compilations.all {
+            kotlinOptions {
+                jvmTarget = "1.8"
+            }
         }
     }
 
@@ -140,6 +149,12 @@ kotlin {
         val iosSimulatorArm64Test by sourceSets.getting
         iosSimulatorArm64Main.dependsOn(iosMain)
         iosSimulatorArm64Test.dependsOn(iosTest)
+
+        sourceSets["jvmMain"].dependencies {
+            implementation(libs.sqlDelight.jvm)
+            implementation(libs.ktor.client.android)
+        }
+
     }
 }
 android {

@@ -12,21 +12,26 @@
 package org.sagebionetworks.bridge.kmm.shared.models
 
 import kotlinx.serialization.Serializable
-
 import kotlinx.serialization.SerialName
 
 /**
-* The type of report:  |Type|Description| |---|---| |participant|Reports are scoped to an individual participant and can only be seen by the participant or a researcher| |study|Reports are available to all authenticated users in a study| 
-* Values: "participant","study"
-*/
+ * 
+ * @param requestParams 
+ * @param type ResourceList
+ * @param total The total number of records in the items list
+ * @param items 
+ */
 @Serializable
-enum class ReportType(val serialName: String? = null) {
-
-    @SerialName("participant")
-    PARTICIPANT,
-
-    @SerialName("study")
-    STUDY;
-
-}
+data class AssessmentList (
+    @SerialName("requestParams")
+    val requestParams: RequestParams? = null,
+    /* ResourceList */
+    @SerialName("type")
+    val type: String,
+    /* The total number of records in the items list */
+    @SerialName("total")
+    val total: Int,
+    @SerialName("items")
+    val items: List<Assessment>
+)
 

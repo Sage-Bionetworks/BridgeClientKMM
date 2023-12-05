@@ -20,7 +20,7 @@ import kotlinx.serialization.SerialName
 * Values: "customization_options","data_repository","science_documentation","developer_documentation","license","publication","release_note","sample_app","sample_data","screenshot","see_also","used_in_study","website","other"
 */
 @Serializable
-internal enum class ResourceCategory(val serialName: String? = null) {
+enum class ResourceCategory(val serialName: String? = null) {
 
     @SerialName("customization_options")
     CUSTOMIZATION_OPTIONS,

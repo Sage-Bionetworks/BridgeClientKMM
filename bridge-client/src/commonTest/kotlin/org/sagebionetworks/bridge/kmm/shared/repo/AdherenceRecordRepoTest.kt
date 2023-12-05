@@ -1,6 +1,9 @@
 package org.sagebionetworks.bridge.kmm.shared.repo
 
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.datetime.TimeZone
 import kotlinx.serialization.json.jsonPrimitive
 import org.sagebionetworks.bridge.kmm.shared.BaseTest
@@ -40,7 +43,8 @@ class AdherenceRecordRepoTest: BaseTest() {
     fun testAdherenceRepo() {
         runTest {
             val studyId = "testId"
-            val repo = AdherenceRecordRepo(getTestClient(json), null, ResourceDatabaseHelper(testDatabaseDriver()), MainScope())
+            val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+            val repo = AdherenceRecordRepo(getTestClient(json), null, ResourceDatabaseHelper(testDatabaseDriver()), scope)
 
             assertTrue(repo.loadRemoteAdherenceRecords(studyId))
             val adherenceRecord = repo.getCachedAdherenceRecord(instanceGuid, startedOn)
@@ -65,11 +69,12 @@ class AdherenceRecordRepoTest: BaseTest() {
     fun testRequestUploadMetadata() {
         runTest {
             val studyId = "testId"
+            val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
             val repo = AdherenceRecordRepo(
                 getTestClient(json),
                 null,
                 ResourceDatabaseHelper(testDatabaseDriver()),
-                MainScope()
+                scope
             )
 
             assertTrue(repo.loadRemoteAdherenceRecords(studyId))

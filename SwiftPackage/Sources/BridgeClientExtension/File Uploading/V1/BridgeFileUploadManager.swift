@@ -1355,21 +1355,30 @@ class BridgeFileUploadManager: SandboxFileManager, BridgeURLSessionDownloadDeleg
     }
     
     func apiInfoFromXAttrs(for filePath: String, debugMessage: String? = nil) -> (uploadApi: BridgeFileUploadAPI, fileId: String, contentType: String, extras: Codable?)? {
+        var message = "\(debugMessage ?? ""): File=\(filePath)"
         do {
-            return try self._apiInfoFromXAttrs(for: filePath)
+            let (tempFile, attributes) = try _tempFile(for: filePath)
+            if let attributes = attributes {
+                message += ", attributes=\(attributes)"
+            }
+            return try self._apiInfoFromXAttrs(for: tempFile)
         } catch {
-            Logger.log(tag: .upload, error: error, message: debugMessage)
+            Logger.log(tag: .upload, error: error, message: message)
             return nil
         }
     }
     
-    func _apiInfoFromXAttrs(for filePath: String) throws -> (uploadApi: BridgeFileUploadAPI, fileId: String, contentType: String, extras: Codable?) {
+    func _tempFile(for filePath: String) throws -> (URL, [FileAttributeKey : Any]?) {
         let fullPath = self.fullyQualifiedPath(of: filePath)
         guard FileManager.default.fileExists(atPath: fullPath) else {
             let message = "Unexpected: Attempting to retrieve upload API info for temp file with invariant path '\(filePath) but temp file does not exist at '\(fullPath)"
             throw BridgeUnexpectedNullError(category: .missingFile, message: message)
         }
-        let tempFile = URL(fileURLWithPath: fullPath)
+        let attributes = try? FileManager.default.attributesOfItem(atPath: fullPath)
+        return (URL(fileURLWithPath: fullPath), attributes)
+    }
+    
+    func _apiInfoFromXAttrs(for tempFile: URL) throws -> (uploadApi: BridgeFileUploadAPI, fileId: String, contentType: String, extras: Codable?) {
 
         let apiStringData = try tempFile.extendedAttribute(forName: self.uploadApiAttributeName)
         let fileIdData = try tempFile.extendedAttribute(forName: self.fileIdAttributeName)

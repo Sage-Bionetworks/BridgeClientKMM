@@ -1042,11 +1042,13 @@ class BridgeFileUploadManager: SandboxFileManager, BridgeURLSessionDownloadDeleg
                     else {
                         continue
                 }
+                let uploadSuffix = "Uploads"
                 if isDirectory {
-                    if !name.hasSuffix("Uploads") {
+                    if !name.hasSuffix(uploadSuffix) {
                         dirEnumerator.skipDescendants()
                     }
-                } else {
+                } else if fileUrl.pathComponents.contains(where: { $0.hasSuffix(uploadSuffix) }) {
+                    // Exclude files at the base of the application support directory.
                     allFiles.append(fileUrl)
                 }
             }

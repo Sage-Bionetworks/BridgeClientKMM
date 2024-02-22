@@ -1,5 +1,6 @@
 package org.sagebionetworks.bridge.kmm.shared.managers
 
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
@@ -19,9 +20,20 @@ import platform.Foundation.*
 class NativeTimelineStudyBurstManager(
     private val studyId: String,
     scheduleMutator: ParticipantScheduleMutator?,
-    private val viewUpdated: (NativeStudyBurstSchedule) -> Unit,
-    private val updateFailed: (() -> Unit)?
+    private val viewUpdated: (NativeStudyBurstSchedule) -> Unit
 ) : AbstractNativeTimelineManager(studyId, scheduleMutator) {
+
+    @Deprecated("`updateFailed` is ignored")
+    constructor(
+        studyId: String,
+        scheduleMutator: ParticipantScheduleMutator?,
+        viewUpdated: (NativeStudyBurstSchedule) -> Unit,
+        updateFailed: (() -> Unit)?
+    ) : this(
+        studyId = studyId,
+        scheduleMutator = scheduleMutator,
+        viewUpdated = viewUpdated,
+    )
 
     var scheduleJob: Job? = null
 
@@ -48,15 +60,14 @@ class NativeTimelineStudyBurstManager(
 
     fun observeStudyBurstSchedule() {
         scheduleJob = scope.launch {
-            if (!adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)) {
-                updateFailed?.invoke()
-            }
+            !adherenceRecordRepo.loadRemoteAdherenceRecords(studyId)
             repo.getStudyBurstSchedule(studyId).collect { timelineResource ->
                 (timelineResource as? ResourceResult.Success)?.data?.let { schedule ->
                     viewUpdated(schedule.toNative())
                 } ?: run {
                     if (timelineResource is ResourceResult.Failed) {
-                        updateFailed?.invoke()
+                        Logger.e("Update of the `StudyBurstSchedule` failed.",
+                            Throwable("Reason Unknown."))
                     }
                 }
             }
@@ -68,20 +79,20 @@ class NativeTimelineManager(
     private val studyId: String,
     private val includeAllNotifications: Boolean,
     private val alwaysIncludeNextDay: Boolean,
-    scheduleMutator: ParticipantScheduleMutator?,
     private val viewUpdate: (NativeScheduledSessionTimelineSlice) -> Unit
-) : AbstractNativeTimelineManager(studyId, scheduleMutator) {
+) : AbstractNativeTimelineManager(studyId, null) {
 
+    @Deprecated("`scheduleMutator` is ignored")
     constructor(
         studyId: String,
         includeAllNotifications: Boolean,
         alwaysIncludeNextDay: Boolean,
+        scheduleMutator: ParticipantScheduleMutator?,
         viewUpdate: (NativeScheduledSessionTimelineSlice) -> Unit
     ) : this(
         studyId = studyId,
         includeAllNotifications = includeAllNotifications,
         alwaysIncludeNextDay = alwaysIncludeNextDay,
-        scheduleMutator = null,
         viewUpdate = viewUpdate
     )
 

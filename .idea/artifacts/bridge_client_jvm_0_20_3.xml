@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="bridge-client-jvm-0.20.3">
+    <output-path>$PROJECT_DIR$/bridge-client/build/libs</output-path>
+    <root id="archive" name="bridge-client-jvm-0.20.3.jar">
+      <element id="module-output" name="BridgeClientKMM.bridge-client.jvmMain" />
+    </root>
+  </artifact>
+</component>
